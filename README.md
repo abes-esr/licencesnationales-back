@@ -4,7 +4,7 @@ lancer MongoDB :
 avoir Docker Desktop
 lancer la commande "docker-compose -f mongodb.yaml up" là ou est le mongodb.yaml
 
-Faire un import des requêtes postman (si on a la flemme de les écrires) : https://www.getpostman.com/collections/8361a54d5bea0f49ab4f
+Faire un import des requêtes postman : https://www.getpostman.com/collections/8361a54d5bea0f49ab4f
 
 lancer le programme avec l'applicaion.properties :
 
