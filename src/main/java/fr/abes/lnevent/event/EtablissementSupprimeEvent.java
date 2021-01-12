@@ -5,10 +5,10 @@ import lombok.Setter;
 
 @Getter
 public class EtablissementSupprimeEvent extends Event {
-    private String nom;
+    private String siren;
 
-    public EtablissementSupprimeEvent(Object source, String nom) {
+    public EtablissementSupprimeEvent(Object source, String siren) {
         super(source);
-        this.nom = nom;
+        this.siren = siren;
     }
 }

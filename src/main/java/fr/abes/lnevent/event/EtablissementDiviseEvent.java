@@ -8,12 +8,12 @@ import java.util.ArrayList;
 @Getter
 @Setter
 public class EtablissementDiviseEvent extends Event {
-    private String vieuxNom;
-    private ArrayList<String> etablisementsDivise;
+    private String ancienSiren;
+    private ArrayList<String> sirens;
 
-    public EtablissementDiviseEvent(Object source, String vieuxNom, ArrayList<String> etablisementsDivise) {
+    public EtablissementDiviseEvent(Object source, String ancienSiren, ArrayList<String> sirens) {
         super(source);
-        this.vieuxNom = vieuxNom;
-        this.etablisementsDivise = etablisementsDivise;
+        this.ancienSiren = ancienSiren;
+        this.sirens = sirens;
     }
 }

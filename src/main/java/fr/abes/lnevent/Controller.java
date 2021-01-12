@@ -1,11 +1,13 @@
 package fr.abes.lnevent;
 
-import fr.abes.lnevent.collection.EventCollection;
-import fr.abes.lnevent.collection.repository.EventRepository;
-import fr.abes.lnevent.event.EtablissementCreeEvent;
-import fr.abes.lnevent.event.EtablissementDiviseEvent;
-import fr.abes.lnevent.event.EtablissementFusionneEvent;
-import fr.abes.lnevent.event.EtablissementSupprimeEvent;
+import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.repository.*;
+import fr.abes.lnevent.event.*;
+import fr.abes.lnevent.dto.EtablissementCreeDTO;
+import fr.abes.lnevent.dto.EtablissementDiviseDTO;
+import fr.abes.lnevent.dto.EtablissementFusionneDTO;
+import fr.abes.lnevent.dto.IpAjouteeDTO;
+import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.services.ArbreService;
 import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;
@@ -14,14 +16,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 @Log
 @RestController
 public class Controller {
 
     @Autowired
-    private  EventRepository repository;
+    private EventRepository repository;
 
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
@@ -32,38 +33,53 @@ public class Controller {
     @Autowired
     private ArbreService arbreService;
 
-    @PutMapping(value = "/ln/creation/{name}")
-    public String add(@PathVariable String name) {
-        EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this, name);
+    @PostMapping(value = "/ln/creation")
+    public String add(@RequestBody EtablissementCreeDTO event) {
+        EtablissementCreeEvent etablissementCreeEvent =
+                new EtablissementCreeEvent(this,
+                        event.getNom(),
+                        event.getAdresse(),
+                        event.getSiren(),
+                        event.getTypeEtablissement(),
+                        event.getMotDePasse(),
+                        event.getIdAbes(),
+                        event.getMailContact(),
+                        event.getNomContact(),
+                        event.getPrenomContact(),
+                        event.getTelephoneContact(),
+                        event.getAdresseContact());
         applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        repository.save(new EventCollection(etablissementCreeEvent));
+        repository.save(new EventRow(etablissementCreeEvent));
 
         return "done";
     }
 
-    @PostMapping(value = "/ln/fusion/{name}")
-    public String fusion(@PathVariable String name, @RequestBody Collection<String> etablissements) {
-        EtablissementFusionneEvent etablissementFusionneEvent = new EtablissementFusionneEvent(this, name, new ArrayList<>(etablissements));
+    @PostMapping(value = "/ln/fusion")
+    public String fusion(@RequestBody EtablissementFusionneDTO event) {
+        EtablissementFusionneEvent etablissementFusionneEvent
+                = new EtablissementFusionneEvent(this, event.getSiren(), event.getSirenFusionne());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        repository.save(new EventCollection(etablissementFusionneEvent));
+        repository.save(new EventRow(etablissementFusionneEvent));
 
         return "done";
     }
 
-    @PostMapping(value = "/ln/division/{name}")
-    public String division(@PathVariable String name, @RequestBody Collection<String> etablissements) {
-        EtablissementDiviseEvent etablissementDiviseEvent = new EtablissementDiviseEvent(this, name, new ArrayList<>(etablissements));
+    @PostMapping(value = "/ln/division")
+    public String division(@RequestBody EtablissementDiviseDTO event) {
+        EtablissementDiviseEvent etablissementDiviseEvent
+                = new EtablissementDiviseEvent(this, event.getAncienSiren(), new ArrayList<>());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        repository.save(new EventCollection(etablissementDiviseEvent));
+        repository.save(new EventRow(etablissementDiviseEvent));
 
         return "done";
     }
 
     @DeleteMapping(value = "/ln/suppression/{name}")
     public String suppression(@PathVariable String name) {
-        EtablissementSupprimeEvent etablissementSupprimeEvent = new EtablissementSupprimeEvent(this, name);
+        EtablissementSupprimeEvent etablissementSupprimeEvent
+                = new EtablissementSupprimeEvent(this, name);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        repository.save(new EventCollection(etablissementSupprimeEvent));
+        repository.save(new EventRow(etablissementSupprimeEvent));
 
         return "done";
     }
@@ -75,7 +91,19 @@ public class Controller {
 
     @GetMapping(value = "/ln/arbre")
     public String arbre() {
-
         return arbreService.genereArbre();
     }
+
+    @PostMapping(value = "/ln/ipAjout")
+    public String ajoutIp(@RequestBody IpAjouteeDTO event) {
+        IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
+                event.getIp(),
+                event.getSiren());
+        applicationEventPublisher.publishEvent(ipAjouteeEvent);
+        repository.save(new EventRow(ipAjouteeEvent));
+
+        return "done";
+    }
+
+
 }

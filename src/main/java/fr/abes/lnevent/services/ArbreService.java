@@ -1,39 +1,50 @@
 package fr.abes.lnevent.services;
 
-import fr.abes.lnevent.collection.EventCollection;
-import fr.abes.lnevent.collection.repository.EventRepository;
+import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.entities.IpRow;
+import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.repository.IpRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class ArbreService {
     private EventRepository eventRepository;
+    private IpRepository ipRepository;
 
-    public ArbreService(EventRepository eventRepository) {
+    public ArbreService(EventRepository eventRepository, IpRepository ipRepository) {
         this.eventRepository = eventRepository;
+        this.ipRepository = ipRepository;
     }
 
     public String genereArbre() {
         StringBuilder builder = new StringBuilder();
-        for (EventCollection eventCollection :
+        for (EventRow eventRow :
                 eventRepository.findAll()) {
-            switch (eventCollection.event) {
+            switch (eventRow.event) {
                 case "cree":
-                    builder.append("Nouveau : ").append(eventCollection.nomEtab).append("\n");
+                    builder.append("Nouveau : ").append(eventRow.nomEtab).append("\n");
+                    List<IpRow> ips = ipRepository.findAllBySiren(eventRow.siren);
+                    for (IpRow ipRow :
+                            ips) {
+                        builder.append(ipRow.ip).append("\n");
+                    }
                     break;
                 case "supprime":
-                    builder.append("Supprimer : ").append(eventCollection.nomEtab).append("\n");
+                    builder.append("Supprimer : ").append(eventRow.nomEtab).append("\n");
                     break;
                 case "divise":
-                    builder.append("Divise : ").append(eventCollection.ancienNomEtab).append("\n");
+                    builder.append("Divise : ").append(eventRow.ancienNomEtab).append("\n");
                     for (String etab :
-                            eventCollection.etablisementsDivise) {
+                            eventRow.etablisementsDivise) {
                         builder.append(etab).append("\n");
                     }
                     break;
                 case "fusionne":
-                    builder.append("Fusion : ").append(eventCollection.nomEtab).append("\n");
+                    builder.append("Fusion : ").append(eventRow.nomEtab).append("\n");
                     for (String etab :
-                            eventCollection.etablissementsFusionne) {
+                            eventRow.etablissementsFusionne) {
                         builder.append(etab).append("\n");
                     }
                     break;

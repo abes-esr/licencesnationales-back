@@ -1,7 +1,7 @@
 package fr.abes.lnevent.listener;
 
-import fr.abes.lnevent.collection.EtablissementCollection;
-import fr.abes.lnevent.collection.repository.EtablissementRepository;
+import fr.abes.lnevent.entities.EtablissementRow;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.event.EtablissementDiviseEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -17,10 +17,16 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
 
     @Override
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
-        etablissementRepository.deleteByName(etablissementDiviseEvent.getVieuxNom());
+        etablissementRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
         for (String etablissementDivise :
-                etablissementDiviseEvent.getEtablisementsDivise()) {
-            etablissementRepository.save(new EtablissementCollection(null, etablissementDivise));
+                etablissementDiviseEvent.getSirens()) {
+            etablissementRepository.save(new EtablissementRow(null,
+                    etablissementDivise,
+                    null,
+                    etablissementDivise,
+                    null,
+                    null,
+                    null));
         }
     }
 }

@@ -1,7 +1,7 @@
 package fr.abes.lnevent.listener;
 
-import fr.abes.lnevent.collection.EtablissementCollection;
-import fr.abes.lnevent.collection.repository.EtablissementRepository;
+import fr.abes.lnevent.entities.EtablissementRow;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.event.EtablissementFusionneEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -18,11 +18,17 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
     @Override
     public void onApplicationEvent(EtablissementFusionneEvent etablissementFusionneEvent) {
 
-        etablissementRepository.save(new EtablissementCollection(null, etablissementFusionneEvent.getNom()));
+        etablissementRepository.save(new EtablissementRow(null,
+                null,
+                null,
+                etablissementFusionneEvent.getSiren(),
+                null,
+                null,
+                null));
 
         for (String etablissementFusionne :
-                etablissementFusionneEvent.getEtablissementsFusionne()) {
-            etablissementRepository.deleteByName(etablissementFusionne);
+                etablissementFusionneEvent.getSirenFusionne()) {
+            etablissementRepository.deleteBySiren(etablissementFusionne);
         }
     }
 }

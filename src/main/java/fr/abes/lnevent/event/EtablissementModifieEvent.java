@@ -1,23 +1,7 @@
 package fr.abes.lnevent.event;
 
-import lombok.Getter;
-
-@Getter
-public class EtablissementCreeEvent extends Event {
-
-    public EtablissementCreeEvent(
-            Object source,
-            String nom,
-            String adresse,
-            String siren,
-            String typeEtablissement,
-            String motDePasse,
-            String idAbes,
-            String mailContact,
-            String nomContact,
-            String prenomContact,
-            String telephoneContact,
-            String adresseContact) {
+public class EtablissementModifieEvent extends Event {
+    public EtablissementModifieEvent(Object source, String nom, String adresse, String siren, String typeEtablissement, String motDePasse, String idAbes, String mailContact, String nomContact, String prenomContact, String telephoneContact, String adresseContact) {
         super(source);
         this.nom = nom;
         this.adresse = adresse;
