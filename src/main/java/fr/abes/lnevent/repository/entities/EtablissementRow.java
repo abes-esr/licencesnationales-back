@@ -1,4 +1,4 @@
-package fr.abes.lnevent.entities;
+package fr.abes.lnevent.repository.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -6,13 +6,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Etablissement")
 public class EtablissementRow {
 
-    public EtablissementRow(String id, String name, String adresse, String siren, String typeEtablissement, String motDePasse, String idAbes) {
+    public EtablissementRow(String id, String name, String adresse, String siren, String typeEtablissement, String idAbes) {
         this.id = id;
         this.name = name;
         this.adresse = adresse;
         this.siren = siren;
         this.typeEtablissement = typeEtablissement;
-        this.motDePasse = motDePasse;
         this.idAbes = idAbes;
     }
 
@@ -26,8 +25,6 @@ public class EtablissementRow {
     private String siren;
 
     private String typeEtablissement;
-
-    private String motDePasse;
 
     private String idAbes;
 }

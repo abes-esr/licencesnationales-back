@@ -1,6 +1,9 @@
 package fr.abes.lnevent.listener;
 
-import fr.abes.lnevent.entities.EtablissementRow;
+import fr.abes.lnevent.dto.Etablissement;
+import fr.abes.lnevent.repository.ContactRepository;
+import fr.abes.lnevent.repository.entities.ContactRow;
+import fr.abes.lnevent.repository.entities.EtablissementRow;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.event.EtablissementFusionneEvent;
 import org.springframework.context.ApplicationListener;
@@ -10,25 +13,41 @@ import org.springframework.stereotype.Component;
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {
 
     private final EtablissementRepository etablissementRepository;
+    private final ContactRepository contactRepository;
 
-    public EtablissementFusionneListener(EtablissementRepository etablissementRepository) {
+    public EtablissementFusionneListener(EtablissementRepository etablissementRepository, ContactRepository contactRepository) {
         this.etablissementRepository = etablissementRepository;
+        this.contactRepository = contactRepository;
     }
 
     @Override
     public void onApplicationEvent(EtablissementFusionneEvent etablissementFusionneEvent) {
 
-        etablissementRepository.save(new EtablissementRow(null,
-                null,
-                null,
-                etablissementFusionneEvent.getSiren(),
-                null,
-                null,
-                null));
+        Etablissement etablissementFusione = etablissementFusionneEvent.getEtablissement();
 
-        for (String etablissementFusionne :
+        etablissementRepository.save(new EtablissementRow(null,
+                etablissementFusione.getNom(),
+                etablissementFusione.getAdresse(),
+                etablissementFusione.getSiren(),
+                etablissementFusione.getTypeEtablissement(),
+                etablissementFusione.getIdAbes()));
+
+        ContactRow contactRow =
+                new ContactRow(null,
+                        etablissementFusione.getNomContact(),
+                        etablissementFusione.getPrenomContact(),
+                        etablissementFusione.getMailContact(),
+                        etablissementFusione.getMotDePasse(),
+                        etablissementFusione.getTelephoneContact(),
+                        etablissementFusione.getAdresseContact(),
+                        etablissementFusione.getSiren());
+
+        contactRepository.save(contactRow);
+
+        for (String siren :
                 etablissementFusionneEvent.getSirenFusionne()) {
-            etablissementRepository.deleteBySiren(etablissementFusionne);
+            etablissementRepository.deleteBySiren(siren);
+            contactRepository.deleteBySiren(siren);
         }
     }
 }

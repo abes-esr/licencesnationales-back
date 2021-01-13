@@ -1,7 +1,6 @@
-package fr.abes.lnevent;
+package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.entities.EventRow;
-import fr.abes.lnevent.repository.*;
+import fr.abes.lnevent.repository.entities.EventRow;
 import fr.abes.lnevent.event.*;
 import fr.abes.lnevent.dto.EtablissementCreeDTO;
 import fr.abes.lnevent.dto.EtablissementDiviseDTO;
@@ -15,11 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-
 @Log
 @RestController
-public class Controller {
+public class EtablissementController {
 
     @Autowired
     private EventRepository repository;
@@ -57,7 +54,7 @@ public class Controller {
     @PostMapping(value = "/ln/fusion")
     public String fusion(@RequestBody EtablissementFusionneDTO event) {
         EtablissementFusionneEvent etablissementFusionneEvent
-                = new EtablissementFusionneEvent(this, event.getSiren(), event.getSirenFusionne());
+                = new EtablissementFusionneEvent(this, event.getEtablissement(), event.getSirenFusionne());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         repository.save(new EventRow(etablissementFusionneEvent));
 
@@ -67,43 +64,26 @@ public class Controller {
     @PostMapping(value = "/ln/division")
     public String division(@RequestBody EtablissementDiviseDTO event) {
         EtablissementDiviseEvent etablissementDiviseEvent
-                = new EtablissementDiviseEvent(this, event.getAncienSiren(), new ArrayList<>());
+                = new EtablissementDiviseEvent(this, event.getAncienSiren(), event.getEtablissements());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         repository.save(new EventRow(etablissementDiviseEvent));
 
         return "done";
     }
 
-    @DeleteMapping(value = "/ln/suppression/{name}")
-    public String suppression(@PathVariable String name) {
+    @DeleteMapping(value = "/ln/suppression/{siren}")
+    public String suppression(@PathVariable String siren) {
         EtablissementSupprimeEvent etablissementSupprimeEvent
-                = new EtablissementSupprimeEvent(this, name);
+                = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
         repository.save(new EventRow(etablissementSupprimeEvent));
 
         return "done";
     }
 
-    @GetMapping(value = "/ln/resetEtablissement")
-    public String resetEtablissement() {
-        return resetService.resetEtablissement();
-    }
 
-    @GetMapping(value = "/ln/arbre")
-    public String arbre() {
-        return arbreService.genereArbre();
-    }
 
-    @PostMapping(value = "/ln/ipAjout")
-    public String ajoutIp(@RequestBody IpAjouteeDTO event) {
-        IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
-                event.getIp(),
-                event.getSiren());
-        applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        repository.save(new EventRow(ipAjouteeEvent));
 
-        return "done";
-    }
 
 
 }

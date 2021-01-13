@@ -1,4 +1,4 @@
-package fr.abes.lnevent.entities;
+package fr.abes.lnevent.repository.entities;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -10,16 +10,18 @@ public class ContactRow {
                       String nom,
                       String prenom,
                       String mail,
+                      String motDePasse,
                       String telephone,
                       String adresse,
-                      String idEtablissement) {
+                      String siren) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.mail = mail;
+        this.motDePasse = motDePasse;
         this.telephone = telephone;
         this.adresse = adresse;
-        this.idEtablissement = idEtablissement;
+        this.siren = siren;
     }
 
     @Id
@@ -31,10 +33,12 @@ public class ContactRow {
 
     public String mail;
 
+    public String motDePasse;
+
     public String telephone;
 
     public String adresse;
 
-    public String idEtablissement;
+    public String siren;
 
 }

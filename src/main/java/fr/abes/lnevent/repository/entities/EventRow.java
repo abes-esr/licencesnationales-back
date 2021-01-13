@@ -1,5 +1,6 @@
-package fr.abes.lnevent.entities;
+package fr.abes.lnevent.repository.entities;
 
+import fr.abes.lnevent.dto.Etablissement;
 import fr.abes.lnevent.event.*;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
@@ -34,12 +35,12 @@ public class EventRow {
     public EventRow(EtablissementDiviseEvent etablissementDiviseEvent) {
         this.event = "divise";
         this.ancienNomEtab = etablissementDiviseEvent.getAncienSiren();
-        this.etablisementsDivise = etablissementDiviseEvent.getSirens();
+        this.etablisementsDivise = etablissementDiviseEvent.getEtablissements();
     }
 
     public EventRow(EtablissementFusionneEvent etablissementFusionneEvent) {
         this.event = "fusionne";
-        this.nomEtab = etablissementFusionneEvent.getSiren();
+        this.etablissementFusion = etablissementFusionneEvent.getEtablissement();
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
     }
 
@@ -76,7 +77,9 @@ public class EventRow {
 
     public String ancienNomEtab;
 
-    public List<String> etablisementsDivise;
+    public Etablissement etablissementFusion;
+
+    public List<Etablissement> etablisementsDivise;
 
     public List<String> etablissementsFusionne;
 

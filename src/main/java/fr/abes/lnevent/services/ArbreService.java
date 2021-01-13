@@ -1,7 +1,8 @@
 package fr.abes.lnevent.services;
 
-import fr.abes.lnevent.entities.EventRow;
-import fr.abes.lnevent.entities.IpRow;
+import fr.abes.lnevent.dto.Etablissement;
+import fr.abes.lnevent.repository.entities.EventRow;
+import fr.abes.lnevent.repository.entities.IpRow;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.repository.IpRepository;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,9 @@ public class ArbreService {
                     break;
                 case "divise":
                     builder.append("Divise : ").append(eventRow.ancienNomEtab).append("\n");
-                    for (String etab :
+                    for (Etablissement etab :
                             eventRow.etablisementsDivise) {
-                        builder.append(etab).append("\n");
+                        builder.append(etab.getNom()).append("\n");
                     }
                     break;
                 case "fusionne":

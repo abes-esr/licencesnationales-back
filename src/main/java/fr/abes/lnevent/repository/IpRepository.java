@@ -1,6 +1,6 @@
 package fr.abes.lnevent.repository;
 
-import fr.abes.lnevent.entities.IpRow;
+import fr.abes.lnevent.repository.entities.IpRow;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;

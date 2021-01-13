@@ -1,6 +1,8 @@
 package fr.abes.lnevent.services;
 
-import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.dto.Etablissement;
+import fr.abes.lnevent.event.EtablissementCreeEvent;
+import fr.abes.lnevent.repository.entities.EventRow;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.event.EtablissementDiviseEvent;
@@ -29,9 +31,20 @@ public class ResetService {
                 eventRepository.findAll()) {
             switch (eventRow.event) {
                 case "cree":
-      /*              EtablissementCreeEvent etablissementCreeEvent =
-                            new EtablissementCreeEvent(this, eventCollection.nomEtab);
-                    applicationEventPublisher.publishEvent(etablissementCreeEvent);*/
+                    EtablissementCreeEvent etablissementCreeEvent =
+                            new EtablissementCreeEvent(this,
+                                    eventRow.nomEtab,
+                                    eventRow.adresse,
+                                    eventRow.siren,
+                                    eventRow.typeEtablissement,
+                                    eventRow.motDePasse,
+                                    eventRow.idAbes,
+                                    eventRow.mailContact,
+                                    eventRow.nomContact,
+                                    eventRow.prenomContact,
+                                    eventRow.telephoneContact,
+                                    eventRow.adresseContact);
+                    applicationEventPublisher.publishEvent(etablissementCreeEvent);
                     break;
                 case "supprime":
                     EtablissementSupprimeEvent etablissementSupprimeEvent =
@@ -43,13 +56,13 @@ public class ResetService {
                             new EtablissementDiviseEvent(
                                     this,
                                     eventRow.ancienNomEtab,
-                                    (ArrayList<String>) eventRow.etablisementsDivise);
+                                    (ArrayList<Etablissement>) eventRow.etablisementsDivise);
                     applicationEventPublisher.publishEvent(etablissementDiviseEvent);
                     break;
                 case "fusionne":
                     EtablissementFusionneEvent etablissementFusionneEvent =
                             new EtablissementFusionneEvent(this,
-                                    eventRow.nomEtab,
+                                    eventRow.etablissementFusion,
                                     (ArrayList<String>) eventRow.etablissementsFusionne);
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;

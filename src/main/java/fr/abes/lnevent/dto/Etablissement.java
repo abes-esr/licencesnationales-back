@@ -13,11 +13,11 @@ public class Etablissement {
 
     private String typeEtablissement;
 
-    private String motDePasse;
-
     private String idAbes;
 
     private String mailContact;
+
+    private String motDePasse;
 
     private String nomContact;
 
