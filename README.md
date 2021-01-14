@@ -6,7 +6,7 @@ lancer la commande "docker-compose -f mongodb.yaml up" là ou est le mongodb.yam
 
 Faire un import des requêtes postman : https://www.getpostman.com/collections/8361a54d5bea0f49ab4f
 
-lancer le programme avec l'applicaion.properties :
+lancer le programme avec l'application.properties :
 
 server.port=8081
 spring.data.mongodb.authentication-database=admin
