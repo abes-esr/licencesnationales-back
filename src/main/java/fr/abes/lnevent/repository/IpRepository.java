@@ -8,4 +8,5 @@ import java.util.List;
 public interface IpRepository extends MongoRepository<IpRow, String> {
 
     List<IpRow> findAllBySiren(String siren);
+    void deleteByIpAndSiren(String ip, String siren);
 }

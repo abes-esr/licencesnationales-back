@@ -1,6 +1,7 @@
-package fr.abes.lnevent.event;
+package fr.abes.lnevent.event.etablissement;
 
-import fr.abes.lnevent.dto.Etablissement;
+import fr.abes.lnevent.event.Event;
+import fr.abes.lnevent.event.editeur.dto.etablissement.Etablissement;
 import lombok.Getter;
 import lombok.Setter;
 

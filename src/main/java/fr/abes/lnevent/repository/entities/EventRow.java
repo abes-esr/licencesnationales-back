@@ -1,7 +1,11 @@
 package fr.abes.lnevent.repository.entities;
 
-import fr.abes.lnevent.dto.Etablissement;
-import fr.abes.lnevent.event.*;
+import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
+import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
+import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
+import fr.abes.lnevent.event.editeur.dto.etablissement.Etablissement;
+import fr.abes.lnevent.event.etablissement.*;
+import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -27,6 +31,21 @@ public class EventRow {
         this.adresseContact = etablissementCreeEvent.getAdresseContact();
     }
 
+    public EventRow(EtablissementModifieEvent etablissementModifieEvent) {
+        this.event = "modifie";
+        this.nomEtab = etablissementModifieEvent.getNom();
+        this.adresse = etablissementModifieEvent.getAdresse();
+        this.siren = etablissementModifieEvent.getSiren();
+        this.typeEtablissement = etablissementModifieEvent.getTypeEtablissement();
+        this.motDePasse = etablissementModifieEvent.getMotDePasse();
+        this.idAbes = etablissementModifieEvent.getIdAbes();
+        this.mailContact = etablissementModifieEvent.getMailContact();
+        this.nomContact = etablissementModifieEvent.getNomContact();
+        this.prenomContact = etablissementModifieEvent.getPrenomContact();
+        this.telephoneContact = etablissementModifieEvent.getTelephoneContact();
+        this.adresseContact = etablissementModifieEvent.getAdresseContact();
+    }
+
     public EventRow(EtablissementSupprimeEvent etablissementSupprimeEvent) {
         this.event = "supprime";
         this.nomEtab = etablissementSupprimeEvent.getSiren();
@@ -42,6 +61,31 @@ public class EventRow {
         this.event = "fusionne";
         this.etablissementFusion = etablissementFusionneEvent.getEtablissement();
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
+    }
+
+    public EventRow(EditeurCreeEvent editeurCreeEvent) {
+        this.event = "editeurcree";
+        this.nomEditeur = editeurCreeEvent.getNom();
+        this.adresseEditeur = editeurCreeEvent.getAdresse();
+        this.mailPourBatchEditeur = editeurCreeEvent.getMailPourBatch();
+        this.mailPourInformationEditeur = editeurCreeEvent.getMailPourInformation();
+    }
+
+    public EventRow(EditeurModifieEvent editeurModifieEvent) {
+        this.event = "editeurmodifie";
+        this.nomEditeur = editeurModifieEvent.getNom();
+        this.adresseEditeur = editeurModifieEvent.getAdresse();
+        this.mailPourBatchEditeur = editeurModifieEvent.getMailPourBatch();
+        this.mailPourInformationEditeur = editeurModifieEvent.getMailPourInformation();
+    }
+
+    public EventRow(EditeurFusionneEvent editeurFusionneEvent) {
+        this.event = "editeurfusione";
+        this.nomEditeur = editeurFusionneEvent.getEditeur().getNom();
+        this.adresseEditeur = editeurFusionneEvent.getEditeur().getAdresse();
+        this.mailPourBatchEditeur = editeurFusionneEvent.getEditeur().getMailPourBatch();
+        this.mailPourInformationEditeur = editeurFusionneEvent.getEditeur().getMailPourInformation();
+        this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
     }
 
     public EventRow(IpAjouteeEvent ipAjouteeEvent) {
@@ -87,5 +131,14 @@ public class EventRow {
 
     public String siren;
 
+    private String nomEditeur;
+
+    private String adresseEditeur;
+
+    private List<String> mailPourBatchEditeur;
+
+    private List<String> mailPourInformationEditeur;
+
+    private List<String> idEditeurFusionnes;
 
 }

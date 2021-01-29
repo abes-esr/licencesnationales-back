@@ -1,4 +1,4 @@
-package fr.abes.lnevent.dto;
+package fr.abes.lnevent.event.editeur.dto.etablissement;
 
 import lombok.Getter;
 

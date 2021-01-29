@@ -1,13 +1,13 @@
 package fr.abes.lnevent.services;
 
-import fr.abes.lnevent.dto.Etablissement;
-import fr.abes.lnevent.event.EtablissementCreeEvent;
+import fr.abes.lnevent.event.editeur.dto.etablissement.Etablissement;
+import fr.abes.lnevent.event.etablissement.EtablissementCreeEvent;
 import fr.abes.lnevent.repository.entities.EventRow;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.event.EtablissementDiviseEvent;
-import fr.abes.lnevent.event.EtablissementFusionneEvent;
-import fr.abes.lnevent.event.EtablissementSupprimeEvent;
+import fr.abes.lnevent.event.etablissement.EtablissementDiviseEvent;
+import fr.abes.lnevent.event.etablissement.EtablissementFusionneEvent;
+import fr.abes.lnevent.event.etablissement.EtablissementSupprimeEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
