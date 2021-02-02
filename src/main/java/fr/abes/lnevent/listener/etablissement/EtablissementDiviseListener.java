@@ -1,6 +1,6 @@
 package fr.abes.lnevent.listener.etablissement;
 
-import fr.abes.lnevent.event.editeur.dto.etablissement.Etablissement;
+import fr.abes.lnevent.dto.etablissement.Etablissement;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.entities.ContactRow;
 import fr.abes.lnevent.repository.entities.EtablissementRow;

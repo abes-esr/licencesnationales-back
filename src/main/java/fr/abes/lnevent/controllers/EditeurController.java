@@ -1,8 +1,8 @@
 package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.event.editeur.dto.editeur.EditeurCreeDTO;
-import fr.abes.lnevent.event.editeur.dto.editeur.EditeurFusionneDTO;
-import fr.abes.lnevent.event.editeur.dto.editeur.EditeurModifieDTO;
+import fr.abes.lnevent.dto.editeur.EditeurCreeDTO;
+import fr.abes.lnevent.dto.editeur.EditeurFusionneDTO;
+import fr.abes.lnevent.dto.editeur.EditeurModifieDTO;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;

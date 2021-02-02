@@ -1,11 +1,9 @@
-package fr.abes.lnevent.event.editeur.dto.etablissement;
+package fr.abes.lnevent.dto.etablissement;
 
 import lombok.Getter;
 
 @Getter
-public class EtablissementModifieDTO {
-
-    private String id;
+public class Etablissement {
 
     private String nom;
 
@@ -15,13 +13,11 @@ public class EtablissementModifieDTO {
 
     private String typeEtablissement;
 
-    private String motDePasse;
-
     private String idAbes;
 
-    private String idContact;
-
     private String mailContact;
+
+    private String motDePasse;
 
     private String nomContact;
 
@@ -30,4 +26,5 @@ public class EtablissementModifieDTO {
     private String telephoneContact;
 
     private String adresseContact;
+
 }

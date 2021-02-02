@@ -3,9 +3,12 @@ package fr.abes.lnevent.repository.entities;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
-import fr.abes.lnevent.event.editeur.dto.etablissement.Etablissement;
+import fr.abes.lnevent.dto.etablissement.Etablissement;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
+import fr.abes.lnevent.event.ip.IpModifieeEvent;
+import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
+import fr.abes.lnevent.event.ip.IpValideeEvent;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -94,6 +97,24 @@ public class EventRow {
         this.siren = ipAjouteeEvent.getSiren();
     }
 
+    public EventRow(IpModifieeEvent ipModifieeEvent) {
+        this.event = "ipModifie";
+        this.ip = ipModifieeEvent.getIp();
+        this.siren = ipModifieeEvent.getSiren();
+    }
+
+    public EventRow(IpValideeEvent ipValideeEvent) {
+        this.event = "ipValidee";
+        this.ip = ipValideeEvent.getIp();
+        this.siren = ipValideeEvent.getSiren();
+    }
+
+    public EventRow(IpSupprimeeEvent ipSupprimeeEvent) {
+        this.event = "ipSupprimee";
+        this.ip = ipSupprimeeEvent.getIp();
+        this.siren = ipSupprimeeEvent.getSiren();
+    }
+
     @Id
     public String id;
 
@@ -140,5 +161,7 @@ public class EventRow {
     private List<String> mailPourInformationEditeur;
 
     private List<String> idEditeurFusionnes;
+
+
 
 }

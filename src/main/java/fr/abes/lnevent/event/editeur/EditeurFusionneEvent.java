@@ -1,7 +1,7 @@
 package fr.abes.lnevent.event.editeur;
 
 import fr.abes.lnevent.event.Event;
-import fr.abes.lnevent.event.editeur.dto.editeur.Editeur;
+import fr.abes.lnevent.dto.editeur.Editeur;
 import lombok.Getter;
 
 import java.util.List;

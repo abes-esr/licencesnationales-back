@@ -1,10 +1,9 @@
-package fr.abes.lnevent.event.editeur.dto.etablissement;
+package fr.abes.lnevent.dto.etablissement;
 
 import lombok.Getter;
 
 @Getter
-public class Etablissement {
-
+public class EtablissementCreeDTO {
     private String nom;
 
     private String adresse;
@@ -13,11 +12,11 @@ public class Etablissement {
 
     private String typeEtablissement;
 
+    private String motDePasse;
+
     private String idAbes;
 
     private String mailContact;
-
-    private String motDePasse;
 
     private String nomContact;
 
@@ -26,5 +25,4 @@ public class Etablissement {
     private String telephoneContact;
 
     private String adresseContact;
-
 }

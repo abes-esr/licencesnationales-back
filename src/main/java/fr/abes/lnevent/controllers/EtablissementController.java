@@ -1,9 +1,9 @@
 package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.event.editeur.dto.etablissement.EtablissementCreeDTO;
-import fr.abes.lnevent.event.editeur.dto.etablissement.EtablissementDiviseDTO;
-import fr.abes.lnevent.event.editeur.dto.etablissement.EtablissementFusionneDTO;
-import fr.abes.lnevent.event.editeur.dto.etablissement.EtablissementModifieDTO;
+import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
+import fr.abes.lnevent.dto.etablissement.EtablissementDiviseDTO;
+import fr.abes.lnevent.dto.etablissement.EtablissementFusionneDTO;
+import fr.abes.lnevent.dto.etablissement.EtablissementModifieDTO;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.repository.entities.EventRow;
 import fr.abes.lnevent.repository.EventRepository;

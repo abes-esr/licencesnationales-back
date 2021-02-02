@@ -1,11 +1,11 @@
-package fr.abes.lnevent.event.editeur.dto.editeur;
+package fr.abes.lnevent.dto.editeur;
 
 import lombok.Getter;
 
 import java.util.List;
 
 @Getter
-public class EditeurModifieDTO {
+public class EditeurCreeDTO {
     private String nom;
 
     private String adresse;
