@@ -1,4 +1,4 @@
-package fr.abes.lnevent.dto;
+package fr.abes.lnevent.dto.ip;
 
 import lombok.Getter;
 

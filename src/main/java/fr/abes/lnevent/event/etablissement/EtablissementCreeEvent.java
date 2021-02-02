@@ -1,5 +1,6 @@
-package fr.abes.lnevent.event;
+package fr.abes.lnevent.event.etablissement;
 
+import fr.abes.lnevent.event.Event;
 import lombok.Getter;
 
 @Getter

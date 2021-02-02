@@ -1,6 +1,6 @@
 package fr.abes.lnevent.services;
 
-import fr.abes.lnevent.dto.Etablissement;
+import fr.abes.lnevent.dto.etablissement.Etablissement;
 import fr.abes.lnevent.repository.entities.EventRow;
 import fr.abes.lnevent.repository.entities.IpRow;
 import fr.abes.lnevent.repository.EventRepository;

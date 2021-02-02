@@ -6,7 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "Ip")
 public class IpRow {
 
-    public IpRow(String ip, String siren) {
+    public IpRow(String id, String ip, String siren) {
+        this.id = id;
         this.ip = ip;
         this.siren = siren;
         this.validee = false;
