@@ -9,7 +9,7 @@ import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.event.ip.IpValideeEvent;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.repository.entities.EventRow;
+import fr.abes.lnevent.entities.EventRow;
 import fr.abes.lnevent.services.ArbreService;
 import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;

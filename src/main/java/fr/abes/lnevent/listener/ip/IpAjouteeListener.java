@@ -1,6 +1,6 @@
 package fr.abes.lnevent.listener.ip;
 
-import fr.abes.lnevent.repository.entities.IpRow;
+import fr.abes.lnevent.entities.IpRow;
 import fr.abes.lnevent.repository.IpRepository;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import org.springframework.context.ApplicationListener;

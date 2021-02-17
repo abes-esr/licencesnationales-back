@@ -7,7 +7,7 @@ import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.repository.entities.EventRow;
+import fr.abes.lnevent.entities.EventRow;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;

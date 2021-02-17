@@ -1,8 +1,8 @@
 package fr.abes.lnevent.services;
 
 import fr.abes.lnevent.dto.etablissement.Etablissement;
-import fr.abes.lnevent.repository.entities.EventRow;
-import fr.abes.lnevent.repository.entities.IpRow;
+import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.entities.IpRow;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.repository.IpRepository;
 import org.springframework.stereotype.Service;

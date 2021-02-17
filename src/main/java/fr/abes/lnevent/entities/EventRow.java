@@ -1,4 +1,4 @@
-package fr.abes.lnevent.repository.entities;
+package fr.abes.lnevent.entities;
 
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;

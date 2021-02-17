@@ -3,7 +3,7 @@ package fr.abes.lnevent.listener.editeur;
 import fr.abes.lnevent.dto.editeur.Editeur;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.repository.EditeurRepository;
-import fr.abes.lnevent.repository.entities.EditeurRow;
+import fr.abes.lnevent.entities.EditeurRow;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

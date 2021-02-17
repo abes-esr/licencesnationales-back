@@ -5,7 +5,7 @@ import fr.abes.lnevent.dto.etablissement.EtablissementDiviseDTO;
 import fr.abes.lnevent.dto.etablissement.EtablissementFusionneDTO;
 import fr.abes.lnevent.dto.etablissement.EtablissementModifieDTO;
 import fr.abes.lnevent.event.etablissement.*;
-import fr.abes.lnevent.repository.entities.EventRow;
+import fr.abes.lnevent.entities.EventRow;
 import fr.abes.lnevent.repository.EventRepository;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
