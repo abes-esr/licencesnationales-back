@@ -1,11 +1,11 @@
 package fr.abes.lnevent.security.jwt;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.lnevent.exception.ApplicationError;
-import lombok.extern.slf4j.Slf4j;
+
+import fr.abes.lnevent.constant.Constant;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,49 +15,32 @@ import java.io.IOException;
 @Component
 public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    @Override
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
+        this.sendErrorGenericAuthorization();
 
-        String urlPath = httpServletRequest.getRequestURI().substring(httpServletRequest.getContextPath().length());
-        log.error(e.getLocalizedMessage());
-
-        this.sendUnAuthorizedError(urlPath,httpServletResponse); 
+        if (e.getMessage().contains(Constant.ERROR_ACCESS_DATABASE)) {
+            this.sendErrorTechnicalProblems(httpServletResponse);
+        } else if (e.getMessage().contains(Constant.BLOCKED)) {
+            this.sendErrorAccountBlocked(httpServletResponse);
+        } else {
+            this.sendErrorAccessResourceNotAllowed(httpServletResponse);
+        }
     }
 
-    private void sendInternalServerError(String urlPath, HttpServletResponse httpServletResponse) throws IOException{
-
-        ObjectMapper mapper = new ObjectMapper();
-        ApplicationError errorMessageHandler = new ApplicationError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,"INTERNAL_SERVER_ERROR",urlPath);
-        String json = mapper.findAndRegisterModules().writeValueAsString(errorMessageHandler);
-        httpServletResponse.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setCharacterEncoding("UTF-8");
-        httpServletResponse.getWriter().write(json);
+    private void sendErrorGenericAuthorization(){
+        log.error(Constant.ERROR_RESPONDING_WITH_UNAUTHORIZED_ERROR);
     }
 
-    private void sendForbiddenError(String urlPath, HttpServletResponse httpServletResponse) throws IOException{
-
-        ObjectMapper mapper = new ObjectMapper();
-        ApplicationError errorMessageHandler = new ApplicationError(HttpServletResponse.SC_FORBIDDEN,"FORBIDDEN",urlPath);
-        String json = mapper.findAndRegisterModules().writeValueAsString(errorMessageHandler);
-        httpServletResponse.setStatus(HttpServletResponse.SC_FORBIDDEN);
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setCharacterEncoding("UTF-8");
-        httpServletResponse.getWriter().write(json);
-
+    private void sendErrorTechnicalProblems(HttpServletResponse httpServletResponse) throws IOException{
+        httpServletResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, Constant.ERROR_GENERIC_TECHNICAL_PROBLEMS);
     }
 
-    private void sendUnAuthorizedError(String urlPath, HttpServletResponse httpServletResponse) throws IOException{
+    private void sendErrorAccountBlocked(HttpServletResponse httpServletResponse) throws IOException{
+        httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, Constant.ERROR_ACCOUNT_BLOCKED);
+    }
 
-        ObjectMapper mapper = new ObjectMapper();
-        ApplicationError errorMessageHandler = new ApplicationError(HttpServletResponse.SC_UNAUTHORIZED,"UNAUTHORIZED",urlPath);
-        String json = mapper.findAndRegisterModules().writeValueAsString(errorMessageHandler);
-        httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        httpServletResponse.setContentType("application/json");
-        httpServletResponse.setCharacterEncoding("UTF-8");
-        httpServletResponse.getWriter().write(json);
-
+    private void sendErrorAccessResourceNotAllowed(HttpServletResponse httpServletResponse) throws IOException{
+        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, Constant.ERROR_ACCESS_RESSOURCE_NOT_ALLOWED);
     }
 
 }
-

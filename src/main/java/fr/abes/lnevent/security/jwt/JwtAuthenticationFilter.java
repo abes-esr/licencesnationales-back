@@ -1,84 +1,69 @@
 package fr.abes.lnevent.security.jwt;
 
-import fr.abes.lnevent.security.services.CustomUserDetailsService;
+import fr.abes.lnevent.constant.Constant;
+import fr.abes.lnevent.entities.ContactRow;
+import fr.abes.lnevent.security.cache.LoginAttemptService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
-/**
- * Filtre de jetons JWT.
- * Cette classe est basée sur le framework Spring avec les modules Spring Web et Spring Security.
- * @since 0.0.1
- */
-@Component
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
-    /** Service utilitaire pour les jetons JWT. */
-    private final fr.abes.lnevent.security.jwt.JwtUtility jwtUtility;
-
-    /** Service d'authentification des utilisateurs. */
-    private final CustomUserDetailsService service;
-
-    /**
-     * Construit un filtre de jetons JWT.
-     * @param jwtUtility Service utilitaire pour les jetons JWT.
-     * @param service Service d'authentification des utilisateurs.
-     */
     @Autowired
-    public JwtAuthenticationFilter(fr.abes.lnevent.security.jwt.JwtUtility jwtUtility, CustomUserDetailsService service) {
-        this.jwtUtility = jwtUtility;
-        this.service = service;
-    }
+    private JwtTokenProvider tokenProvider;
 
-    /**
-     * Execute le filtre avec la vérification du jeton JWT.
-     * @param httpServletRequest requête HTTP entrante.
-     * @param httpServletResponse requête HTTP sortante.
-     * @param filterChain Chaîne de filtres.
-     * @throws ServletException si
-     * @throws IOException si
-     */
+    @Autowired
+    private LoginAttemptService loginAttemptService;
+
+    @Autowired
+    private HttpServletRequest request;
+
     @Override
-    protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse,
-                                    FilterChain filterChain) throws ServletException, IOException, UsernameNotFoundException {
-
-        String authorizationHeader = httpServletRequest.getHeader("Authorization");
-
-        String token = null;
-        String userName = null;
-
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            token = authorizationHeader.substring(7);
-            if(jwtUtility.checkToken(token,httpServletRequest)) {
-                userName = jwtUtility.extractSubject(token);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        try {
+            log.debug(Constant.ENTER_DOFILTERINTERNAL);
+            final String ip = getClientIP();
+            if (loginAttemptService.isBlocked(ip)) {
+                throw new RuntimeException(Constant.IP_BLOCKED);
             }
+
+            String jwt = tokenProvider.getJwtFromRequest(request);
+
+            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
+                ContactRow u = tokenProvider.getUtilisateurFromJwt(jwt);
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                authorities.add(new SimpleGrantedAuthority(u.getRole()));
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(u, null, authorities);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                request.setAttribute("userNum", u.getUserNum());
+                request.setAttribute("iln", u.getIln());
+            }
+        } catch (Exception ex) {
+            log.error(Constant.ERROR_AUTHENTICATION_IN_SECURITY_CONTEXT, ex);
         }
 
-        if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-            UserDetails userDetails = service.loadUserByUsername(userName);
-
-            if (jwtUtility.validateToken(token, userDetails)) {
-
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken =
-                        new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(httpServletRequest));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
-            }
-        }
-        filterChain.doFilter(httpServletRequest, httpServletResponse);
+        filterChain.doFilter(request, response);
     }
 
+    private final String getClientIP() {
+        final String xfHeader = request.getHeader("X-Forwarded-For");
+        if (xfHeader == null) {
+            return request.getRemoteAddr();
+        }
+        return xfHeader.split(",")[0];
+    }
 }
+

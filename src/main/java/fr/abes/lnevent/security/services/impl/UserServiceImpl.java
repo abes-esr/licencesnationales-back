@@ -1,7 +1,7 @@
 package fr.abes.lnevent.security.services.impl;
 
 import fr.abes.lnevent.repository.IUserDao;
-import fr.abes.lnevent.entities.AppUser;
+import fr.abes.lnevent.dto.User;
 import fr.abes.lnevent.security.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -38,7 +38,7 @@ public class UserServiceImpl implements IUserService {
      * @return L'utilisateur du service web enregistré.
      */
     @Override
-    public AppUser createUser(AppUser user) {
+    public User createUser(User user) {
         String passHash = bCryptPasswordEncoder.encode(user.getPassWord());
         user.setPassWord(passHash);
         return userRepository.save(user);
@@ -50,7 +50,7 @@ public class UserServiceImpl implements IUserService {
      * @return L'utilisateur du service web trouvé.
      */
     @Override
-    public AppUser findUserByUserName(AppUser user) {
+    public User findUserByUserName(User user) {
         return userRepository.findByUserName(user.getUserName());
     }
 

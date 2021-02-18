@@ -1,27 +1,12 @@
 package fr.abes.lnevent.security.services;
 
-import fr.abes.lnevent.entities.AppUser;
+import fr.abes.lnevent.dto.User;
 
-/**
- * Représente un service pour gérer les utilisateurs du service web.
- * Cette interface a uniquement vocation de permettre l'utilisation d'injection des dépendances 
- * du framework Spring.
- * @since 0.0.1
- */
+
 public interface IUserService {
 
-    /**
-     * Enregistre nouvel utilisateur du service web.
-     * @param user Utilisateur du service web.
-     * @return L'utilisateur du service web enregistré.
-     */
-    AppUser createUser(AppUser user);
+    User createUser(User user);
 
-    /**
-     * Recherche un utilisateur par son nom d'utilisateur.
-     * @param user Utilisateur du service web à rechercher.
-     * @return L'utilisateur du service web trouvé.
-     */
-    AppUser findUserByUserName(AppUser user);
+    User findUserByUserName(User user);
 
 }

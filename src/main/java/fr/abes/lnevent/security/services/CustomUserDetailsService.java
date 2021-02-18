@@ -1,10 +1,9 @@
 package fr.abes.lnevent.security.services;
 
 
-import fr.abes.lnevent.entities.AppUser;
+import fr.abes.lnevent.dto.User;
 import fr.abes.lnevent.repository.IUserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -41,11 +40,11 @@ public class CustomUserDetailsService implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        AppUser user = userRepository.findByUserName(userName);
+        User user = userRepository.findByUserName(userName);
         if(user == null) {
             throw new UsernameNotFoundException(userName);
         }
-        return new User(user.getUserName(), user.getPassWord(), new ArrayList<>());
+        return new org.springframework.security.core.userdetails.User(user.getUserName(), user.getPassWord(), new ArrayList<>());
     }
 
 }

@@ -1,9 +1,16 @@
 package fr.abes.lnevent.entities;
 
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Document(collection = "Contact")
+import javax.persistence.*;
+
+
+@Entity
+@Table(name = "CONTACT_LN_EVENT")
+@Getter @Setter
+@NoArgsConstructor
 public class ContactRow {
 
     public ContactRow(String id,
@@ -13,7 +20,8 @@ public class ContactRow {
                       String motDePasse,
                       String telephone,
                       String adresse,
-                      String siren) {
+                      String siren,
+                      Boolean isAdmin) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -22,9 +30,11 @@ public class ContactRow {
         this.telephone = telephone;
         this.adresse = adresse;
         this.siren = siren;
+        this.isAdmin = isAdmin;
     }
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public String id;
 
     public String nom;
@@ -40,5 +50,7 @@ public class ContactRow {
     public String adresse;
 
     public String siren;
+
+    public Boolean isAdmin;
 
 }
