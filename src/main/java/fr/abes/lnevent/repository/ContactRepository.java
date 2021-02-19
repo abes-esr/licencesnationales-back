@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContactRepository extends JpaRepository<ContactRow, String> {
     void deleteBySiren(String siren);
+    ContactRow findBySiren(String siren);
 }

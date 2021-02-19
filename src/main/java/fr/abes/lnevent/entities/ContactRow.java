@@ -5,15 +5,27 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-
-
 @Entity
-@Table(name = "CONTACT_LN_EVENT")
-@Getter @Setter
+@Table(name = "Contact")
 @NoArgsConstructor
+@Getter @Setter
 public class ContactRow {
 
-    public ContactRow(String id,
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
+    @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ")
+    public Long id;
+    public String nom;
+    public String prenom;
+    public String mail;
+    public String motDePasse;
+    public String telephone;
+    public String adresse;
+    public String siren;
+    public String role;
+
+
+    public ContactRow(Long id,
                       String nom,
                       String prenom,
                       String mail,
@@ -21,7 +33,7 @@ public class ContactRow {
                       String telephone,
                       String adresse,
                       String siren,
-                      Boolean isAdmin) {
+                      String role) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -30,27 +42,7 @@ public class ContactRow {
         this.telephone = telephone;
         this.adresse = adresse;
         this.siren = siren;
-        this.isAdmin = isAdmin;
+        this.role = role;
     }
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public String id;
-
-    public String nom;
-
-    public String prenom;
-
-    public String mail;
-
-    public String motDePasse;
-
-    public String telephone;
-
-    public String adresse;
-
-    public String siren;
-
-    public Boolean isAdmin;
-
 }
+

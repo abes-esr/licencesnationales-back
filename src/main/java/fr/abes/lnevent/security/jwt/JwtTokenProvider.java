@@ -27,12 +27,11 @@ public class JwtTokenProvider {
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
 
         return Jwts.builder()
-                .setSubject(u.getId())// USER_KEY de la base
+                .setSubject(u.getSiren())// USER_KEY de la base
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .claim("userId", u.getId())
-                .claim("userSiren", u.getSiren())
-                .claim("userRole", u.getIsAdmin())
+                .claim("userRole", u.getRole())
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
@@ -62,7 +61,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public ContactRow getUtilisateurFromJwt(String token) {
+    /*public ContactRow getUtilisateurFromJwt(String token) {
         Claims claims = Jwts.parser()
                 .setSigningKey(jwtSecret)
                 .parseClaimsJws(token)
@@ -71,8 +70,12 @@ public class JwtTokenProvider {
         ContactRow u = new ContactRow();
         u.setId(claims.get("userId").toString());
         u.setSiren(claims.get("userSiren").toString());
-        u.setIsAdmin(claims.get("userRole").toString());
+        u.setIsAdmin(Boolean.parseBoolean((String) claims.get("userRole")));
 
         return u;
+    }*/
+
+    public String getSirenFromJwtToken(String token) {
+        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
     }
 }
