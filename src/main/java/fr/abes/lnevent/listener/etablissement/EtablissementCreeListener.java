@@ -1,7 +1,7 @@
 package fr.abes.lnevent.listener.etablissement;
 
-import fr.abes.lnevent.repository.entities.ContactRow;
-import fr.abes.lnevent.repository.entities.EtablissementRow;
+import fr.abes.lnevent.entities.ContactEntity;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.event.etablissement.EtablissementCreeEvent;
@@ -22,18 +22,18 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
 
     @Override
     public void onApplicationEvent(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementRow etablissementRow =
-                new EtablissementRow(null,
+        EtablissementEntity etablissementEntity =
+                new EtablissementEntity(null,
                 etablissementCreeEvent.getNom(),
                 etablissementCreeEvent.getAdresse(),
                 etablissementCreeEvent.getSiren(),
                 etablissementCreeEvent.getTypeEtablissement(),
                 etablissementCreeEvent.getIdAbes());
 
-        etablissementRepository.save(etablissementRow);
+        etablissementRepository.save(etablissementEntity);
 
-        ContactRow contactRow =
-                new ContactRow(null,
+        ContactEntity contactEntity =
+                new ContactEntity(null,
                         etablissementCreeEvent.getNomContact(),
                         etablissementCreeEvent.getPrenomContact(),
                         etablissementCreeEvent.getMailContact(),
@@ -42,7 +42,7 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
                         etablissementCreeEvent.getAdresseContact(),
                         etablissementCreeEvent.getSiren());
 
-        contactRepository.save(contactRow);
+        contactRepository.save(contactEntity);
 
     }
 }

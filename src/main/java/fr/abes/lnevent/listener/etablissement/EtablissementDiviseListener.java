@@ -1,13 +1,15 @@
 package fr.abes.lnevent.listener.etablissement;
 
-import fr.abes.lnevent.dto.etablissement.Etablissement;
+import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
 import fr.abes.lnevent.repository.ContactRepository;
-import fr.abes.lnevent.repository.entities.ContactRow;
-import fr.abes.lnevent.repository.entities.EtablissementRow;
+import fr.abes.lnevent.entities.ContactEntity;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.event.etablissement.EtablissementDiviseEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
 
 @Component
 public class EtablissementDiviseListener implements ApplicationListener<EtablissementDiviseEvent> {
@@ -21,29 +23,30 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
     }
 
     @Override
+    @Transactional
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
         etablissementRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
         contactRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
-        for (Etablissement etablissementDivise :
-                etablissementDiviseEvent.getEtablissements()) {
-            etablissementRepository.save(new EtablissementRow(null,
-                    etablissementDivise.getNom(),
-                    etablissementDivise.getAdresse(),
-                    etablissementDivise.getSiren(),
-                    etablissementDivise.getTypeEtablissement(),
-                    etablissementDivise.getIdAbes()));
+        for (EtablissementDTO etablissementDTODivise :
+                etablissementDiviseEvent.getEtablissementDTOS()) {
+            etablissementRepository.save(new EtablissementEntity(null,
+                    etablissementDTODivise.getNom(),
+                    etablissementDTODivise.getAdresse(),
+                    etablissementDTODivise.getSiren(),
+                    etablissementDTODivise.getTypeEtablissement(),
+                    etablissementDTODivise.getIdAbes()));
 
-            ContactRow contactRow =
-                    new ContactRow(null,
-                            etablissementDivise.getNomContact(),
-                            etablissementDivise.getPrenomContact(),
-                            etablissementDivise.getMailContact(),
-                            etablissementDivise.getMotDePasse(),
-                            etablissementDivise.getTelephoneContact(),
-                            etablissementDivise.getAdresseContact(),
-                            etablissementDivise.getSiren());
+            ContactEntity contactEntity =
+                    new ContactEntity(null,
+                            etablissementDTODivise.getNomContact(),
+                            etablissementDTODivise.getPrenomContact(),
+                            etablissementDTODivise.getMailContact(),
+                            etablissementDTODivise.getMotDePasse(),
+                            etablissementDTODivise.getTelephoneContact(),
+                            etablissementDTODivise.getAdresseContact(),
+                            etablissementDTODivise.getSiren());
 
-            contactRepository.save(contactRow);
+            contactRepository.save(contactEntity);
         }
     }
 }

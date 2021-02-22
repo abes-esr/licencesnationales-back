@@ -16,7 +16,7 @@ public class EditeurModifieEvent extends Event {
         this.mailPourInformation = mailPourInformation;
     }
 
-    private String id;
+    private Long id;
 
     private String nom;
 

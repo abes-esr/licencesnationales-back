@@ -1,11 +1,13 @@
 package fr.abes.lnevent.listener.editeur;
 
-import fr.abes.lnevent.dto.editeur.Editeur;
+import fr.abes.lnevent.dto.editeur.EditeurDTO;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.repository.EditeurRepository;
-import fr.abes.lnevent.repository.entities.EditeurRow;
+import fr.abes.lnevent.entities.EditeurEntity;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
+
+import javax.transaction.Transactional;
 
 @Component
 public class EditeurFusionneListener implements ApplicationListener<EditeurFusionneEvent> {
@@ -17,17 +19,18 @@ public class EditeurFusionneListener implements ApplicationListener<EditeurFusio
     }
 
     @Override
+    @Transactional
     public void onApplicationEvent(EditeurFusionneEvent editeurFusionneEvent) {
 
-        Editeur editeur = editeurFusionneEvent.getEditeur();
+        EditeurDTO editeurDTO = editeurFusionneEvent.getEditeurDTO();
 
-        editeurRepository.save(new EditeurRow(null,
-                editeur.getNom(),
-                editeur.getAdresse(),
-                editeur.getMailPourBatch(),
-                editeur.getMailPourInformation()));
+        editeurRepository.save(new EditeurEntity(null,
+                editeurDTO.getNom(),
+                editeurDTO.getAdresse(),
+                editeurDTO.getMailPourBatch(),
+                editeurDTO.getMailPourInformation()));
 
-        for (String idEditeur :
+        for (Long idEditeur :
                 editeurFusionneEvent.getIdEditeurFusionnes()) {
             editeurRepository.deleteById(idEditeur);
         }

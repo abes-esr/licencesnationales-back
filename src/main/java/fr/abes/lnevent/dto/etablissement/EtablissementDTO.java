@@ -3,7 +3,7 @@ package fr.abes.lnevent.dto.etablissement;
 import lombok.Getter;
 
 @Getter
-public class Etablissement {
+public class EtablissementDTO {
 
     private String nom;
 

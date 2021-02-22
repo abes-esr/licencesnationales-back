@@ -6,6 +6,6 @@ import java.util.ArrayList;
 
 @Getter
 public class EtablissementFusionneDTO {
-    private Etablissement etablissement;
+    private EtablissementDTO etablissementDTO;
     private ArrayList<String> sirenFusionnes;
 }
