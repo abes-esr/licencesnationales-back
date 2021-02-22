@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class IpModifieeDTO {
-    private String id;
+    private Long id;
     private String ip;
     private String siren;
 }

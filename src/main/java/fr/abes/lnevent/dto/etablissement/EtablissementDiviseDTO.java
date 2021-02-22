@@ -7,5 +7,5 @@ import java.util.ArrayList;
 @Getter
 public class EtablissementDiviseDTO {
     private String ancienSiren;
-    private ArrayList<Etablissement> etablissements;
+    private ArrayList<EtablissementDTO> etablissementDTOS;
 }

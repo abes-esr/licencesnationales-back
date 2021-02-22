@@ -5,11 +5,11 @@ import lombok.Getter;
 
 @Getter
 public class IpModifieeEvent extends Event {
-    private String id;
+    private Long id;
     private String ip;
     private String siren;
 
-    public IpModifieeEvent(Object source, String id, String ip, String siren) {
+    public IpModifieeEvent(Object source, Long id, String ip, String siren) {
         super(source);
         this.id = id;
         this.ip = ip;

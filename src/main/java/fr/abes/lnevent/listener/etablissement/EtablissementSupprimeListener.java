@@ -6,6 +6,8 @@ import fr.abes.lnevent.event.etablissement.EtablissementSupprimeEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+import javax.transaction.Transactional;
+
 @Component
 public class EtablissementSupprimeListener implements ApplicationListener<EtablissementSupprimeEvent> {
 
@@ -18,6 +20,7 @@ public class EtablissementSupprimeListener implements ApplicationListener<Etabli
     }
 
     @Override
+    @Transactional
     public void onApplicationEvent(EtablissementSupprimeEvent etablissementSupprimeEvent) {
         etablissementRepository.deleteBySiren(etablissementSupprimeEvent.getSiren());
         contactRepository.deleteBySiren(etablissementSupprimeEvent.getSiren());

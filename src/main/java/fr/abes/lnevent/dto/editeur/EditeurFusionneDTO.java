@@ -6,6 +6,6 @@ import java.util.List;
 
 @Getter
 public class EditeurFusionneDTO {
-    private Editeur editeur;
-    private List<String> idEditeurFusionnes;
+    private EditeurDTO editeurDTO;
+    private List<Long> idEditeurFusionnes;
 }

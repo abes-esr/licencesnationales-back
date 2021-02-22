@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class EtablissementModifieEvent extends Event {
-    public EtablissementModifieEvent(Object source, String idEtablissement, String nom, String adresse, String siren, String typeEtablissement, String motDePasse, String idAbes, String idContact, String mailContact, String nomContact, String prenomContact, String telephoneContact, String adresseContact) {
+    public EtablissementModifieEvent(Object source, Long idEtablissement, String nom, String adresse, String siren, String typeEtablissement, String motDePasse, String idAbes, String idContact, String mailContact, String nomContact, String prenomContact, String telephoneContact, String adresseContact) {
         super(source);
         this.idEtablissement = idEtablissement;
         this.nom = nom;
@@ -22,7 +22,7 @@ public class EtablissementModifieEvent extends Event {
         this.adresseContact = adresseContact;
     }
 
-    private String idEtablissement;
+    private Long idEtablissement;
 
     private String nom;
 

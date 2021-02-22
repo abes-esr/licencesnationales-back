@@ -1,8 +1,10 @@
 package fr.abes.lnevent.repository;
 
-import fr.abes.lnevent.repository.entities.ContactRow;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import fr.abes.lnevent.entities.ContactEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-public interface ContactRepository extends MongoRepository<ContactRow, String> {
+@Repository
+public interface ContactRepository extends JpaRepository<ContactEntity, String> {
     void deleteBySiren(String siren);
 }

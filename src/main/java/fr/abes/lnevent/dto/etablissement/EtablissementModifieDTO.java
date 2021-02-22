@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class EtablissementModifieDTO {
 
-    private String id;
+    private Long id;
 
     private String nom;
 
