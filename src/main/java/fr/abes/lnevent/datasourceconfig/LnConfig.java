@@ -1,3 +1,4 @@
+/*
 package fr.abes.lnevent.datasourceconfig;
 
 import com.zaxxer.hikari.HikariConfig;
@@ -115,4 +116,4 @@ public class LnConfig
 
 
 
-}
+}*/

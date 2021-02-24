@@ -5,21 +5,29 @@ import fr.abes.lnevent.dto.User;
 import fr.abes.lnevent.entities.ContactEntity;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
 @Component
 @Slf4j
 public class JwtTokenProvider {
-    @Value("${app.jwtSecret}")
-    private String jwtSecret;
 
-    @Value("${app.jwtExpirationInMs}")
-    private int jwtExpirationInMs;
+    /*@Autowired
+    private Environment env;*/
+
+
+    //@Value("${app.jwtSecret}")
+    //private String jwtSecret = env.getProperty("app.jwtSecret");
+    private String jwtSecret = "1234";
+
+    //@Value("${app.jwtExpirationInMs}")
+    //private int jwtExpirationInMs = Integer.parseInt(env.getProperty("app.jwtExpirationInMs"));
+    private int jwtExpirationInMs = 1234;
 
     public String generateToken(ContactEntity u) {
 

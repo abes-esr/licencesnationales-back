@@ -1,3 +1,4 @@
+/*
 package fr.abes.lnevent.repository;
 
 import fr.abes.lnevent.dto.User;
@@ -8,3 +9,4 @@ public interface UserRepository extends JpaRepository<ContactEntity, String> {
 
     User findByUserName(String userName);
 }
+*/

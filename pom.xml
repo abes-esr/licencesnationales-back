@@ -18,6 +18,8 @@
         <java.version>11</java.version>
     </properties>
 
+    <packaging>war</packaging>
+
     <!-- ===================================================== -->
     <!--     Description du projet                             -->
     <!-- ===================================================== -->
@@ -35,10 +37,7 @@
     <!-- =========================================================== -->
 
     <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
+
 
         <!-- === Spring web === -->
         <dependency>
@@ -58,15 +57,21 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>-->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
 
         <!--- === DAO === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
             <!--- === bdd === -->
             <dependency>
@@ -103,6 +108,12 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
         <!--- === Securite === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -114,19 +125,6 @@
             <version>0.9.1</version>
         </dependency>
 
-        <!--- === LDAP AUTHENTIFICATION === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.ldap</groupId>
-            <artifactId>spring-ldap-core</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.security</groupId>
-            <artifactId>spring-security-ldap</artifactId>
-        </dependency>
 
         <!--- === Documentation API === -->
         <dependency>
@@ -139,6 +137,7 @@
             <artifactId>springfox-swagger-ui</artifactId>
             <version>2.9.2</version>
         </dependency>
+
     </dependencies>
 
     <!-- =========================================================== -->
