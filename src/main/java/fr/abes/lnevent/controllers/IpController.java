@@ -9,7 +9,7 @@ import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.event.ip.IpValideeEvent;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.services.ArbreService;
 import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;
@@ -42,7 +42,7 @@ public class IpController {
                 event.getIp(),
                 event.getSiren());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        repository.save(new EventRow(ipAjouteeEvent));
+        repository.save(new EventEntity(ipAjouteeEvent));
 
         return "done";
     }
@@ -54,7 +54,7 @@ public class IpController {
                 ipModifieeDTO.getIp(),
                 ipModifieeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
-        repository.save(new EventRow(ipModifieeEvent));
+        repository.save(new EventEntity(ipModifieeEvent));
         return "done";
     }
 
@@ -64,7 +64,7 @@ public class IpController {
                 ipValideeDTO.getIp(),
                 ipValideeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipValideeEvent);
-        repository.save(new EventRow(ipValideeEvent));
+        repository.save(new EventEntity(ipValideeEvent));
         return "done";
     }
 
@@ -74,7 +74,7 @@ public class IpController {
                 ipSupprimeeDTO.getIp(),
                 ipSupprimeeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-        repository.save(new EventRow(ipSupprimeeEvent));
+        repository.save(new EventEntity(ipSupprimeeEvent));
         return "done";
     }
 

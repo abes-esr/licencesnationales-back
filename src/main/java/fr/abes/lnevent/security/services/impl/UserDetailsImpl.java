@@ -1,7 +1,7 @@
 package fr.abes.lnevent.security.services.impl;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.abes.lnevent.entities.ContactRow;
+import fr.abes.lnevent.entities.ContactEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +33,7 @@ public class UserDetailsImpl implements UserDetails {
 		this.authorities = authorities;
 	}
 
-	public static UserDetailsImpl build(ContactRow user) {
+	public static UserDetailsImpl build(ContactEntity user) {
 		String isAdmin = user.getRole();
 
 		List<GrantedAuthority> authorities = new ArrayList<>();

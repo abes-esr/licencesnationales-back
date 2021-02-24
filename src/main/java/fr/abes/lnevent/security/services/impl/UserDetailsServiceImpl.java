@@ -1,7 +1,7 @@
 package fr.abes.lnevent.security.services.impl;
 
 
-import fr.abes.lnevent.entities.ContactRow;
+import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,7 +19,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	@Override
 	@Transactional
 	public UserDetails loadUserByUsername(String siren) throws UsernameNotFoundException {
-		ContactRow user = contactRepository.findBySiren(siren);
+		ContactEntity user = contactRepository.findBySiren(siren);
 		if(user == null) {
 			throw new UsernameNotFoundException(siren);
 		}

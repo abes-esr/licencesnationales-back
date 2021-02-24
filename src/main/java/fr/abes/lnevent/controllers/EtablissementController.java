@@ -5,7 +5,7 @@ import fr.abes.lnevent.dto.etablissement.EtablissementDiviseDTO;
 import fr.abes.lnevent.dto.etablissement.EtablissementFusionneDTO;
 import fr.abes.lnevent.dto.etablissement.EtablissementModifieDTO;
 import fr.abes.lnevent.event.etablissement.*;
-import fr.abes.lnevent.entities.EventRow;
+import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.repository.EventRepository;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,10 @@ public class EtablissementController {
                         eventDTO.getNomContact(),
                         eventDTO.getPrenomContact(),
                         eventDTO.getTelephoneContact(),
-                        eventDTO.getAdresseContact());
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getRoleContact());
         applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        repository.save(new EventRow(etablissementCreeEvent));
+        repository.save(new EventEntity(etablissementCreeEvent));
 
         return "done";
     }
@@ -60,9 +61,10 @@ public class EtablissementController {
                         eventDTO.getNomContact(),
                         eventDTO.getPrenomContact(),
                         eventDTO.getTelephoneContact(),
-                        eventDTO.getAdresseContact());
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getRoleContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
-        repository.save(new EventRow(etablissementModifieEvent));
+        repository.save(new EventEntity(etablissementModifieEvent));
 
         return "done";
     }
@@ -70,9 +72,9 @@ public class EtablissementController {
     @PostMapping(value = "/fusion")
     public String fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
         EtablissementFusionneEvent etablissementFusionneEvent
-                = new EtablissementFusionneEvent(this, eventDTO.getEtablissement(), eventDTO.getSirenFusionnes());
+                = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        repository.save(new EventRow(etablissementFusionneEvent));
+        repository.save(new EventEntity(etablissementFusionneEvent));
 
         return "done";
     }
@@ -80,9 +82,9 @@ public class EtablissementController {
     @PostMapping(value = "/division")
     public String division(@RequestBody EtablissementDiviseDTO eventDTO) {
         EtablissementDiviseEvent etablissementDiviseEvent
-                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissements());
+                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        repository.save(new EventRow(etablissementDiviseEvent));
+        repository.save(new EventEntity(etablissementDiviseEvent));
 
         return "done";
     }
@@ -92,7 +94,7 @@ public class EtablissementController {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        repository.save(new EventRow(etablissementSupprimeEvent));
+        repository.save(new EventEntity(etablissementSupprimeEvent));
 
         return "done";
     }

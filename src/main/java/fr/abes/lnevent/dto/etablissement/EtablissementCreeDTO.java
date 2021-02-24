@@ -25,4 +25,6 @@ public class EtablissementCreeDTO {
     private String telephoneContact;
 
     private String adresseContact;
+
+    private String roleContact;
 }

@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.util.List;
 
 @Getter
-public class Editeur {
+public class EditeurDTO {
     private String nom;
 
     private String adresse;

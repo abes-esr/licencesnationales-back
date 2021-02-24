@@ -1,12 +1,14 @@
 package fr.abes.lnevent.repository;
 
-import fr.abes.lnevent.entities.IpRow;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import fr.abes.lnevent.entities.IpEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-public interface IpRepository extends MongoRepository<IpRow, String> {
+@Repository
+public interface IpRepository extends JpaRepository<IpEntity, String> {
 
-    List<IpRow> findAllBySiren(String siren);
+    List<IpEntity> findAllBySiren(String siren);
     void deleteByIpAndSiren(String ip, String siren);
 }

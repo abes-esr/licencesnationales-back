@@ -18,7 +18,8 @@ public class EtablissementCreeEvent extends Event {
             String nomContact,
             String prenomContact,
             String telephoneContact,
-            String adresseContact) {
+            String adresseContact,
+            String roleContact) {
         super(source);
         this.nom = nom;
         this.adresse = adresse;
@@ -31,6 +32,7 @@ public class EtablissementCreeEvent extends Event {
         this.prenomContact = prenomContact;
         this.telephoneContact = telephoneContact;
         this.adresseContact = adresseContact;
+        this.roleContact = roleContact;
     }
 
     private String nom;
@@ -54,4 +56,6 @@ public class EtablissementCreeEvent extends Event {
     private String telephoneContact;
 
     private String adresseContact;
+
+    private String roleContact;
 }

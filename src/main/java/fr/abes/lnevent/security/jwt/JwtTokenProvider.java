@@ -2,7 +2,7 @@ package fr.abes.lnevent.security.jwt;
 
 import fr.abes.lnevent.constant.Constant;
 import fr.abes.lnevent.dto.User;
-import fr.abes.lnevent.entities.ContactRow;
+import fr.abes.lnevent.entities.ContactEntity;
 import io.jsonwebtoken.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,7 +21,7 @@ public class JwtTokenProvider {
     @Value("${app.jwtExpirationInMs}")
     private int jwtExpirationInMs;
 
-    public String generateToken(ContactRow u) {
+    public String generateToken(ContactEntity u) {
 
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);

@@ -2,8 +2,8 @@ package fr.abes.lnevent.controllers;
 
 
 import fr.abes.lnevent.dto.User;
-import fr.abes.lnevent.entities.ContactRow;
-import fr.abes.lnevent.entities.EtablissementRow;
+import fr.abes.lnevent.entities.ContactEntity;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
@@ -69,7 +69,7 @@ public class AuthenticationController {
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //User user = (User)authentication.getPrincipal();
-        ContactRow user = (ContactRow)authentication.getPrincipal();
+        ContactEntity user = (ContactEntity) authentication.getPrincipal();
         String jwt = tokenProvider.generateToken(user);
 
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getSiren(), user.getNom(), user.getRole()));

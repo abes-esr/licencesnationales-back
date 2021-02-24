@@ -1,7 +1,6 @@
 package fr.abes.lnevent.security.jwt;
 
 import fr.abes.lnevent.constant.Constant;
-import fr.abes.lnevent.entities.ContactRow;
 import fr.abes.lnevent.security.cache.LoginAttemptService;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;

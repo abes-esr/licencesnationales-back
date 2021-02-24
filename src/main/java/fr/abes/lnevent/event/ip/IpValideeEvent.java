@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 public class IpValideeEvent extends Event {
 
-    private String id;
+    private Long id;
     private String ip;
     private String siren;
 

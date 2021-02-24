@@ -2,7 +2,7 @@ package fr.abes.lnevent.listener.editeur;
 
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
 import fr.abes.lnevent.repository.EditeurRepository;
-import fr.abes.lnevent.entities.EditeurRow;
+import fr.abes.lnevent.entities.EditeurEntity;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
 
     @Override
     public void onApplicationEvent(EditeurModifieEvent editeurModifieEvent) {
-        editeurRepository.save(new EditeurRow(editeurModifieEvent.getId(),
+        editeurRepository.save(new EditeurEntity(editeurModifieEvent.getId(),
                 editeurModifieEvent.getNom(),
                 editeurModifieEvent.getAdresse(),
                 editeurModifieEvent.getMailPourBatch(),
