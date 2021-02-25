@@ -1,7 +1,9 @@
+/*
 
 
 package fr.abes.lnevent;
 
+import fr.abes.lnevent.datasourceconfig.H2JpaConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,3 +20,4 @@ class LneventApplicationTests {
 }
 
 
+*/

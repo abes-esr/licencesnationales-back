@@ -1,6 +1,7 @@
 package fr.abes.lnevent.security.jwt;
 
 import fr.abes.lnevent.constant.Constant;
+import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.security.cache.LoginAttemptService;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
@@ -39,18 +40,23 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             log.debug(Constant.ENTER_DOFILTERINTERNAL);
+            log.info("doFilterInternal début");
             final String ip = getClientIP();
             if (loginAttemptService.isBlocked(ip)) {
                 throw new RuntimeException(Constant.IP_BLOCKED);
             }
 
             String jwt = tokenProvider.getJwtFromRequest(request);
+            log.info("StringUtils.hasText(jwt) = " + StringUtils.hasText(jwt));
+            log.info("Si false, signifie que nous n'avons pas déjà de token, donc on vient se connecter donc on est redirigé vers l'authentification" );
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                //ContactRow u = tokenProvider.getUtilisateurFromJwt(jwt);
                 String siren = tokenProvider.getSirenFromJwtToken(jwt);
+                log.info("siren = " + siren);
+                log.info("On charge le tuple en bdd qui match ave le siren dans userdetails ");
                 UserDetails userDetails = userDetailsService.loadUserByUsername(siren);
 
+                //on vérifie que pour le siren et le pass trouvé c'est bien celui du jeton?
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));

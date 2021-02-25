@@ -7,6 +7,7 @@ import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
+import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,15 +65,23 @@ public class AuthenticationController {
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
     public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-
+        log.info("debut authenticateUser");
+        log.info("NB : le controller intervient maintenant mais il a au préalable été intercepté par JwtAuthenticationFilter");
+        log.info("ce qui permet d'appliquer des filtres en amont du controller comme une ip interdite etc + de vérifier si on a déjà un token");
+        log.info("si on a déjà un token, on reste dans le filtre, sinon on est redirigé ici, ce qui explique que dans le filter comme ici, on applique dans tous les cas la méthode authentication");
+        log.info("Soit on applique l'authentification dans le controller avec les params login pass (cas connection) " );
+        log.info("Soit on applique l'authentification dans le filter avec les params contenus dans le jeton (cas déjà connecté)");
+        log.info("LoginRequest login = " + loginRequest.getLogin());
+        log.info("LoginRequest password = " + loginRequest.getPassword());
         Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        //User user = (User)authentication.getPrincipal();
-        ContactEntity user = (ContactEntity) authentication.getPrincipal();
+        //on charge dans user le tuple bdd mis dans authentication
+        UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
+        log.info("là");
         String jwt = tokenProvider.generateToken(user);
-
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, user.getSiren(), user.getNom(), user.getRole()));
+        log.info("ici");
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getAuthorities().iterator().next().toString().equals("admin")? "true":"false"));
     }
 }
 

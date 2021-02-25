@@ -84,6 +84,11 @@
                 <artifactId>xdb6</artifactId>
                 <version>12.1.0.1.0</version>
             </dependency>
+
+            <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+            </dependency>
             <!--- === Contrôle des entités === -->
             <dependency>
                 <groupId>javax.validation</groupId>
