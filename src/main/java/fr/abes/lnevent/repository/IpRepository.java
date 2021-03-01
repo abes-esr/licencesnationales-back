@@ -2,13 +2,16 @@ package fr.abes.lnevent.repository;
 
 import fr.abes.lnevent.entities.IpEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 @Repository
-public interface IpRepository extends JpaRepository<IpEntity, String> {
+public interface IpRepository extends JpaRepository<IpEntity, Long> {
 
-    List<IpEntity> findAllBySiren(String siren);
-    void deleteByIpAndSiren(String ip, String siren);
+    @Query("select etab.ips from EtablissementEntity etab where etab.siren = ?1")
+    Set<IpEntity> findAllBySiren(String siren);
+
+    void deleteById(Long id);
 }

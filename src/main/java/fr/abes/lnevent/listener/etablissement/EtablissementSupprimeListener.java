@@ -23,6 +23,5 @@ public class EtablissementSupprimeListener implements ApplicationListener<Etabli
     @Transactional
     public void onApplicationEvent(EtablissementSupprimeEvent etablissementSupprimeEvent) {
         etablissementRepository.deleteBySiren(etablissementSupprimeEvent.getSiren());
-        contactRepository.deleteBySiren(etablissementSupprimeEvent.getSiren());
     }
 }

@@ -15,11 +15,9 @@ import javax.transaction.Transactional;
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {
 
     private final EtablissementRepository etablissementRepository;
-    private final ContactRepository contactRepository;
 
-    public EtablissementFusionneListener(EtablissementRepository etablissementRepository, ContactRepository contactRepository) {
+    public EtablissementFusionneListener(EtablissementRepository etablissementRepository) {
         this.etablissementRepository = etablissementRepository;
-        this.contactRepository = contactRepository;
     }
 
     @Override
@@ -27,30 +25,27 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
     public void onApplicationEvent(EtablissementFusionneEvent etablissementFusionneEvent) {
 
         EtablissementDTO etablissementDTOFusione = etablissementFusionneEvent.getEtablissementDTO();
+        ContactEntity contactEntity =
+                new ContactEntity(null,
+                        etablissementDTOFusione.getNomContact(),
+                        etablissementDTOFusione.getPrenomContact(),
+                        etablissementDTOFusione.getTelephoneContact(),
+                        etablissementDTOFusione.getMailContact(),
+                        etablissementDTOFusione.getAdresseContact());
 
         etablissementRepository.save(new EtablissementEntity(null,
                 etablissementDTOFusione.getNom(),
                 etablissementDTOFusione.getAdresse(),
                 etablissementDTOFusione.getSiren(),
+                etablissementDTOFusione.getMotDePasse(),
                 etablissementDTOFusione.getTypeEtablissement(),
-                etablissementDTOFusione.getIdAbes()));
-
-        ContactEntity contactEntity =
-                new ContactEntity(null,
-                        etablissementDTOFusione.getNomContact(),
-                        etablissementDTOFusione.getPrenomContact(),
-                        etablissementDTOFusione.getMailContact(),
-                        etablissementDTOFusione.getMotDePasse(),
-                        etablissementDTOFusione.getTelephoneContact(),
-                        etablissementDTOFusione.getAdresseContact(),
-                        etablissementDTOFusione.getSiren());
-
-        contactRepository.save(contactEntity);
+                etablissementDTOFusione.getIdAbes(),
+                contactEntity,
+                null));
 
         for (String siren :
                 etablissementFusionneEvent.getSirenFusionne()) {
             etablissementRepository.deleteBySiren(siren);
-            contactRepository.deleteBySiren(siren);
         }
     }
 }

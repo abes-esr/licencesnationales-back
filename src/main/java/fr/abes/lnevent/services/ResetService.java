@@ -1,28 +1,35 @@
 package fr.abes.lnevent.services;
 
 import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
+import fr.abes.lnevent.entities.*;
 import fr.abes.lnevent.event.etablissement.EtablissementCreeEvent;
-import fr.abes.lnevent.entities.EventEntity;
+import fr.abes.lnevent.repository.EditeurRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.event.etablissement.EtablissementDiviseEvent;
 import fr.abes.lnevent.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.lnevent.event.etablissement.EtablissementSupprimeEvent;
+import fr.abes.lnevent.repository.IpRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 @Service
 public class ResetService {
     private EtablissementRepository etablissementRepository;
     private EventRepository eventRepository;
     private ApplicationEventPublisher applicationEventPublisher;
+    private EditeurRepository editeurRepository;
+    private IpRepository ipRepository;
 
-    public ResetService(EtablissementRepository etablissementRepository, EventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher) {
+    public ResetService(EtablissementRepository etablissementRepository, EventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher, EditeurRepository editeurRepository, IpRepository ipRepository) {
         this.etablissementRepository = etablissementRepository;
         this.eventRepository = eventRepository;
         this.applicationEventPublisher = applicationEventPublisher;
+        this.editeurRepository = editeurRepository;
+        this.ipRepository = ipRepository;
     }
 
     public String resetEtablissement() {
@@ -71,3 +78,40 @@ public class ResetService {
         return "done";
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

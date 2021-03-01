@@ -14,38 +14,33 @@ import javax.transaction.Transactional;
 public class EtablissementModifieListener implements ApplicationListener<EtablissementModifieEvent> {
 
     private final EtablissementRepository etablissementRepository;
-    private final ContactRepository contactRepository;
 
-    public EtablissementModifieListener(EtablissementRepository etablissementRepository,
-                                     ContactRepository contactRepository) {
+    public EtablissementModifieListener(EtablissementRepository etablissementRepository) {
         this.etablissementRepository = etablissementRepository;
-        this.contactRepository = contactRepository;
     }
 
     @Override
     @Transactional
     public void onApplicationEvent(EtablissementModifieEvent etablissementModifieEvent) {
+        ContactEntity contactEntity =
+                new ContactEntity(null,
+                        etablissementModifieEvent.getNomContact(),
+                        etablissementModifieEvent.getPrenomContact(),
+                        etablissementModifieEvent.getMailContact(),
+                        etablissementModifieEvent.getTelephoneContact(),
+                        etablissementModifieEvent.getAdresseContact());
         EtablissementEntity etablissementEntity =
                 new EtablissementEntity(
                         etablissementModifieEvent.getIdEtablissement(),
                         etablissementModifieEvent.getNom(),
                         etablissementModifieEvent.getAdresse(),
                         etablissementModifieEvent.getSiren(),
+                        etablissementModifieEvent.getMotDePasse(),
                         etablissementModifieEvent.getTypeEtablissement(),
-                        etablissementModifieEvent.getIdAbes());
+                        etablissementModifieEvent.getIdAbes(),
+                        contactEntity,
+                        null);
 
         etablissementRepository.save(etablissementEntity);
-
-        ContactEntity contactEntity =
-                new ContactEntity(null,
-                        etablissementModifieEvent.getNomContact(),
-                        etablissementModifieEvent.getPrenomContact(),
-                        etablissementModifieEvent.getMailContact(),
-                        etablissementModifieEvent.getMotDePasse(),
-                        etablissementModifieEvent.getTelephoneContact(),
-                        etablissementModifieEvent.getAdresseContact(),
-                        etablissementModifieEvent.getSiren());
-
-        contactRepository.save(contactEntity);
     }
 }

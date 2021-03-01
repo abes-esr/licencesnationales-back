@@ -12,37 +12,32 @@ import org.springframework.stereotype.Component;
 public class EtablissementCreeListener implements ApplicationListener<EtablissementCreeEvent> {
 
     private final EtablissementRepository etablissementRepository;
-    private final ContactRepository contactRepository;
 
-    public EtablissementCreeListener(EtablissementRepository etablissementRepository,
-                                     ContactRepository contactRepository) {
+    public EtablissementCreeListener(EtablissementRepository etablissementRepository) {
         this.etablissementRepository = etablissementRepository;
-        this.contactRepository = contactRepository;
     }
 
     @Override
     public void onApplicationEvent(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementEntity etablissementEntity =
-                new EtablissementEntity(null,
-                etablissementCreeEvent.getNom(),
-                etablissementCreeEvent.getAdresse(),
-                etablissementCreeEvent.getSiren(),
-                etablissementCreeEvent.getTypeEtablissement(),
-                etablissementCreeEvent.getIdAbes());
-
-        etablissementRepository.save(etablissementEntity);
-
         ContactEntity contactEntity =
                 new ContactEntity(null,
                         etablissementCreeEvent.getNomContact(),
                         etablissementCreeEvent.getPrenomContact(),
                         etablissementCreeEvent.getMailContact(),
-                        etablissementCreeEvent.getMotDePasse(),
                         etablissementCreeEvent.getTelephoneContact(),
-                        etablissementCreeEvent.getAdresseContact(),
-                        etablissementCreeEvent.getSiren());
+                        etablissementCreeEvent.getAdresseContact());
+        EtablissementEntity etablissementEntity =
+                new EtablissementEntity(null,
+                        etablissementCreeEvent.getNom(),
+                        etablissementCreeEvent.getAdresse(),
+                        etablissementCreeEvent.getSiren(),
+                        etablissementCreeEvent.getMotDePasse(),
+                        etablissementCreeEvent.getTypeEtablissement(),
+                        etablissementCreeEvent.getIdAbes(),
+                        contactEntity,
+                        null);
 
-        contactRepository.save(contactEntity);
+        etablissementRepository.save(etablissementEntity);
 
     }
 }
