@@ -22,7 +22,8 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
                 editeurCreeEvent.getNom(),
                 editeurCreeEvent.getAdresse(),
                 editeurCreeEvent.getMailPourBatch(),
-                editeurCreeEvent.getMailPourInformation());
+                editeurCreeEvent.getMailPourInformation(),
+                null);
         editeurRepository.save(editeurEntity);
 
     }

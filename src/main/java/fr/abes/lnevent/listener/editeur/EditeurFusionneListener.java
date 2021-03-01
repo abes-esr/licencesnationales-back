@@ -28,7 +28,8 @@ public class EditeurFusionneListener implements ApplicationListener<EditeurFusio
                 editeurDTO.getNom(),
                 editeurDTO.getAdresse(),
                 editeurDTO.getMailPourBatch(),
-                editeurDTO.getMailPourInformation()));
+                editeurDTO.getMailPourInformation(),
+                null));
 
         for (Long idEditeur :
                 editeurFusionneEvent.getIdEditeurFusionnes()) {
