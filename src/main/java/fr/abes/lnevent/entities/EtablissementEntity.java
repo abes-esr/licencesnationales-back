@@ -54,8 +54,7 @@ public class EtablissementEntity {
     private ContactEntity contact;
 
     @OneToMany(cascade = CascadeType.ALL,
-            orphanRemoval = true
-            /*mappedBy = "etablissementEntity"*/)
+            orphanRemoval = true)
     @JsonIgnore
     private Set<IpEntity> ips = new HashSet<>();
 
