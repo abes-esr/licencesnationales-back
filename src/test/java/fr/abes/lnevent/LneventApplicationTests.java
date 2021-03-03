@@ -39,7 +39,6 @@ class LneventApplicationTests {
 
         EtablissementEntity etablissementEntity = new EtablissementEntity(null,
                 "umtp2init",
-                "batallioninit",
                 "3555646init",
                 "uuuu",
                 "universite",
@@ -87,7 +86,6 @@ class LneventApplicationTests {
 
         EtablissementEntity etablissementEntity = new EtablissementEntity(null,
                 "umtp2",
-                "batallion",
                 "3555646",
                 "uuuu",
                 "universite",
@@ -123,7 +121,11 @@ class LneventApplicationTests {
                 "simba",
                 "c@est.moi",
                 "le roi",
-                "du royaume");
+                "du royaume",
+                "animal",
+                "34000",
+                "CS",
+                "Montpellier");
 
         etablissementEntity1.setContact(contactEntity);
 

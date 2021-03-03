@@ -32,10 +32,13 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
                             etablissementDTODivise.getPrenomContact(),
                             etablissementDTODivise.getMailContact(),
                             etablissementDTODivise.getTelephoneContact(),
-                            etablissementDTODivise.getAdresseContact());
+                            etablissementDTODivise.getAdresseContact(),
+                            etablissementDTODivise.getBoitePostaleContact(),
+                            etablissementDTODivise.getCodePostalContact(),
+                            etablissementDTODivise.getCedexContact(),
+                            etablissementDTODivise.getVilleContact());
             etablissementRepository.save(new EtablissementEntity(null,
                     etablissementDTODivise.getNom(),
-                    etablissementDTODivise.getAdresse(),
                     etablissementDTODivise.getSiren(),
                     etablissementDTODivise.getMotDePasse(),
                     etablissementDTODivise.getTypeEtablissement(),

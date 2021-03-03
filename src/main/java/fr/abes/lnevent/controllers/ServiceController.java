@@ -2,6 +2,7 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.services.ArbreService;
+import fr.abes.lnevent.services.PeuplementService;
 import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class ServiceController {
     @Autowired
     private ArbreService arbreService;
 
+    @Autowired
+    private PeuplementService peuplementService;
+
     @GetMapping(value = "/ln/resetEtablissement")
     public String resetEtablissement() {
         return resetService.resetEtablissement();
@@ -32,5 +36,10 @@ public class ServiceController {
     @GetMapping(value = "/ln/arbre")
     public String arbre() {
         return arbreService.genereArbre();
+    }
+
+    @GetMapping(value = "/ln/peuplement")
+    public String peuplement() {
+        return peuplementService.ajoutEtablissementfromCSV();
     }
 }
