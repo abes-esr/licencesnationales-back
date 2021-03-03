@@ -3,6 +3,7 @@ package fr.abes.lnevent.services;
 import com.fasterxml.jackson.databind.MappingIterator;
 import com.fasterxml.jackson.dataformat.csv.CsvMapper;
 import com.fasterxml.jackson.dataformat.csv.CsvSchema;
+import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.event.etablissement.EtablissementCreeEvent;
 import fr.abes.lnevent.event.etablissement.EtablissementModifieEvent;
@@ -39,7 +40,7 @@ public class PeuplementService {
             CsvMapper mapper = new CsvMapper();
             File file = new ClassPathResource(fileName).getFile();
             MappingIterator<T> readValues =
-                    mapper.reader(type).with(bootstrapSchema).readValues(file);
+                    mapper.readerWithSchemaFor(type).with(bootstrapSchema).readValues(file);
             return readValues.readAll();
         } catch (Exception e) {
             return Collections.emptyList();
@@ -71,19 +72,24 @@ public class PeuplementService {
                 etablissementFiltered) {
             EtablissementCreeEvent etablissementCreeEvent =
                     new EtablissementCreeEvent(this,
-                            etablissementCSV.NomEtablissement,
-                            etablissementCSV.Adresse + " " + etablissementCSV.Adresse2 + " " + etablissementCSV.Ville,
-                            etablissementCSV.SIRENEtalissement,
-                            etablissementCSV.TypeEtablissement,
-                            "",
-                            etablissementCSV.IDEtablissement,
-                            etablissementCSV.ContactEmail,
-                            etablissementCSV.ContactNom,
-                            "",
-                            etablissementCSV.ContactTel,
-                            "");
-            //applicationEventPublisher.publishEvent(etablissementCreeEvent);
-            //eventRepository.save(new EventEntity(etablissementCreeEvent));
+                            new EtablissementDTO(
+                                    etablissementCSV.NomEtablissement,
+                                    etablissementCSV.SIRENEtalissement,
+                                    etablissementCSV.TypeEtablissement,
+                                    etablissementCSV.IDEtablissement,
+                                    etablissementCSV.ContactEmail,
+                                    "",
+                                    etablissementCSV.ContactNom,
+                                    "",
+                                    etablissementCSV.ContactTel,
+                                    etablissementCSV.Adresse,
+                                    etablissementCSV.BoitePostale,
+                                    etablissementCSV.CodePostal,
+                                    etablissementCSV.Cedex,
+                                    etablissementCSV.Ville)
+                            );
+/*            applicationEventPublisher.publishEvent(etablissementCreeEvent);
+            eventRepository.save(new EventEntity(etablissementCreeEvent));*/
         }
 
         return "done";

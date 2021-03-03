@@ -19,10 +19,9 @@ public class EtablissementEntity {
 
 
 
-    public EtablissementEntity(Long id, String name, String adresse, String siren, String motDePasse, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
+    public EtablissementEntity(Long id, String name, String siren, String motDePasse, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
         this.id = id;
         this.name = name;
-        this.adresse = adresse;
         this.siren = siren;
         this.motDePasse = motDePasse;
         this.typeEtablissement = typeEtablissement;
@@ -37,8 +36,6 @@ public class EtablissementEntity {
     private Long id;
 
     private String name;
-
-    private String adresse;
 
     private String siren;
 

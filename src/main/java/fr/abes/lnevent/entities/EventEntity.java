@@ -23,33 +23,41 @@ import java.util.List;
 public class EventEntity {
 
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
+        EtablissementDTO etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
-        this.nomEtab = etablissementCreeEvent.getNom();
-        this.adresse = etablissementCreeEvent.getAdresse();
-        this.siren = etablissementCreeEvent.getSiren();
-        this.typeEtablissement = etablissementCreeEvent.getTypeEtablissement();
-        this.motDePasse = etablissementCreeEvent.getMotDePasse();
-        this.idAbes = etablissementCreeEvent.getIdAbes();
-        this.mailContact = etablissementCreeEvent.getMailContact();
-        this.nomContact = etablissementCreeEvent.getNomContact();
-        this.prenomContact = etablissementCreeEvent.getPrenomContact();
-        this.telephoneContact = etablissementCreeEvent.getTelephoneContact();
-        this.adresseContact = etablissementCreeEvent.getAdresseContact();
+        this.nomEtab = etablissement.getNom();
+        this.siren = etablissement.getSiren();
+        this.typeEtablissement = etablissement.getTypeEtablissement();
+        this.motDePasse = etablissement.getMotDePasse();
+        this.idAbes = etablissement.getIdAbes();
+        this.mailContact = etablissement.getMailContact();
+        this.nomContact = etablissement.getNomContact();
+        this.prenomContact = etablissement.getPrenomContact();
+        this.telephoneContact = etablissement.getTelephoneContact();
+        this.adresseContact = etablissement.getAdresseContact();
+        this.boitePostaleContact = etablissement.getBoitePostaleContact();
+        this.codePostalContact = etablissement.getCodePostalContact();
+        this.cedexContact = etablissement.getCedexContact();
+        this.villeContact = etablissement.getVilleContact();
     }
 
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
+        EtablissementDTO etablissement = etablissementModifieEvent.getEtablissement();
         this.event = "modifie";
-        this.nomEtab = etablissementModifieEvent.getNom();
-        this.adresse = etablissementModifieEvent.getAdresse();
-        this.siren = etablissementModifieEvent.getSiren();
-        this.typeEtablissement = etablissementModifieEvent.getTypeEtablissement();
-        this.motDePasse = etablissementModifieEvent.getMotDePasse();
-        this.idAbes = etablissementModifieEvent.getIdAbes();
-        this.mailContact = etablissementModifieEvent.getMailContact();
-        this.nomContact = etablissementModifieEvent.getNomContact();
-        this.prenomContact = etablissementModifieEvent.getPrenomContact();
-        this.telephoneContact = etablissementModifieEvent.getTelephoneContact();
-        this.adresseContact = etablissementModifieEvent.getAdresseContact();
+        this.nomEtab = etablissement.getNom();
+        this.siren = etablissement.getSiren();
+        this.typeEtablissement = etablissement.getTypeEtablissement();
+        this.motDePasse = etablissement.getMotDePasse();
+        this.idAbes = etablissement.getIdAbes();
+        this.mailContact = etablissement.getMailContact();
+        this.nomContact = etablissement.getNomContact();
+        this.prenomContact = etablissement.getPrenomContact();
+        this.telephoneContact = etablissement.getTelephoneContact();
+        this.adresseContact = etablissement.getAdresseContact();
+        this.boitePostaleContact = etablissement.getBoitePostaleContact();
+        this.codePostalContact = etablissement.getCodePostalContact();
+        this.cedexContact = etablissement.getCedexContact();
+        this.villeContact = etablissement.getVilleContact();
     }
 
     public EventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {
@@ -145,6 +153,14 @@ public class EventEntity {
 
     public String adresseContact;
 
+    public String boitePostaleContact;
+
+    public String codePostalContact;
+
+    public String cedexContact;
+
+    public String villeContact;
+
     public String ancienNomEtab;
 
     @Lob
@@ -163,9 +179,9 @@ public class EventEntity {
 
     public String siren;
 
-    private String nomEditeur;
+    public String nomEditeur;
 
-    private String adresseEditeur;
+    public String adresseEditeur;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)

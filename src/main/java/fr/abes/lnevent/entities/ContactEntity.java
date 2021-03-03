@@ -12,18 +12,17 @@ import javax.persistence.*;
 @Getter @Setter
 public class ContactEntity {
 
-    public ContactEntity(Long id,
-                         String nom,
-                         String prenom,
-                         String mail,
-                         String telephone,
-                         String adresse) {
+    public ContactEntity(Long id, String nom, String prenom, String mail, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville) {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.mail = mail;
         this.telephone = telephone;
         this.adresse = adresse;
+        this.boitePostale = boitePostale;
+        this.codePostal = codePostal;
+        this.cedex = cedex;
+        this.ville = ville;
     }
 
     @Id
@@ -40,5 +39,13 @@ public class ContactEntity {
     private String telephone;
 
     private String adresse;
+
+    private String boitePostale;
+
+    private String codePostal;
+
+    private String cedex;
+
+    private String ville;
 
 }

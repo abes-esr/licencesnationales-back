@@ -1,9 +1,6 @@
 package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
-import fr.abes.lnevent.dto.etablissement.EtablissementDiviseDTO;
-import fr.abes.lnevent.dto.etablissement.EtablissementFusionneDTO;
-import fr.abes.lnevent.dto.etablissement.EtablissementModifieDTO;
+import fr.abes.lnevent.dto.etablissement.*;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.repository.EventRepository;
@@ -27,17 +24,7 @@ public class EtablissementController {
     public String add(@RequestBody EtablissementCreeDTO eventDTO) {
         EtablissementCreeEvent etablissementCreeEvent =
                 new EtablissementCreeEvent(this,
-                        eventDTO.getNom(),
-                        eventDTO.getAdresse(),
-                        eventDTO.getSiren(),
-                        eventDTO.getTypeEtablissement(),
-                        eventDTO.getMotDePasse(),
-                        eventDTO.getIdAbes(),
-                        eventDTO.getMailContact(),
-                        eventDTO.getNomContact(),
-                        eventDTO.getPrenomContact(),
-                        eventDTO.getTelephoneContact(),
-                        eventDTO.getAdresseContact());
+                        eventDTO);
         applicationEventPublisher.publishEvent(etablissementCreeEvent);
         repository.save(new EventEntity(etablissementCreeEvent));
 
@@ -49,18 +36,7 @@ public class EtablissementController {
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
                         eventDTO.getId(),
-                        eventDTO.getNom(),
-                        eventDTO.getAdresse(),
-                        eventDTO.getSiren(),
-                        eventDTO.getTypeEtablissement(),
-                        eventDTO.getMotDePasse(),
-                        eventDTO.getIdAbes(),
-                        eventDTO.getIdContact(),
-                        eventDTO.getMailContact(),
-                        eventDTO.getNomContact(),
-                        eventDTO.getPrenomContact(),
-                        eventDTO.getTelephoneContact(),
-                        eventDTO.getAdresseContact());
+                        eventDTO);
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         repository.save(new EventEntity(etablissementModifieEvent));
 

@@ -31,11 +31,14 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
                         etablissementDTOFusione.getPrenomContact(),
                         etablissementDTOFusione.getTelephoneContact(),
                         etablissementDTOFusione.getMailContact(),
-                        etablissementDTOFusione.getAdresseContact());
+                        etablissementDTOFusione.getAdresseContact(),
+                        etablissementDTOFusione.getBoitePostaleContact(),
+                        etablissementDTOFusione.getCodePostalContact(),
+                        etablissementDTOFusione.getCedexContact(),
+                        etablissementDTOFusione.getVilleContact());
 
         etablissementRepository.save(new EtablissementEntity(null,
                 etablissementDTOFusione.getNom(),
-                etablissementDTOFusione.getAdresse(),
                 etablissementDTOFusione.getSiren(),
                 etablissementDTOFusione.getMotDePasse(),
                 etablissementDTOFusione.getTypeEtablissement(),
