@@ -33,18 +33,21 @@ public class ResetService {
                 case "cree":
                     EtablissementCreeEvent etablissementCreeEvent =
                             new EtablissementCreeEvent(this,
-                                    eventEntity.nomEtab,
-                                    eventEntity.adresse,
-                                    eventEntity.siren,
-                                    eventEntity.typeEtablissement,
-                                    eventEntity.motDePasse,
-                                    eventEntity.idAbes,
-                                    eventEntity.mailContact,
-                                    eventEntity.nomContact,
-                                    eventEntity.prenomContact,
-                                    eventEntity.telephoneContact,
-                                    eventEntity.adresseContact,
-                                    eventEntity.roleContact);
+                                    new EtablissementDTO(eventEntity.nomEtab,
+                                            eventEntity.siren,
+                                            eventEntity.typeEtablissement,
+                                            eventEntity.idAbes,
+                                            eventEntity.mailContact,
+                                            eventEntity.motDePasse,
+                                            eventEntity.nomContact,
+                                            eventEntity.prenomContact,
+                                            eventEntity.telephoneContact,
+                                            eventEntity.adresseContact,
+                                            eventEntity.boitePostaleContact,
+                                            eventEntity.codePostalContact,
+                                            eventEntity.cedexContact,
+                                            eventEntity.roleContact,
+                                            eventEntity.villeContact));
                     applicationEventPublisher.publishEvent(etablissementCreeEvent);
                     break;
                 case "supprime":

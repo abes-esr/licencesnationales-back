@@ -15,35 +15,36 @@ import javax.transaction.Transactional;
 public class EtablissementDiviseListener implements ApplicationListener<EtablissementDiviseEvent> {
 
     private final EtablissementRepository etablissementRepository;
-    private final ContactRepository contactRepository;
 
-    public EtablissementDiviseListener(EtablissementRepository etablissementRepository, ContactRepository contactRepository) {
+    public EtablissementDiviseListener(EtablissementRepository etablissementRepository) {
         this.etablissementRepository = etablissementRepository;
-        this.contactRepository = contactRepository;
     }
 
     @Override
     @Transactional
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
         etablissementRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
-        contactRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
         for (EtablissementDTO etablissementDTODivise :
                 etablissementDiviseEvent.getEtablissementDTOS()) {
-            etablissementRepository.save(new EtablissementEntity(null,
-                    etablissementDTODivise.getNom(),
-                    etablissementDTODivise.getAdresse(),
-                    etablissementDTODivise.getSiren(),
-                    etablissementDTODivise.getTypeEtablissement(),
-                    etablissementDTODivise.getIdAbes()));
-
             ContactEntity contactEntity =
                     new ContactEntity(null,
                             etablissementDTODivise.getNomContact(),
                             etablissementDTODivise.getPrenomContact(),
                             etablissementDTODivise.getMailContact(),
-                            etablissementDTODivise.getMotDePasse(),
                             etablissementDTODivise.getTelephoneContact(),
                             etablissementDTODivise.getAdresseContact(),
+                            etablissementDTODivise.getBoitePostaleContact(),
+                            etablissementDTODivise.getCodePostalContact(),
+                            etablissementDTODivise.getCedexContact(),
+                            etablissementDTODivise.getVilleContact());
+            etablissementRepository.save(new EtablissementEntity(null,
+                    etablissementDTODivise.getNom(),
+                    etablissementDTODivise.getSiren(),
+                    etablissementDTODivise.getMotDePasse(),
+                    etablissementDTODivise.getTypeEtablissement(),
+                    etablissementDTODivise.getIdAbes(),
+                    contactEntity,
+                    null));
                             etablissementDTODivise.getSiren(),
                             etablissementDTODivise.getRoleContact());
 

@@ -21,6 +21,7 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
                 editeurModifieEvent.getNom(),
                 editeurModifieEvent.getAdresse(),
                 editeurModifieEvent.getMailPourBatch(),
-                editeurModifieEvent.getMailPourInformation()));
+                editeurModifieEvent.getMailPourInformation(),
+                null));
     }
 }

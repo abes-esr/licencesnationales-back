@@ -1,20 +1,15 @@
 package fr.abes.lnevent.entities;
 
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
-import java.util.Collection;
 
 @Entity
 @Table(name = "Contact")
 @NoArgsConstructor
-@Getter
-@Setter
 public class ContactEntity {
 
+    public ContactEntity(Long id, String nom, String prenom, String mail, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville) {
     public ContactEntity(Long id,
                          String nom,
                          String prenom,
@@ -31,10 +26,12 @@ public class ContactEntity {
         this.motDePasse = motDePasse;
         this.telephone = telephone;
         this.adresse = adresse;
-        this.siren = siren;
+        this.boitePostale = boitePostale;
+        this.codePostal = codePostal;
+        this.cedex = cedex;
+        this.ville = ville;
         this.role = role;
     }
-
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
@@ -54,7 +51,5 @@ public class ContactEntity {
     public String adresse;
 
     public String siren;
-
-    public String role;
 
 }

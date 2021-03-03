@@ -1,30 +1,31 @@
 package fr.abes.lnevent.entities;
 
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "Ip")
 @NoArgsConstructor
-public class IpEntity {
+@Getter @Setter
+public class IpEntity implements Serializable {
 
-    public IpEntity(Long id, String ip, String siren) {
+    public IpEntity(Long id, String ip) {
         this.id = id;
         this.ip = ip;
-        this.siren = siren;
         this.validee = false;
     }
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "ip_Sequence")
     @SequenceGenerator(name = "ip_Sequence", sequenceName = "IP_SEQ", allocationSize = 1)
-    public Long id;
+    private Long id;
 
-    public String ip;
+    private String ip;
 
-    public String siren;
-
-    public boolean validee;
+    private boolean validee;
 }

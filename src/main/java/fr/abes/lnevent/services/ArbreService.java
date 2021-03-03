@@ -26,10 +26,10 @@ public class ArbreService {
             switch (eventEntity.event) {
                 case "cree":
                     builder.append("Nouveau : ").append(eventEntity.nomEtab).append("\n");
-                    List<IpEntity> ips = ipRepository.findAllBySiren(eventEntity.siren);
+                    List<IpEntity> ips = (List<IpEntity>) ipRepository.findAllBySiren(eventEntity.siren);
                     for (IpEntity ipEntity :
                             ips) {
-                        builder.append(ipEntity.ip).append("\n");
+                        builder.append(ipEntity.getIp()).append("\n");
                     }
                     break;
                 case "supprime":
