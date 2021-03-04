@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter @Setter
 public class EtablissementCreeDTO extends EtablissementDTO {
-    public EtablissementCreeDTO(String nom, String siren, String typeEtablissement, String idAbes, String mailContact, String motDePasse, String nomContact, String prenomContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String cedexContact, String villeContact, String roleContact) {
-        super(nom, siren, typeEtablissement, idAbes, mailContact, motDePasse, nomContact, prenomContact, telephoneContact, adresseContact, boitePostaleContact, codePostalContact, cedexContact, villeContact, roleContact);
+    public EtablissementCreeDTO(String nom, String siren, String typeEtablissement, String idAbes, String nomContact, String prenomContact, String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact, String telephoneContact, String mailContact, String motDePasse, String roleContact) {
+        super(nom, siren, typeEtablissement, idAbes,  nomContact, prenomContact, adresseContact, boitePostaleContact, codePostalContact, villeContact, cedexContact, telephoneContact, mailContact, motDePasse, roleContact);
     }
 }

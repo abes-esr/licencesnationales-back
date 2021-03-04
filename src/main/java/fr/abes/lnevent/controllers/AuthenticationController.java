@@ -8,6 +8,7 @@ import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import fr.abes.lnevent.services.GenererIdAbes;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,9 @@ public class AuthenticationController {
 
     @Autowired
     EtablissementController etablissementController;
+
+    @Autowired
+    GenererIdAbes genererIdAbes;
 
 
 
@@ -99,7 +103,17 @@ public class AuthenticationController {
 
     @PostMapping("/creationCompte")
     public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
+        log.info("eventDto = " + eventDTO.toString());
         log.info("siren = " + eventDTO.getSiren());
+        log.info("mdp = " + eventDTO.getMotDePasse());
+        log.info("mdp = " + eventDTO.getNomContact());
+        log.info("mdp = " + eventDTO.getNom());
+        log.info("mdp = " + eventDTO.getAdresseContact());
+        log.info("mdp = " + eventDTO.getCedexContact());
+        log.info("mdp = " + eventDTO.getCodePostalContact());
+        log.info("mdp = " + eventDTO.getPrenomContact());
+        log.info("mdp = " + eventDTO.getTelephoneContact());
+        log.info("mdp = " + eventDTO.getTypeEtablissement());
         boolean existeSiren = contactRepository.existeSiren(eventDTO.getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
@@ -108,7 +122,11 @@ public class AuthenticationController {
                     .body("Cet établissement existe déjà.");
         }
         else{
+        log.info("mdp = " + eventDTO.getMotDePasse());
         eventDTO.setMotDePasse(passwordEncoder.encode(eventDTO.getMotDePasse()));
+        eventDTO.setIdAbes(genererIdAbes.genererIdAbes(GenererIdAbes.generateId()));
+        eventDTO.setRoleContact("etab");
+        log.info("idAbes = " + eventDTO.getIdAbes());
         log.info("mdphash = " + eventDTO.getMotDePasse());
         etablissementController.add(eventDTO);
         return ResponseEntity.ok("Creation du compte effectuée.");}
