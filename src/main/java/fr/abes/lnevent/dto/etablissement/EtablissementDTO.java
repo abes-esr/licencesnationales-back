@@ -2,11 +2,18 @@ package fr.abes.lnevent.dto.etablissement;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.Setter;
 
-@Getter
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+@Getter @Setter
 @AllArgsConstructor
 public class EtablissementDTO {
 
+    @NotBlank
+    @Size(min = 3, max = 20)
     private String nom;
 
     private String siren;
@@ -15,6 +22,9 @@ public class EtablissementDTO {
 
     private String idAbes;
 
+    @NotBlank
+    @Size(max = 50)
+    @Email
     private String mailContact;
 
     private String motDePasse;
