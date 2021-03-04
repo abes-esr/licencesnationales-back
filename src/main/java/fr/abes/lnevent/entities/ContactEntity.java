@@ -1,37 +1,17 @@
 package fr.abes.lnevent.entities;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "Contact")
 @NoArgsConstructor
+@Getter
+@Setter
 public class ContactEntity {
-
-    public ContactEntity(Long id, String nom, String prenom, String mail, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville) {
-    public ContactEntity(Long id,
-                         String nom,
-                         String prenom,
-                         String mail,
-                         String motDePasse,
-                         String telephone,
-                         String adresse,
-                         String siren,
-                         String role) {
-        this.id = id;
-        this.nom = nom;
-        this.prenom = prenom;
-        this.mail = mail;
-        this.motDePasse = motDePasse;
-        this.telephone = telephone;
-        this.adresse = adresse;
-        this.boitePostale = boitePostale;
-        this.codePostal = codePostal;
-        this.cedex = cedex;
-        this.ville = ville;
-        this.role = role;
-    }
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
@@ -51,5 +31,32 @@ public class ContactEntity {
     public String adresse;
 
     public String siren;
+
+    public String boitePostale;
+
+    public String codePostal;
+
+    public String cedex;
+
+    public String ville;
+
+    public  String role;
+
+
+    public ContactEntity(Long id, String nom, String prenom, String mail, String motDePasse, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville, String role) {
+
+        this.id = id;
+        this.nom = nom;
+        this.prenom = prenom;
+        this.mail = mail;
+        this.motDePasse = motDePasse;
+        this.telephone = telephone;
+        this.adresse = adresse;
+        this.boitePostale = boitePostale;
+        this.codePostal = codePostal;
+        this.cedex = cedex;
+        this.ville = ville;
+        this.role = role;
+    }
 
 }

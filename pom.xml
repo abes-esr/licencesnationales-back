@@ -106,6 +106,13 @@
             <optional>true</optional>
         </dependency>
 
+        <!--- === Csv pour bdd === -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.dataformat</groupId>
+            <artifactId>jackson-dataformat-csv</artifactId>
+            <version>2.5.3</version>
+        </dependency>
+
         <!--- === Tests === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

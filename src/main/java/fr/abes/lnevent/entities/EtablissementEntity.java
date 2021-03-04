@@ -17,19 +17,6 @@ import java.util.Set;
 @Getter
 public class EtablissementEntity {
 
-
-
-    public EtablissementEntity(Long id, String name, String siren, String motDePasse, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
-        this.id = id;
-        this.name = name;
-        this.siren = siren;
-        this.motDePasse = motDePasse;
-        this.typeEtablissement = typeEtablissement;
-        this.idAbes = idAbes;
-        this.contact = contact;
-        this.editeurs = editeurs;
-    }
-
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "etablissement_Sequence")
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
@@ -61,4 +48,19 @@ public class EtablissementEntity {
             joinColumns = @JoinColumn(name = "etablissement_id"),
             inverseJoinColumns = @JoinColumn(name = "editeur_id"))
     private Set<EditeurEntity> editeurs = new HashSet<>();
+
+
+
+    public EtablissementEntity(Long id, String name, String siren, String motDePasse, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
+        this.id = id;
+        this.name = name;
+        this.siren = siren;
+        this.motDePasse = motDePasse;
+        this.typeEtablissement = typeEtablissement;
+        this.idAbes = idAbes;
+        this.contact = contact;
+        this.editeurs = editeurs;
+    }
+
+
 }

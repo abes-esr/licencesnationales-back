@@ -29,12 +29,14 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
                         etablissement.getNomContact(),
                         etablissement.getPrenomContact(),
                         etablissement.getMailContact(),
+                        etablissement.getMotDePasse(),
                         etablissement.getTelephoneContact(),
                         etablissement.getAdresseContact(),
                         etablissement.getBoitePostaleContact(),
                         etablissement.getCodePostalContact(),
                         etablissement.getCedexContact(),
-                        etablissement.getVilleContact());
+                        etablissement.getVilleContact(),
+                        etablissement.getRoleContact());
         EtablissementEntity etablissementEntity =
                 new EtablissementEntity(
                         etablissementModifieEvent.getIdEtablissement(),

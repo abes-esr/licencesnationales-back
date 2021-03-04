@@ -39,6 +39,7 @@ public class EventEntity {
         this.codePostalContact = etablissement.getCodePostalContact();
         this.cedexContact = etablissement.getCedexContact();
         this.villeContact = etablissement.getVilleContact();
+        this.roleContact = etablissement.getRoleContact();
     }
 
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
@@ -58,7 +59,7 @@ public class EventEntity {
         this.codePostalContact = etablissement.getCodePostalContact();
         this.cedexContact = etablissement.getCedexContact();
         this.villeContact = etablissement.getVilleContact();
-        this.roleContact = etablissementModifieEvent.getRoleContact();
+        this.roleContact = etablissement.getRoleContact();
     }
 
     public EventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {
