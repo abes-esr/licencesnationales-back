@@ -1,5 +1,6 @@
 package fr.abes.lnevent.repository;
 
+import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.entities.EtablissementEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -13,4 +14,7 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
 
     @Query("select e.name from EtablissementEntity e where e.siren like :x")
     public String getNomEtabBySiren(@Param("x") String siren);
+
+    @Query("select e.contact from EtablissementEntity e where e.siren like :x")
+    ContactEntity getContactBySiren(String siren);
 }

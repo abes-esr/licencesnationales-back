@@ -28,7 +28,7 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/")
+@RequestMapping("/ln/auth")
 public class AuthenticationController {
 
 
@@ -51,31 +51,6 @@ public class AuthenticationController {
     GenererIdAbes genererIdAbes;
 
 
-
-
-
-   /* @PostMapping("/register")
-    @ApiOperation(
-            value = "Enregistrer un nouvel établissement et son contact",
-            notes = "Enregistre un nouvel établissement et son contact")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Opération terminée avec succès."),
-            @ApiResponse(code = 503, message = "Service indisponible."),
-            @ApiResponse(code = 400, message = "Mauvaise requête. Le paramètre problématique sera précisé par le message d'erreur. Par exemple : paramètre manquant, adresse erronnée..."),
-            @ApiResponse(code = 404, message = "Opération a échoué."),
-    })
-    public AppUser register(
-            @ApiParam(value = "Objet JSON contenant les informations sur l'utilisateur à enregistrer. Tous les champs sont nécessairese.", required = true)
-            @PathParam("user")
-            @Valid @NotNull @RequestBody EtablissementCreeDTO eventDTO) {
-
-        final String uri = "http://localhost:8080/creation?iddoc=" + this.iddoc + "&contexte=" + this.contexte;
-        RestTemplate restTemplate = new RestTemplate();
-        String result = restTemplate.getForObject(uri, String.class);
-
-        return userService.createUser(user);
-    }
-*/
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
