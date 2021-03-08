@@ -1,8 +1,10 @@
 package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.etablissement.*;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,11 +13,14 @@ import org.springframework.web.bind.annotation.*;
 
 @Log
 @RestController
-@RequestMapping("ln/Etablissement")
+@RequestMapping("ln/etablissement")
 public class EtablissementController {
 
     @Autowired
-    private EventRepository repository;
+    private EventRepository eventRepository;
+
+    @Autowired
+    private EtablissementRepository etablissementRepository;
 
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
@@ -26,7 +31,7 @@ public class EtablissementController {
                 new EtablissementCreeEvent(this,
                         eventDTO);
         applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        repository.save(new EventEntity(etablissementCreeEvent));
+        eventRepository.save(new EventEntity(etablissementCreeEvent));
 
         return "done";
     }
@@ -38,7 +43,7 @@ public class EtablissementController {
                         eventDTO.getId(),
                         eventDTO);
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
-        repository.save(new EventEntity(etablissementModifieEvent));
+        eventRepository.save(new EventEntity(etablissementModifieEvent));
 
         return "done";
     }
@@ -48,7 +53,7 @@ public class EtablissementController {
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        repository.save(new EventEntity(etablissementFusionneEvent));
+        eventRepository.save(new EventEntity(etablissementFusionneEvent));
 
         return "done";
     }
@@ -58,7 +63,7 @@ public class EtablissementController {
         EtablissementDiviseEvent etablissementDiviseEvent
                 = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        repository.save(new EventEntity(etablissementDiviseEvent));
+        eventRepository.save(new EventEntity(etablissementDiviseEvent));
 
         return "done";
     }
@@ -68,9 +73,14 @@ public class EtablissementController {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        repository.save(new EventEntity(etablissementSupprimeEvent));
+        eventRepository.save(new EventEntity(etablissementSupprimeEvent));
 
         return "done";
+    }
+
+    @GetMapping(value = "/{siren}")
+    public EtablissementEntity get(@PathVariable String siren)  {
+        return etablissementRepository.getFirstBySiren(siren);
     }
 
 
