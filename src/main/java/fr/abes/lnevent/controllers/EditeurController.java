@@ -3,18 +3,20 @@ package fr.abes.lnevent.controllers;
 import fr.abes.lnevent.dto.editeur.EditeurCreeDTO;
 import fr.abes.lnevent.dto.editeur.EditeurFusionneDTO;
 import fr.abes.lnevent.dto.editeur.EditeurModifieDTO;
+import fr.abes.lnevent.entities.EditeurEntity;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
+import fr.abes.lnevent.repository.EditeurRepository;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.entities.EventEntity;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Set;
 
 @Log
 @RestController
@@ -22,7 +24,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class EditeurController {
 
     @Autowired
-    private EventRepository repository;
+    private EventRepository eventRepository;
+
+    @Autowired
+    private EtablissementRepository etablissementRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -35,7 +40,7 @@ public class EditeurController {
                 editeurCreeDTO.getMailPourBatch(),
                 editeurCreeDTO.getMailPourInformation());
         applicationEventPublisher.publishEvent(editeurCreeEvent);
-        repository.save(new EventEntity(editeurCreeEvent));
+        eventRepository.save(new EventEntity(editeurCreeEvent));
         return "done";
     }
 
@@ -47,7 +52,7 @@ public class EditeurController {
                 editeurModifieDTO.getMailPourBatch(),
                 editeurModifieDTO.getMailPourInformation());
         applicationEventPublisher.publishEvent(editeurModifieEvent);
-        repository.save(new EventEntity(editeurModifieEvent));
+        eventRepository.save(new EventEntity(editeurModifieEvent));
         return "done";
     }
 
@@ -57,7 +62,15 @@ public class EditeurController {
                 editeurFusionneDTO.getEditeurDTO(),
                 editeurFusionneDTO.getIdEditeurFusionnes());
         applicationEventPublisher.publishEvent(editeurFusionneEvent);
-        repository.save(new EventEntity(editeurFusionneEvent));
+        eventRepository.save(new EventEntity(editeurFusionneEvent));
         return "done";
     }
+
+
+    @GetMapping(value = "/{siren}")
+    public Set<EditeurEntity> get(@PathVariable String siren) {
+        return etablissementRepository.getFirstBySiren(siren).getEditeurs();
+    }
+
+
 }
