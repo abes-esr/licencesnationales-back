@@ -51,6 +51,16 @@
             </exclusions>
         </dependency>
 
+
+        <!-- === Configuring the Annotation Processor === -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-configuration-processor</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+
+
         <!-- === Log === -->
         <!--spring secu starter contient déjà log4j ce qui fait un conflit si on garde les lignes ci-dessous
         <dependency>

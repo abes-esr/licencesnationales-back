@@ -16,5 +16,5 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     public String getNomEtabBySiren(@Param("x") String siren);
 
     @Query("select e.contact from EtablissementEntity e where e.siren like :x")
-    ContactEntity getContactBySiren(String siren);
+    ContactEntity getContactBySiren(@Param("x") String siren);
 }

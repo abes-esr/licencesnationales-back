@@ -3,12 +3,14 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.User;
 import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
+import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.services.GenererIdAbes;
+import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,27 +30,30 @@ import java.util.Set;
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/ln/auth")
+@RequestMapping("/")
 public class AuthenticationController {
 
 
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     @Autowired
-    JwtTokenProvider tokenProvider;
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
-    ContactRepository contactRepository;
+    private ContactRepository contactRepository;
 
     @Autowired
-    PasswordEncoder passwordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
-    EtablissementController etablissementController;
+    private EtablissementController etablissementController;
 
     @Autowired
-    GenererIdAbes genererIdAbes;
+    private GenererIdAbes genererIdAbes;
+
+    @Autowired
+    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
 
 
 
@@ -89,6 +94,18 @@ public class AuthenticationController {
         log.info("mdp = " + eventDTO.getPrenomContact());
         log.info("mdp = " + eventDTO.getTelephoneContact());
         log.info("mdp = " + eventDTO.getTypeEtablissement());
+        log.info("recaptcharesponse = " + eventDTO.getRecaptcha());
+        String recaptcharesponse = eventDTO.getRecaptcha();
+
+        //verifier la réponse recaptcha
+        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcharesponse);
+        if(!reCaptchaResponse.isSuccess()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
+        }
+
+
         boolean existeSiren = contactRepository.existeSiren(eventDTO.getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
