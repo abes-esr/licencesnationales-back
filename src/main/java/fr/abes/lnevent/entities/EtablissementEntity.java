@@ -26,8 +26,6 @@ public class EtablissementEntity {
 
     private String siren;
 
-    private String motDePasse;
-
     private String typeEtablissement;
 
     private boolean valide;
@@ -51,11 +49,10 @@ public class EtablissementEntity {
 
 
 
-    public EtablissementEntity(Long id, String name, String siren, String motDePasse, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
+    public EtablissementEntity(Long id, String name, String siren, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
         this.id = id;
         this.name = name;
         this.siren = siren;
-        this.motDePasse = motDePasse;
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         this.contact = contact;
