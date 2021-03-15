@@ -4,37 +4,34 @@ import fr.abes.lnevent.dto.ip.IpAjouteeDTO;
 import fr.abes.lnevent.dto.ip.IpModifieeDTO;
 import fr.abes.lnevent.dto.ip.IpSupprimeeDTO;
 import fr.abes.lnevent.dto.ip.IpValideeDTO;
+import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.event.ip.IpValideeEvent;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.entities.EventEntity;
-import fr.abes.lnevent.services.ArbreService;
-import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Set;
 
 @Log
 @RestController
 @RequestMapping("ln/ip")
 public class IpController {
     @Autowired
-    private EventRepository repository;
+    private EventRepository eventRepository;
+
+    @Autowired
+    private EtablissementRepository etablissementRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
-
-    @Autowired
-    private ResetService resetService;
-
-    @Autowired
-    private ArbreService arbreService;
 
     @PostMapping(value = "/ajout")
     public String ajoutIp(@RequestBody IpAjouteeDTO event) {
@@ -42,7 +39,7 @@ public class IpController {
                 event.getIp(),
                 event.getSiren());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        repository.save(new EventEntity(ipAjouteeEvent));
+        eventRepository.save(new EventEntity(ipAjouteeEvent));
 
         return "done";
     }
@@ -54,7 +51,7 @@ public class IpController {
                 ipModifieeDTO.getIp(),
                 ipModifieeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
-        repository.save(new EventEntity(ipModifieeEvent));
+        eventRepository.save(new EventEntity(ipModifieeEvent));
         return "done";
     }
 
@@ -64,7 +61,7 @@ public class IpController {
                 ipValideeDTO.getIp(),
                 ipValideeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipValideeEvent);
-        repository.save(new EventEntity(ipValideeEvent));
+        eventRepository.save(new EventEntity(ipValideeEvent));
         return "done";
     }
 
@@ -74,9 +71,21 @@ public class IpController {
                 ipSupprimeeDTO.getIp(),
                 ipSupprimeeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-        repository.save(new EventEntity(ipSupprimeeEvent));
+        eventRepository.save(new EventEntity(ipSupprimeeEvent));
         return "done";
     }
+
+    @GetMapping(value = "/{siren}")
+    public Set<IpEntity> get(@PathVariable String siren) {
+        return etablissementRepository.getFirstBySiren(siren).getIps();
+    }
+
+
+
+
+
+
+
 
 
 }

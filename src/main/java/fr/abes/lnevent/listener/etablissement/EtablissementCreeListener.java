@@ -37,7 +37,6 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
                 new EtablissementEntity(null,
                         etablissement.getNom(),
                         etablissement.getSiren(),
-                        etablissement.getMotDePasse(),
                         etablissement.getTypeEtablissement(),
                         etablissement.getIdAbes(),
                         contactEntity,

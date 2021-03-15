@@ -67,7 +67,6 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
         EtablissementEntity etablissementEntity = new EtablissementEntity(null,
                 etablissementDTOFusione.getNom(),
                 etablissementDTOFusione.getSiren(),
-                etablissementDTOFusione.getMotDePasse(),
                 etablissementDTOFusione.getTypeEtablissement(),
                 etablissementDTOFusione.getIdAbes(),
                 contactEntity,

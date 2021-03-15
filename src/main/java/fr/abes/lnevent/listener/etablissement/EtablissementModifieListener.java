@@ -2,7 +2,6 @@ package fr.abes.lnevent.listener.etablissement;
 
 import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
 import fr.abes.lnevent.event.etablissement.EtablissementModifieEvent;
-import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.entities.EtablissementEntity;
@@ -42,7 +41,6 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
                         etablissementModifieEvent.getIdEtablissement(),
                         etablissement.getNom(),
                         etablissement.getSiren(),
-                        etablissement.getMotDePasse(),
                         etablissement.getTypeEtablissement(),
                         etablissement.getIdAbes(),
                         contactEntity,

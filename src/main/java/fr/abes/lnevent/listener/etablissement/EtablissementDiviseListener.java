@@ -42,7 +42,6 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
             etablissementRepository.save(new EtablissementEntity(null,
                     etablissementDTODivise.getNom(),
                     etablissementDTODivise.getSiren(),
-                    etablissementDTODivise.getMotDePasse(),
                     etablissementDTODivise.getTypeEtablissement(),
                     etablissementDTODivise.getIdAbes(),
                     contactEntity,
