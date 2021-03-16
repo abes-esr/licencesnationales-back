@@ -30,8 +30,6 @@ public class ContactEntity {
 
     public String adresse;
 
-    public String siren;
-
     public String boitePostale;
 
     public String codePostal;
@@ -58,5 +56,4 @@ public class ContactEntity {
         this.ville = ville;
         this.role = role;
     }
-
 }

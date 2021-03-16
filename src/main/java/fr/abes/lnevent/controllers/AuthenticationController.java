@@ -1,10 +1,10 @@
 package fr.abes.lnevent.controllers;
 
 
-import fr.abes.lnevent.dto.User;
 import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.ContactRepository;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
@@ -19,12 +19,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.Set;
 
 
 @Slf4j
@@ -41,7 +38,7 @@ public class AuthenticationController {
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    private ContactRepository contactRepository;
+    private EtablissementRepository etablissementRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -71,30 +68,35 @@ public class AuthenticationController {
         log.info("LoginRequest password = " + loginRequest.getPassword());
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+        log.info("authenticateUser 1");
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //on charge dans user le tuple bdd mis dans authentication
         UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
-        log.info("là");
+        log.info("authenticateUser 2");
         String jwt = tokenProvider.generateToken(user);
-        log.info("ici");
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getAuthorities().iterator().next().toString().equals("admin") ? "true" : "false"));
+        log.info("authenticateUser 3");
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getIsAdmin()));
     }
 
 
     @PostMapping("/creationCompte")
     public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
         log.info("eventDto = " + eventDTO.toString());
+        log.info("NomEtab = " + eventDTO.getNom());
         log.info("siren = " + eventDTO.getSiren());
+        log.info("TypeEtablissement = " + eventDTO.getTypeEtablissement());
+        log.info("NomContact = " + eventDTO.getNomContact());
+        log.info("PrenomContact = " + eventDTO.getPrenomContact());
+        log.info("AdresseContact = " + eventDTO.getAdresseContact());
+        log.info("BPContact = " + eventDTO.getBoitePostaleContact());
+        log.info("CodePostalContact = " + eventDTO.getCodePostalContact());
+        log.info("VilleContact = " + eventDTO.getVilleContact());
+        log.info("CedexContact = " + eventDTO.getCedexContact());
+        log.info("TelephoneContact = " + eventDTO.getTelephoneContact());
+        log.info("MailContact = " + eventDTO.getMailContact());
         log.info("mdp = " + eventDTO.getMotDePasse());
-        log.info("mdp = " + eventDTO.getNomContact());
-        log.info("mdp = " + eventDTO.getNom());
-        log.info("mdp = " + eventDTO.getAdresseContact());
-        log.info("mdp = " + eventDTO.getCedexContact());
-        log.info("mdp = " + eventDTO.getCodePostalContact());
-        log.info("mdp = " + eventDTO.getPrenomContact());
-        log.info("mdp = " + eventDTO.getTelephoneContact());
-        log.info("mdp = " + eventDTO.getTypeEtablissement());
         log.info("recaptcharesponse = " + eventDTO.getRecaptcha());
+
         String recaptcharesponse = eventDTO.getRecaptcha();
 
         //verifier la réponse recaptcha
@@ -105,14 +107,15 @@ public class AuthenticationController {
                     .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
         }
 
-
-        boolean existeSiren = contactRepository.existeSiren(eventDTO.getSiren());
+        //verifier que le siren n'est pas déjà en base
+        boolean existeSiren = etablissementRepository.existeSiren(eventDTO.getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
             return ResponseEntity
                     .badRequest()
                     .body("Cet établissement existe déjà.");
         }
+        //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
         else{
         log.info("mdp = " + eventDTO.getMotDePasse());
         eventDTO.setMotDePasse(passwordEncoder.encode(eventDTO.getMotDePasse()));

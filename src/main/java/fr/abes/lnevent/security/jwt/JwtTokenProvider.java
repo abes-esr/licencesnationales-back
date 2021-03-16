@@ -19,9 +19,6 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     @Autowired
-    private EtablissementRepository etablissementRepository;
-
-    @Autowired
     private Environment env;
 
 
@@ -35,25 +32,22 @@ public class JwtTokenProvider {
 
     public String generateToken(UserDetailsImpl u) {
 
+        log.info("JwtTokenProvider");
+        log.info("Début generateToken");
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
-        String nomEtab = etablissementRepository.getNomEtabBySiren(u.getUsername());
-
-
-        log.info("u.getUsername() = " + u.getUsername());
+        log.info("u.getUsername() = " + u.getUsername());//le siren
         log.info("u.getId() = " + u.getId());
-        //log.info("u.getAuthorities() = " + u.getAuthorities());
-        log.info("nomEtab = " + nomEtab);
+        log.info("u.getAuthorities() = " + u.getAuthorities());
 
         return Jwts.builder()
-                .setSubject(u.getUsername()) //c'est le siren, mais comme provient de spring UserDetailsImpl qui implemente org.springframework.security.core.userdetails, on ne peut pas changer le nom
+                .setSubject(u.getUsername()) //siren
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .claim("id", u.getId())
                 .claim("name", u.getUsername()) //le siren
                 .claim("isAdmin", u.getIsAdmin())
                 .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
-                .claim("nameEtab", nomEtab)
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
                 .compact();
     }
