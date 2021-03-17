@@ -81,21 +81,21 @@ public class AuthenticationController {
 
     @PostMapping("/creationCompte")
     public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
-        log.info("eventDto = " + eventDTO.toString());
-        log.info("NomEtab = " + eventDTO.getNom());
-        log.info("siren = " + eventDTO.getSiren());
-        log.info("TypeEtablissement = " + eventDTO.getTypeEtablissement());
-        log.info("NomContact = " + eventDTO.getNomContact());
-        log.info("PrenomContact = " + eventDTO.getPrenomContact());
-        log.info("AdresseContact = " + eventDTO.getAdresseContact());
-        log.info("BPContact = " + eventDTO.getBoitePostaleContact());
-        log.info("CodePostalContact = " + eventDTO.getCodePostalContact());
-        log.info("VilleContact = " + eventDTO.getVilleContact());
-        log.info("CedexContact = " + eventDTO.getCedexContact());
-        log.info("TelephoneContact = " + eventDTO.getTelephoneContact());
-        log.info("MailContact = " + eventDTO.getMailContact());
-        log.info("mdp = " + eventDTO.getMotDePasse());
-        log.info("recaptcharesponse = " + eventDTO.getRecaptcha());
+        log.debug("eventDto = " + eventDTO.toString());
+        log.debug("NomEtab = " + eventDTO.getNom());
+        log.debug("siren = " + eventDTO.getSiren());
+        log.debug("TypeEtablissement = " + eventDTO.getTypeEtablissement());
+        log.debug("NomContact = " + eventDTO.getNomContact());
+        log.debug("PrenomContact = " + eventDTO.getPrenomContact());
+        log.debug("AdresseContact = " + eventDTO.getAdresseContact());
+        log.debug("BPContact = " + eventDTO.getBoitePostaleContact());
+        log.debug("CodePostalContact = " + eventDTO.getCodePostalContact());
+        log.debug("VilleContact = " + eventDTO.getVilleContact());
+        log.debug("CedexContact = " + eventDTO.getCedexContact());
+        log.debug("TelephoneContact = " + eventDTO.getTelephoneContact());
+        log.debug("MailContact = " + eventDTO.getMailContact());
+        log.debug("mdp = " + eventDTO.getMotDePasse());
+        log.debug("recaptcharesponse = " + eventDTO.getRecaptcha());
 
         String recaptcharesponse = eventDTO.getRecaptcha();
 
