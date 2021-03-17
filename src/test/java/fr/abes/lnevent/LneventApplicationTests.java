@@ -124,7 +124,8 @@ class LneventApplicationTests {
                 "animal",
                 "34000",
                 "CS",
-                "Montpellier");
+                "Montpellier",
+                "admin");
 
         etablissementEntity1.setContact(contactEntity);
 

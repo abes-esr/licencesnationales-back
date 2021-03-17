@@ -31,7 +31,8 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
                         etablissement.getBoitePostaleContact(),
                         etablissement.getCodePostalContact(),
                         etablissement.getCedexContact(),
-                        etablissement.getVilleContact());
+                        etablissement.getVilleContact(),
+                        etablissement.getRoleContact());
         EtablissementEntity etablissementEntity =
                 new EtablissementEntity(null,
                         etablissement.getNom(),

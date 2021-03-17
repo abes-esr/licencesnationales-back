@@ -1,3 +1,4 @@
+/*
 package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.repository.EventRepository;
@@ -43,3 +44,4 @@ public class ServiceController {
         return peuplementService.ajoutEtablissementfromCSV();
     }
 }
+*/

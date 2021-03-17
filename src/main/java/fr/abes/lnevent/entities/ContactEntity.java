@@ -9,10 +9,40 @@ import javax.persistence.*;
 @Entity
 @Table(name = "Contact")
 @NoArgsConstructor
-@Getter @Setter
+@Getter
+@Setter
 public class ContactEntity {
 
-    public ContactEntity(Long id, String nom, String prenom, String mail, String motDePasse, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville) {
+    @Id
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
+    @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
+    public Long id;
+
+    public String nom;
+
+    public String prenom;
+
+    public String mail;
+
+    public String motDePasse;
+
+    public String telephone;
+
+    public String adresse;
+
+    public String boitePostale;
+
+    public String codePostal;
+
+    public String cedex;
+
+    public String ville;
+
+    public  String role;
+
+
+    public ContactEntity(Long id, String nom, String prenom, String mail, String motDePasse, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville, String role) {
+
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
@@ -24,31 +54,6 @@ public class ContactEntity {
         this.codePostal = codePostal;
         this.cedex = cedex;
         this.ville = ville;
+        this.role = role;
     }
-
-    @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
-    @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
-    private Long id;
-
-    private String nom;
-
-    private String prenom;
-
-    private String mail;
-
-    private String motDePasse;
-
-    private String telephone;
-
-    private String adresse;
-
-    private String boitePostale;
-
-    private String codePostal;
-
-    private String cedex;
-
-    private String ville;
-
 }

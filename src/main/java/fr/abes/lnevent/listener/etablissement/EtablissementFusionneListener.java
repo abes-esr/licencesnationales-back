@@ -54,14 +54,15 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
                 new ContactEntity(null,
                         etablissementDTOFusione.getNomContact(),
                         etablissementDTOFusione.getPrenomContact(),
-                        etablissementDTOFusione.getTelephoneContact(),
                         etablissementDTOFusione.getMailContact(),
                         etablissementDTOFusione.getMotDePasse(),
+                        etablissementDTOFusione.getTelephoneContact(),
                         etablissementDTOFusione.getAdresseContact(),
                         etablissementDTOFusione.getBoitePostaleContact(),
                         etablissementDTOFusione.getCodePostalContact(),
                         etablissementDTOFusione.getCedexContact(),
-                        etablissementDTOFusione.getVilleContact());
+                        etablissementDTOFusione.getVilleContact(),
+                        etablissementDTOFusione.getRoleContact());
 
         EtablissementEntity etablissementEntity = new EtablissementEntity(null,
                 etablissementDTOFusione.getNom(),

@@ -34,7 +34,8 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
                         etablissement.getBoitePostaleContact(),
                         etablissement.getCodePostalContact(),
                         etablissement.getCedexContact(),
-                        etablissement.getVilleContact());
+                        etablissement.getVilleContact(),
+                        etablissement.getRoleContact());
         EtablissementEntity etablissementEntity =
                 new EtablissementEntity(
                         etablissementModifieEvent.getIdEtablissement(),

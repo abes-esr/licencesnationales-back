@@ -1,6 +1,7 @@
 package fr.abes.lnevent.listener.etablissement;
 
 import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
+import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.repository.EtablissementRepository;
@@ -36,7 +37,8 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
                             etablissementDTODivise.getBoitePostaleContact(),
                             etablissementDTODivise.getCodePostalContact(),
                             etablissementDTODivise.getCedexContact(),
-                            etablissementDTODivise.getVilleContact());
+                            etablissementDTODivise.getVilleContact(),
+                            etablissementDTODivise.getRoleContact());
             etablissementRepository.save(new EtablissementEntity(null,
                     etablissementDTODivise.getNom(),
                     etablissementDTODivise.getSiren(),
@@ -44,6 +46,7 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
                     etablissementDTODivise.getIdAbes(),
                     contactEntity,
                     null));
+
         }
     }
 }
