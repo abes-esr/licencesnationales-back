@@ -19,7 +19,7 @@ public class UserDetailsImpl implements UserDetails {
 
 	private Long id;
 	private String siren;
-	private String nameEtab;
+	private String nameEtab;//nom etab
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 	private String isAdmin;
