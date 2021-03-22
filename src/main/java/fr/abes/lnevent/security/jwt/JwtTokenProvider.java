@@ -45,7 +45,8 @@ public class JwtTokenProvider {
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .claim("id", u.getId())
-                .claim("name", u.getUsername()) //le siren
+                .claim("siren", u.getUsername()) //le siren
+                .claim("nameEtab",u.getNameEtab())
                 .claim("isAdmin", u.getIsAdmin())
                 .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
                 .signWith(SignatureAlgorithm.HS512, jwtSecret)
