@@ -75,7 +75,7 @@ public class AuthenticationController {
         log.info("authenticateUser 2");
         String jwt = tokenProvider.generateToken(user);
         log.info("authenticateUser 3");
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getIsAdmin()));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getIsAdmin()));
     }
 
 
