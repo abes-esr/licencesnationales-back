@@ -19,16 +19,18 @@ public class UserDetailsImpl implements UserDetails {
 
 	private Long id;
 	private String siren;
+	private String nameEtab;//nom etab
 	private String password;
 	private Collection<? extends GrantedAuthority> authorities;
 	private String isAdmin;
 
 
 
-	public UserDetailsImpl(Long id, String siren, String password, Collection<? extends GrantedAuthority> authorities,
+	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, Collection<? extends GrantedAuthority> authorities,
 						   String isAdmin) {
 		this.id = id;
 		this.siren = siren;
+		this.nameEtab=nameEtab;
 		this.password = password;
 		this.authorities = authorities;
 		this.isAdmin = isAdmin;
@@ -41,7 +43,7 @@ public class UserDetailsImpl implements UserDetails {
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(user.getContact().role));
 		log.info("userPwd = " + user.getContact().motDePasse);
-		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getContact().motDePasse, authorities, isAdmin);
+		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().motDePasse, authorities, isAdmin);
 	}
 
 
