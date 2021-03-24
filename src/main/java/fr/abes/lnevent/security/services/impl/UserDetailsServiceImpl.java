@@ -4,6 +4,7 @@ import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -29,6 +30,20 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 			log.info("UsernameNotFoundException");
 			throw new UsernameNotFoundException(siren);
 		}
+
+		log.info("UserDetailsServiceImpl fin");
+		return UserDetailsImpl.build(user);
+	}
+	@Transactional
+	public UserDetails loadUserByEmail(EtablissementEntity user) throws UsernameNotFoundException {
+		log.info("UserDetailsServiceImpl début loadUserByEmail");
+		//log.info("mail = " + email);
+		//EtablissementEntity user = etablissementRepository.getUserByMail(email);
+		log.info("user = " + user);
+		/*if(user == null) {
+			log.info("UsernameNotFoundException");
+			throw new UsernameNotFoundException(email);
+		}*/
 
 		log.info("UserDetailsServiceImpl fin");
 		return UserDetailsImpl.build(user);

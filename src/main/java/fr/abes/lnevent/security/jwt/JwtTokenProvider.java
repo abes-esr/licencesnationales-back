@@ -70,6 +70,7 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
     public String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
