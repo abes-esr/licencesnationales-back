@@ -4,9 +4,12 @@ import fr.abes.lnevent.constant.Constant;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -16,26 +19,27 @@ import java.util.Date;
 
 @Component
 @Slf4j
+@ConfigurationProperties(prefix = "jwt.token")
+@Getter
+@Setter
 public class JwtTokenProvider {
 
     @Autowired
     private Environment env;
 
+    private String secret;
+    private int expirationInMs;
 
-    //@Value("${app.jwtSecret}")
-    //private String jwtSecret = env.getProperty("jwtSecret");
-    private String jwtSecret = "1234";
-
-    //@Value("${app.jwtExpirationInMs}")
-    //private String jwtExpirationInMs = env.getProperty("jwtExpirationInMs");
-    private int jwtExpirationInMs = 1234;
 
     public String generateToken(UserDetailsImpl u) {
+
+        log.info("expirationInMs = " + expirationInMs);
+        log.info("secret = " + secret);
 
         log.info("JwtTokenProvider");
         log.info("Début generateToken");
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtExpirationInMs);
+        Date expiryDate = new Date(now.getTime() + expirationInMs);
         log.info("u.getUsername() = " + u.getUsername());//le siren
         log.info("u.getId() = " + u.getId());
         log.info("u.getAuthorities() = " + u.getAuthorities());
@@ -49,13 +53,13 @@ public class JwtTokenProvider {
                 .claim("nameEtab",u.getNameEtab())//nom de l'étab
                 .claim("isAdmin", u.getIsAdmin())
                 .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
-                .signWith(SignatureAlgorithm.HS512, jwtSecret)
+                .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
 
     public boolean validateToken(String authToken) {
         try {
-            Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(authToken);
+            Jwts.parser().setSigningKey(secret).parseClaimsJws(authToken);
             return true;
         } catch (SignatureException ex) {
             log.error(Constant.JWT_SIGNATURE_INVALID, ex.getMessage());
@@ -70,6 +74,7 @@ public class JwtTokenProvider {
         }
         return false;
     }
+
     public String getJwtFromRequest(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
@@ -80,7 +85,7 @@ public class JwtTokenProvider {
 
     /*public ContactEntity getUtilisateurFromJwt(String token) {
         Claims claims = Jwts.parser()
-                .setSigningKey(jwtSecret)
+                .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
 
@@ -94,6 +99,6 @@ public class JwtTokenProvider {
 
     public String getSirenFromJwtToken(String token) {
         log.info("token = " + token);
-        return Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 }
