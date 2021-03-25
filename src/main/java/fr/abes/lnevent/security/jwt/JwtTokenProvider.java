@@ -33,8 +33,8 @@ public class JwtTokenProvider {
 
     public String generateToken(UserDetailsImpl u) {
 
-        log.info("expirationInMs = " + expirationInMs);
-        log.info("secret = " + secret);
+        log.debug("expirationInMs = " + expirationInMs);
+        log.debug("secret = " + secret);
 
         log.info("JwtTokenProvider");
         log.info("Début generateToken");
