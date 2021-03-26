@@ -1,23 +1,26 @@
 package fr.abes.lnevent.services;
 
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.MessageSource;
 import org.springframework.mail.SimpleMailMessage;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Locale;
 
 @Component
+@Slf4j
+@ConfigurationProperties(prefix = "mail.set.from")
 public class EmailService {
 
-    @Autowired
-    private JavaMailSender emailSender;
 
     @Autowired
     private MessageSource messages;
+
+    private String noreply;
 
 
     /*public void sendSimpleMessage(String to, String subject, String body) {
@@ -36,9 +39,9 @@ public class EmailService {
     }*/
 
     public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, UserDetailsImpl user) {
-        final String url = contextPath + "/user/changePassword?token=" + token;
+        final String url = contextPath + "/reinitialisationPass?token=" + token;
         final String message = messages.getMessage("message.resetPassword", null, locale);
-        return constructEmail("Reset Password", message + " \r\n" + url, user);
+        return constructEmail("Reinitialisation mot de passe", message + " \r\n" + url, user);
     }
 
     private SimpleMailMessage constructEmail(String subject, String body, UserDetailsImpl user) {
@@ -46,11 +49,12 @@ public class EmailService {
         email.setSubject(subject);
         email.setText(body);
         email.setTo(user.getEmail());
-        email.setFrom("noreply@licencesnationales.fr");
+        email.setFrom(noreply);
         return email;
     }
 
     public String getAppUrl(HttpServletRequest request) {
-        return "http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath();
+        log.info("getAppUrl = http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
+        return "http://" + request.getServerName() + ":8080"  + request.getContextPath();
     }
 }

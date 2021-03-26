@@ -1,7 +1,9 @@
 package fr.abes.lnevent.controllers;
 
 
+import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
@@ -46,6 +48,15 @@ public class ReinitialisationPassController {
     @Autowired
     EtablissementRepository etablissementRepository;
 
+    @Autowired
+    ContactRepository contactRepository;
+
+    @Autowired
+    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     UserDetails userDetails;
 
 
@@ -65,8 +76,6 @@ public class ReinitialisationPassController {
                     .body("Le mail renseigné n'a pas été trouvé.");
         }
         userDetails = new UserDetailsServiceImpl().loadUserByEmail(user);
-
-
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String url = emailService.getAppUrl(request);
         mailSender.send(emailService.constructResetTokenEmail(url,
@@ -98,8 +107,48 @@ public class ReinitialisationPassController {
     }
 
 
+    @ApiOperation(value = "permet de ",
+            notes = "le ")
+    @PostMapping("/enregistrerPassword")
+    public ResponseEntity<?> enregistrerPassword(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+        log.info("requestData = " + requestData);
+        JSONObject data = new JSONObject(requestData);
+        String recaptcha = data.getString("recaptcha");
+        log.info("recaptcha = " + recaptcha);
+        String mdp = data.getString("motDePasse");
+        log.info("mdp = " + mdp);
+        String token = data.getString("token");
+        log.info("token = " + token);
+        String action = "reinitialisationPass";
 
+        //verifier la réponse recaptcha
+        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcha, action);
+        if(!reCaptchaResponse.isSuccess()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
+        }
+        if(!tokenProvider.validateToken(token)){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Token invalide" );
+        }
+        String siren = tokenProvider.getSirenFromJwtToken(token);
+        log.info("siren = " + siren);
+        String mdphash = passwordEncoder.encode(mdp);
+        log.info("mdphash = " + mdp);
+        EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
+        ContactEntity c = e.getContact();
+        c.setMotDePasse(mdphash);
+        contactRepository.save(c);
+        //envoyer mail
+        return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
+    }
 }
+
+
+
+
 
 
 
