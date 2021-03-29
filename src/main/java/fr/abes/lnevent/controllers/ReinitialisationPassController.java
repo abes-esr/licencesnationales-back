@@ -57,51 +57,50 @@ public class ReinitialisationPassController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    UserDetails userDetails;
+    private UserDetails userDetails;
+
+    private String emailUser;
+
 
 
 
     @ApiOperation(value = "permet de ",
             notes = "le ")
-    @PostMapping("/resetPasswordByMail")
-    public ResponseEntity<?> resetPasswordByMail(HttpServletRequest request, @Valid @RequestBody String userEmail) throws JSONException {
-        log.info("email = " + userEmail);
-        JSONObject email = new JSONObject(userEmail);
-        String mail = email.getString("email");
-        log.info("mail = " + mail);
-        EtablissementEntity user = etablissementRepository.getUserByMail(mail);
-        if (user==null) {
+    @PostMapping("/resetPassword")
+    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody String userEmailOrSiren) throws JSONException {
+
+        log.info("userEmailOrSiren = " + userEmailOrSiren);
+        JSONObject emailOrSiren = new JSONObject(userEmailOrSiren);
+        String param = emailOrSiren.keys().next().toString();
+        log.info("param = " + param);
+        String mail = null;
+        String siren = null;
+        EtablissementEntity user = null;
+        if(param.equals("email")) {
+            mail = emailOrSiren.getString("email");
+            log.info("mail = " + mail);
+            user = etablissementRepository.getUserByMail(mail);
+        }
+        else{
+            siren = emailOrSiren.getString("siren");
+            user = etablissementRepository.getFirstBySiren(siren);
+        }
+        if (param.equals("email") && user==null) {
             return ResponseEntity
                     .badRequest()
                     .body("Le mail renseigné n'a pas été trouvé.");
-        }
-        userDetails = new UserDetailsServiceImpl().loadUserByEmail(user);
-        String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
-        String url = emailService.getAppUrl(request);
-        mailSender.send(emailService.constructResetTokenEmail(url,
-                request.getLocale(), jwt, (UserDetailsImpl)userDetails));
-
-        return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
-    }
-
-    @ApiOperation(value = "permet de ",
-            notes = "le ")
-    @PostMapping("/resetPasswordBySiren")
-    public ResponseEntity<?> resetPasswordBySiren(HttpServletRequest request, @Valid @RequestBody String userSiren) throws JSONException {
-        log.info("siren = " + userSiren);
-        JSONObject sirenUser = new JSONObject(userSiren);
-        String siren = sirenUser.getString("siren");
-        log.info("siren = " + siren);
-        UserDetails user = new UserDetailsServiceImpl().loadUserByUsername(siren);
-        if (user==null) {
+        }else if(param.equals("siren") && user==null){
             return ResponseEntity
                     .badRequest()
                     .body("Le siren renseigné n'a pas été trouvé.");
         }
-        String jwt = tokenProvider.generateToken((UserDetailsImpl) user);
+        userDetails = new UserDetailsServiceImpl().loadUser(user);
+
+        String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String url = emailService.getAppUrl(request);
+        emailUser = ((UserDetailsImpl) userDetails).getEmail();
         mailSender.send(emailService.constructResetTokenEmail(url,
-                request.getLocale(), jwt, (UserDetailsImpl)user));
+                request.getLocale(), jwt, emailUser));
 
         return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
     }
@@ -141,7 +140,8 @@ public class ReinitialisationPassController {
         ContactEntity c = e.getContact();
         c.setMotDePasse(mdphash);
         contactRepository.save(c);
-        //envoyer mail
+        emailUser = c.getMail();
+        mailSender.send(emailService.constructValidationNewPassEmail( request.getLocale(), emailUser));
         return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
     }
 }

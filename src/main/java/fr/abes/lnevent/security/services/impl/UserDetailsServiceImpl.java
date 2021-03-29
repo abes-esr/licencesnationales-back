@@ -35,17 +35,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(user);
 	}
 	@Transactional
-	public UserDetails loadUserByEmail(EtablissementEntity user) throws UsernameNotFoundException {
-		log.info("UserDetailsServiceImpl début loadUserByEmail");
-		//log.info("mail = " + email);
-		//EtablissementEntity user = etablissementRepository.getUserByMail(email);
+	public UserDetails loadUser(EtablissementEntity user) throws UsernameNotFoundException {
+		log.info("UserDetailsServiceImpl début loadUser");
 		log.info("user = " + user);
-		/*if(user == null) {
-			log.info("UsernameNotFoundException");
-			throw new UsernameNotFoundException(email);
-		}*/
-
 		log.info("UserDetailsServiceImpl fin");
 		return UserDetailsImpl.build(user);
 	}
+
 }

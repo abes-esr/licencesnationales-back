@@ -38,17 +38,22 @@ public class EmailService {
         return constructEmail("Resend Registration Token", message + " \r\n" + confirmationUrl, user);
     }*/
 
-    public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, UserDetailsImpl user) {
+    public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser) {
         final String url = contextPath + "/reinitialisationPass?token=" + token;
         final String message = messages.getMessage("message.resetPassword", null, locale);
-        return constructEmail("Reinitialisation mot de passe", message + " \r\n" + url, user);
+        return constructEmail("Reinitialisation mot de passe", message + " \r\n" + url, emailUser);
     }
 
-    private SimpleMailMessage constructEmail(String subject, String body, UserDetailsImpl user) {
+    public SimpleMailMessage constructValidationNewPassEmail(Locale locale, String emailUser){
+        final String message = messages.getMessage("message.validationNewPass", null, locale);
+        return constructEmail("Nouveau mot de passe enregistré", message , emailUser);
+    }
+
+    private SimpleMailMessage constructEmail(String subject, String body, String emailUser) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setSubject(subject);
         email.setText(body);
-        email.setTo(user.getEmail());
+        email.setTo(emailUser);
         email.setFrom(noreply);
         return email;
     }
