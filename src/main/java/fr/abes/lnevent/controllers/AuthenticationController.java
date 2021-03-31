@@ -98,9 +98,10 @@ public class AuthenticationController {
         log.debug("recaptcharesponse = " + eventDTO.getRecaptcha());
 
         String recaptcharesponse = eventDTO.getRecaptcha();
+        String action = "creationCompte";
 
         //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcharesponse);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcharesponse, action);
         if(!reCaptchaResponse.isSuccess()){
             return ResponseEntity
                     .badRequest()

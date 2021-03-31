@@ -27,4 +27,11 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     @Query(nativeQuery = true, value = "select case when exists(select * from Etablissement "
             + "where siren = :siren) then 'true' else 'false' end from dual")
     Boolean existeSiren(@Param("siren") String siren);
+
+    @Query("select e from EtablissementEntity e where e.contact.mail like :x")
+    EtablissementEntity getUserByMail(@Param("x") String email);
+
+    @Query(nativeQuery = true, value = "select case when exists(select * from Etablissement "
+            + "where contact.mail = :mail) then 'true' else 'false' end from dual")
+    Boolean existeMail(@Param("mail") String mail);
 }
