@@ -209,8 +209,23 @@ node {
         ]) {
           newconfig = newconfig.replaceAll("spring.jpa.properties.hibernate.dialect=*", "spring.jpa.properties.hibernate.dialect=${dialect}")
         }
+        withCredentials([
+          string(credentialsId: "google-recaptcha-key-site", variable: 'googleRecaptchaKey')
+        ]) {
+          newconfig = newconfig.replaceAll("google.recaptcha.key.site=*", "google.recaptcha.key.site=${googleRecaptchaKey}")
+        }
+        withCredentials([
+          string(credentialsId: "google-recaptcha-key-secret", variable: 'googleRecaptchaSecret')
+        ]) {
+          newconfig = newconfig.replaceAll("google.recaptcha.key.secret=*", "google.recaptcha.key.secret=${googleRecaptchaSecret}")
+        }
+        withCredentials([
+          string(credentialsId: "google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
+        ]) {
+          newconfig = newconfig.replaceAll("google.recaptcha.key.threshold=*", "google.recaptcha.key.threshold=${googleRecaptchaThreshold}")
+        }
 
-        writeFile file: "src/main/resources/application-${mavenProfil}.properties", text: "${newconfig}"
+        writeFile file: "src/main/resources/application.properties", text: "${newconfig}"
 
       } catch (e) {
         currentBuild.result = hudson.model.Result.FAILURE.toString()
