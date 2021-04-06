@@ -155,14 +155,14 @@ node {
           newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
         }
         withCredentials([
-          string(credentialsId: "LN-username-orpins", variable: 'username')
+          string(credentialsId: "LN-username-orpins", variable: 'BDusername')
         ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${username}")
+          newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
         }
         withCredentials([
-          string(credentialsId: "LN-password-orpins", variable: 'password')
+          string(credentialsId: "LN-password-orpins", variable: 'BDpassword')
         ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${password}")
+          newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${BDpassword}")
         }
         withCredentials([
           string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken')
