@@ -20,6 +20,7 @@ node {
     def ENV
     def serverHostnames = []
     def executeTests
+    def mavenProfil
 
     // Configuration du job Jenkins
     // On garde les 5 derniers builds par branche
@@ -74,14 +75,17 @@ node {
             }
 
              if (ENV == 'DEV') {
+                mavenProfil = "dev"
                 serverHostnames.add('hostname.server-back-1-dev')
                 serverHostnames.add('hostname.server-back-2-dev')
 
             } else if (ENV == 'TEST') {
+                mavenProfil = "test"
                 serverHostnames.add('hostname.server-back-1-test')
                 serverHostnames.add('hostname.server-back-2-test')
 
             } else if (ENV == 'PROD') {
+                mavenProfil = "prod"
                 serverHostnames.add('hostname.server-back-1-prod')
                 serverHostnames.add('hostname.server-back-2-prod')
             }
@@ -137,77 +141,83 @@ node {
         echo "Tests are skipped"
     }
 
-    // stage('edit-properties') {
-        // try {
-            // if (ENV == 'DEV') {
-                // withCredentials([
-                        // usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                        // string(credentialsId: 'periscope.oracle', variable: 'url')
-                // ]) {
-                    // echo 'Edition application-dev.properties'
-                    // echo "--------------------------"
 
-                    // original = readFile "web/src/main/resources/application-dev.properties"
-                    // newconfig = original
+    stage("Edit properties files") {
+      try {
+        echo "Edition application-${mavenProfil}.properties"
+        echo "--------------------------"
+        original = readFile "src/main/resources/application-${mavenProfil}.properties"
+        newconfig = original
 
-                    // newconfig = newconfig.replaceAll("spring.main.allow-bean-definition-overriding=true", "")
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.url=${url}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.username=${username}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.password=${pass}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.driver-class-name=oracle.jdbc.OracleDrive"
+        withCredentials([
+          string(credentialsId: "url-orpins-${mavenProfil}", variable: 'url')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-username-orpins", variable: 'username')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${username}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-password-orpins", variable: 'password')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${password}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken')
+        ]) {
+          newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-jwt-token-expirationInMs", variable: 'tokenExpirationInMs')
+        ]) {
+          newconfig = newconfig.replaceAll("jwt.token.expirationInMs=*", "jwt.token.expirationInMs=${tokenExpirationInMs}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-server-port", variable: 'serverPort')
+        ]) {
+          newconfig = newconfig.replaceAll("server.port=*", "server.port=${serverPort}")
+        }
+        withCredentials([
+          string(credentialsId: "smtp-host", variable: 'smtpHost')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.mail.host=*", "spring.mail.host=${smtpHost}")
+        }
+        withCredentials([
+          string(credentialsId: "smtp-port", variable: 'smtpPort')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.mail.port=*", "spring.mail.port=${smtpPort}")
+        }
+        withCredentials([
+          string(credentialsId: "smtp-username", variable: 'smtpUsername')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.mail.username=*", "spring.mail.username=${smtpUsername}")
+        }
+        withCredentials([
+          string(credentialsId: "smtp-password", variable: 'smtpPassword')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.mail.password=*", "spring.mail.password=${smtpPassword}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-orpins-driver", variable: 'driver')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.datasource.driver-class-name=*", "spring.datasource.driver-class-name=${driver}")
+        }
+        withCredentials([
+          string(credentialsId: "LN-orpins-dialect", variable: 'dialect')
+        ]) {
+          newconfig = newconfig.replaceAll("spring.jpa.properties.hibernate.dialect=*", "spring.jpa.properties.hibernate.dialect=${dialect}")
+        }
 
-                    // writeFile file: "web/src/main/resources/application-dev.properties", text: "${newconfig}"
-                // }
-            // }
+        writeFile file: "src/main/resources/application-${mavenProfil}.properties", text: "${newconfig}"
 
-            // if (ENV == 'TEST') {
-                // withCredentials([
-                        // usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                        // string(credentialsId: 'periscope.oracle', variable: 'url')
-                // ]) {
-                    // echo 'Edition application-test.properties'
-                    // echo "--------------------------"
-
-                    // original = readFile "web/src/main/resources/application-test.properties"
-                    // newconfig = original
-
-                    // newconfig = newconfig.replaceAll("spring.main.allow-bean-definition-overriding=true", "")
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.url=${url}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.username=${username}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.password=${pass}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.driver-class-name=oracle.jdbc.OracleDrive"
-
-                    // writeFile file: "web/src/main/resources/application-test.properties", text: "${newconfig}"
-                // }
-            // }
-
-            // if (ENV == 'PROD') {
-                // withCredentials([
-                        // usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                        // string(credentialsId: 'periscope.oracle', variable: 'url')
-                // ]) {
-                    // echo 'Edition application-prod.properties'
-                    // echo "--------------------------"
-
-                    // original = readFile "web/src/main/resources/application-prod.properties"
-                    // newconfig = original
-
-                    // newconfig = newconfig.replaceAll("spring.main.allow-bean-definition-overriding=true", "")
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.url=${url}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.username=${username}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.password=${pass}"
-                    // newconfig = newconfig + System.getProperty("line.separator") + "sujets.datasource.driver-class-name=oracle.jdbc.OracleDrive"
-
-                    // writeFile file: "web/src/main/resources/application-prod.properties", text: "${newconfig}"
-                // }
-            // }
-
-        // } catch(e) {
-            // currentBuild.result = hudson.model.Result.FAILURE.toString()
-            // notifySlack(slackChannel,e.getLocalizedMessage())
-            // throw e
-        // }
-    // }
+      } catch (e) {
+        currentBuild.result = hudson.model.Result.FAILURE.toString()
+        notifySlack(slackChannel, "Failed to edit properties files: " + e.getLocalizedMessage())
+        throw e
+      }
+    }
 
     stage('compile-package') {
         try {
