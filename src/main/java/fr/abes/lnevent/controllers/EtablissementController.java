@@ -40,8 +40,11 @@ public class EtablissementController {
     public String edit(@RequestBody EtablissementModifieDTO eventDTO) {
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        eventDTO.getId(),
-                        eventDTO);
+                        eventDTO.getSiren(),
+                        eventDTO.getNomContact(),
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getMailContact(),
+                        eventDTO.getTelephoneContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         eventRepository.save(new EventEntity(etablissementModifieEvent));
 

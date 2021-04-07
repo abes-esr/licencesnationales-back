@@ -3,13 +3,13 @@ package fr.abes.lnevent.dto.etablissement;
 import lombok.Getter;
 
 @Getter
-public class EtablissementModifieDTO extends EtablissementDTO{
+public class EtablissementModifieDTO {
 
-    private Long id;
+    private String siren;
+    private String nomContact;
+    private String adresseContact;
+    private String mailContact;
+    private String telephoneContact;
 
-    private Long idContact;
 
-    public EtablissementModifieDTO(String nom, String siren, String typeEtablissement, String idAbes, String mailContact, String motDePasse, String nomContact, String prenomContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String cedexContact, String villeContact, String roleContact) {
-        super(nom, siren, typeEtablissement, idAbes, mailContact, motDePasse, nomContact, prenomContact, telephoneContact, adresseContact, boitePostaleContact, codePostalContact, cedexContact, villeContact, roleContact);
-    }
 }
