@@ -236,7 +236,7 @@ node {
 
     stage('compile-package') {
         try {
-            echo 'Compile for ${mavenProfile} profile'
+            echo "Compile for ${mavenProfile} profile"
             echo "--------------------------"
 
             sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -P${mavenProfile}"
