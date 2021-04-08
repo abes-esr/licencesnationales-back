@@ -20,7 +20,7 @@ node {
     def ENV
     def serverHostnames = []
     def executeTests
-    def mavenProfil
+    def mavenProfile
 
     // Configuration du job Jenkins
     // On garde les 5 derniers builds par branche
@@ -75,17 +75,17 @@ node {
             }
 
              if (ENV == 'DEV') {
-                mavenProfil = "dev"
+                mavenProfile = "dev"
                 serverHostnames.add('hostname.server-back-1-dev')
                 serverHostnames.add('hostname.server-back-2-dev')
 
             } else if (ENV == 'TEST') {
-                mavenProfil = "test"
+                mavenProfile = "test"
                 serverHostnames.add('hostname.server-back-1-test')
                 serverHostnames.add('hostname.server-back-2-test')
 
             } else if (ENV == 'PROD') {
-                mavenProfil = "prod"
+                mavenProfile = "prod"
                 serverHostnames.add('hostname.server-back-1-prod')
                 serverHostnames.add('hostname.server-back-2-prod')
             }
@@ -144,13 +144,13 @@ node {
 
     stage("Edit properties files") {
       try {
-        echo "Edition application-${mavenProfil}.properties"
+        echo "Edition application-${mavenProfile}.properties"
         echo "--------------------------"
-        original = readFile "src/main/resources/application-${mavenProfil}.properties"
+        original = readFile "src/main/resources/application-${mavenProfile}.properties"
         newconfig = original
 
         withCredentials([
-          string(credentialsId: "url-orpins-${mavenProfil}", variable: 'url')
+          string(credentialsId: "url-orpins-${mavenProfile}", variable: 'url')
         ]) {
           newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
         }
@@ -236,27 +236,10 @@ node {
 
     stage('compile-package') {
         try {
-            if (ENV == 'DEV') {
-                echo 'Compile for dev profile'
-                echo "--------------------------"
+            echo 'Compile for ${mavenProfile} profile'
+            echo "--------------------------"
 
-                sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -Pdev"
-            }
-
-            if (ENV == 'TEST') {
-                echo 'Compile for test profile'
-                echo "--------------------------"
-
-                sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -Ptest"
-            }
-
-            if (ENV == 'PROD') {
-                echo 'Compile for prod profile'
-                echo "--------------------------"
-
-                sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -Pprod"
-            }
-
+            sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -P${mavenProfile}"
         } catch(e) {
             currentBuild.result = hudson.model.Result.FAILURE.toString()
             notifySlack(slackChannel,e.getLocalizedMessage())
