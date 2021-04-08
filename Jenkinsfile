@@ -7,7 +7,7 @@ node {
     def gitURL = "https://github.com/abes-esr/licencesnationales-back.git"
     def gitCredentials = ''
     def warDir = "target/"
-    def warName = "lnevent"
+    def warName = "licencesnationales"
     def tomcatWebappsDir = "/usr/local/tomcat9-licencesNationales/webapps/"
     def tomcatServiceName = "tomcat9-licencesNationales.service"
     def slackChannel = "#notif-licencesnationales"
