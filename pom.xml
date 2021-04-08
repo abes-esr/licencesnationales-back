@@ -199,7 +199,7 @@
     <!-- =========================================================== -->
 
     <build>
-        <finalName>lnevent</finalName>
+        <finalName>licencesnationales</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
