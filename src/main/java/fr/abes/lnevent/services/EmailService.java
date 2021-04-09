@@ -1,5 +1,6 @@
 package fr.abes.lnevent.services;
 
+import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -21,10 +22,15 @@ public class EmailService {
     private String noreply;
 
 
-    public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser) {
+
+    public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser, String nomEtab) {
         final String url = contextPath + "/reinitialisationPass?token=" + token;
-        final String message = messages.getMessage("message.resetPassword", null, locale);
-        return constructEmail("Reinitialisation mot de passe", message + " \r\n" + url, emailUser);
+        String message = messages.getMessage("message.resetPasswordDebut",null, locale);
+        message +=nomEtab + " ";
+        message += messages.getMessage("message.resetPasswordMilieu", null, locale);
+        message += " \r\n" + url;
+        message += " \r\n" + messages.getMessage("message.resetPasswordFin", null, locale);
+        return constructEmail("Reinitialisation mot de passe", message, emailUser);
     }
 
     public SimpleMailMessage constructValidationNewPassEmail(Locale locale, String emailUser){

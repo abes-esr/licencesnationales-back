@@ -1,7 +1,7 @@
 package fr.abes.lnevent.recaptcha;
 
 
-import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
+import fr.abes.lnevent.services.ReCaptchaService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
@@ -14,8 +14,8 @@ public class ReCaptchaConfig {
         return new RestTemplate();
     }
     @Bean
-    ReCaptchaCreationCompteService ReCaptchaCreationCompteService(){
-        return new ReCaptchaCreationCompteService();
+    ReCaptchaService ReCaptchaCreationCompteService(){
+        return new ReCaptchaService();
     }
     @Bean
     ReCaptchaKeys recaptchaKeys () {

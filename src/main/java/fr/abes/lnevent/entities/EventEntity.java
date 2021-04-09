@@ -42,24 +42,32 @@ public class EventEntity {
         this.roleContact = etablissement.getRoleContact();
     }
 
+//    public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
+//        EtablissementDTO etablissement = etablissementModifieEvent.getEtablissement();
+//        this.event = "modifie";
+//        this.nomEtab = etablissement.getNom();
+//        this.siren = etablissement.getSiren();
+//        this.typeEtablissement = etablissement.getTypeEtablissement();
+//        this.motDePasse = etablissement.getMotDePasse();
+//        this.idAbes = etablissement.getIdAbes();
+//        this.mailContact = etablissement.getMailContact();
+//        this.nomContact = etablissement.getNomContact();
+//        this.prenomContact = etablissement.getPrenomContact();
+//        this.telephoneContact = etablissement.getTelephoneContact();
+//        this.adresseContact = etablissement.getAdresseContact();
+//        this.boitePostaleContact = etablissement.getBoitePostaleContact();
+//        this.codePostalContact = etablissement.getCodePostalContact();
+//        this.cedexContact = etablissement.getCedexContact();
+//        this.villeContact = etablissement.getVilleContact();
+//        this.roleContact = etablissement.getRoleContact();
+//    }
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
-        EtablissementDTO etablissement = etablissementModifieEvent.getEtablissement();
         this.event = "modifie";
-        this.nomEtab = etablissement.getNom();
-        this.siren = etablissement.getSiren();
-        this.typeEtablissement = etablissement.getTypeEtablissement();
-        this.motDePasse = etablissement.getMotDePasse();
-        this.idAbes = etablissement.getIdAbes();
-        this.mailContact = etablissement.getMailContact();
-        this.nomContact = etablissement.getNomContact();
-        this.prenomContact = etablissement.getPrenomContact();
-        this.telephoneContact = etablissement.getTelephoneContact();
-        this.adresseContact = etablissement.getAdresseContact();
-        this.boitePostaleContact = etablissement.getBoitePostaleContact();
-        this.codePostalContact = etablissement.getCodePostalContact();
-        this.cedexContact = etablissement.getCedexContact();
-        this.villeContact = etablissement.getVilleContact();
-        this.roleContact = etablissement.getRoleContact();
+        this.siren = etablissementModifieEvent.getSiren();
+        this.nomContact = etablissementModifieEvent.getNomContact();
+        this.adresseContact = etablissementModifieEvent.getAdresseContact();
+        this.mailContact = etablissementModifieEvent.getMailContact();
+        this.telephoneContact = etablissementModifieEvent.getTelephoneContact();
     }
 
     public EventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {

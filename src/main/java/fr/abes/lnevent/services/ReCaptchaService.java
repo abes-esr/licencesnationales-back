@@ -9,7 +9,7 @@ import java.net.URI;
 
 
 @Slf4j
-public class ReCaptchaCreationCompteService{
+public class ReCaptchaService {
 
     @Autowired
     private ReCaptchaKeys reCaptchaKeys = null;
@@ -17,12 +17,12 @@ public class ReCaptchaCreationCompteService{
     private RestTemplate restTemplate = null;
 
     @Autowired
-    public ReCaptchaCreationCompteService(ReCaptchaKeys reCaptchaKeys, RestTemplate restTemplate){
+    public ReCaptchaService(ReCaptchaKeys reCaptchaKeys, RestTemplate restTemplate){
         this.reCaptchaKeys = reCaptchaKeys;
         this.restTemplate = restTemplate;
     }
 
-    public ReCaptchaCreationCompteService() {
+    public ReCaptchaService() {
 
     }
 

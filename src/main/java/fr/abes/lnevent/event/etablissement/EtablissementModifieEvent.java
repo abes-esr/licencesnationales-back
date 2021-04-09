@@ -6,17 +6,17 @@ import lombok.Getter;
 
 @Getter
 public class EtablissementModifieEvent extends Event {
-    public EtablissementModifieEvent(
-            Object source,
-            Long idEtablissement,
-            EtablissementDTO etablissement) {
+    public EtablissementModifieEvent(Object source, String siren, String nomContact, String adresseContact, String mailContact, String telephoneContact) {
         super(source);
-        this.idEtablissement = idEtablissement;
-        this.etablissement = etablissement;
+        this.siren = siren;
+        this.nomContact = nomContact;
+        this.adresseContact = adresseContact;
+        this.mailContact = mailContact;
+        this.telephoneContact = telephoneContact;
     }
-
-
-    private Long idEtablissement;
-
-    private EtablissementDTO etablissement;
+    private String siren;
+    private String nomContact;
+    private String adresseContact;
+    private String mailContact;
+    private String telephoneContact;
 }

@@ -4,12 +4,18 @@ import fr.abes.lnevent.dto.etablissement.*;
 import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
+import fr.abes.lnevent.exception.AccesInterditException;
+import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Log
 @RestController
@@ -25,6 +31,10 @@ public class EtablissementController {
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
 
+    @Autowired
+    FiltrerAccesServices filtrerAccesServices;
+
+
     @PostMapping(value = "/creation")
     public String add(@RequestBody EtablissementCreeDTO eventDTO) {
         EtablissementCreeEvent etablissementCreeEvent =
@@ -37,11 +47,15 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/modification")
-    public String edit(@RequestBody EtablissementModifieDTO eventDTO) {
+    public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) {//throws SirenIntrouvableException, AccesInterditException
+        //filtrerAccesServices.autoriserServicesParSiren(eventDTO.getSiren());
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        eventDTO.getId(),
-                        eventDTO);
+                        eventDTO.getSiren(),
+                        eventDTO.getNomContact(),
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getMailContact(),
+                        eventDTO.getTelephoneContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         eventRepository.save(new EventEntity(etablissementModifieEvent));
 
@@ -49,6 +63,7 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/fusion")
+    @PreAuthorize("hasAuthority('admin')")
     public String fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
@@ -59,6 +74,7 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/division")
+    @PreAuthorize("hasAuthority('admin')")
     public String division(@RequestBody EtablissementDiviseDTO eventDTO) {
         EtablissementDiviseEvent etablissementDiviseEvent
                 = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
@@ -69,7 +85,8 @@ public class EtablissementController {
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
-    public String suppression(@PathVariable String siren) {
+    public String suppression(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
+        filtrerAccesServices.autoriserServicesParSiren(siren);
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
@@ -79,7 +96,8 @@ public class EtablissementController {
     }
 
     @GetMapping(value = "/{siren}")
-    public EtablissementEntity get(@PathVariable String siren)  {
+    public EtablissementEntity get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
+        filtrerAccesServices.autoriserServicesParSiren(siren);
         return etablissementRepository.getFirstBySiren(siren);
     }
 

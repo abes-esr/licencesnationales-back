@@ -3,14 +3,13 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
-import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.payload.request.LoginRequest;
 import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.services.GenererIdAbes;
-import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
+import fr.abes.lnevent.services.ReCaptchaService;
 import io.swagger.annotations.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,7 @@ public class AuthenticationController {
     private GenererIdAbes genererIdAbes;
 
     @Autowired
-    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
+    private ReCaptchaService reCaptchaService;
 
 
 
@@ -101,7 +100,7 @@ public class AuthenticationController {
         String action = "creationCompte";
 
         //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcharesponse, action);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcharesponse, action);
         if(!reCaptchaResponse.isSuccess()){
             return ResponseEntity
                     .badRequest()

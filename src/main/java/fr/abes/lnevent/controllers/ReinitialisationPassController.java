@@ -10,7 +10,7 @@ import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.lnevent.services.EmailService;
-import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
+import fr.abes.lnevent.services.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,7 +49,7 @@ public class ReinitialisationPassController {
     ContactRepository contactRepository;
 
     @Autowired
-    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
+    private ReCaptchaService reCaptchaService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -73,6 +73,7 @@ public class ReinitialisationPassController {
         String mail = null;
         String siren = null;
         EtablissementEntity user = null;
+        String msgErr = "Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales";
         if(param.equals("email")) {
             mail = emailOrSiren.getString("email");
             log.info("mail = " + mail);
@@ -85,19 +86,20 @@ public class ReinitialisationPassController {
         if (param.equals("email") && user==null) {
             return ResponseEntity
                     .badRequest()
-                    .body("Le mail renseigné n'a pas été trouvé.");
+                    .body(msgErr);
         }else if(param.equals("siren") && user==null){
             return ResponseEntity
                     .badRequest()
-                    .body("Le siren renseigné n'a pas été trouvé.");
+                    .body(msgErr);
         }
         userDetails = new UserDetailsServiceImpl().loadUser(user);
 
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
+        String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
         String url = emailService.getAppUrl(request);
         emailUser = ((UserDetailsImpl) userDetails).getEmail();
         mailSender.send(emailService.constructResetTokenEmail(url,
-                request.getLocale(), jwt, emailUser));
+                request.getLocale(), jwt, emailUser, nomEtab));
 
         return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
     }
@@ -118,7 +120,7 @@ public class ReinitialisationPassController {
         String action = "reinitialisationPass";
 
         //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcha, action);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcha, action);
         if(!reCaptchaResponse.isSuccess()){
             return ResponseEntity
                     .badRequest()
