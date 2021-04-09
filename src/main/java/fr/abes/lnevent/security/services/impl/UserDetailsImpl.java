@@ -1,9 +1,12 @@
 package fr.abes.lnevent.security.services.impl;
 
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,36 +17,43 @@ import java.util.Objects;
 
 @Slf4j
 @Setter @Getter
+@NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
+
+	@Autowired
+	EtablissementRepository etablissementRepository;
 
 
 	private Long id;
 	private String siren;
 	private String nameEtab;//nom etab
 	private String password;
+	private String email;
 	private Collection<? extends GrantedAuthority> authorities;
 	private String isAdmin;
 
 
 
-	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, Collection<? extends GrantedAuthority> authorities,
+	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, String email, Collection<? extends GrantedAuthority> authorities,
 						   String isAdmin) {
 		this.id = id;
 		this.siren = siren;
 		this.nameEtab=nameEtab;
 		this.password = password;
+		this.email = email;
 		this.authorities = authorities;
 		this.isAdmin = isAdmin;
 	}
 
-	public static UserDetailsImpl build(EtablissementEntity user) {
+
+    public static UserDetailsImpl build(EtablissementEntity user) {
 
 		log.info("UserDetailsImpl build début");
 		String isAdmin = user.getContact().role.equals("admin")? "true":"false";
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(user.getContact().role));
 		log.info("userPwd = " + user.getContact().motDePasse);
-		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().motDePasse, authorities, isAdmin);
+		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().motDePasse, user.getContact().mail,authorities, isAdmin);
 	}
 
 
@@ -91,5 +101,8 @@ public class UserDetailsImpl implements UserDetails {
 		return Objects.equals(id, user.id);
 	}
 
+	public String getEmail() {
+		return email;
+	}
 }
 

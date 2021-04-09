@@ -27,7 +27,7 @@ public class ReCaptchaCreationCompteService{
     }
 
     //@Override
-    public ReCaptchaResponse verify(String recaptcharesponse) {
+    public ReCaptchaResponse verify(String recaptcharesponse, String action) {
 
         log.info("debut ReCaptchaCreationCompteService - verify()");
         log.info("response = " + recaptcharesponse);
@@ -44,7 +44,7 @@ public class ReCaptchaCreationCompteService{
 
         if(reCaptchaResponse!=null){
             if(reCaptchaResponse.isSuccess() && (reCaptchaResponse.getScore() < reCaptchaKeys.getThreshold()
-            || !reCaptchaResponse.getAction().equals("creationCompte"))) {
+            || !reCaptchaResponse.getAction().equals(action))) {
                 reCaptchaResponse.setSuccess(false);
             }
 
