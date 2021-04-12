@@ -25,12 +25,13 @@ public class EmailService {
 
     public SimpleMailMessage constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser, String nomEtab) {
         final String url = contextPath + "/reinitialisationPass?token=" + token;
-        String message = messages.getMessage("message.resetPasswordDebut",null, locale);
+        String objetMsg = messages.getMessage("message.resetTokenEmailObjet",null, locale);
+        String message = messages.getMessage("message.resetTokenEmailDebut",null, locale);
         message +=nomEtab + " ";
-        message += messages.getMessage("message.resetPasswordMilieu", null, locale);
+        message += messages.getMessage("message.resetTokenEmailMilieu", null, locale);
         message += " \r\n" + url;
-        message += " \r\n" + messages.getMessage("message.resetPasswordFin", null, locale);
-        return constructEmail("Reinitialisation mot de passe", message, emailUser);
+        message += " \r\n" + messages.getMessage("message.resetTokenEmailFin", null, locale);
+        return constructEmail(objetMsg, message, emailUser);
     }
 
     public SimpleMailMessage constructValidationNewPassEmail(Locale locale, String emailUser){

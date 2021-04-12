@@ -47,8 +47,9 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/modification")
-    public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) {//throws SirenIntrouvableException, AccesInterditException
-        //filtrerAccesServices.autoriserServicesParSiren(eventDTO.getSiren());
+    public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException{
+        log.info("debut EtablissementController modification");
+        filtrerAccesServices.autoriserServicesParSiren(eventDTO.getSiren());
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
                         eventDTO.getSiren(),
