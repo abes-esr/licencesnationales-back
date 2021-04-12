@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+
 @Log
 @RestController
 @RequestMapping("ln/etablissement")
@@ -37,11 +39,14 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/modification")
-    public String edit(@RequestBody EtablissementModifieDTO eventDTO) {
+    public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) {
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        eventDTO.getId(),
-                        eventDTO);
+                        eventDTO.getSiren(),
+                        eventDTO.getNomContact(),
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getMailContact(),
+                        eventDTO.getTelephoneContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         eventRepository.save(new EventEntity(etablissementModifieEvent));
 
