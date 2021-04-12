@@ -44,9 +44,13 @@ public class EtablissementController {
                 new EtablissementModifieEvent(this,
                         eventDTO.getSiren(),
                         eventDTO.getNomContact(),
-                        eventDTO.getAdresseContact(),
                         eventDTO.getMailContact(),
-                        eventDTO.getTelephoneContact());
+                        eventDTO.getTelephoneContact(),
+                        eventDTO.getAdresseContact(),
+                        eventDTO.getBoitePostaleContact(),
+                        eventDTO.getCodePostalContact(),
+                        eventDTO.getVilleContact(),
+                        eventDTO.getCedexContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         eventRepository.save(new EventEntity(etablissementModifieEvent));
 
