@@ -1,10 +1,8 @@
 package fr.abes.lnevent.listener.etablissement;
 
-import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.event.etablissement.EtablissementModifieEvent;
 import fr.abes.lnevent.repository.EtablissementRepository;
-import fr.abes.lnevent.entities.ContactEntity;
-import fr.abes.lnevent.entities.EtablissementEntity;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +25,10 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         etablissementEntity.getContact().setAdresse(etablissementModifieEvent.getAdresseContact());
         etablissementEntity.getContact().setMail(etablissementModifieEvent.getMailContact());
         etablissementEntity.getContact().setTelephone(etablissementModifieEvent.getTelephoneContact());
+        etablissementEntity.getContact().setBoitePostale(etablissementModifieEvent.getBoitePostaleContact());
+        etablissementEntity.getContact().setCodePostal(etablissementModifieEvent.getCodePostalContact());
+        etablissementEntity.getContact().setVille(etablissementModifieEvent.getVilleContact());
+        etablissementEntity.getContact().setCedex(etablissementModifieEvent.getCedexContact());
 
         etablissementRepository.save(etablissementEntity);
     }

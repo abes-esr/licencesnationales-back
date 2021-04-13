@@ -49,6 +49,10 @@ public class EventEntity {
         this.adresseContact = etablissementModifieEvent.getAdresseContact();
         this.mailContact = etablissementModifieEvent.getMailContact();
         this.telephoneContact = etablissementModifieEvent.getTelephoneContact();
+        this.boitePostaleContact = etablissementModifieEvent.getBoitePostaleContact();
+        this.codePostalContact = etablissementModifieEvent.getCodePostalContact();
+        this.villeContact = etablissementModifieEvent.getVilleContact();
+        this.cedexContact = etablissementModifieEvent.getCedexContact();
 
     }
 
