@@ -14,6 +14,9 @@ public class EtablissementModifieDTO {
     @NotBlank
     private String nomContact;
     @NotBlank
+    @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le prénom fourni n'est pas valide")
+    private String prenomContact;
+    @NotBlank
     private String mailContact;
     @NotBlank
     private String telephoneContact;
@@ -34,9 +37,10 @@ public class EtablissementModifieDTO {
 
     private String cedexContact;
 
-    public EtablissementModifieDTO(String siren, String nomContact, String mailContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact) {
+    public EtablissementModifieDTO(String siren, String nomContact, String prenomContact, String mailContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact) {
         this.siren = siren;
         this.nomContact = nomContact;
+        this.prenomContact = prenomContact;
         this.mailContact = mailContact;
         this.telephoneContact = telephoneContact;
         this.adresseContact = adresseContact;
