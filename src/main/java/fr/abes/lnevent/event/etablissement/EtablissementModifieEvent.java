@@ -15,6 +15,7 @@ public class EtablissementModifieEvent extends Event {
     private String siren;
 
     private String nomContact;
+    private String prenomContact;
     private String mailContact;
     private String telephoneContact;
     private String adresseContact;
@@ -23,10 +24,11 @@ public class EtablissementModifieEvent extends Event {
     private String villeContact;
     private String cedexContact;
 
-    public EtablissementModifieEvent(Object source, String siren, String nomContact, String mailContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact) {
+    public EtablissementModifieEvent(Object source, String siren, String nomContact, String prenomContact, String mailContact, String telephoneContact, String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact) {
         super(source);
         this.siren = siren;
         this.nomContact = nomContact;
+        this.prenomContact = prenomContact;
         this.mailContact = mailContact;
         this.telephoneContact = telephoneContact;
         this.adresseContact = adresseContact;

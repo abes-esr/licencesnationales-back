@@ -44,6 +44,7 @@ public class EtablissementController {
                 new EtablissementModifieEvent(this,
                         eventDTO.getSiren(),
                         eventDTO.getNomContact(),
+                        eventDTO.getPrenomContact(),
                         eventDTO.getMailContact(),
                         eventDTO.getTelephoneContact(),
                         eventDTO.getAdresseContact(),

@@ -22,6 +22,7 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
     public void onApplicationEvent(EtablissementModifieEvent etablissementModifieEvent) {
         EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(etablissementModifieEvent.getSiren());
         etablissementEntity.getContact().setNom(etablissementModifieEvent.getNomContact());
+        etablissementEntity.getContact().setPrenom(etablissementModifieEvent.getPrenomContact());
         etablissementEntity.getContact().setAdresse(etablissementModifieEvent.getAdresseContact());
         etablissementEntity.getContact().setMail(etablissementModifieEvent.getMailContact());
         etablissementEntity.getContact().setTelephone(etablissementModifieEvent.getTelephoneContact());
