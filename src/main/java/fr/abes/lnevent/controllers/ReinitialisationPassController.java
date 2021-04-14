@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -140,6 +141,28 @@ public class ReinitialisationPassController {
         emailUser = c.getMail();
         mailSender.send(emailService.constructValidationNewPassEmail( request.getLocale(), emailUser));
         return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
+    }
+
+    @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+        JSONObject data = new JSONObject(requestData);
+        String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(request));
+        String oldPassword = data.getString("oldPassword");
+        String newPasswordHash = passwordEncoder.encode(data.getString("newPassword"));
+
+        EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
+        ContactEntity c = e.getContact();
+
+        if(passwordEncoder.matches(oldPassword,c.getMotDePasse())) {
+            c.setMotDePasse(newPasswordHash);
+            contactRepository.save(c);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe renseigné ne correspond pas à votre ancien mot de passe.");
+        }
+
+        return ResponseEntity.ok("Mot de passe mis à jour.");
     }
 }
 
