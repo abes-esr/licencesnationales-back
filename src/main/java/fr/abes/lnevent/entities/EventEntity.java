@@ -46,9 +46,15 @@ public class EventEntity {
         this.event = "modifie";
         this.siren = etablissementModifieEvent.getSiren();
         this.nomContact = etablissementModifieEvent.getNomContact();
+        this.prenomContact = etablissementModifieEvent.getPrenomContact();
         this.adresseContact = etablissementModifieEvent.getAdresseContact();
         this.mailContact = etablissementModifieEvent.getMailContact();
         this.telephoneContact = etablissementModifieEvent.getTelephoneContact();
+        this.boitePostaleContact = etablissementModifieEvent.getBoitePostaleContact();
+        this.codePostalContact = etablissementModifieEvent.getCodePostalContact();
+        this.villeContact = etablissementModifieEvent.getVilleContact();
+        this.cedexContact = etablissementModifieEvent.getCedexContact();
+
     }
 
     public EventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {
