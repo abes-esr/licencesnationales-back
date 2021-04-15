@@ -12,6 +12,7 @@ import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.event.ip.IpValideeEvent;
+import fr.abes.lnevent.event.password.UpdatePasswordEvent;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -123,6 +124,12 @@ public class EventEntity {
         this.siren = ipSupprimeeEvent.getSiren();
     }
 
+    public EventEntity(UpdatePasswordEvent updatePasswordEvent) {
+        this.event = "motDePasseMisAJour";
+        this.siren = updatePasswordEvent.getSiren();
+        this.motDePasse = updatePasswordEvent.getNewpasswordHash();
+    }
+
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "event_Sequence")
     @SequenceGenerator(name = "event_Sequence", sequenceName = "EVENT_SEQ", allocationSize = 1)
@@ -193,7 +200,5 @@ public class EventEntity {
     @Lob
     @Convert(converter = JpaConverterJson.class)
     private List<Long> idEditeurFusionnes;
-
-
 
 }
