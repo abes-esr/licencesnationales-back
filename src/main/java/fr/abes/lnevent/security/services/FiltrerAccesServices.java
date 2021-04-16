@@ -47,7 +47,7 @@ public class FiltrerAccesServices {
                 log.error("Acces interdit");
                 throw new AccesInterditException("Acces interdit");
             }
-            boolean existeSiren = etablissementRepository.existeSiren(sirenFromJwt);
+            boolean existeSiren = etablissementRepository.existeSiren(sirenFromJwt); // ou existeSiren(sirenFromSecurityContextUser)
             log.info("existeSiren = "+ existeSiren);
             if (!existeSiren) {
                 log.error("Siren absent de la base");
