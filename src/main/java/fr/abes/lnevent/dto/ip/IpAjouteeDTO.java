@@ -6,4 +6,6 @@ import lombok.Getter;
 public class IpAjouteeDTO {
     private String ip;
     private String siren;
+    private String typeAcces;
+    private String typeIp;
 }

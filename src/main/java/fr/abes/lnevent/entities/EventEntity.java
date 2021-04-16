@@ -24,6 +24,8 @@ import java.util.List;
 @NoArgsConstructor
 public class EventEntity {
 
+
+
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
         EtablissementDTO etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
@@ -114,6 +116,9 @@ public class EventEntity {
         this.dateCreationEvent = ipAjouteeEvent.created;
         this.ip = ipAjouteeEvent.getIp();
         this.siren = ipAjouteeEvent.getSiren();
+        this.typeAccesIp = ipAjouteeEvent.getTypeAcces();
+        this.typeIp = ipAjouteeEvent.getTypeIp();
+        //this.dateCreationIp = ipAjouteeEvent.getDate();
     }
 
     public EventEntity(IpModifieeEvent ipModifieeEvent) {
@@ -216,5 +221,13 @@ public class EventEntity {
     @Lob
     @Convert(converter = JpaConverterJson.class)
     private List<Long> idEditeurFusionnes;
+
+    private String typeAccesIp;
+
+    private String typeIp;
+
+    private Date dateCreationIp;
+
+    private Date dateModificationIp;
 
 }

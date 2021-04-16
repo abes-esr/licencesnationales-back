@@ -138,13 +138,16 @@ class LneventApplicationTests {
         EtablissementEntity etablissementEntity1 = etablissementRepository.getFirstBySiren("3555646init");
         IpEntity ipEntity = new IpEntity(
                 null,
-                "231.256.257.2802");
+                "231.256.257.2802", "plage", "ipv4");
         etablissementEntity1.getIps().add(ipEntity);
+
 
         etablissementRepository.save(etablissementEntity1);
 
         assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().size()).isEqualTo(1);
         assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getIp()).isEqualTo("231.256.257.2802");
+        assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getTypeAcces()).isEqualTo("plage");
+        assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getTypeIp()).isEqualTo("ipv4");
     }
 
 }
