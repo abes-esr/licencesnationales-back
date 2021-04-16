@@ -7,7 +7,11 @@ import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.repository.IpRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+import java.util.Set;
 
 @Service
 public class ArbreService {
@@ -19,16 +23,19 @@ public class ArbreService {
         this.ipRepository = ipRepository;
     }
 
-    public String genereArbre() {
+    public String genereArbre() throws ParseException {
         StringBuilder builder = new StringBuilder();
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
         for (EventEntity eventEntity :
-                eventRepository.findAll()) {
+                eventRepository.getAllByDateCreationEventBetweenOrderByDateCreationEvent(simpleDateFormat.parse("15-04-2021"),
+                        new Date())) {
             switch (eventEntity.event) {
                 case "cree":
-                    builder.append("Nouveau : ").append(eventEntity.nomEtab).append("\n");
-                    List<IpEntity> ips = (List<IpEntity>) ipRepository.findAllBySiren(eventEntity.siren);
+                    builder.append("Nouvel établissement : ").append(eventEntity.nomEtab).append("\n");
+                    Set<IpEntity> ips = ipRepository.findAllBySiren(eventEntity.siren);
                     for (IpEntity ipEntity :
                             ips) {
+                        builder.append("Nouvelle ip créé : ");
                         builder.append(ipEntity.getIp()).append("\n");
                     }
                     break;
@@ -39,7 +46,7 @@ public class ArbreService {
                     builder.append("Divise : ").append(eventEntity.ancienNomEtab).append("\n");
                     for (EtablissementDTO etab :
                             eventEntity.etablisementsDivise) {
-                        builder.append(etab.getNom()).append("\n");
+                        builder.append(etab.getSiren()).append("\n");
                     }
                     break;
                 case "fusionne":
