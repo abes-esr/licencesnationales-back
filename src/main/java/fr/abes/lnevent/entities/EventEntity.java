@@ -16,6 +16,7 @@ import fr.abes.lnevent.event.password.UpdatePasswordEvent;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -26,6 +27,7 @@ public class EventEntity {
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
         EtablissementDTO etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
+        this.dateCreationEvent = etablissementCreeEvent.created;
         this.nomEtab = etablissement.getNom();
         this.siren = etablissement.getSiren();
         this.typeEtablissement = etablissement.getTypeEtablissement();
@@ -45,7 +47,8 @@ public class EventEntity {
 
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
         this.event = "modifie";
-        this.siren = etablissementModifieEvent.getSiren();
+        this.dateCreationEvent = etablissementModifieEvent.created;
+                this.siren = etablissementModifieEvent.getSiren();
         this.nomContact = etablissementModifieEvent.getNomContact();
         this.prenomContact = etablissementModifieEvent.getPrenomContact();
         this.adresseContact = etablissementModifieEvent.getAdresseContact();
@@ -60,23 +63,27 @@ public class EventEntity {
 
     public EventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {
         this.event = "supprime";
+        this.dateCreationEvent = etablissementSupprimeEvent.created;
         this.nomEtab = etablissementSupprimeEvent.getSiren();
     }
 
     public EventEntity(EtablissementDiviseEvent etablissementDiviseEvent) {
         this.event = "divise";
+        this.dateCreationEvent = etablissementDiviseEvent.created;
         this.ancienNomEtab = etablissementDiviseEvent.getAncienSiren();
         this.etablisementsDivise = etablissementDiviseEvent.getEtablissementDTOS();
     }
 
     public EventEntity(EtablissementFusionneEvent etablissementFusionneEvent) {
         this.event = "fusionne";
+        this.dateCreationEvent = etablissementFusionneEvent.created;
         this.etablissementDTOFusion = etablissementFusionneEvent.getEtablissementDTO();
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
     }
 
     public EventEntity(EditeurCreeEvent editeurCreeEvent) {
         this.event = "editeurcree";
+        this.dateCreationEvent = editeurCreeEvent.created;
         this.nomEditeur = editeurCreeEvent.getNom();
         this.adresseEditeur = editeurCreeEvent.getAdresse();
         this.mailPourBatchEditeur = editeurCreeEvent.getMailPourBatch();
@@ -85,6 +92,7 @@ public class EventEntity {
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
         this.event = "editeurmodifie";
+        this.dateCreationEvent = editeurModifieEvent.created;
         this.nomEditeur = editeurModifieEvent.getNom();
         this.adresseEditeur = editeurModifieEvent.getAdresse();
         this.mailPourBatchEditeur = editeurModifieEvent.getMailPourBatch();
@@ -93,6 +101,7 @@ public class EventEntity {
 
     public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
         this.event = "editeurfusione";
+        this.dateCreationEvent = editeurFusionneEvent.created;
         this.nomEditeur = editeurFusionneEvent.getEditeurDTO().getNom();
         this.adresseEditeur = editeurFusionneEvent.getEditeurDTO().getAdresse();
         this.mailPourBatchEditeur = editeurFusionneEvent.getEditeurDTO().getMailPourBatch();
@@ -102,30 +111,35 @@ public class EventEntity {
 
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {
         this.event = "ipAjoute";
+        this.dateCreationEvent = ipAjouteeEvent.created;
         this.ip = ipAjouteeEvent.getIp();
         this.siren = ipAjouteeEvent.getSiren();
     }
 
     public EventEntity(IpModifieeEvent ipModifieeEvent) {
         this.event = "ipModifie";
+        this.dateCreationEvent = ipModifieeEvent.created;
         this.ip = ipModifieeEvent.getIp();
         this.siren = ipModifieeEvent.getSiren();
     }
 
     public EventEntity(IpValideeEvent ipValideeEvent) {
         this.event = "ipValidee";
+        this.dateCreationEvent = ipValideeEvent.created;
         this.ip = ipValideeEvent.getIp();
         this.siren = ipValideeEvent.getSiren();
     }
 
     public EventEntity(IpSupprimeeEvent ipSupprimeeEvent) {
         this.event = "ipSupprimee";
+        this.dateCreationEvent = ipSupprimeeEvent.created;
         this.ip = ipSupprimeeEvent.getIp();
         this.siren = ipSupprimeeEvent.getSiren();
     }
 
     public EventEntity(UpdatePasswordEvent updatePasswordEvent) {
         this.event = "motDePasseMisAJour";
+        this.dateCreationEvent = updatePasswordEvent.created;
         this.siren = updatePasswordEvent.getSiren();
         this.motDePasse = updatePasswordEvent.getNewpasswordHash();
     }
@@ -134,6 +148,8 @@ public class EventEntity {
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "event_Sequence")
     @SequenceGenerator(name = "event_Sequence", sequenceName = "EVENT_SEQ", allocationSize = 1)
     public Long id;
+
+    public Date dateCreationEvent;
 
     public String event;
 
