@@ -1,15 +1,15 @@
-/*
 package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.services.ArbreService;
-import fr.abes.lnevent.services.PeuplementService;
 import fr.abes.lnevent.services.ResetService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.text.ParseException;
 
 @Log
 @RestController
@@ -26,22 +26,14 @@ public class ServiceController {
     @Autowired
     private ArbreService arbreService;
 
-    @Autowired
-    private PeuplementService peuplementService;
-
     @GetMapping(value = "/ln/resetEtablissement")
     public String resetEtablissement() {
         return resetService.resetEtablissement();
     }
 
     @GetMapping(value = "/ln/arbre")
-    public String arbre() {
+    public String arbre() throws ParseException {
         return arbreService.genereArbre();
     }
 
-    @GetMapping(value = "/ln/peuplement")
-    public String peuplement() {
-        return peuplementService.ajoutEtablissementfromCSV();
-    }
 }
-*/
