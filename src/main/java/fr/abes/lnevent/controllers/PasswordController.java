@@ -3,19 +3,23 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.entities.ContactEntity;
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.entities.EventEntity;
+import fr.abes.lnevent.event.password.UpdatePasswordEvent;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
+import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.lnevent.services.EmailService;
-import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
+import fr.abes.lnevent.services.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.configurationprocessor.json.JSONException;
 import org.springframework.boot.configurationprocessor.json.JSONObject;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -50,7 +54,7 @@ public class PasswordController {
     ContactRepository contactRepository;
 
     @Autowired
-    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
+    private ReCaptchaService reCaptchaService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -125,7 +129,7 @@ public class PasswordController {
         String action = "reinitialisationPass";
 
         //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcha, action);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcha, action);
         if(!reCaptchaResponse.isSuccess()){
             return ResponseEntity
                     .badRequest()
