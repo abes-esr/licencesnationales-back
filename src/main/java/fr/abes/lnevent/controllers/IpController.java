@@ -37,7 +37,9 @@ public class IpController {
     public String ajoutIp(@RequestBody IpAjouteeDTO event) {
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
                 event.getIp(),
-                event.getSiren());
+                event.getSiren(),
+                event.getTypeAcces(),
+                event.getIp());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
         eventRepository.save(new EventEntity(ipAjouteeEvent));
 

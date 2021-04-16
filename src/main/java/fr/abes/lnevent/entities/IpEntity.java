@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 
 @Entity
 @Table(name = "Ip")
@@ -14,10 +15,14 @@ import java.io.Serializable;
 @Getter @Setter
 public class IpEntity implements Serializable {
 
-    public IpEntity(Long id, String ip) {
+    public IpEntity(Long id, String ip, String typeAcces, String typeIp) {
         this.id = id;
         this.ip = ip;
         this.validee = false;
+        this.dateCreation = new Date();
+        this.typeAcces = typeAcces;
+        this.typeIp=typeIp;
+
     }
 
     @Id
@@ -28,4 +33,12 @@ public class IpEntity implements Serializable {
     private String ip;
 
     private boolean validee;
+
+    private Date dateCreation;
+
+    private Date dateModification;
+
+    private String typeAcces;
+
+    private String typeIp;
 }
