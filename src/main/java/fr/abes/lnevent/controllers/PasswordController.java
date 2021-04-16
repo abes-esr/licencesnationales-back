@@ -10,7 +10,7 @@ import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.lnevent.services.EmailService;
-import fr.abes.lnevent.services.ReCaptchaService;
+import fr.abes.lnevent.services.ReCaptchaCreationCompteService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/ln/reinitialisationMotDePasse")
-public class ReinitialisationPassController {
+public class PasswordController {
 
 
     @Autowired
@@ -50,7 +50,7 @@ public class ReinitialisationPassController {
     ContactRepository contactRepository;
 
     @Autowired
-    private ReCaptchaService reCaptchaService;
+    private ReCaptchaCreationCompteService reCaptchaCreationCompteService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -59,7 +59,11 @@ public class ReinitialisationPassController {
 
     private String emailUser;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
+    @Autowired
+    private EventRepository eventRepository;
 
 
     @ApiOperation(value = "permet de ",
@@ -121,7 +125,7 @@ public class ReinitialisationPassController {
         String action = "reinitialisationPass";
 
         //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcha, action);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaCreationCompteService.verify(recaptcha, action);
         if(!reCaptchaResponse.isSuccess()){
             return ResponseEntity
                     .badRequest()
@@ -156,11 +160,11 @@ public class ReinitialisationPassController {
         EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
         ContactEntity c = e.getContact();
 
-        if(passwordEncoder.matches(oldPassword,c.getMotDePasse())) {
-            c.setMotDePasse(newPasswordHash);
-            contactRepository.save(c);
-        }
-        else {
+        if (passwordEncoder.matches(oldPassword, c.getMotDePasse())) {
+            UpdatePasswordEvent updatePasswordEvent = new UpdatePasswordEvent(this, siren, newPasswordHash);
+            applicationEventPublisher.publishEvent(updatePasswordEvent);
+            eventRepository.save(new EventEntity(updatePasswordEvent));
+        } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe renseigné ne correspond pas à votre ancien mot de passe.");
         }
 
