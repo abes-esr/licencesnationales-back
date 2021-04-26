@@ -210,17 +210,17 @@ node {
           newconfig = newconfig.replaceAll("spring.jpa.properties.hibernate.dialect=*", "spring.jpa.properties.hibernate.dialect=${dialect}")
         }
         withCredentials([
-          string(credentialsId: "google-recaptcha-key-site", variable: 'googleRecaptchaKey')
+          string(credentialsId: "LN-google-recaptcha-key-site", variable: 'googleRecaptchaKey')
         ]) {
           newconfig = newconfig.replaceAll("google.recaptcha.key.site=*", "google.recaptcha.key.site=${googleRecaptchaKey}")
         }
         withCredentials([
-          string(credentialsId: "google-recaptcha-key-secret", variable: 'googleRecaptchaSecret')
+          string(credentialsId: "LN-google-recaptcha-key-secret", variable: 'googleRecaptchaSecret')
         ]) {
           newconfig = newconfig.replaceAll("google.recaptcha.key.secret=*", "google.recaptcha.key.secret=${googleRecaptchaSecret}")
         }
         withCredentials([
-          string(credentialsId: "google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
+          string(credentialsId: "LN-google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
         ]) {
           newconfig = newconfig.replaceAll("google.recaptcha.key.threshold=*", "google.recaptcha.key.threshold=${googleRecaptchaThreshold}")
         }
