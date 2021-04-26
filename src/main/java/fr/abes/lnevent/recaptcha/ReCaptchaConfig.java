@@ -14,7 +14,7 @@ public class ReCaptchaConfig {
         return new RestTemplate();
     }
     @Bean
-    ReCaptchaService ReCaptchaCreationCompteService(){
+    ReCaptchaService ReCaptchaService(){
         return new ReCaptchaService();
     }
     @Bean

@@ -29,7 +29,7 @@ public class ReCaptchaService {
     //@Override
     public ReCaptchaResponse verify(String recaptcharesponse, String action) {
 
-        log.info("debut ReCaptchaCreationCompteService - verify()");
+        log.info("debut ReCaptchaService - verify()");
         log.info("response = " + recaptcharesponse);
         log.info("reCaptchaKeys.getSecret() = " + reCaptchaKeys.getSecret());
 

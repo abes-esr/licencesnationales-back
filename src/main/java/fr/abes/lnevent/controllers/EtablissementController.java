@@ -8,16 +8,19 @@ import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.security.services.FiltrerAccesServices;
-import lombok.extern.java.Log;
+import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Log
+
+
+@Slf4j
 @RestController
 @RequestMapping("ln/etablissement")
 public class EtablissementController {
@@ -31,11 +34,9 @@ public class EtablissementController {
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
-    FiltrerAccesServices filtrerAccesServices;
 
 
-    @PostMapping(value = "/creation")
+    //@PostMapping(value = "/creation")
     public String add(@RequestBody EtablissementCreeDTO eventDTO) {
         EtablissementCreeEvent etablissementCreeEvent =
                 new EtablissementCreeEvent(this,
@@ -49,10 +50,9 @@ public class EtablissementController {
     @PostMapping(value = "/modification")
     public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException{
         log.info("debut EtablissementController modification");
-        filtrerAccesServices.autoriserServicesParSiren(eventDTO.getSiren());
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        eventDTO.getSiren(),
+                        getSirenFromSecurityContextUser(),
                         eventDTO.getNomContact(),
                         eventDTO.getPrenomContact(),
                         eventDTO.getMailContact(),
@@ -91,8 +91,8 @@ public class EtablissementController {
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
-    public String suppression(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(siren);
+    @PreAuthorize("hasAuthority('admin')")
+    public String suppression(@PathVariable String siren) {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
@@ -102,14 +102,30 @@ public class EtablissementController {
     }
 
     @GetMapping(value = "/{siren}")
-    public EtablissementEntity get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(siren);
+    @PreAuthorize("hasAuthority('admin')")
+    public EtablissementEntity get(@PathVariable String siren) {
         return etablissementRepository.getFirstBySiren(siren);
     }
 
+    @GetMapping(value = "/getInfoEtab")
+    public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
+        return etablissementRepository.getFirstBySiren(getSirenFromSecurityContextUser());
+    }
 
-
-
-
-
+    private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String sirenFromSecurityContextUser = userDetails.getUsername();
+        log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+        if(sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser==null){
+            log.error("Acces interdit");
+            throw new AccesInterditException("Acces interdit");
+        }
+        boolean existeSiren = etablissementRepository.existeSiren(sirenFromSecurityContextUser);
+        log.info("existeSiren = "+ existeSiren);
+        if (!existeSiren) {
+            log.error("Siren absent de la base");
+            throw new SirenIntrouvableException("Siren absent de la base");
+        }
+        return sirenFromSecurityContextUser;
+    }
 }
