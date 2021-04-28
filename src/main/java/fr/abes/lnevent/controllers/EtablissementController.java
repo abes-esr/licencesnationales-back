@@ -6,14 +6,19 @@ import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.exception.SirenIntrouvableException;
+import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import fr.abes.lnevent.services.GenererIdAbes;
+import fr.abes.lnevent.services.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -34,10 +39,70 @@ public class EtablissementController {
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
 
+    @Autowired
+    private GenererIdAbes genererIdAbes;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ReCaptchaService reCaptchaService;
 
 
-    //@PostMapping(value = "/creation")
-    public String add(@RequestBody EtablissementCreeDTO eventDTO) {
+    @PostMapping("/creationCompte")
+    public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
+        log.debug("eventDto = " + eventDTO.toString());
+        log.debug("NomEtab = " + eventDTO.getNom());
+        log.debug("siren = " + eventDTO.getSiren());
+        log.debug("TypeEtablissement = " + eventDTO.getTypeEtablissement());
+        log.debug("NomContact = " + eventDTO.getNomContact());
+        log.debug("PrenomContact = " + eventDTO.getPrenomContact());
+        log.debug("AdresseContact = " + eventDTO.getAdresseContact());
+        log.debug("BPContact = " + eventDTO.getBoitePostaleContact());
+        log.debug("CodePostalContact = " + eventDTO.getCodePostalContact());
+        log.debug("VilleContact = " + eventDTO.getVilleContact());
+        log.debug("CedexContact = " + eventDTO.getCedexContact());
+        log.debug("TelephoneContact = " + eventDTO.getTelephoneContact());
+        log.debug("MailContact = " + eventDTO.getMailContact());
+        log.debug("mdp = " + eventDTO.getMotDePasse());
+        log.debug("recaptcharesponse = " + eventDTO.getRecaptcha());
+
+        String recaptcharesponse = eventDTO.getRecaptcha();
+        String action = "creationCompte";
+
+        //verifier la réponse recaptcha
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcharesponse, action);
+        if(!reCaptchaResponse.isSuccess()){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
+        }
+
+        //verifier que le siren n'est pas déjà en base
+        boolean existeSiren = etablissementRepository.existeSiren(eventDTO.getSiren());
+        log.info("existeSiren = "+ existeSiren);
+        if (existeSiren) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Cet établissement existe déjà.");
+        }
+        //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
+        else{
+            log.info("mdp = " + eventDTO.getMotDePasse());
+            eventDTO.setMotDePasse(passwordEncoder.encode(eventDTO.getMotDePasse()));
+            eventDTO.setIdAbes(genererIdAbes.genererIdAbes(GenererIdAbes.generateId()));
+            eventDTO.setRoleContact("etab");
+            log.info("idAbes = " + eventDTO.getIdAbes());
+            log.info("mdphash = " + eventDTO.getMotDePasse());
+            EtablissementCreeEvent etablissementCreeEvent =
+                    new EtablissementCreeEvent(this,
+                            eventDTO);
+            applicationEventPublisher.publishEvent(etablissementCreeEvent);
+            eventRepository.save(new EventEntity(etablissementCreeEvent));
+            return ResponseEntity.ok("Creation du compte effectuée.");}
+    }
+
+   /* public String add(@RequestBody EtablissementCreeDTO eventDTO) {
         EtablissementCreeEvent etablissementCreeEvent =
                 new EtablissementCreeEvent(this,
                         eventDTO);
@@ -45,7 +110,7 @@ public class EtablissementController {
         eventRepository.save(new EventEntity(etablissementCreeEvent));
 
         return "done";
-    }
+    }*/
 
     @PostMapping(value = "/modification")
     public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException{

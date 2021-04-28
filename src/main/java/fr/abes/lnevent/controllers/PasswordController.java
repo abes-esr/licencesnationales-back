@@ -9,6 +9,7 @@ import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
 import fr.abes.lnevent.security.jwt.JwtTokenProvider;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
@@ -73,7 +74,7 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody String userEmailOrSiren) throws JSONException {
+    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody String userEmailOrSiren) throws JSONException, DonneeIncoherenteBddException {
 
         log.info("userEmailOrSiren = " + userEmailOrSiren);
         JSONObject emailOrSiren = new JSONObject(userEmailOrSiren);

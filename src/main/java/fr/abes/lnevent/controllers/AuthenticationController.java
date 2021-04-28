@@ -36,22 +36,6 @@ public class AuthenticationController {
     @Autowired
     private JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private EtablissementRepository etablissementRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private EtablissementController etablissementController;
-
-    @Autowired
-    private GenererIdAbes genererIdAbes;
-
-    @Autowired
-    private ReCaptchaService reCaptchaService;
-
-
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
@@ -75,56 +59,6 @@ public class AuthenticationController {
         String jwt = tokenProvider.generateToken(user);
         log.info("authenticateUser 3");
         return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getIsAdmin()));
-    }
-
-
-    @PostMapping("/creationCompte")
-    public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
-        log.debug("eventDto = " + eventDTO.toString());
-        log.debug("NomEtab = " + eventDTO.getNom());
-        log.debug("siren = " + eventDTO.getSiren());
-        log.debug("TypeEtablissement = " + eventDTO.getTypeEtablissement());
-        log.debug("NomContact = " + eventDTO.getNomContact());
-        log.debug("PrenomContact = " + eventDTO.getPrenomContact());
-        log.debug("AdresseContact = " + eventDTO.getAdresseContact());
-        log.debug("BPContact = " + eventDTO.getBoitePostaleContact());
-        log.debug("CodePostalContact = " + eventDTO.getCodePostalContact());
-        log.debug("VilleContact = " + eventDTO.getVilleContact());
-        log.debug("CedexContact = " + eventDTO.getCedexContact());
-        log.debug("TelephoneContact = " + eventDTO.getTelephoneContact());
-        log.debug("MailContact = " + eventDTO.getMailContact());
-        log.debug("mdp = " + eventDTO.getMotDePasse());
-        log.debug("recaptcharesponse = " + eventDTO.getRecaptcha());
-
-        String recaptcharesponse = eventDTO.getRecaptcha();
-        String action = "creationCompte";
-
-        //verifier la réponse recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcharesponse, action);
-        if(!reCaptchaResponse.isSuccess()){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
-        }
-
-        //verifier que le siren n'est pas déjà en base
-        boolean existeSiren = etablissementRepository.existeSiren(eventDTO.getSiren());
-        log.info("existeSiren = "+ existeSiren);
-        if (existeSiren) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Cet établissement existe déjà.");
-        }
-        //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
-        else{
-        log.info("mdp = " + eventDTO.getMotDePasse());
-        eventDTO.setMotDePasse(passwordEncoder.encode(eventDTO.getMotDePasse()));
-        eventDTO.setIdAbes(genererIdAbes.genererIdAbes(GenererIdAbes.generateId()));
-        eventDTO.setRoleContact("etab");
-        log.info("idAbes = " + eventDTO.getIdAbes());
-        log.info("mdphash = " + eventDTO.getMotDePasse());
-        etablissementController.add(eventDTO);
-        return ResponseEntity.ok("Creation du compte effectuée.");}
     }
 }
 
