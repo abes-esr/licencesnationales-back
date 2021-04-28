@@ -17,6 +17,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(
@@ -58,7 +59,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/login").permitAll()
-                .antMatchers("/creationCompte").permitAll()
+                .antMatchers("/ln/etablissement/creationCompte").permitAll()
                 .antMatchers("/ln/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/applicationVersion").permitAll()
@@ -73,5 +74,6 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**");
     }
+
 }
 

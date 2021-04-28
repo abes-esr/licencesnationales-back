@@ -1,7 +1,9 @@
 package fr.abes.lnevent.security.services.impl;
 
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.repository.EtablissementRepository;
+import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -46,12 +48,19 @@ public class UserDetailsImpl implements UserDetails {
 	}
 
 
-    public static UserDetailsImpl build(EtablissementEntity user) {
+    public static UserDetailsImpl build(EtablissementEntity user) throws DonneeIncoherenteBddException {
 
 		log.info("UserDetailsImpl build début");
-		String isAdmin = user.getContact().role.equals("admin")? "true":"false";
+		String role = user.getContact().role;
+		String isAdmin = "";
+		if(role==null || role.equals("")){
+			throw new DonneeIncoherenteBddException("Le role utilisateur est absent de la bdd");
+		}
+		else {
+			isAdmin = role.equals("admin") ? "true" : "false";
+		}
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(user.getContact().role));
+		authorities.add(new SimpleGrantedAuthority(role));
 		log.info("userPwd = " + user.getContact().motDePasse);
 		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().motDePasse, user.getContact().mail,authorities, isAdmin);
 	}

@@ -96,19 +96,20 @@
             <version>12.1.0.1.0</version>
         </dependency>
 
-            <dependency>
-                <groupId>com.h2database</groupId>
-                <artifactId>h2</artifactId>
-            </dependency>
-            <!--- === Contrôle des entités === -->
-            <dependency>
-                <groupId>javax.validation</groupId>
-                <artifactId>validation-api</artifactId>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-validation</artifactId>
-            </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+        </dependency>
+        <!--- === Contrôle des entités === -->
+        <dependency>
+            <groupId>javax.validation</groupId>
+            <artifactId>validation-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+
+        </dependency>
 
         <!--- === Envoi de mail === -->
         <dependency>
@@ -199,7 +200,7 @@
     <!-- =========================================================== -->
 
     <build>
-        <finalName>licencesnationales</finalName>
+        <finalName>Licences Nationales back-end</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>

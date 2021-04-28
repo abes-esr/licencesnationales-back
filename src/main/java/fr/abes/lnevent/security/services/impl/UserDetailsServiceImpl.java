@@ -2,6 +2,8 @@ package fr.abes.lnevent.security.services.impl;
 
 import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.repository.EtablissementRepository;
+import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,9 +21,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	EtablissementRepository etablissementRepository;
 
 
+	@SneakyThrows
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String siren) throws UsernameNotFoundException {
+	public UserDetails loadUserByUsername(String siren) throws UsernameNotFoundException{
 		log.info("UserDetailsServiceImpl début");
 		log.info("siren = " + siren);
 		EtablissementEntity user = etablissementRepository.getFirstBySiren(siren);
@@ -35,7 +38,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 		return UserDetailsImpl.build(user);
 	}
 	@Transactional
-	public UserDetails loadUser(EtablissementEntity user) throws UsernameNotFoundException {
+	public UserDetails loadUser(EtablissementEntity user) throws UsernameNotFoundException, DonneeIncoherenteBddException {
 		log.info("UserDetailsServiceImpl début loadUser");
 		log.info("user = " + user);
 		log.info("UserDetailsServiceImpl fin");
