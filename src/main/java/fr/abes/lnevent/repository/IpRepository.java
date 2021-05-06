@@ -14,4 +14,6 @@ public interface IpRepository extends JpaRepository<IpEntity, Long> {
     Set<IpEntity> findAllBySiren(String siren);
 
     void deleteById(Long id);
+
+    IpEntity getFirstById(Long id);
 }

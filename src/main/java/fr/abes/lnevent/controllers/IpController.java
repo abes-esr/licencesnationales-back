@@ -1,9 +1,6 @@
 package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.dto.ip.IpAjouteeDTO;
-import fr.abes.lnevent.dto.ip.IpModifieeDTO;
-import fr.abes.lnevent.dto.ip.IpSupprimeeDTO;
-import fr.abes.lnevent.dto.ip.IpValideeDTO;
+import fr.abes.lnevent.dto.ip.*;
 import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
@@ -14,6 +11,7 @@ import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.entities.EventEntity;
+import fr.abes.lnevent.repository.IpRepository;
 import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +30,9 @@ public class IpController {
 
     @Autowired
     private EtablissementRepository etablissementRepository;
+
+    @Autowired
+    private IpRepository ipRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -91,6 +92,13 @@ public class IpController {
     public Set<IpEntity> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
         return etablissementRepository.getFirstBySiren(siren).getIps();
+    }
+
+    @PostMapping(value = "/getIpEntity")
+    public IpEntity getIpEntity(@RequestBody IpDTO ipDTO) throws SirenIntrouvableException, AccesInterditException {
+        filtrerAccesServices.autoriserServicesParSiren(ipDTO.getSiren());
+        Long identifiant = Long.parseLong(ipDTO.getId());
+        return ipRepository.getFirstById(identifiant);
     }
 
 
