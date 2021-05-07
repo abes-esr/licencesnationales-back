@@ -50,6 +50,6 @@ public class EmailService {
 
     public String getAppUrl(HttpServletRequest request) {
         log.info("getAppUrl = http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
-        return "http://" + request.getServerName();
+        return "https://" + request.getServerName();
     }
 }

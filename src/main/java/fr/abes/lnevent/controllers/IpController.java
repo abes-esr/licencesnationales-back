@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -54,14 +55,21 @@ public class IpController {
         return "done";
     }
 
-    @PostMapping(value = "/modifie")
+    @PostMapping(value = "/modification")
     public String edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(ipModifieeDTO.getSiren());
+        log.info("debut IpController modification");
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
+                ipModifieeDTO.getSiren(),
                 ipModifieeDTO.getId(),
                 ipModifieeDTO.getIp(),
-                ipModifieeDTO.getSiren());
+                ipModifieeDTO.getValidee(),
+                ipModifieeDTO.getDateModification(),
+                ipModifieeDTO.getTypeAcces(),
+                ipModifieeDTO.getTypeIp());
+                //ipModifieeDTO.getSirenFromSecurityContextUser());
+        log.info("IpController modification2");
         applicationEventPublisher.publishEvent(ipModifieeEvent);
+        log.info("IpController modification3");
         eventRepository.save(new EventEntity(ipModifieeEvent));
         return "done";
     }
