@@ -39,6 +39,23 @@ public class EmailService {
         return constructEmail("Nouveau mot de passe enregistré", message , emailUser);
     }
 
+    public SimpleMailMessage constructAccesModifieEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
+        String message = messages.getMessage("message.modificationAcces", null, locale);
+        message += "\r\n" + descriptionAcces;
+        if(!commentaires.equals("")){
+            message += "\r\n Commentaires liés à la modification de l'accès : " + commentaires;
+        }
+        return constructEmail("Modification Acces", message , emailUser);
+    }
+    public SimpleMailMessage constructAccesCreeEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
+        String message = messages.getMessage("message.creationAcces", null, locale);
+        message += "\r\n" + descriptionAcces;
+        if(!commentaires.equals("")){
+            message += "\r\n Commentaires liés à la création de l'accès : " + commentaires;
+        }
+        return constructEmail("Modification Acces", message , emailUser);
+    }
+
     private SimpleMailMessage constructEmail(String subject, String body, String emailUser) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setSubject(subject);

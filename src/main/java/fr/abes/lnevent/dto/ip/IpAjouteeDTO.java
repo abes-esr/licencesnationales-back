@@ -8,4 +8,6 @@ public class IpAjouteeDTO {
     private String siren;
     private String typeAcces;
     private String typeIp;
+    private String commentaires;
+
 }

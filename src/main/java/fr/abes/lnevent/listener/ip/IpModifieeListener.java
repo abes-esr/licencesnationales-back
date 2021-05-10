@@ -28,7 +28,6 @@ public class IpModifieeListener implements ApplicationListener<IpModifieeEvent> 
     public void onApplicationEvent(IpModifieeEvent ipModifieeEvent) {
         log.info("ipModifieeEvent.getSiren()= " + ipModifieeEvent.getSiren());
         EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(ipModifieeEvent.getSiren());
-        //etablissementEntity.getContact().setPrenom(etablissementModifieEvent.getPrenomContact());
         etablissementEntity.getIps().stream().filter(ipEntity -> ipEntity.getId().equals(ipModifieeEvent.getId()))
                 .findFirst().get().setIp(ipModifieeEvent.getIp());
         etablissementEntity.getIps().stream().filter(ipEntity -> ipEntity.getId().equals(ipModifieeEvent.getId()))

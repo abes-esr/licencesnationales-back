@@ -9,6 +9,7 @@ import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.services.GenererIdAbes;
 import fr.abes.lnevent.services.ReCaptchaService;
@@ -47,6 +48,9 @@ public class EtablissementController {
 
     @Autowired
     private ReCaptchaService reCaptchaService;
+
+    @Autowired
+    FiltrerAccesServices filtrerAccesServices;
 
 
     @PostMapping("/creationCompte")
@@ -117,7 +121,7 @@ public class EtablissementController {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        getSirenFromSecurityContextUser(),
+                        filtrerAccesServices.getSirenFromSecurityContextUser(),
                         eventDTO.getNomContact(),
                         eventDTO.getPrenomContact(),
                         eventDTO.getMailContact(),
@@ -174,10 +178,10 @@ public class EtablissementController {
 
     @GetMapping(value = "/getInfoEtab")
     public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
-        return etablissementRepository.getFirstBySiren(getSirenFromSecurityContextUser());
+        return etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
-    private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
+    /*private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String sirenFromSecurityContextUser = userDetails.getUsername();
         log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
@@ -192,5 +196,5 @@ public class EtablissementController {
             throw new SirenIntrouvableException("Siren absent de la base");
         }
         return sirenFromSecurityContextUser;
-    }
+    }*/
 }

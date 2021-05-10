@@ -13,13 +13,19 @@ import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.repository.IpRepository;
 import fr.abes.lnevent.security.services.FiltrerAccesServices;
+import fr.abes.lnevent.services.EmailService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 @Log
@@ -41,37 +47,59 @@ public class IpController {
     @Autowired
     FiltrerAccesServices filtrerAccesServices;
 
+    @Autowired
+    public JavaMailSender mailSender;
+
+    @Autowired
+    EmailService emailService;
+
+    @Value("${ln.dest.notif.admin}")
+    private String admin;
+
+
+
     @PostMapping(value = "/ajout")
-    public String ajoutIp(@RequestBody IpAjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(event.getSiren());
+    public ResponseEntity<?> ajoutIp(@RequestBody IpAjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
                 event.getIp(),
-                event.getSiren(),
+                filtrerAccesServices.getSirenFromSecurityContextUser(),
                 event.getTypeAcces(),
-                event.getIp());
+                event.getIp(),
+                event.getCommentaires());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
         eventRepository.save(new EventEntity(ipAjouteeEvent));
 
-        return "done";
+        String etab = etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()).getName();
+        String descriptionAcces = "id = " + event.getId() + ", ip = " + event.getIp() + " en provenance de l'établissement " + etab;
+        log.info("admin = " + admin);
+        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin ));
+
+        return ResponseEntity.ok("L'accès a bien été créé.");
     }
 
+
     @PostMapping(value = "/modification")
-    public String edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
+    public ResponseEntity<?> edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut IpController modification");
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
-                ipModifieeDTO.getSiren(),
+                filtrerAccesServices.getSirenFromSecurityContextUser(),
                 ipModifieeDTO.getId(),
                 ipModifieeDTO.getIp(),
                 ipModifieeDTO.getValidee(),
-                ipModifieeDTO.getDateModification(),
+                //ipModifieeDTO.getDateModification() pour le moment ce champ n'est pas necessaire puisqu'on fixe la date de modif dans le listener
                 ipModifieeDTO.getTypeAcces(),
-                ipModifieeDTO.getTypeIp());
-                //ipModifieeDTO.getSirenFromSecurityContextUser());
+                ipModifieeDTO.getTypeIp(),
+                ipModifieeDTO.getCommentaires());
         log.info("IpController modification2");
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         log.info("IpController modification3");
         eventRepository.save(new EventEntity(ipModifieeEvent));
-        return "done";
+        String etab = etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()).getName();
+        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
+        log.info("admin = " + admin);
+        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
+
+        return ResponseEntity.ok("L'accès a bien été modifié.");
     }
 
     @PostMapping(value = "/valide")

@@ -57,7 +57,22 @@ public class FiltrerAccesServices {
             }
         }
 
-        //Services IpController
+    public String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String sirenFromSecurityContextUser = userDetails.getUsername();
+        log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+        if(sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser==null){
+            log.error("Acces interdit");
+            throw new AccesInterditException("Acces interdit");
+        }
+        boolean existeSiren = etablissementRepository.existeSiren(sirenFromSecurityContextUser);
+        log.info("existeSiren = "+ existeSiren);
+        if (!existeSiren) {
+            log.error("Siren absent de la base");
+            throw new SirenIntrouvableException("Siren absent de la base");
+        }
+        return sirenFromSecurityContextUser;
+    }
 
 }
 
