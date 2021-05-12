@@ -5,12 +5,12 @@ import lombok.Getter;
 
 @Getter
 public class IpSupprimeeEvent extends Event {
-    private String ip;
+    private String id;
     private String siren;
 
-    public IpSupprimeeEvent(Object source, String ip, String siren) {
+    public IpSupprimeeEvent(Object source, String id, String siren) {
         super(source);
-        this.ip = ip;
+        this.id = id;
         this.siren = siren;
     }
 }

@@ -2,6 +2,7 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.ip.*;
 import fr.abes.lnevent.entities.IpEntity;
+import fr.abes.lnevent.event.Event;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
@@ -21,8 +22,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -57,26 +60,32 @@ public class IpController {
     private String admin;
 
 
+    @PostMapping(value = "/ajoutIpV4")
+    public ResponseEntity<?> ajoutIpv4(@Valid @RequestBody Ipv4AjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
 
-    @PostMapping(value = "/ajout")
-    public ResponseEntity<?> ajoutIp(@RequestBody IpAjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
+    @PostMapping(value = "/ajoutIpV6")
+    public ResponseEntity<?> ajoutIpv6(@Valid @RequestBody Ipv6AjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String sirenFromSecurityContext){
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
-                event.getIp(),
-                filtrerAccesServices.getSirenFromSecurityContextUser(),
+                sirenFromSecurityContext,
+                event.getTypeIp(),
                 event.getTypeAcces(),
-                event.getIp(),
-                event.getCommentaires());
+                event.getIp());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
         eventRepository.save(new EventEntity(ipAjouteeEvent));
 
-        String etab = etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()).getName();
-        String descriptionAcces = "id = " + event.getId() + ", ip = " + event.getIp() + " en provenance de l'établissement " + etab;
+        String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+        String descriptionAcces = " ip = " + event.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
-        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin ));
+        mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin ));
 
         return ResponseEntity.ok("L'accès a bien été créé.");
     }
-
 
     @PostMapping(value = "/modification")
     public ResponseEntity<?> edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
@@ -114,14 +123,24 @@ public class IpController {
     }
 
     @PostMapping(value = "/supprime")
-    public String delete(@RequestBody IpSupprimeeDTO ipSupprimeeDTO) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(ipSupprimeeDTO.getSiren());
+    public String delete(@Valid @RequestBody IpSupprimeeDTO ipSupprimeeDTO) throws SirenIntrouvableException, AccesInterditException {
+        log.info("ipSupprimeeDTO.getId() = " + ipSupprimeeDTO.getId());
         IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
-                ipSupprimeeDTO.getIp(),
+                ipSupprimeeDTO.getId(),
+                filtrerAccesServices.getSirenFromSecurityContextUser());
+        applicationEventPublisher.publishEvent(ipSupprimeeEvent);
+        eventRepository.save(new EventEntity(ipSupprimeeEvent));
+        return "L'accès a bien été supprimé";
+    }
+    @PostMapping(value = "/supprimeByAdmin")
+    @PreAuthorize("hasAuthority('admin')")
+    public String deleteByAdmin(@Valid @RequestBody IpSupprimeeDTO ipSupprimeeDTO) throws SirenIntrouvableException, AccesInterditException {
+        IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
+                ipSupprimeeDTO.getId(),
                 ipSupprimeeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(new EventEntity(ipSupprimeeEvent));
-        return "done";
+        return "L'accès a bien été supprimé";
     }
 
     @GetMapping(value = "/{siren}")

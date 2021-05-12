@@ -2,6 +2,7 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.etablissement.*;
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.exception.AccesInterditException;
@@ -23,7 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-
+import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -179,6 +181,12 @@ public class EtablissementController {
     @GetMapping(value = "/getInfoEtab")
     public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
         return etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    @GetMapping(value = "/getListEtab")
+    //@PreAuthorize("hasAuthority('admin')")
+    public List<EtablissementEntity> getListEtab() {
+        return etablissementRepository.findAll();
     }
 
     /*private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{

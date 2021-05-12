@@ -138,7 +138,7 @@ public class EventEntity {
     public EventEntity(IpSupprimeeEvent ipSupprimeeEvent) {
         this.event = "ipSupprimee";
         this.dateCreationEvent = ipSupprimeeEvent.created;
-        this.ip = ipSupprimeeEvent.getIp();
+        this.id = Long.parseLong(ipSupprimeeEvent.getId());
         this.siren = ipSupprimeeEvent.getSiren();
     }
 
