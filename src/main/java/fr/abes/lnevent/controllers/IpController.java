@@ -2,7 +2,6 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.ip.*;
 import fr.abes.lnevent.entities.IpEntity;
-import fr.abes.lnevent.event.Event;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
@@ -18,7 +17,6 @@ import fr.abes.lnevent.services.EmailService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -26,8 +24,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -87,7 +83,38 @@ public class IpController {
         return ResponseEntity.ok("L'accès a bien été créé.");
     }
 
-    @PostMapping(value = "/modification")
+    @PostMapping(value = "/modifIpV4")
+    public ResponseEntity<?> modifIpv4(@Valid @RequestBody Ipv4ModifieeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    @PostMapping(value = "/modifIpV6")
+    public ResponseEntity<?> modifIpv6(@Valid @RequestBody Ipv6ModifieeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    public ResponseEntity<?> traiterModifIp(IpModifieeDTO ipModifieeDTO, String sirenFromSecurityContext){
+        IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
+                sirenFromSecurityContext,
+                Long.parseLong(ipModifieeDTO.getId()),
+                ipModifieeDTO.getIp(),
+                ipModifieeDTO.getValidee(),
+                ipModifieeDTO.getTypeAcces(),
+                ipModifieeDTO.getTypeIp(),
+                ipModifieeDTO.getCommentaires());
+        log.info("IpController modification2");
+        applicationEventPublisher.publishEvent(ipModifieeEvent);
+        log.info("IpController modification3");
+        eventRepository.save(new EventEntity(ipModifieeEvent));
+        String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
+        log.info("admin = " + admin);
+        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
+
+        return ResponseEntity.ok("L'accès a bien été modifié.");
+    }
+
+    /*@PostMapping(value = "/modification")
     public ResponseEntity<?> edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut IpController modification");
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
@@ -95,7 +122,6 @@ public class IpController {
                 ipModifieeDTO.getId(),
                 ipModifieeDTO.getIp(),
                 ipModifieeDTO.getValidee(),
-                //ipModifieeDTO.getDateModification() pour le moment ce champ n'est pas necessaire puisqu'on fixe la date de modif dans le listener
                 ipModifieeDTO.getTypeAcces(),
                 ipModifieeDTO.getTypeIp(),
                 ipModifieeDTO.getCommentaires());
@@ -109,7 +135,7 @@ public class IpController {
         mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
 
         return ResponseEntity.ok("L'accès a bien été modifié.");
-    }
+    }*/
 
     @PostMapping(value = "/valide")
     public String validate(@RequestBody IpValideeDTO ipValideeDTO) throws SirenIntrouvableException, AccesInterditException {
