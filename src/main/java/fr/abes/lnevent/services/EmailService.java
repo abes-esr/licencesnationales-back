@@ -49,7 +49,7 @@ public class EmailService {
     }
 
     public String getAppUrl(HttpServletRequest request) {
-        log.info("getAppUrl = http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
-        return "http://" + request.getServerName();
+        log.info("getAppUrl = https://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
+        return "https://" + request.getServerName();
     }
 }
