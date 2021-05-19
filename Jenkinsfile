@@ -224,6 +224,11 @@ node {
         ]) {
           newconfig = newconfig.replaceAll("google.recaptcha.key.threshold=*", "google.recaptcha.key.threshold=${googleRecaptchaThreshold}")
         }
+        withCredentials([
+          string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin')
+        ]) {
+          newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
+        }
 
         writeFile file: "src/main/resources/application.properties", text: "${newconfig}"
 
