@@ -48,8 +48,8 @@ public class EmailService {
         return email;
     }
 
-    public String getAppUrl(HttpServletRequest request) {
-        log.info("getAppUrl = http://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
-        return "http://" + request.getServerName();
+    public String getAppUrl(HttpServletRequest request) { //https vers les serveurs
+        log.info("getAppUrl = https://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
+        return "https://" + request.getServerName();
     }
 }
