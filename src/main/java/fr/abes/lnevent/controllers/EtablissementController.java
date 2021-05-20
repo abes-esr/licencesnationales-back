@@ -176,6 +176,7 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "/suppression/{siren}")
+    @PreAuthorize("hasAuthority('admin')")
     public String suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
         //envoi du mail de suppression
         EtablissementEntity etab = etablissementRepository.getFirstBySiren(siren);
