@@ -37,13 +37,15 @@ public class FiltrerAccesServices {
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String sirenFromSecurityContextUser = userDetails.getUsername();
             log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+            log.info("type 1 = " + sirenFromSecurityContextUser.getClass().getSimpleName());
+            log.info("type 2 = " + sirenFromController.getClass().getSimpleName());
 
             //le test d'acceptance :
             //soit on compare sirenFromController avec sirenFromJwtContenuDansLaRequest
             //soit on compare sirenFromController avec sirenFromSecurityContextUser => là on remonte un peu plus haut que le token
 
 
-            if(!sirenFromJwt.equals(sirenFromController)){
+            if(!sirenFromSecurityContextUser.equals(sirenFromController)){
                 log.error("Acces interdit");
                 throw new AccesInterditException("Acces interdit");
             }
@@ -55,7 +57,22 @@ public class FiltrerAccesServices {
             }
         }
 
-        //Services IpController
+    public String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String sirenFromSecurityContextUser = userDetails.getUsername();
+        log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+        if(sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser==null){
+            log.error("Acces interdit");
+            throw new AccesInterditException("Acces interdit");
+        }
+        boolean existeSiren = etablissementRepository.existeSiren(sirenFromSecurityContextUser);
+        log.info("existeSiren = "+ existeSiren);
+        if (!existeSiren) {
+            log.error("Siren absent de la base");
+            throw new SirenIntrouvableException("Siren absent de la base");
+        }
+        return sirenFromSecurityContextUser;
+    }
 
 }
 

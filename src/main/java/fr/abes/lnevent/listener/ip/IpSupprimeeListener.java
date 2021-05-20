@@ -3,13 +3,21 @@ package fr.abes.lnevent.listener.ip;
 import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.repository.EtablissementRepository;
+import fr.abes.lnevent.repository.IpRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class IpSupprimeeListener implements ApplicationListener<IpSupprimeeEvent> {
 
     private final EtablissementRepository etablissementRepository;
+
+    @Autowired
+    private IpRepository ipRepository;
+
 
     public IpSupprimeeListener(EtablissementRepository etablissementRepository) {
         this.etablissementRepository = etablissementRepository;
@@ -17,9 +25,14 @@ public class IpSupprimeeListener implements ApplicationListener<IpSupprimeeEvent
 
     @Override
     public void onApplicationEvent(IpSupprimeeEvent ipSupprimeeEvent) {
+        log.info("ipSupprimeeEvent.getSiren() = " + ipSupprimeeEvent.getSiren());
+        log.info("ipSupprimeeEvent.getId() = " + ipSupprimeeEvent.getId());
         EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(ipSupprimeeEvent.getSiren());
-        etablissementEntity.getIps().removeIf(ipEntity -> ipEntity.getIp().equals(ipSupprimeeEvent.getIp()));
+        log.info("etablissementEntity.getIps() = "+ etablissementEntity.getIps());
+        etablissementEntity.getIps().removeIf(ipEntity -> ipEntity.getId().equals(ipSupprimeeEvent.getId()));
 
+        etablissementEntity.getIps().remove(ipSupprimeeEvent.getId());
+        ipRepository.deleteById(Long.parseLong(ipSupprimeeEvent.getId()));
         etablissementRepository.save(etablissementEntity);
     }
 }

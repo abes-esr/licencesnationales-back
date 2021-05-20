@@ -2,6 +2,7 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.etablissement.*;
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.exception.AccesInterditException;
@@ -9,20 +10,30 @@ import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
+import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
+import fr.abes.lnevent.services.EmailService;
 import fr.abes.lnevent.services.GenererIdAbes;
 import fr.abes.lnevent.services.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
+import org.h2.engine.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 
 @Slf4j
@@ -47,6 +58,15 @@ public class EtablissementController {
 
     @Autowired
     private ReCaptchaService reCaptchaService;
+
+    @Autowired
+    FiltrerAccesServices filtrerAccesServices;
+
+    @Autowired
+    public JavaMailSender mailSender;
+
+    @Autowired
+    EmailService emailService;
 
 
     @PostMapping("/creationCompte")
@@ -117,7 +137,7 @@ public class EtablissementController {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
-                        getSirenFromSecurityContextUser(),
+                        filtrerAccesServices.getSirenFromSecurityContextUser(),
                         eventDTO.getNomContact(),
                         eventDTO.getPrenomContact(),
                         eventDTO.getMailContact(),
@@ -155,9 +175,16 @@ public class EtablissementController {
         return "done";
     }
 
-    @DeleteMapping(value = "/suppression/{siren}")
+    @PostMapping(value = "/suppression/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public String suppression(@PathVariable String siren) {
+    public String suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
+        //envoi du mail de suppression
+        EtablissementEntity etab = etablissementRepository.getFirstBySiren(siren);
+        UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
+        String emailUser = ((UserDetailsImpl) user).getEmail();
+        String nomEtab = ((UserDetailsImpl) user).getNameEtab();
+        mailSender.send(emailService.constructSuppressionMail( request.getLocale(), motif.get("motif"), nomEtab, emailUser));
+
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
@@ -174,10 +201,16 @@ public class EtablissementController {
 
     @GetMapping(value = "/getInfoEtab")
     public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
-        return etablissementRepository.getFirstBySiren(getSirenFromSecurityContextUser());
+        return etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
-    private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
+    @GetMapping(value = "/getListEtab")
+    //@PreAuthorize("hasAuthority('admin')")
+    public List<EtablissementEntity> getListEtab() {
+        return etablissementRepository.findAll();
+    }
+
+    /*private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String sirenFromSecurityContextUser = userDetails.getUsername();
         log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
@@ -192,5 +225,5 @@ public class EtablissementController {
             throw new SirenIntrouvableException("Siren absent de la base");
         }
         return sirenFromSecurityContextUser;
-    }
+    }*/
 }

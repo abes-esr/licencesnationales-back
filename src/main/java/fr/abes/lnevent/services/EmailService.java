@@ -36,7 +36,30 @@ public class EmailService {
 
     public SimpleMailMessage constructValidationNewPassEmail(Locale locale, String emailUser){
         final String message = messages.getMessage("message.validationNewPass", null, locale);
-        return constructEmail("Nouveau mot de passe enregistré", message , emailUser);
+        return constructEmail("LN Nouveau mot de passe enregistré", message , emailUser);
+    }
+
+    public SimpleMailMessage constructAccesModifieEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
+        String message = messages.getMessage("message.modificationAcces", null, locale);
+        message += "\r\n" + descriptionAcces;
+        message += "\r\n Commentaires liés à la modification de l'accès : " + commentaires;
+        return constructEmail("LN Modification Acces", message , emailUser);
+    }
+    public SimpleMailMessage constructAccesCreeEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
+        String message = messages.getMessage("message.creationAcces", null, locale);
+        message += "\r\n" + descriptionAcces;
+        message += "\r\n Commentaires liés à la création de l'accès : " + commentaires;
+        return constructEmail("LN Creation Acces", message , emailUser);
+    }
+
+    public SimpleMailMessage constructSuppressionMail(Locale locale, String motifSuppression, String nomEtab, String emailUser){
+        String message = "Bonjour,\n" +
+                "Le compte que vous avez créé pour " + nomEtab + " sur le site Licencesnationales.fr vient d'être supprimé.\n" +
+                "Raison de la suppression : \n" + motifSuppression + "\n" + "Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n" +
+                "Bien cordialement,\n" +
+                "L’équipe Licences nationales\n" +
+                "https://acces.licencesnationales.fr/";
+        return constructEmail("Suppression de votre compte Licences Nationales", message , emailUser);
     }
 
     private SimpleMailMessage constructEmail(String subject, String body, String emailUser) {

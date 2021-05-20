@@ -22,7 +22,7 @@ public class IpAjouteeEvent extends Event {
 
 
 
-    public IpAjouteeEvent(Object source, String ip, String siren, String typeAcces, String typeIp) {
+    public IpAjouteeEvent(Object source, String siren, String typeIp, String typeAcces, String ip) {
         super(source);
         this.ip = ip;
         this.siren = siren;
