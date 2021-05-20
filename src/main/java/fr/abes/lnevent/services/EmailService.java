@@ -71,7 +71,7 @@ public class EmailService {
         return email;
     }
 
-    public String getAppUrl(HttpServletRequest request) {
+    public String getAppUrl(HttpServletRequest request) { //https vers les serveurs
         log.info("getAppUrl = https://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
         return "https://" + request.getServerName();
     }
