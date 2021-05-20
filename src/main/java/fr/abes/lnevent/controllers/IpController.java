@@ -114,29 +114,6 @@ public class IpController {
         return ResponseEntity.ok("L'accès a bien été modifié.");
     }
 
-    /*@PostMapping(value = "/modification")
-    public ResponseEntity<?> edit(@RequestBody IpModifieeDTO ipModifieeDTO) throws SirenIntrouvableException, AccesInterditException {
-        log.info("debut IpController modification");
-        IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
-                filtrerAccesServices.getSirenFromSecurityContextUser(),
-                ipModifieeDTO.getId(),
-                ipModifieeDTO.getIp(),
-                ipModifieeDTO.getValidee(),
-                ipModifieeDTO.getTypeAcces(),
-                ipModifieeDTO.getTypeIp(),
-                ipModifieeDTO.getCommentaires());
-        log.info("IpController modification2");
-        applicationEventPublisher.publishEvent(ipModifieeEvent);
-        log.info("IpController modification3");
-        eventRepository.save(new EventEntity(ipModifieeEvent));
-        String etab = etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()).getName();
-        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
-        log.info("admin = " + admin);
-        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
-
-        return ResponseEntity.ok("L'accès a bien été modifié.");
-    }*/
-
     @PostMapping(value = "/valide")
     public String validate(@RequestBody IpValideeDTO ipValideeDTO) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(ipValideeDTO.getSiren());
@@ -181,13 +158,4 @@ public class IpController {
         Long identifiant = Long.parseLong(ipDTO.getId());
         return ipRepository.getFirstById(identifiant);
     }
-
-
-
-
-
-
-
-
-
 }
