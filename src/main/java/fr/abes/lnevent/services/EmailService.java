@@ -52,6 +52,16 @@ public class EmailService {
         return constructEmail("LN Creation Acces", message , emailUser);
     }
 
+    public SimpleMailMessage constructSuppressionMail(Locale locale, String motifSuppression, String nomEtab, String emailUser){
+        String message = "Bonjour,\n" +
+                "Le compte que vous avez créé pour " + nomEtab + " sur le site Licencesnationales.fr vient d'être supprimé.\n" +
+                "Raison de la suppression : \n" + motifSuppression + "\n" + "Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n" +
+                "Bien cordialement,\n" +
+                "L’équipe Licences nationales\n" +
+                "https://acces.licencesnationales.fr/";
+        return constructEmail("Suppression de votre compte Licences Nationales", message , emailUser);
+    }
+
     private SimpleMailMessage constructEmail(String subject, String body, String emailUser) {
         final SimpleMailMessage email = new SimpleMailMessage();
         email.setSubject(subject);

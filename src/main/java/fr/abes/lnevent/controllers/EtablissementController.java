@@ -10,21 +10,29 @@ import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
 import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
+import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
+import fr.abes.lnevent.services.EmailService;
 import fr.abes.lnevent.services.GenererIdAbes;
 import fr.abes.lnevent.services.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
+import org.h2.engine.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 
@@ -53,6 +61,12 @@ public class EtablissementController {
 
     @Autowired
     FiltrerAccesServices filtrerAccesServices;
+
+    @Autowired
+    public JavaMailSender mailSender;
+
+    @Autowired
+    EmailService emailService;
 
 
     @PostMapping("/creationCompte")
@@ -161,9 +175,15 @@ public class EtablissementController {
         return "done";
     }
 
-    @DeleteMapping(value = "/suppression/{siren}")
-    @PreAuthorize("hasAuthority('admin')")
-    public String suppression(@PathVariable String siren) {
+    @PostMapping(value = "/suppression/{siren}")
+    public String suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
+        //envoi du mail de suppression
+        EtablissementEntity etab = etablissementRepository.getFirstBySiren(siren);
+        UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
+        String emailUser = ((UserDetailsImpl) user).getEmail();
+        String nomEtab = ((UserDetailsImpl) user).getNameEtab();
+        mailSender.send(emailService.constructSuppressionMail( request.getLocale(), motif.get("motif"), nomEtab, emailUser));
+
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
