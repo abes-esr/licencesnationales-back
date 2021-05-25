@@ -66,6 +66,16 @@ public class IpController {
         return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
+    @PostMapping(value = "/ajoutPlageIpV4")
+    public ResponseEntity<?> ajoutPlageIpv4(@Valid @RequestBody PlageIpv4AjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    @PostMapping(value = "/ajoutPlageIpV6")
+    public ResponseEntity<?> ajoutPlageIpv6(@Valid @RequestBody PlageIpv6AjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
     public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String sirenFromSecurityContext){
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
                 sirenFromSecurityContext,
@@ -76,11 +86,11 @@ public class IpController {
         eventRepository.save(new EventEntity(ipAjouteeEvent));
 
         String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
-        String descriptionAcces = " ip = " + event.getIp() + " en provenance de l'établissement " + etab;
+        String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
         mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin ));
 
-        return ResponseEntity.ok("L'accès a bien été créé.");
+        return ResponseEntity.ok("Création effectuée.");
     }
 
     @PostMapping(value = "/modifIpV4")
@@ -90,6 +100,16 @@ public class IpController {
 
     @PostMapping(value = "/modifIpV6")
     public ResponseEntity<?> modifIpv6(@Valid @RequestBody Ipv6ModifieeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    @PostMapping(value = "/modifPlageIpV4")
+    public ResponseEntity<?> modifPlageIpv4(@Valid @RequestBody PlageIpv4ModifieeDTO event) throws SirenIntrouvableException, AccesInterditException {
+        return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
+    }
+
+    @PostMapping(value = "/modifPlageIpV6")
+    public ResponseEntity<?> modifPlageIpv6(@Valid @RequestBody PlageIpv6ModifieeDTO event) throws SirenIntrouvableException, AccesInterditException {
         return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
@@ -107,11 +127,11 @@ public class IpController {
         log.info("IpController modification3");
         eventRepository.save(new EventEntity(ipModifieeEvent));
         String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
-        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
+        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip ou plage d'ips = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
         mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
 
-        return ResponseEntity.ok("L'accès a bien été modifié.");
+        return ResponseEntity.ok("Modification effectuée.");
     }
 
     @PostMapping(value = "/valide")
