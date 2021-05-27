@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 public class PlageIpv4AjouteeDTO extends IpAjouteeDTO {
 
     @NotBlank(message="La plage d'Ips est obligatoire")
-    @Pattern(regexp = "^(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))?$", message = "La plage d'Ips fournie n'est pas valide")
+    @Pattern(regexp = "^(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))$", message = "La plage d'Ips fournie n'est pas valide")
     private String ip;
 
     public PlageIpv4AjouteeDTO(String siren, String typeIp, String ip, String typeAcces, String commentaires) {
