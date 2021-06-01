@@ -1,5 +1,6 @@
 package fr.abes.lnevent.controllers;
 
+import fr.abes.lnevent.constant.Constant;
 import fr.abes.lnevent.dto.ip.*;
 import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
@@ -14,6 +15,7 @@ import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.repository.IpRepository;
 import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import fr.abes.lnevent.services.EmailService;
+import fr.abes.lnevent.services.IpService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,8 +26,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 @Log
 @RestController
@@ -52,6 +53,9 @@ public class IpController {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    IpService ipService;
+
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
@@ -77,20 +81,28 @@ public class IpController {
     }
 
     public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String sirenFromSecurityContext){
-        IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
-                sirenFromSecurityContext,
-                event.getTypeIp(),
-                event.getTypeAcces(),
-                event.getIp());
-        applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        eventRepository.save(new EventEntity(ipAjouteeEvent));
+        log.info("ipService.checkDoublonIpAjouteeDto(event).getStatusCode() ="+ ipService.checkDoublonIpAjouteeDto(event).getStatusCode());
+        log.info("String value of =  "+ String.valueOf(ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue()));
+        ResponseEntity doublonIp = ipService.checkDoublonIpAjouteeDto(event);
+        if(doublonIp.getStatusCodeValue()==400){
+            return doublonIp;
+        }
+        else {
+            IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
+                    sirenFromSecurityContext,
+                    event.getTypeIp(),
+                    event.getTypeAcces(),
+                    event.getIp());
+            applicationEventPublisher.publishEvent(ipAjouteeEvent);
+            eventRepository.save(new EventEntity(ipAjouteeEvent));
 
-        String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
-        String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
-        log.info("admin = " + admin);
-        mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin ));
+            String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+            String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
+            log.info("admin = " + admin);
+            mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin));
 
-        return ResponseEntity.ok("Création effectuée.");
+            return ResponseEntity.ok("Création effectuée.");
+        }
     }
 
     @PostMapping(value = "/modifIpV4")
@@ -114,6 +126,7 @@ public class IpController {
     }
 
     public ResponseEntity<?> traiterModifIp(IpModifieeDTO ipModifieeDTO, String sirenFromSecurityContext){
+        ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
                 sirenFromSecurityContext,
                 Long.parseLong(ipModifieeDTO.getId()),
@@ -133,6 +146,7 @@ public class IpController {
 
         return ResponseEntity.ok("Modification effectuée.");
     }
+
 
     @PostMapping(value = "/valide")
     public String validate(@RequestBody IpValideeDTO ipValideeDTO) throws SirenIntrouvableException, AccesInterditException {

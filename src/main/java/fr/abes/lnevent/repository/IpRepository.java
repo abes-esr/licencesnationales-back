@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Set;
 
 @Repository
@@ -16,4 +17,7 @@ public interface IpRepository extends JpaRepository<IpEntity, Long> {
     void deleteById(Long id);
 
     IpEntity getFirstById(Long id);
+
+    @Query("select i.ip from IpEntity i")
+    List<String> findAllIp();
 }
