@@ -47,5 +47,9 @@ public class Constant implements Serializable {
     public static final int IP_SAME = 4;
     public static final int IP_RESERVED = 5;
     public static final int IP_NOT_RESERVED = 0;
+
+    /**Email service */
+    public static final String ERROR_CONVERSION_MAIL_TO_JSON = "Erreur lors de la conversion Mail-Json";
+    public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
 }
 

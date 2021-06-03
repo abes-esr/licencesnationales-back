@@ -8,6 +8,7 @@ import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
+import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
@@ -20,6 +21,7 @@ import fr.abes.lnevent.services.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
 import org.h2.engine.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -48,6 +50,9 @@ public class EtablissementController {
     private EtablissementRepository etablissementRepository;
 
     @Autowired
+    private ContactRepository contactRepository;
+
+    @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
@@ -68,9 +73,12 @@ public class EtablissementController {
     @Autowired
     EmailService emailService;
 
+    @Value("${ln.dest.notif.admin}")
+    private String admin;
+
 
     @PostMapping("/creationCompte")
-    public ResponseEntity<?> creationCompte(@Valid @RequestBody EtablissementCreeDTO eventDTO) {
+    public ResponseEntity<?> creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) {
         log.debug("eventDto = " + eventDTO.toString());
         log.debug("NomEtab = " + eventDTO.getNom());
         log.debug("siren = " + eventDTO.getSiren());
@@ -106,6 +114,15 @@ public class EtablissementController {
                     .badRequest()
                     .body("Cet établissement existe déjà.");
         }
+        //verifier que le mail du contact n'est pas déjà en base
+        //boolean existeMail = etablissementRepository.findEtablissementEntityByContactContains(eventDTO.getMailContact()));
+        boolean existeMail = contactRepository.findContactEntityByMail(eventDTO.getMailContact())!=null;
+        log.info("existeMail = "+ existeMail);
+        if (existeMail) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+        }
         //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
         else{
             log.info("mdp = " + eventDTO.getMotDePasse());
@@ -119,6 +136,9 @@ public class EtablissementController {
                             eventDTO);
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
             eventRepository.save(new EventEntity(etablissementCreeEvent));
+            String emailUser = eventDTO.getMailContact();
+            emailService.constructCreationCompteEmailUser( request.getLocale(), emailUser);
+            emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getSiren(), eventDTO.getNom());
             return ResponseEntity.ok("Creation du compte effectuée.");}
     }
 
@@ -183,7 +203,7 @@ public class EtablissementController {
         UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
         String emailUser = ((UserDetailsImpl) user).getEmail();
         String nomEtab = ((UserDetailsImpl) user).getNameEtab();
-        mailSender.send(emailService.constructSuppressionMail( request.getLocale(), motif.get("motif"), nomEtab, emailUser));
+        emailService.constructSuppressionMail( request.getLocale(), motif.get("motif"), nomEtab, emailUser);
 
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);

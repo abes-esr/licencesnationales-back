@@ -20,9 +20,11 @@ public class IpAjouteeEvent extends Event {
 
     private String typeIp;
 
+    private String commentaires;
 
 
-    public IpAjouteeEvent(Object source, String siren, String typeIp, String typeAcces, String ip) {
+
+    public IpAjouteeEvent(Object source, String siren, String typeIp, String typeAcces, String ip, String commentaires) {
         super(source);
         this.ip = ip;
         this.siren = siren;
@@ -30,6 +32,7 @@ public class IpAjouteeEvent extends Event {
         this.dateModification = dateModification;
         this.typeAcces = typeAcces;
         this.typeIp = typeIp;
+        this.commentaires=commentaires;
 
     }
 }

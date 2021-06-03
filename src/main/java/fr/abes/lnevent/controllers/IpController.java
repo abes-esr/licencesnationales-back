@@ -81,8 +81,7 @@ public class IpController {
     }
 
     public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String sirenFromSecurityContext){
-        log.info("ipService.checkDoublonIpAjouteeDto(event).getStatusCode() ="+ ipService.checkDoublonIpAjouteeDto(event).getStatusCode());
-        log.info("String value of =  "+ String.valueOf(ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue()));
+        log.info("ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue() ="+ ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue());
         ResponseEntity doublonIp = ipService.checkDoublonIpAjouteeDto(event);
         if(doublonIp.getStatusCodeValue()==400){
             return doublonIp;
@@ -92,14 +91,16 @@ public class IpController {
                     sirenFromSecurityContext,
                     event.getTypeIp(),
                     event.getTypeAcces(),
-                    event.getIp());
+                    event.getIp(),
+                    event.getCommentaires());
             applicationEventPublisher.publishEvent(ipAjouteeEvent);
             eventRepository.save(new EventEntity(ipAjouteeEvent));
 
             String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
             String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
             log.info("admin = " + admin);
-            mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin));
+            //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin));
+            emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin);
 
             return ResponseEntity.ok("Création effectuée.");
         }
@@ -126,25 +127,32 @@ public class IpController {
     }
 
     public ResponseEntity<?> traiterModifIp(IpModifieeDTO ipModifieeDTO, String sirenFromSecurityContext){
-        ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
-        IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
-                sirenFromSecurityContext,
-                Long.parseLong(ipModifieeDTO.getId()),
-                ipModifieeDTO.getIp(),
-                ipModifieeDTO.getValidee(),
-                ipModifieeDTO.getTypeAcces(),
-                ipModifieeDTO.getTypeIp(),
-                ipModifieeDTO.getCommentaires());
-        log.info("IpController modification2");
-        applicationEventPublisher.publishEvent(ipModifieeEvent);
-        log.info("IpController modification3");
-        eventRepository.save(new EventEntity(ipModifieeEvent));
-        String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
-        String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip ou plage d'ips = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
-        log.info("admin = " + admin);
-        mailSender.send(emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin ));
+        log.info("ipService.checkDoublonIpModifieeDto(ipModifieeDTO).getStatusCodeValue() ="+ ipService.checkDoublonIpModifieeDto(ipModifieeDTO).getStatusCodeValue());
+        ResponseEntity doublonIp = ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
+        if(doublonIp.getStatusCodeValue()==400){
+            return doublonIp;
+        }
+        else {
+            ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
+            IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
+                    sirenFromSecurityContext,
+                    Long.parseLong(ipModifieeDTO.getId()),
+                    ipModifieeDTO.getIp(),
+                    ipModifieeDTO.getValidee(),
+                    ipModifieeDTO.getTypeAcces(),
+                    ipModifieeDTO.getTypeIp(),
+                    ipModifieeDTO.getCommentaires());
+            log.info("IpController modification2");
+            applicationEventPublisher.publishEvent(ipModifieeEvent);
+            log.info("IpController modification3");
+            eventRepository.save(new EventEntity(ipModifieeEvent));
+            String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+            String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip ou plage d'ips = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
+            log.info("admin = " + admin);
+            emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin);
 
-        return ResponseEntity.ok("Modification effectuée.");
+            return ResponseEntity.ok("Modification effectuée.");
+        }
     }
 
 

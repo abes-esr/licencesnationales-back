@@ -138,7 +138,7 @@ class LneventApplicationTests {
         EtablissementEntity etablissementEntity1 = etablissementRepository.getFirstBySiren("3555646init");
         IpEntity ipEntity = new IpEntity(
                 null,
-                "231.256.257.2802", "plage", "ipv4");
+                "231.256.257.2802", "plage", "ipv4", "Comment");
         etablissementEntity1.getIps().add(ipEntity);
 
 

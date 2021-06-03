@@ -6,7 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.annotation.processing.Generated;
 import javax.persistence.*;
+import javax.persistence.metamodel.StaticMetamodel;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -34,15 +36,22 @@ public class IpEntity implements Serializable {
 
     private String typeIp;
 
+    private String commentaires;
+
+    //@ManyToOne
+    //private EtablissementEntity e
 
 
-    public IpEntity(Long id, String ip, String typeAcces, String typeIp) {
+
+    public IpEntity(Long id, String ip, String typeAcces, String typeIp, String commentaires) {
         this.id = id;
         this.ip = ip;
         this.validee = false;
         this.dateCreation = new Date();
         this.typeAcces = typeAcces;
         this.typeIp=typeIp;
+        this.commentaires=commentaires;
+
 
     }
 

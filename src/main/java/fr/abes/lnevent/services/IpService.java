@@ -5,9 +5,11 @@ import fr.abes.lnevent.dto.ip.IpAjouteeDTO;
 import fr.abes.lnevent.dto.ip.IpContains;
 import fr.abes.lnevent.dto.ip.IpDTO;
 import fr.abes.lnevent.dto.ip.IpModifieeDTO;
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.recaptcha.ReCaptchaKeys;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
+import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.IpRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -27,6 +31,9 @@ public class IpService {
 
     @Autowired
     private IpRepository ipRepository;
+
+    @Autowired
+    private EtablissementRepository etablissementRepository;
 
     private IpAjouteeDTO ipAjouteeDTO;
     private IpModifieeDTO ipModifieeDTO;
@@ -70,6 +77,7 @@ public class IpService {
         log.info("listIpContains.size = " + listIpContains.size());
         return listIpContains;
     }
+
 
     public List<IpContains> isAccesExist(IpEntity acces) {
         log.info("accesList = " + ipRepository.findAllIp().toString());
@@ -122,6 +130,7 @@ public class IpService {
 
             for (List<IpContains> listIpsContains : listAllIpContains) {
                 for (IpContains ipContains : listIpsContains) {
+                    String nomEtab = etablissementRepository.findEtablissementEntityByIpsContains(ipContains.getDBAcces()).getName();
                     erreurMsg = ((ipContains.getErreurAcces().getTypeAcces().equals("ip")) ? "L'adresse IP" : "La plage d'adresses IP") + " '" + ipContains.getErreurAcces().getIp() + "' ";
                     log.info("erreurMsg = " + erreurMsg);
                     responseEntity = badRequest(erreurMsg);
@@ -134,22 +143,22 @@ public class IpService {
                     else if (ipContains.getDBAcces().getDateCreation() != null) {
                         switch (ipContains.getContains()) {
                             case Constant.IP_SAME:
-                                erreurMsg = erreurMsg + "est déjà déclarée par l'établissement \'";/*+ ipContains.getDBAcces().*/
+                                erreurMsg = erreurMsg + "est déjà déclarée par l'établissement " + nomEtab;
                                 log.info("erreurMsg3 = " + erreurMsg);
                                 responseEntity = badRequest(erreurMsg);
                                 break;
                             case Constant.IP_CONTAINED:
-                                erreurMsg = erreurMsg + "est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  \'";/* + ipContains.getDBAcces().getEtablissement().getNom() + "\'.";*/
+                                erreurMsg = erreurMsg + "est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab;
                                 log.info("erreurMsg4 = " + erreurMsg);
                                 responseEntity = badRequest(erreurMsg);
                                 break;
                             case Constant.IP_CONTAINS:
-                                erreurMsg = erreurMsg + "contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '"; /*+ ipContains.getDBAcces().getIp() + "' de l'établissement  \'" + ipContains.getDBAcces().getEtablissement().getNom() + "\'.";*/
+                                erreurMsg = erreurMsg + "contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '" + ipContains.getDBAcces().getIp() + "' de l'établissement " + nomEtab;
                                 log.info("erreurMsg5 = " + erreurMsg);
                                 responseEntity = badRequest(erreurMsg);
                                 break;
                             case Constant.IP_CROSS:
-                                erreurMsg = erreurMsg + "chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  \'";/* + ipContains.getDBAcces().getEtablissement().getNom() + "\'.";*/
+                                erreurMsg = erreurMsg + "chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab;
                                 log.info("erreurMsg6 = " + erreurMsg);
                                 responseEntity = badRequest(erreurMsg);
                                 break;

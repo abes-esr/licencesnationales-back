@@ -108,8 +108,8 @@ public class PasswordController {
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
         String url = emailService.getAppUrl(request);
         emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        mailSender.send(emailService.constructResetTokenEmail(url,
-                request.getLocale(), jwt, emailUser, nomEtab));
+        emailService.constructResetTokenEmail(url,
+                request.getLocale(), jwt, emailUser, nomEtab);
 
         return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
     }
@@ -150,7 +150,7 @@ public class PasswordController {
         c.setMotDePasse(mdphash);
         contactRepository.save(c);
         emailUser = c.getMail();
-        mailSender.send(emailService.constructValidationNewPassEmail( request.getLocale(), emailUser));
+        emailService.constructValidationNewPassEmail( request.getLocale(), emailUser);
         return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
     }
 

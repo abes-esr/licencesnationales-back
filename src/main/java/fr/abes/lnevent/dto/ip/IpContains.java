@@ -5,16 +5,27 @@
 package fr.abes.lnevent.dto.ip;
 
 
+import fr.abes.lnevent.entities.EtablissementEntity;
 import fr.abes.lnevent.entities.IpEntity;
+import fr.abes.lnevent.repository.EtablissementRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 // Stocke les infos retournées après un test d'existence d'ip dans la base.
 // erreurAcces contient le message d'erreur correspondant à l'existence de l'ip (voir cointains)
 // contains contient le code correspondant à l'existence de l'ip dans la base (si l'ip est comprise dans une plage, si elle chevauche une plahe, si elle contient une adresse...)
 // dbacces contient l'ip déjà présente dans la base
+@Slf4j
+
 public class IpContains {
     private IpEntity erreurAcces;
     private IpEntity dbAcces;
     private Integer contains;
+    private EtablissementEntity etablissementEntity;
+    @Autowired
+    EtablissementRepository etablissementRepository;
 
     public IpContains(IpEntity erreurAcces, IpEntity dbAcces, Integer contains) {
         this.erreurAcces = erreurAcces;
@@ -45,4 +56,5 @@ public class IpContains {
     public void setContains(Integer contains) {
         this.contains = contains;
     }
+
 }

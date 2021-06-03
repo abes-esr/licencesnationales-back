@@ -20,7 +20,7 @@ public class IpAjouteeListener implements ApplicationListener<IpAjouteeEvent> {
     @Override
     public void onApplicationEvent(IpAjouteeEvent ipAjouteeEvent) {
         IpEntity ipEntity = new IpEntity(null,
-                ipAjouteeEvent.getIp(), ipAjouteeEvent.getTypeAcces(), ipAjouteeEvent.getTypeIp());
+                ipAjouteeEvent.getIp(), ipAjouteeEvent.getTypeAcces(), ipAjouteeEvent.getTypeIp(), ipAjouteeEvent.getCommentaires());
         EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(ipAjouteeEvent.getSiren());
         etablissementEntity.getIps().add(ipEntity);
 
