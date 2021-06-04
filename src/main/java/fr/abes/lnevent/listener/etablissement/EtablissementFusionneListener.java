@@ -38,7 +38,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
             if (etablissementRepository.getFirstBySiren(siren).getIps() != null) {
                 ipEntities.addAll(etablissementRepository.getFirstBySiren(siren).getIps()
-                        .stream().map(e -> new IpEntity(null, e.getIp(), e.getTypeAcces(), e.getTypeIp()))
+                        .stream().map(e -> new IpEntity(null, e.getIp(), e.getTypeAcces(), e.getTypeIp(), e.getCommentaires()))
                         .collect(Collectors.toSet()));
             }
 

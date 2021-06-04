@@ -6,7 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.annotation.processing.Generated;
 import javax.persistence.*;
+import javax.persistence.metamodel.SetAttribute;
+import javax.persistence.metamodel.StaticMetamodel;
 import java.util.HashSet;
 import java.util.Set;
 

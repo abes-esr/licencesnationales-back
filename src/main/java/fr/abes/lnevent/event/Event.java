@@ -20,4 +20,5 @@ public abstract class Event extends ApplicationEvent {
         id = UUID.randomUUID();
         created = new Date();
     }
+
 }

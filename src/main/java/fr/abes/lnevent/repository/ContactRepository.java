@@ -13,4 +13,6 @@ public interface ContactRepository extends JpaRepository<ContactEntity, String> 
             + "where mail = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 
+    ContactEntity findContactEntityByMail(String mail);
+
 }

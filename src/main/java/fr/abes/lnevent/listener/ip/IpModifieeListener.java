@@ -38,6 +38,8 @@ public class IpModifieeListener implements ApplicationListener<IpModifieeEvent> 
                 .findFirst().get().setTypeAcces(ipModifieeEvent.getTypeAcces());
         etablissementEntity.getIps().stream().filter(ipEntity -> ipEntity.getId().equals(ipModifieeEvent.getId()))
                 .findFirst().get().setTypeIp(ipModifieeEvent.getTypeIp());
+        etablissementEntity.getIps().stream().filter(ipEntity -> ipEntity.getId().equals(ipModifieeEvent.getId()))
+                .findFirst().get().setCommentaires(ipModifieeEvent.getCommentaires());
 
         etablissementRepository.save(etablissementEntity);
     }

@@ -10,7 +10,7 @@ import javax.validation.constraints.Pattern;
 public class Ipv4AjouteeDTO extends IpAjouteeDTO {
 
     @NotBlank(message="L'IP est obligatoire")
-    @Pattern(regexp = "\\b((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(\\.)){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\\b", message = "L'IP fournie n'est pas valide")
+    @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$", message = "L'IP fournie n'est pas valide")
     private String ip;
 
     public Ipv4AjouteeDTO(String siren, String typeIp, String ip, String typeAcces, String commentaires) {

@@ -37,5 +37,19 @@ public class Constant implements Serializable {
     public static final String JWT_TOKEN_EXPIRED = "Expired JWT token : {}";
     public static final String JWT_TOKEN_INVALID = "Invalid JWT token : {}";
     public static final String JWT_SIGNATURE_INVALID = "Invalid JWT signature : {}";
+
+    /**Ip service */
+
+    public static final int IP_NOT_CONTAINED = 0;
+    public static final int IP_CONTAINED = 1;
+    public static final int IP_CONTAINS = 2;
+    public static final int IP_CROSS = 3;
+    public static final int IP_SAME = 4;
+    public static final int IP_RESERVED = 5;
+    public static final int IP_NOT_RESERVED = 0;
+
+    /**Email service */
+    public static final String ERROR_CONVERSION_MAIL_TO_JSON = "Erreur lors de la conversion Mail-Json";
+    public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
 }
 

@@ -18,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
@@ -40,7 +41,7 @@ public class AuthenticationController {
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         log.info("debut authenticateUser");
         log.info("NB : le controller intervient maintenant mais il a au préalable été intercepté par JwtAuthenticationFilter");
         log.info("ce qui permet d'appliquer des filtres en amont du controller comme une ip interdite etc + de vérifier si on a déjà un token");
@@ -49,16 +50,30 @@ public class AuthenticationController {
         log.info("Soit on applique l'authentification dans le filter avec les params contenus dans le jeton (cas déjà connecté)");
         log.info("LoginRequest login = " + loginRequest.getLogin());
         log.info("LoginRequest password = " + loginRequest.getPassword());
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
-        log.info("authenticateUser 1");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        //on charge dans user le tuple bdd mis dans authentication
-        UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
-        log.info("authenticateUser 2");
-        String jwt = tokenProvider.generateToken(user);
-        log.info("authenticateUser 3");
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getIsAdmin()));
+        try {
+            Authentication authentication = authenticationManager
+                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+            log.info("authenticateUser 1");
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try{
+                //on charge dans user le tuple bdd mis dans authentication
+                UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
+                log.info("authenticateUser 2");
+                String jwt = tokenProvider.generateToken(user);
+                log.info("authenticateUser 3");
+                return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getIsAdmin()));
+            }
+            catch (UsernameNotFoundException e) {
+                return ResponseEntity
+                        .badRequest()
+                        .body("La combinaison siren/mot de passe n'a pas été trouvée.");
+            }
+        }
+        catch (Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("La combinaison siren/mot de passe n'a pas été trouvée.");
+        }
     }
 }
 

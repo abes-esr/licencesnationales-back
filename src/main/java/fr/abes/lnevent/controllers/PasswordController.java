@@ -108,10 +108,26 @@ public class PasswordController {
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
         String url = emailService.getAppUrl(request);
         emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        mailSender.send(emailService.constructResetTokenEmail(url,
-                request.getLocale(), jwt, emailUser, nomEtab));
+        emailService.constructResetTokenEmail(url,
+                request.getLocale(), jwt, emailUser, nomEtab);
 
         return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
+    }
+
+    @PostMapping("/verifTokenValide")
+    public ResponseEntity<?> verifTokenValide(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+        log.info("requestDataVerifTokenValid = " + requestData);
+        JSONObject data = new JSONObject(requestData);
+        String jwtToken = data.getString("jwtToken");
+        log.info("token = " + jwtToken);
+        if(!tokenProvider.validateToken(jwtToken)){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Token invalide" );
+        }
+        else{
+            return ResponseEntity.ok("Token valide");
+        }
     }
 
 
@@ -150,7 +166,7 @@ public class PasswordController {
         c.setMotDePasse(mdphash);
         contactRepository.save(c);
         emailUser = c.getMail();
-        mailSender.send(emailService.constructValidationNewPassEmail( request.getLocale(), emailUser));
+        emailService.constructValidationNewPassEmail( request.getLocale(), emailUser);
         return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
     }
 
