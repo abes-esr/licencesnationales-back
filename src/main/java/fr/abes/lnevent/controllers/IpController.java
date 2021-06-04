@@ -59,6 +59,8 @@ public class IpController {
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
+    private String demandeOk = "Votre demande a été prise en compte.";
+
 
     @PostMapping(value = "/ajoutIpV4")
     public ResponseEntity<?> ajoutIpv4(@Valid @RequestBody Ipv4AjouteeDTO event) throws SirenIntrouvableException, AccesInterditException {
@@ -102,7 +104,7 @@ public class IpController {
             //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin));
             emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin);
 
-            return ResponseEntity.ok("Création effectuée.");
+            return ResponseEntity.ok(demandeOk);
         }
     }
 
@@ -151,7 +153,7 @@ public class IpController {
             log.info("admin = " + admin);
             emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin);
 
-            return ResponseEntity.ok("Modification effectuée.");
+            return ResponseEntity.ok(demandeOk);
         }
     }
 
@@ -175,7 +177,7 @@ public class IpController {
                 filtrerAccesServices.getSirenFromSecurityContextUser());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(new EventEntity(ipSupprimeeEvent));
-        return "L'accès a bien été supprimé";
+        return demandeOk;
     }
     @PostMapping(value = "/supprimeByAdmin")
     @PreAuthorize("hasAuthority('admin')")
@@ -185,7 +187,7 @@ public class IpController {
                 ipSupprimeeDTO.getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(new EventEntity(ipSupprimeeEvent));
-        return "L'accès a bien été supprimé";
+        return demandeOk;
     }
 
     @GetMapping(value = "/{siren}")

@@ -48,7 +48,7 @@ public class EmailService {
     }
 
     public void constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser, String nomEtab) {
-        final String url = contextPath + "/reinitialisationPass?token=" + token;
+        final String url = contextPath + "/reinitialisationPass?token=" + token; //test
         String objetMsg = messages.getMessage("message.resetTokenEmailObjet",null, locale);
         String message = messages.getMessage("message.resetTokenEmailDebut",null, locale);
         message +=nomEtab + " ";
@@ -94,7 +94,8 @@ public class EmailService {
 
     public String getAppUrl(HttpServletRequest request) { //https vers les serveurs
         log.info("getAppUrl = https://" + request.getServerName() + ":" + request.getServerPort() + request.getContextPath());
-        return "https://" + request.getServerName();
+        return "https://" + request.getServerName();//test
+        //return "http://" + request.getServerName() + ":8080";//dev
     }
 
 

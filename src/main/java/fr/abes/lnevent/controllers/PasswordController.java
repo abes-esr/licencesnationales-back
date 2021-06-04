@@ -114,6 +114,22 @@ public class PasswordController {
         return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
     }
 
+    @PostMapping("/verifTokenValide")
+    public ResponseEntity<?> verifTokenValide(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+        log.info("requestDataVerifTokenValid = " + requestData);
+        JSONObject data = new JSONObject(requestData);
+        String jwtToken = data.getString("jwtToken");
+        log.info("token = " + jwtToken);
+        if(!tokenProvider.validateToken(jwtToken)){
+            return ResponseEntity
+                    .badRequest()
+                    .body("Token invalide" );
+        }
+        else{
+            return ResponseEntity.ok("Token valide");
+        }
+    }
+
 
     @ApiOperation(value = "permet de ",
             notes = "le ")
