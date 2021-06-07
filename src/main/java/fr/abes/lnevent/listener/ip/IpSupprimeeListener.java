@@ -1,6 +1,7 @@
 package fr.abes.lnevent.listener.ip;
 
 import fr.abes.lnevent.entities.EtablissementEntity;
+import fr.abes.lnevent.entities.IpEntity;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.IpRepository;
@@ -28,11 +29,9 @@ public class IpSupprimeeListener implements ApplicationListener<IpSupprimeeEvent
         log.info("ipSupprimeeEvent.getSiren() = " + ipSupprimeeEvent.getSiren());
         log.info("ipSupprimeeEvent.getId() = " + ipSupprimeeEvent.getId());
         EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(ipSupprimeeEvent.getSiren());
-        log.info("etablissementEntity.getIps() = "+ etablissementEntity.getIps());
-        etablissementEntity.getIps().removeIf(ipEntity -> ipEntity.getId().equals(ipSupprimeeEvent.getId()));
-
-        etablissementEntity.getIps().remove(ipSupprimeeEvent.getId());
-        ipRepository.deleteById(Long.parseLong(ipSupprimeeEvent.getId()));
+        IpEntity ipEntity = ipRepository.getFirstById(Long.parseLong(ipSupprimeeEvent.getId()));
+        log.info("etablissementEntity.getIps().remove = ");
+        etablissementEntity.getIps().remove(ipEntity);
         etablissementRepository.save(etablissementEntity);
     }
 }
