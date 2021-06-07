@@ -229,6 +229,11 @@ node {
         ]) {
           newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
         }
+        withCredentials([
+          string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl')
+        ]) {
+          newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
+        }
 
         writeFile file: "src/main/resources/application.properties", text: "${newconfig}"
 
