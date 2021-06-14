@@ -40,7 +40,7 @@ import java.util.Set;
 
 @Slf4j
 @RestController
-@RequestMapping("ln/etablissement")
+@RequestMapping("/v1/ln/etablissement")
 public class EtablissementController {
 
     @Autowired
