@@ -35,7 +35,7 @@ import javax.validation.Valid;
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/ln/reinitialisationMotDePasse")
+@RequestMapping("/v1/ln/reinitialisationMotDePasse")
 public class PasswordController {
 
 

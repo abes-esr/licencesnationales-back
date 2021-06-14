@@ -27,7 +27,7 @@ import javax.validation.Valid;
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/")
+@RequestMapping("/v1")
 public class AuthenticationController {
 
 

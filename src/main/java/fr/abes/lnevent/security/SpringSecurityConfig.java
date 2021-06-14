@@ -58,11 +58,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
-                .antMatchers("/login").permitAll()
-                .antMatchers("/ln/etablissement/creationCompte").permitAll()
-                .antMatchers("/ln/reinitialisationMotDePasse/**").permitAll()
+                .antMatchers("/v1/login").permitAll()
+                .antMatchers("/v1/ln/etablissement/creationCompte").permitAll()
+                .antMatchers("/v1/ln/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
-                .antMatchers("/applicationVersion").permitAll()
+                .antMatchers("/v1/applicationVersion").permitAll()
                 .antMatchers("/v2/api-docs", "/v3/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**","/swagger-ui.html**", "/swagger-ui/**","/webjars/**").permitAll()
                 .anyRequest().authenticated();
 
