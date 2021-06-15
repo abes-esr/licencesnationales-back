@@ -12,6 +12,7 @@ import fr.abes.lnevent.repository.ContactRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
 import fr.abes.lnevent.security.exception.DonneeIncoherenteBddException;
+import fr.abes.lnevent.security.payload.response.JwtAuthenticationResponse;
 import fr.abes.lnevent.security.services.FiltrerAccesServices;
 import fr.abes.lnevent.security.services.impl.UserDetailsImpl;
 import fr.abes.lnevent.security.services.impl.UserDetailsServiceImpl;
@@ -175,24 +176,37 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public String fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
+    public ResponseEntity<String> fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
+        try{
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         eventRepository.save(new EventEntity(etablissementFusionneEvent));
+        return ResponseEntity.ok("Fusion effectuée.");
 
-        return "done";
+        } catch(Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur lors de la fusion. Veuillez vérifier les SIREN et les informations renseignées.");
+        }
+
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public String division(@RequestBody EtablissementDiviseDTO eventDTO) {
+    public ResponseEntity<String> division(@RequestBody EtablissementDiviseDTO eventDTO) {
+        try{
         EtablissementDiviseEvent etablissementDiviseEvent
                 = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventRepository.save(new EventEntity(etablissementDiviseEvent));
+        return ResponseEntity.ok("Scission effectuée.");
 
-        return "done";
+        } catch(Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur lors de la scission. Veuillez vérifier les SIREN et les informations renseignées");
+        }
     }
 
     @PostMapping(value = "/suppression/{siren}")
