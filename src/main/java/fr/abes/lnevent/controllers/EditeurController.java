@@ -20,7 +20,7 @@ import java.util.Set;
 
 @Log
 @RestController
-@RequestMapping("ln/editeur")
+@RequestMapping("/v1/ln/editeur")
 public class EditeurController {
 
     @Autowired

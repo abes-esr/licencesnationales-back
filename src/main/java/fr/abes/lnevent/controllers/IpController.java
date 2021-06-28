@@ -30,7 +30,7 @@ import java.util.*;
 
 @Log
 @RestController
-@RequestMapping("ln/ip")
+@RequestMapping("/v1/ln/ip")
 public class IpController {
     @Autowired
     private EventRepository eventRepository;
