@@ -192,7 +192,7 @@ public class IpController {
 
     @GetMapping(value = "/{siren}")
     public Set<IpEntity> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
-        log.info("get");
+        log.info("get - ");
         filtrerAccesServices.autoriserServicesParSiren(siren);
         return etablissementRepository.getFirstBySiren(siren).getIps();
     }
