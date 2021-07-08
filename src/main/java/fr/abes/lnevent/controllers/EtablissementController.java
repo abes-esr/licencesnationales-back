@@ -34,9 +34,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 
 @Slf4j
@@ -233,13 +234,29 @@ public class EtablissementController {
         return etablissementRepository.getFirstBySiren(siren);
     }
 
+    @GetMapping(value = "/getDerniereDateModificationIp/{siren}")
+    @PreAuthorize("hasAuthority('admin')")
+    public String getDerniereDateModificationIp(@PathVariable String siren) {
+        ArrayList<String> listDateModifIp = etablissementRepository.findDateModificationBySiren(siren);
+        ArrayList<String> listDateModifCourtes = new ArrayList<>();
+        for(String date:listDateModifIp) listDateModifCourtes.add(date.substring(0, 10));
+        log.info("dtaModif = "+ listDateModifCourtes.get(0));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        Collections.sort(listDateModifCourtes, Comparator.comparing(s -> LocalDate.parse(s, formatter).atStartOfDay()));
+        log.info("dtaModif = "+ listDateModifCourtes.get(0));
+        log.info("dtaModif = "+ listDateModifCourtes.get(listDateModifCourtes.size() - 1));
+
+        for(String date:listDateModifCourtes) log.info(date);
+        return listDateModifCourtes.get(listDateModifCourtes.size() - 1);
+    }
+
     @GetMapping(value = "/getInfoEtab")
     public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
         return etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
     @GetMapping(value = "/getListEtab")
-    //@PreAuthorize("hasAuthority('admin')")
+    @PreAuthorize("hasAuthority('admin')")
     public List<EtablissementEntity> getListEtab() {
         return etablissementRepository.findAll();
     }
