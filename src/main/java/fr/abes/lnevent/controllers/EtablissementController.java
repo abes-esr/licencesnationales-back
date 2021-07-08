@@ -23,7 +23,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.h2.engine.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.configurationprocessor.json.JSONException;
+import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -77,6 +80,7 @@ public class EtablissementController {
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
+
 
 
     @PostMapping("/creationCompte")
@@ -234,20 +238,29 @@ public class EtablissementController {
         return etablissementRepository.getFirstBySiren(siren);
     }
 
-    @GetMapping(value = "/getDerniereDateModificationIp/{siren}")
+    @PostMapping(value = "/getDerniereDateModificationIp/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public String getDerniereDateModificationIp(@PathVariable String siren) {
-        ArrayList<String> listDateModifIp = etablissementRepository.findDateModificationBySiren(siren);
-        ArrayList<String> listDateModifCourtes = new ArrayList<>();
-        for(String date:listDateModifIp) listDateModifCourtes.add(date.substring(0, 10));
-        log.info("dtaModif = "+ listDateModifCourtes.get(0));
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        Collections.sort(listDateModifCourtes, Comparator.comparing(s -> LocalDate.parse(s, formatter).atStartOfDay()));
-        log.info("dtaModif = "+ listDateModifCourtes.get(0));
-        log.info("dtaModif = "+ listDateModifCourtes.get(listDateModifCourtes.size() - 1));
+    public ResponseEntity<String> getDerniereDateModificationIp(@PathVariable String siren) {
 
-        for(String date:listDateModifCourtes) log.info(date);
-        return listDateModifCourtes.get(listDateModifCourtes.size() - 1);
+        JSONObject resp = new JSONObject();
+
+        try{
+            ArrayList<String> listDateModifIp = etablissementRepository.findDateModificationBySiren(siren);
+            ArrayList<String> listDateModifCourtes = new ArrayList<>();
+            for(String date:listDateModifIp) listDateModifCourtes.add(date.substring(0, 10));
+            log.info("dtaModif = "+ listDateModifCourtes.get(0));
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            Collections.sort(listDateModifCourtes, Comparator.comparing(s -> LocalDate.parse(s, formatter).atStartOfDay()));
+            log.info("dtaModif = "+ listDateModifCourtes.get(0));
+            log.info("dtaModif = "+ listDateModifCourtes.get(listDateModifCourtes.size() - 1));
+            resp.put("derniereDateModification", listDateModifCourtes.get(listDateModifCourtes.size() - 1));
+            for(String date:listDateModifCourtes) log.info(date);
+            return ResponseEntity.ok(resp.toString());
+        } catch(Exception e) {
+            return ResponseEntity
+                    .badRequest()
+                    .body("Erreur lors de la recupération de la dernière date de modification.");
+        }
     }
 
     @GetMapping(value = "/getInfoEtab")
@@ -257,8 +270,23 @@ public class EtablissementController {
 
     @GetMapping(value = "/getListEtab")
     @PreAuthorize("hasAuthority('admin')")
-    public List<EtablissementEntity> getListEtab() {
-        return etablissementRepository.findAll();
+    public ResponseEntity<String> getListEtab() throws JSONException {
+
+        JSONObject etab = new JSONObject();
+        List<JSONObject> listeEtab = new ArrayList<JSONObject>();
+        List<EtablissementEntity> liste = etablissementRepository.findAll();
+        for(EtablissementEntity e : liste) {
+            getDerniereDateModificationIp(e.getSiren());
+            etab.put("derniereDateModificationIp", getDerniereDateModificationIp(e.getSiren()));
+            etab.put("id", e.getId());
+            etab.put("idAbes", e.getIdAbes());
+            etab.put("siren", e.getSiren());
+            etab.put("nomEtab", e.getName());
+            etab.put("typeEtab", e.getTypeEtablissement());
+            etab.put("statut", e.isValide());
+            listeEtab.add(etab);
+        }
+        return new ResponseEntity<>(listeEtab.toString(), HttpStatus.OK);
     }
 
     /*private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
