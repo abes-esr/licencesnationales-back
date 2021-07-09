@@ -253,8 +253,7 @@ public class EtablissementController {
             ArrayList<String> listDateModifIp = new ArrayList<>();//etablissementRepository.findDateModificationBySiren(siren);
             Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
             for(IpEntity i:listeIpsEtab) {
-                i.getDateCreation(); //creation pour les tests ==> après mettre modification
-                listDateModifIp.add(i.getDateCreation().toString());
+                listDateModifIp.add(i.getDateModification().toString());
             }
             if(!listeIpsEtab.isEmpty() && listeIpsEtab.size()>1) {
                 ArrayList<String> listDateModifCourtes = new ArrayList<>();
