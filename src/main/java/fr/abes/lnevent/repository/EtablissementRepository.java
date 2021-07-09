@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import java.util.ArrayList;
+
 
 
 
@@ -29,7 +29,5 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
 
     EtablissementEntity findEtablissementEntityByIpsContains(IpEntity ip);
 
-    @Query("select i.dateCreation from IpEntity i, EtablissementEntity e where e.siren = :siren")
-    ArrayList<String> findDateModificationBySiren(@Param("siren") String siren);
 
 }
