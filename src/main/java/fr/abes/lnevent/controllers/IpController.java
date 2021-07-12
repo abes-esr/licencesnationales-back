@@ -82,7 +82,31 @@ public class IpController {
         return traiterAjoutIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
-    public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String sirenFromSecurityContext){
+    @PostMapping(value = "/adminAjoutIpV4")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminAjoutIpv4(@Valid @RequestBody Ipv4AjouteeDTO event)  {
+        return traiterAjoutIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminAjoutIpV6")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminAjoutIpv6(@Valid @RequestBody Ipv6AjouteeDTO event)  {
+        return traiterAjoutIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminAjoutPlageIpV4")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminAjoutPlageIpv4(@Valid @RequestBody PlageIpv4AjouteeDTO event)  {
+        return traiterAjoutIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminAjoutPlageIpV6")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminAjoutPlageIpv6(@Valid @RequestBody PlageIpv6AjouteeDTO event)  {
+        return traiterAjoutIp(event,event.getSiren());
+    }
+
+    public ResponseEntity<?> traiterAjoutIp(IpAjouteeDTO event, String siren){
         log.info("ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue() ="+ ipService.checkDoublonIpAjouteeDto(event).getStatusCodeValue());
         ResponseEntity doublonIp = ipService.checkDoublonIpAjouteeDto(event);
         if(doublonIp.getStatusCodeValue()==400){
@@ -90,7 +114,7 @@ public class IpController {
         }
         else {
             IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
-                    sirenFromSecurityContext,
+                    siren,
                     event.getTypeIp(),
                     event.getTypeAcces(),
                     event.getIp(),
@@ -98,7 +122,7 @@ public class IpController {
             applicationEventPublisher.publishEvent(ipAjouteeEvent);
             eventRepository.save(new EventEntity(ipAjouteeEvent));
 
-            String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+            String etab = etablissementRepository.getFirstBySiren(siren).getName();
             String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
             log.info("admin = " + admin);
             //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin));
@@ -128,7 +152,31 @@ public class IpController {
         return traiterModifIp(event,filtrerAccesServices.getSirenFromSecurityContextUser());
     }
 
-    public ResponseEntity<?> traiterModifIp(IpModifieeDTO ipModifieeDTO, String sirenFromSecurityContext){
+    @PostMapping(value = "/adminModifIpV4")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminModifIpv4(@Valid @RequestBody Ipv4ModifieeDTO event)  {
+        return traiterModifIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminModifIpV6")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminModifIpv6(@Valid @RequestBody Ipv6ModifieeDTO event)  {
+        return traiterModifIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminModifPlageIpV4")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminModifPlageIpv4(@Valid @RequestBody PlageIpv4ModifieeDTO event)  {
+        return traiterModifIp(event,event.getSiren());
+    }
+
+    @PostMapping(value = "/adminModifPlageIpV6")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<?> adminModifPlageIpv6(@Valid @RequestBody PlageIpv6ModifieeDTO event)  {
+        return traiterModifIp(event,event.getSiren());
+    }
+
+    public ResponseEntity<?> traiterModifIp(IpModifieeDTO ipModifieeDTO, String siren){
         log.info("ipService.checkDoublonIpModifieeDto(ipModifieeDTO).getStatusCodeValue() ="+ ipService.checkDoublonIpModifieeDto(ipModifieeDTO).getStatusCodeValue());
         ResponseEntity doublonIp = ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
         if(doublonIp.getStatusCodeValue()==400){
@@ -137,7 +185,7 @@ public class IpController {
         else {
             ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
             IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
-                    sirenFromSecurityContext,
+                    siren,
                     Long.parseLong(ipModifieeDTO.getId()),
                     ipModifieeDTO.getIp(),
                     ipModifieeDTO.getValidee(),
@@ -148,7 +196,7 @@ public class IpController {
             applicationEventPublisher.publishEvent(ipModifieeEvent);
             log.info("IpController modification3");
             eventRepository.save(new EventEntity(ipModifieeEvent));
-            String etab = etablissementRepository.getFirstBySiren(sirenFromSecurityContext).getName();
+            String etab = etablissementRepository.getFirstBySiren(siren).getName();
             String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip ou plage d'ips = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
             log.info("admin = " + admin);
             emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin);

@@ -10,6 +10,7 @@ import javax.annotation.processing.Generated;
 import javax.persistence.*;
 import javax.persistence.metamodel.SetAttribute;
 import javax.persistence.metamodel.StaticMetamodel;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,6 +29,8 @@ public class EtablissementEntity {
     private String name;
 
     private String siren;
+
+    private Date dateCreation;
 
     private String typeEtablissement;
 
@@ -56,6 +59,7 @@ public class EtablissementEntity {
         this.id = id;
         this.name = name;
         this.siren = siren;
+        this.dateCreation = new Date();
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         this.contact = contact;

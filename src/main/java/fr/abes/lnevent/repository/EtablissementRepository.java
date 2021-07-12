@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 
+
+
 @Repository
 public interface EtablissementRepository extends JpaRepository<EtablissementEntity, Long> , JpaSpecificationExecutor<EtablissementEntity> {
     void deleteBySiren(String siren);
@@ -26,5 +28,6 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     Boolean existeMail(@Param("mail") String mail);
 
     EtablissementEntity findEtablissementEntityByIpsContains(IpEntity ip);
+
 
 }
