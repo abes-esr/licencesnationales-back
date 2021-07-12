@@ -7,6 +7,7 @@ import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
+import fr.abes.lnevent.event.editeur.EditeurSupprimeEvent;
 import fr.abes.lnevent.event.etablissement.*;
 import fr.abes.lnevent.event.ip.IpAjouteeEvent;
 import fr.abes.lnevent.event.ip.IpModifieeEvent;
@@ -111,13 +112,20 @@ public class EventEntity {
         this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
     }
 
+    public EventEntity(EditeurSupprimeEvent editeurSupprimeEvent) {
+        this.event = "editeurSupprime";
+        this.dateCreationEvent = editeurSupprimeEvent.created;
+        this.id = Long.parseLong(editeurSupprimeEvent.getId());
+        this.siren = editeurSupprimeEvent.getSiren();
+    }
+
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {
         this.event = "ipAjoutee";
         this.dateCreationEvent = ipAjouteeEvent.created;
         this.ip = ipAjouteeEvent.getIp();
         this.siren = ipAjouteeEvent.getSiren();
-        this.typeAccesIp = ipAjouteeEvent.getTypeAcces();
-        this.typeIp = ipAjouteeEvent.getTypeIp();
+        //this.typeAccesIp = ipAjouteeEvent.getTypeAcces();
+        //this.typeIp = ipAjouteeEvent.getTypeIp();
         //this.dateCreationIp = ipAjouteeEvent.getDate();
     }
 
@@ -222,12 +230,5 @@ public class EventEntity {
     @Convert(converter = JpaConverterJson.class)
     private List<Long> idEditeurFusionnes;
 
-    private String typeAccesIp;
-
-    private String typeIp;
-
-    private Date dateCreationIp;
-
-    private Date dateModificationIp;
 
 }

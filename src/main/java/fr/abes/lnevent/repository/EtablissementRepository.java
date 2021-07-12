@@ -13,7 +13,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EtablissementRepository extends JpaRepository<EtablissementEntity, Long> , JpaSpecificationExecutor<EtablissementEntity> {
+
     void deleteBySiren(String siren);
+
     EtablissementEntity getFirstBySiren(String siren);
 
     @Query(nativeQuery = true, value = "select case when exists(select * from Etablissement "
