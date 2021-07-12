@@ -253,7 +253,11 @@ public class EtablissementController {
             ArrayList<String> listDateModifIp = new ArrayList<>();//etablissementRepository.findDateModificationBySiren(siren);
             Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
             for(IpEntity i:listeIpsEtab) {
-                listDateModifIp.add(i.getDateModification().toString());
+                Date dateModif = null;
+                if(i.getDateModification()!=null && (!i.getDateModification().equals(""))){
+                    dateModif=i.getDateModification();
+                    listDateModifIp.add(dateModif.toString());
+                }
             }
             if(!listeIpsEtab.isEmpty() && listeIpsEtab.size()>1) {
                 ArrayList<String> listDateModifCourtes = new ArrayList<>();

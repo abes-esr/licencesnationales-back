@@ -112,7 +112,7 @@ public class EventEntity {
     }
 
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {
-        this.event = "ipAjoute";
+        this.event = "ipAjoutee";
         this.dateCreationEvent = ipAjouteeEvent.created;
         this.ip = ipAjouteeEvent.getIp();
         this.siren = ipAjouteeEvent.getSiren();
@@ -122,7 +122,7 @@ public class EventEntity {
     }
 
     public EventEntity(IpModifieeEvent ipModifieeEvent) {
-        this.event = "ipModifie";
+        this.event = "ipModifiee";
         this.dateCreationEvent = ipModifieeEvent.created;
         this.ip = ipModifieeEvent.getIp();
         this.siren = ipModifieeEvent.getSiren();
