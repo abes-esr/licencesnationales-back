@@ -2,6 +2,7 @@ package fr.abes.lnevent.controllers;
 
 import fr.abes.lnevent.dto.editeur.*;
 import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
+import fr.abes.lnevent.dto.etablissement.EtablissementModifieDTO;
 import fr.abes.lnevent.dto.ip.IpModifieeDTO;
 import fr.abes.lnevent.dto.ip.IpSupprimeeDTO;
 import fr.abes.lnevent.entities.*;
@@ -10,6 +11,7 @@ import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
 import fr.abes.lnevent.event.editeur.EditeurSupprimeEvent;
 import fr.abes.lnevent.event.etablissement.EtablissementCreeEvent;
+import fr.abes.lnevent.event.etablissement.EtablissementModifieEvent;
 import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.exception.SirenIntrouvableException;
@@ -124,6 +126,7 @@ public class EditeurController {
             EditeurModifieEvent editeurModifieEvent = new EditeurModifieEvent(this,
                     editeurModifieDTO.getNomEditeur(),
                     editeurModifieDTO.getIdentifiantEditeur(),
+                    editeurModifieDTO.getGroupesEtabRelies(),
                     editeurModifieDTO.getAdresseEditeur(),
                     editeurModifieDTO.getListeContactCommercialEditeurDTO(),
                     editeurModifieDTO.getListeContactTechniqueEditeurDTO());
@@ -133,7 +136,7 @@ public class EditeurController {
         }
     }
 
-    @PostMapping(value = "/fusion")
+    /*@PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
     public String fusion(@RequestBody EditeurFusionneDTO editeurFusionneDTO) {
         EditeurFusionneEvent editeurFusionneEvent = new EditeurFusionneEvent(this,
@@ -142,7 +145,7 @@ public class EditeurController {
         applicationEventPublisher.publishEvent(editeurFusionneEvent);
         eventRepository.save(new EventEntity(editeurFusionneEvent));
         return "done";
-    }
+    }*/
 
 
     @GetMapping(value = "/{id}")

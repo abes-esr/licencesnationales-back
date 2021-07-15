@@ -1,6 +1,9 @@
 package fr.abes.lnevent.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import fr.abes.lnevent.converter.JpaConverterJson;
+import fr.abes.lnevent.dto.editeur.ContactCommercialEditeurDTO;
+import fr.abes.lnevent.dto.editeur.ContactTechniqueEditeurDTO;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -47,10 +50,10 @@ public class EditeurEntity {
     private Set<EtablissementEntity> etablissements = new HashSet<>();*/
 
 
-    @OneToMany(mappedBy = "editeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities;
 
-    @OneToMany(mappedBy = "editeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities;
 
 
@@ -80,4 +83,6 @@ public class EditeurEntity {
     }
 
 
+    public EditeurEntity(Long id, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies, String adresseEditeur, Set<ContactCommercialEditeurDTO> contactCommercialEditeurDTOS, Set<ContactTechniqueEditeurDTO> contactTechniqueEditeurDTOS) {
+    }
 }

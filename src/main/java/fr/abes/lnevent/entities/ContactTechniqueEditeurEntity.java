@@ -7,15 +7,15 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "ContactEditeur")
+@Table(name = "ContactTechniqueEditeur")
 @NoArgsConstructor
 @Getter
 @Setter
 public class ContactTechniqueEditeurEntity {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_editeur_Sequence")
-    @SequenceGenerator(name = "contact_editeur_Sequence", sequenceName = "CONTACT_EDITEUR_SEQ", allocationSize = 1)
+    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_technique_editeur_Sequence")
+    @SequenceGenerator(name = "contact_technique_editeur_Sequence", sequenceName = "CONTACT_TECHNIQUE_EDITEUR_SEQ", allocationSize = 1)
     public Long id;
 
     public String nomContactTechnique;

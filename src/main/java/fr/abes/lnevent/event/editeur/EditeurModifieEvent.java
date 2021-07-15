@@ -15,36 +15,40 @@ import java.util.Set;
 @Getter
 public class EditeurModifieEvent extends Event {
 
-    /*private Long id;
+    private Long id;
 
     private String nomEditeur;
 
     private String identifiantEditeur;
 
+    private List<String> groupesEtabRelies;
+
     private String adresseEditeur;
 
-    private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities;
+    private Set<ContactCommercialEditeurDTO> contactCommercialEditeurDTOS;
 
-    private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities;
+    private Set<ContactTechniqueEditeurDTO> contactTechniqueEditeurDTOS;
 
     public EditeurModifieEvent(Object source,
                             String nomEditeur,
                             String identifiantEditeur,
-                            String adresseEditeur, *//*List<String> mailsPourBatch, List<String> mailPourInformation,Set<EtablissementEntity> etablissements,*//*
-                            Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities,
-                            Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities) {
+                            List<String> groupesEtabRelies,
+                            String adresseEditeur,
+                            Set<ContactCommercialEditeurDTO> contactCommercialEditeurDTOS,
+                            Set<ContactTechniqueEditeurDTO> contactTechniqueEditeurDTOS) {
         super(source);
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
+        this.groupesEtabRelies = groupesEtabRelies;
         this.adresseEditeur = adresseEditeur;
         //this.mailsPourBatch = mailsPourBatch;
         //this.mailPourInformation = mailPourInformation;
-        this.contactCommercialEditeurEntities = contactCommercialEditeurEntities;
-        this.contactTechniqueEditeurEntities = contactTechniqueEditeurEntities;
+        this.contactCommercialEditeurDTOS = contactCommercialEditeurDTOS;
+        this.contactTechniqueEditeurDTOS = contactTechniqueEditeurDTOS;
     }
-*/
 
-    public EditeurModifieEvent(
+
+    /*public EditeurModifieEvent(
             Object source,
             String nomEditeur,
             String identifiantEditeur,
@@ -53,5 +57,5 @@ public class EditeurModifieEvent extends Event {
             Set<ContactTechniqueEditeurDTO> contactTechniqueEditeurDTO) {
 
         super(source);
-    }
+    }*/
 }

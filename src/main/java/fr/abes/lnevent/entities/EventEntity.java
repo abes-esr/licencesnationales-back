@@ -3,6 +3,9 @@ package fr.abes.lnevent.entities;
 import fr.abes.lnevent.converter.EtablissementDTOConverter;
 import fr.abes.lnevent.converter.JpaConverterJson;
 import fr.abes.lnevent.converter.ListEtablissementDTOConverter;
+import fr.abes.lnevent.dto.editeur.ContactCommercialEditeurDTO;
+import fr.abes.lnevent.dto.editeur.ContactTechniqueEditeurDTO;
+import fr.abes.lnevent.dto.editeur.EditeurDTO;
 import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
@@ -17,8 +20,10 @@ import fr.abes.lnevent.event.password.UpdatePasswordEvent;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "Event")
@@ -51,7 +56,7 @@ public class EventEntity {
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
         this.event = "modifie";
         this.dateCreationEvent = etablissementModifieEvent.created;
-                this.siren = etablissementModifieEvent.getSiren();
+        this.siren = etablissementModifieEvent.getSiren();
         this.nomContact = etablissementModifieEvent.getNomContact();
         this.prenomContact = etablissementModifieEvent.getPrenomContact();
         this.adresseContact = etablissementModifieEvent.getAdresseContact();
@@ -85,24 +90,29 @@ public class EventEntity {
     }
 
     public EventEntity(EditeurCreeEvent editeurCreeEvent) {
+        EditeurDTO editeurDTO = editeurCreeEvent.getEditeurDTO();
         this.event = "editeurcree";
         this.dateCreationEvent = editeurCreeEvent.created;
-        this.nomEditeur = editeurCreeEvent.getNom();
-        this.adresseEditeur = editeurCreeEvent.getAdresse();
-        this.mailPourBatchEditeur = editeurCreeEvent.getMailPourBatch();
-        this.mailPourInformationEditeur = editeurCreeEvent.getMailPourInformation();
+        this.nomEditeur = editeurDTO.getNomEditeur();
+        this.identifiantEditeur = editeurDTO.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeurDTO.getGroupesEtabRelies();
+        this.adresseEditeur = editeurDTO.getAdresseEditeur();
+        this.listeContactCommercialEditeurDTO = editeurDTO.getListeContactCommercialEditeurDTO();
+        this.listeContactTechniqueEditeurDTO = editeurDTO.getListeContactTechniqueEditeurDTO();
     }
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
         this.event = "editeurmodifie";
         this.dateCreationEvent = editeurModifieEvent.created;
-        this.nomEditeur = editeurModifieEvent.getNom();
-        this.adresseEditeur = editeurModifieEvent.getAdresse();
-        this.mailPourBatchEditeur = editeurModifieEvent.getMailPourBatch();
-        this.mailPourInformationEditeur = editeurModifieEvent.getMailPourInformation();
+        this.nomEditeur = editeurModifieEvent.getNomEditeur();
+        this.identifiantEditeur = editeurModifieEvent.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeurModifieEvent.getGroupesEtabRelies();
+        this.adresseEditeur = editeurModifieEvent.getAdresseEditeur();
+        this.listeContactCommercialEditeurDTO = editeurModifieEvent.getContactCommercialEditeurDTOS();
+        this.listeContactTechniqueEditeurDTO = editeurModifieEvent.getContactTechniqueEditeurDTOS();
     }
 
-    public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
+    /*public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
         this.event = "editeurfusione";
         this.dateCreationEvent = editeurFusionneEvent.created;
         this.nomEditeur = editeurFusionneEvent.getEditeurDTO().getNom();
@@ -110,13 +120,13 @@ public class EventEntity {
         this.mailPourBatchEditeur = editeurFusionneEvent.getEditeurDTO().getMailPourBatch();
         this.mailPourInformationEditeur = editeurFusionneEvent.getEditeurDTO().getMailPourInformation();
         this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
-    }
+    }*/
 
     public EventEntity(EditeurSupprimeEvent editeurSupprimeEvent) {
         this.event = "editeurSupprime";
         this.dateCreationEvent = editeurSupprimeEvent.created;
         this.id = Long.parseLong(editeurSupprimeEvent.getId());
-        this.siren = editeurSupprimeEvent.getSiren();
+        //this.siren = editeurSupprimeEvent.getSiren();
     }
 
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {
@@ -216,15 +226,29 @@ public class EventEntity {
 
     public String nomEditeur;
 
+    public String identifiantEditeur;
+
     public String adresseEditeur;
 
     @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public List<String> groupesEtabRelies = new ArrayList<>();
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public Set<ContactCommercialEditeurDTO> listeContactCommercialEditeurDTO;
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public Set<ContactTechniqueEditeurDTO> listeContactTechniqueEditeurDTO;
+
+    /*@Lob
     @Convert(converter = JpaConverterJson.class)
     private List<String> mailPourBatchEditeur;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
-    private List<String> mailPourInformationEditeur;
+    private List<String> mailPourInformationEditeur;*/
 
     @Lob
     @Convert(converter = JpaConverterJson.class)

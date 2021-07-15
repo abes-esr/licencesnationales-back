@@ -21,8 +21,9 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
                 editeurModifieEvent.getId(),
                 editeurModifieEvent.getNomEditeur(),
                 editeurModifieEvent.getIdentifiantEditeur(),
+                editeurModifieEvent.getGroupesEtabRelies(),
                 editeurModifieEvent.getAdresseEditeur(),
-                editeurModifieEvent.getContactCommercialEditeurEntities(),
-                editeurModifieEvent.getContactTechniqueEditeurEntities()));
+                editeurModifieEvent.getContactCommercialEditeurDTOS(),
+                editeurModifieEvent.getContactTechniqueEditeurDTOS()));
     }
 }

@@ -12,7 +12,7 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
 
     void deleteById(Long id);
 
-    EditeurEntity getFirstByNom(String nom);
+    EditeurEntity getFirstByNomEditeur(String nom);
 
     EditeurEntity getFirstById(String id);
 

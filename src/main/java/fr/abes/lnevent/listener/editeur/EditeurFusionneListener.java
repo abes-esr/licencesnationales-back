@@ -1,3 +1,4 @@
+/*
 package fr.abes.lnevent.listener.editeur;
 
 import fr.abes.lnevent.dto.editeur.EditeurDTO;
@@ -37,3 +38,4 @@ public class EditeurFusionneListener implements ApplicationListener<EditeurFusio
         }
     }
 }
+*/
