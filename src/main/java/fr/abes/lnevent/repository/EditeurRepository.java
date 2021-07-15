@@ -16,5 +16,7 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
 
     EditeurEntity getFirstById(String id);
 
-    EditeurEntity findEditeurEntityByMailsPourBatch(String mail);
+    boolean findEditeurEntityByContactCommercialEditeurEntitiesContains(String mail);
+
+    boolean findEditeurEntityByContactTechniqueEditeurEntitiesContains(String mail);
 }

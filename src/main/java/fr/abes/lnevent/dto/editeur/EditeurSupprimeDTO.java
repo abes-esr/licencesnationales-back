@@ -9,6 +9,6 @@ public class EditeurSupprimeDTO {
 
     @NotBlank
     private String id;
-    @NotBlank
-    private String siren;
+   /* @NotBlank
+    private String siren;*/
 }

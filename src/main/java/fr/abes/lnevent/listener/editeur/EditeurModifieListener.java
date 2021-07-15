@@ -17,11 +17,12 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
 
     @Override
     public void onApplicationEvent(EditeurModifieEvent editeurModifieEvent) {
-        editeurRepository.save(new EditeurEntity(editeurModifieEvent.getId(),
-                editeurModifieEvent.getNom(),
-                editeurModifieEvent.getAdresse(),
-                editeurModifieEvent.getMailPourBatch(),
-                editeurModifieEvent.getMailPourInformation(),
-                null));
+        editeurRepository.save(new EditeurEntity(
+                editeurModifieEvent.getId(),
+                editeurModifieEvent.getNomEditeur(),
+                editeurModifieEvent.getIdentifiantEditeur(),
+                editeurModifieEvent.getAdresseEditeur(),
+                editeurModifieEvent.getContactCommercialEditeurEntities(),
+                editeurModifieEvent.getContactTechniqueEditeurEntities()));
     }
 }

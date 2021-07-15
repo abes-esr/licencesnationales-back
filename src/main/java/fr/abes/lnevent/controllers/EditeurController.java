@@ -1,15 +1,10 @@
 package fr.abes.lnevent.controllers;
 
-import fr.abes.lnevent.dto.editeur.EditeurCreeDTO;
-import fr.abes.lnevent.dto.editeur.EditeurFusionneDTO;
-import fr.abes.lnevent.dto.editeur.EditeurModifieDTO;
-import fr.abes.lnevent.dto.editeur.EditeurSupprimeDTO;
+import fr.abes.lnevent.dto.editeur.*;
 import fr.abes.lnevent.dto.etablissement.EtablissementCreeDTO;
 import fr.abes.lnevent.dto.ip.IpModifieeDTO;
 import fr.abes.lnevent.dto.ip.IpSupprimeeDTO;
-import fr.abes.lnevent.entities.EditeurEntity;
-import fr.abes.lnevent.entities.EtablissementEntity;
-import fr.abes.lnevent.entities.IpEntity;
+import fr.abes.lnevent.entities.*;
 import fr.abes.lnevent.event.editeur.EditeurCreeEvent;
 import fr.abes.lnevent.event.editeur.EditeurFusionneEvent;
 import fr.abes.lnevent.event.editeur.EditeurModifieEvent;
@@ -22,7 +17,6 @@ import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
 import fr.abes.lnevent.repository.EditeurRepository;
 import fr.abes.lnevent.repository.EtablissementRepository;
 import fr.abes.lnevent.repository.EventRepository;
-import fr.abes.lnevent.entities.EventEntity;
 import fr.abes.lnevent.services.GenererIdAbes;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -58,28 +52,29 @@ public class EditeurController {
 
     private String demandeOk = "Votre demande a été prise en compte.";
 
-    @PostMapping(value = "/creation")
+   /* @PostMapping(value = "/creation")
     @PreAuthorize("hasAuthority('admin')")
     public String add(@RequestBody EditeurCreeDTO editeurCreeDTO) {
         EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this,
-                editeurCreeDTO.getNom(),
-                editeurCreeDTO.getAdresse(),
-                editeurCreeDTO.getMailPourBatch(),
-                editeurCreeDTO.getMailPourInformation());
+                editeurCreeDTO.getNomEditeur(),
+                editeurCreeDTO.getIdentifiantEditeur(),
+                editeurCreeDTO.getAdresseEditeur(),
+                editeurCreeDTO.getContactCommercialEditeurDTO(),
+                editeurCreeDTO.getContactTechniqueEditeurDTO());
         applicationEventPublisher.publishEvent(editeurCreeEvent);
         eventRepository.save(new EventEntity(editeurCreeEvent));
         return "done";
-    }
+    }*/
 
     @PostMapping("/creationEditeur")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<?> creationEditeur(HttpServletRequest request, @Valid @RequestBody EditeurCreeDTO eventDTO) {
-        log.debug("eventDto = " + eventDTO.toString());
-        log.debug("NomEtab = " + eventDTO.getNom());
+    public ResponseEntity<?> creationEditeur(HttpServletRequest request, @Valid @RequestBody EditeurCreeDTO editeurCreeDTO) {
+
 
 
         //verifier que le mail du contact n'est pas déjà en base
-        boolean existeMail = checkDoublonMail(eventDTO.getMailPourBatch());
+        boolean existeMail = checkDoublonMail(editeurCreeDTO.getListeContactCommercialEditeurDTO(),editeurCreeDTO.getListeContactTechniqueEditeurDTO());
+
         if (existeMail) {
             return ResponseEntity
                     .badRequest()
@@ -87,23 +82,29 @@ public class EditeurController {
         }
         else{
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this,
-                    eventDTO.getNom(),
-                    eventDTO.getAdresse(),
-                    eventDTO.getMailPourBatch(),
-                    eventDTO.getMailPourInformation());
+                    editeurCreeDTO);
             applicationEventPublisher.publishEvent(editeurCreeEvent);
             eventRepository.save(new EventEntity(editeurCreeEvent));
             return ResponseEntity.ok(demandeOk);
         }
     }
 
-    public boolean checkDoublonMail(List<String> mails) {
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurDTO> c, Set<ContactTechniqueEditeurDTO> t) {
         log.info("DEBUT checkDoublonMail ");
-        boolean existeMail = false;
-        for(String mail : mails)
-            existeMail = editeurRepository.findEditeurEntityByMailsPourBatch(mail)!=null;
-        log.info("existeMail = "+ existeMail);
-        if (existeMail) {
+        boolean existeMailCommercial = false;
+        boolean existeMailTechnique = false;
+        String mail = "";
+        for (ContactCommercialEditeurDTO contact : c){
+            mail = contact.getMailContactCommercial();
+            existeMailCommercial = editeurRepository.findEditeurEntityByContactCommercialEditeurEntitiesContains(mail);
+        }
+        for (ContactCommercialEditeurDTO contact : c){
+            mail = contact.getMailContactCommercial();
+            existeMailTechnique = editeurRepository.findEditeurEntityByContactTechniqueEditeurEntitiesContains(mail);
+        }
+        log.info("existeMailCommercial = "+ existeMailCommercial);
+        log.info("existeMailTechnique = "+ existeMailTechnique);
+        if (existeMailCommercial || existeMailTechnique) {
             return true;
         }
         else return false;
@@ -112,7 +113,8 @@ public class EditeurController {
     @PostMapping(value = "/modificationEditeur")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> modificationEditeur (@RequestBody EditeurModifieDTO editeurModifieDTO) {
-        boolean existeMail = checkDoublonMail(editeurModifieDTO.getMailPourBatch());
+        //verifier que le mail du contact n'est pas déjà en base
+        boolean existeMail = checkDoublonMail(editeurModifieDTO.getListeContactCommercialEditeurDTO(),editeurModifieDTO.getListeContactTechniqueEditeurDTO());
         if (existeMail) {
             return ResponseEntity
                     .badRequest()
@@ -120,10 +122,11 @@ public class EditeurController {
         }
         else {
             EditeurModifieEvent editeurModifieEvent = new EditeurModifieEvent(this,
-                    editeurModifieDTO.getNom(),
-                    editeurModifieDTO.getAdresse(),
-                    editeurModifieDTO.getMailPourBatch(),
-                    editeurModifieDTO.getMailPourInformation());
+                    editeurModifieDTO.getNomEditeur(),
+                    editeurModifieDTO.getIdentifiantEditeur(),
+                    editeurModifieDTO.getAdresseEditeur(),
+                    editeurModifieDTO.getListeContactCommercialEditeurDTO(),
+                    editeurModifieDTO.getListeContactTechniqueEditeurDTO());
             applicationEventPublisher.publishEvent(editeurModifieEvent);
             eventRepository.save(new EventEntity(editeurModifieEvent));
             return ResponseEntity.ok(demandeOk);
@@ -151,15 +154,14 @@ public class EditeurController {
 
     @GetMapping(value = "/getListEditeurs")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<String> getListEtab() throws JSONException {
+    public ResponseEntity<String> getListEditeur() throws JSONException {
 
         List<JSONObject> listeEditeurs = new ArrayList<JSONObject>();
         List<EditeurEntity> liste = editeurRepository.findAll();
         for(EditeurEntity e : liste) {
             JSONObject editeurs = new JSONObject();
             editeurs.put("id", e.getId());
-            editeurs.put("nomEditeur", e.getNom());
-            //editeurs.put("statut", e.isValide());
+            editeurs.put("nomEditeur", e.getNomEditeur());
             listeEditeurs.add(editeurs);
         }
         log.info(listeEditeurs.toString());
@@ -170,8 +172,7 @@ public class EditeurController {
     @PreAuthorize("hasAuthority('admin')")
     public String suppression(@Valid @RequestBody EditeurSupprimeDTO editeurSupprimeDTO)  {
         EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this,
-                editeurSupprimeDTO.getId(),
-                editeurSupprimeDTO.getSiren());
+                editeurSupprimeDTO.getId()/*, editeurSupprimeDTO.getSiren()*/);
         applicationEventPublisher.publishEvent(editeurSupprimeEvent);
         eventRepository.save(new EventEntity(editeurSupprimeEvent));
         return demandeOk;
