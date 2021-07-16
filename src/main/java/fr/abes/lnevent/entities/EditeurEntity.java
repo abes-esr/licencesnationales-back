@@ -10,10 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "Editeur")
@@ -31,6 +28,9 @@ public class EditeurEntity {
     private String identifiantEditeur;
 
     private String adresseEditeur;
+
+    private Date dateCreation;
+
 
     /*@Lob
     @Convert(converter = JpaConverterJson.class)
@@ -68,6 +68,7 @@ public class EditeurEntity {
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.adresseEditeur = adresseEditeur;
+        this.dateCreation = new Date();
         //this.mailsPourBatch = mailsPourBatch;
         //this.mailPourInformation = mailPourInformation;
         //this.etablissements = etablissements;

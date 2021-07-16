@@ -16,9 +16,7 @@ import fr.abes.lnevent.event.ip.IpSupprimeeEvent;
 import fr.abes.lnevent.exception.AccesInterditException;
 import fr.abes.lnevent.exception.SirenIntrouvableException;
 import fr.abes.lnevent.recaptcha.ReCaptchaResponse;
-import fr.abes.lnevent.repository.EditeurRepository;
-import fr.abes.lnevent.repository.EtablissementRepository;
-import fr.abes.lnevent.repository.EventRepository;
+import fr.abes.lnevent.repository.*;
 import fr.abes.lnevent.services.GenererIdAbes;
 import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +48,12 @@ public class EditeurController {
     private EditeurRepository editeurRepository;
 
     @Autowired
+    ContactCommercialEditeurRepository contactCommercialEditeurRepository;
+
+    @Autowired
+    ContactTechniqueEditeurRepository contactTechniqueEditeurRepository;
+
+    @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     private String demandeOk = "Votre demande a été prise en compte.";
@@ -71,7 +75,7 @@ public class EditeurController {
     @PostMapping("/creationEditeur")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<?> creationEditeur(HttpServletRequest request, @Valid @RequestBody EditeurCreeDTO editeurCreeDTO) {
-
+        log.info("DEBUT creationEditeur ");
 
 
         //verifier que le mail du contact n'est pas déjà en base
@@ -98,11 +102,15 @@ public class EditeurController {
         String mail = "";
         for (ContactCommercialEditeurDTO contact : c){
             mail = contact.getMailContactCommercial();
-            existeMailCommercial = editeurRepository.findEditeurEntityByContactCommercialEditeurEntitiesContains(mail);
+            log.info("mail = "+ mail);
+            //existeMailCommercial = editeurRepository.findEditeurEntityByContactCommercialEditeurEntitiesContains(mail)!= null;
+            existeMailCommercial = editeurRepository.existeMail(mail);
         }
         for (ContactCommercialEditeurDTO contact : c){
             mail = contact.getMailContactCommercial();
-            existeMailTechnique = editeurRepository.findEditeurEntityByContactTechniqueEditeurEntitiesContains(mail);
+            log.info("mail = "+ mail);
+            //existeMailTechnique = editeurRepository.findEditeurEntityByContactTechniqueEditeurEntitiesContains(mail)!= null;
+            contactTechniqueEditeurRepository.existeMail(mail);
         }
         log.info("existeMailCommercial = "+ existeMailCommercial);
         log.info("existeMailTechnique = "+ existeMailTechnique);
