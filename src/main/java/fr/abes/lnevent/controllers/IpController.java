@@ -257,4 +257,9 @@ public class IpController {
         Long identifiant = Long.parseLong(ipDTO.getId());
         return ipRepository.getFirstById(identifiant);
     }
+
+    @GetMapping(value = "/whoIs/{ip}")
+    public String whoIs(@PathVariable String ip) throws Exception {
+        return ipService.whoIs(ip);
+    }
 }

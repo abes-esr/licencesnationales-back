@@ -18,11 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.URI;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 
 @Slf4j
@@ -200,6 +200,27 @@ public class IpService {
         log.info("ResponseEntity =" + responseEntity.toString());
         return responseEntity;
     }
+
+    public String whoIs(String ip) throws Exception {
+        String result = "";
+        try {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec("whois " + ip);
+            p.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            result = stdInput.readLine();
+            int c;
+            while ((c = stdInput.read()) != -1) {
+                result += (char) c;
+            }
+        } catch (IOException | InterruptedException e) {
+            log.error("ERREUR LORS DU WHOIS : " + e.toString());
+            throw new Exception("Impossible d'éxecuter le WhoIs");
+        }
+        return result.replaceAll("\n", "<br />");
+    }
+
+
     public ResponseEntity<?> badRequest(String msgError) {
         return ResponseEntity
                 .badRequest()
