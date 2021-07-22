@@ -14,7 +14,6 @@ import java.util.Set;
 @Getter @Setter
 @AllArgsConstructor
 public class EditeurDTO {
-
     @NotBlank
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
     private String nomEditeur;
