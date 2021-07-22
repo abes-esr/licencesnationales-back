@@ -43,9 +43,6 @@ public class PasswordController {
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    public JavaMailSender mailSender;
-
-    @Autowired
     EmailService emailService;
 
     @Autowired

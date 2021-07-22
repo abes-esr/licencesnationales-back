@@ -77,9 +77,6 @@ public class EtablissementController {
     FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    public JavaMailSender mailSender;
-
-    @Autowired
     EmailService emailService;
 
     @Value("${ln.dest.notif.admin}")

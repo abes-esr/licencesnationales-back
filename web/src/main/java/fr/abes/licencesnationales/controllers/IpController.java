@@ -48,9 +48,6 @@ public class IpController {
     FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    public JavaMailSender mailSender;
-
-    @Autowired
     EmailService emailService;
 
     @Autowired
