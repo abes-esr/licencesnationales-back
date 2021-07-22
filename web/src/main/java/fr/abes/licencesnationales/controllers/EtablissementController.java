@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.controllers;
 
 
+import fr.abes.licencesnationales.dto.DtoMapper;
+import fr.abes.licencesnationales.dto.EtablissementWebDto;
 import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDTO;
 import fr.abes.licencesnationales.dto.etablissement.EtablissementDiviseDTO;
 import fr.abes.licencesnationales.dto.etablissement.EtablissementFusionneDTO;
@@ -26,12 +28,8 @@ import fr.abes.licencesnationales.services.GenererIdAbes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -48,6 +46,9 @@ import java.util.*;
 @RestController
 @RequestMapping("/v1/ln/etablissement")
 public class EtablissementController {
+
+    @Autowired
+    private DtoMapper mapper;
 
     @Autowired
     private EventRepository eventRepository;
@@ -281,39 +282,11 @@ public class EtablissementController {
 
     @GetMapping(value = "/getListEtab")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<String> getListEtab() throws JSONException {
+    public List<EtablissementWebDto> getListEtab() {
 
-        List<JSONObject> listeEtab = new ArrayList<JSONObject>();
         List<EtablissementEntity> liste = etablissementRepository.findAll();
-        for(EtablissementEntity e : liste) {
-            JSONObject etab = new JSONObject();
-            etab.put("derniereDateModificationIp", getDerniereDateModificationIp(e.getSiren()));
-            etab.put("id", e.getId());
-            etab.put("idAbes", e.getIdAbes());
-            etab.put("siren", e.getSiren());
-            etab.put("nomEtab", e.getName());
-            etab.put("typeEtab", e.getTypeEtablissement());
-            etab.put("statut", e.isValide());
-            listeEtab.add(etab);
-        }
-        log.info(listeEtab.toString());
-        return new ResponseEntity<>(listeEtab.toString(), HttpStatus.OK);
+        return mapper.mapList(liste, EtablissementWebDto.class);
+
     }
 
-    /*private String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String sirenFromSecurityContextUser = userDetails.getUsername();
-        log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
-        if(sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser==null){
-            log.error("Acces interdit");
-            throw new AccesInterditException("Acces interdit");
-        }
-        boolean existeSiren = etablissementRepository.existeSiren(sirenFromSecurityContextUser);
-        log.info("existeSiren = "+ existeSiren);
-        if (!existeSiren) {
-            log.error("Siren absent de la base");
-            throw new SirenIntrouvableException("Siren absent de la base");
-        }
-        return sirenFromSecurityContextUser;
-    }*/
 }
