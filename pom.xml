@@ -4,23 +4,24 @@
 
         licencesnationales-back
      ======================================================================= -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>fr.abes</groupId>
         <artifactId>abes-spring</artifactId>
         <version>1.0.7</version>
     </parent>
 
-    <!-- =========================================================== -->
-    <!--     Description des modules                                 -->
-    <!-- =========================================================== -->
-    <modules>
-        <module>batch</module>
-        <module>core</module>
-        <module>web</module>
-    </modules>
+    <!-- ===================================================== -->
+    <!--     Description du projet                             -->
+    <!-- ===================================================== -->
+    <groupId>fr.abes.licencesnationales</groupId>
+    <artifactId>licencesnationales-backoffice</artifactId>
+    <packaging>pom</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>Licences Nationales Back</name>
+    <description>API pour les licences nationales</description>
 
     <!-- ===================================================== -->
     <!--     Proprietes du projet                              -->
@@ -32,7 +33,14 @@
         <batchBaseDir>./target/</batchBaseDir>
     </properties>
 
-    <packaging>pom</packaging>
+    <!-- =========================================================== -->
+    <!--     Description des modules                                 -->
+    <!-- =========================================================== -->
+    <modules>
+        <module>core</module>
+        <module>batch</module>
+        <module>web</module>
+    </modules>
 
     <!-- =========================================================== -->
     <!--     Profile                                                 -->
@@ -66,16 +74,6 @@
             </properties>
         </profile>
     </profiles>
-
-    <!-- ===================================================== -->
-    <!--     Description du projet                             -->
-    <!-- ===================================================== -->
-
-    <groupId>fr.abes.licencesnationales</groupId>
-    <artifactId>licencesnationales</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <name>licencesnationales</name>
-    <description>Demo LN Event base</description>
 
     <!-- =========================================================== -->
     <!--     Gestion des dependances                                 -->
@@ -142,7 +140,6 @@
     <!-- =========================================================== -->
     <!--     Configuration de la compilation                         -->
     <!-- =========================================================== -->
-
     <build>
         <finalName>${finalName}</finalName>
         <plugins>

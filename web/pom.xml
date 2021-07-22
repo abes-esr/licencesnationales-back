@@ -5,8 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
+        <artifactId>licencesnationales-backoffice</artifactId>
         <groupId>fr.abes.licencesnationales</groupId>
-        <artifactId>licencesnationales</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
@@ -28,7 +28,8 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>core</artifactId>
-            <version>${project.version}</version>
+            <version>${project.parent.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- === Spring web === -->
