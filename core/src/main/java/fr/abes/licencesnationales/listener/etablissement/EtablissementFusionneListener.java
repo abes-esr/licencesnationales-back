@@ -1,13 +1,12 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
-import fr.abes.lnevent.dto.etablissement.EtablissementDTO;
-import fr.abes.lnevent.entities.EditeurEntity;
-import fr.abes.lnevent.entities.IpEntity;
-import fr.abes.lnevent.repository.ContactRepository;
-import fr.abes.lnevent.entities.ContactEntity;
-import fr.abes.lnevent.entities.EtablissementEntity;
-import fr.abes.lnevent.repository.EtablissementRepository;
-import fr.abes.lnevent.event.etablissement.EtablissementFusionneEvent;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.entities.ContactEntity;
+import fr.abes.licencesnationales.entities.EditeurEntity;
+import fr.abes.licencesnationales.entities.EtablissementEntity;
+import fr.abes.licencesnationales.entities.IpEntity;
+import fr.abes.licencesnationales.event.etablissement.EtablissementFusionneEvent;
+import fr.abes.licencesnationales.repository.EtablissementRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 

@@ -88,4 +88,32 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <!-- =========================================================== -->
+    <!--     Configuration de la compilation                         -->
+    <!-- =========================================================== -->
+    <build>
+        <finalName>${warName}</finalName>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/*.properties</include>
+                    <include>**/*.sql</include>
+                    <include>**/*.xml</include>
+                </includes>
+            </resource>
+        </resources>
+
+        <plugins>
+            <!-- ======================================================= -->
+            <!--     Compilation de l'application Spring                 -->
+            <!-- ======================================================= -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
 </project>

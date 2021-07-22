@@ -1,8 +1,8 @@
 package fr.abes.licencesnationales.security;
 
-import fr.abes.lnevent.security.jwt.JwtAuthenticationEntryPoint;
-import fr.abes.lnevent.security.jwt.JwtAuthenticationFilter;
-import fr.abes.lnevent.services.GenererIdAbes;
+import fr.abes.licencesnationales.security.jwt.JwtAuthenticationEntryPoint;
+import fr.abes.licencesnationales.security.jwt.JwtAuthenticationFilter;
+import fr.abes.licencesnationales.services.GenererIdAbes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

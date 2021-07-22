@@ -1,7 +1,9 @@
 package fr.abes.licencesnationales;
 
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
@@ -13,10 +15,19 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Collections;
 
 @SpringBootApplication
-public class LneventApplication extends SpringBootServletInitializer {
+public class LicencesNationalesAPIApplication extends SpringBootServletInitializer implements CommandLineRunner {
 
     public static void main(String[] args) {
-        SpringApplication.run(LneventApplication.class, args);
+        SpringApplication.run(LicencesNationalesAPIApplication.class, args);
+    }
+
+    @Override
+    protected SpringApplicationBuilder configure(SpringApplicationBuilder builder) {
+        return builder.sources(LicencesNationalesAPIApplication.class);
+    }
+
+    @Override
+    public void run(String... args) throws Exception {
     }
 
     @Bean

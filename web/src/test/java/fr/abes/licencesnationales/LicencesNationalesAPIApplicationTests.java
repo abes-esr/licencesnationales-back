@@ -1,9 +1,6 @@
 package fr.abes.licencesnationales;
 
-import fr.abes.licencesnationales.entities.ContactEntity;
-import fr.abes.licencesnationales.entities.EditeurEntity;
-import fr.abes.licencesnationales.entities.EtablissementEntity;
-import fr.abes.licencesnationales.entities.IpEntity;
+import fr.abes.licencesnationales.entities.*;
 import fr.abes.licencesnationales.repository.EditeurRepository;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.repository.IpRepository;
@@ -19,7 +16,7 @@ import java.util.HashSet;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-class LneventApplicationTests {
+class LicencesNationalesAPIApplicationTests {
 
     @Autowired
     private IpRepository ipRepository;
@@ -30,7 +27,7 @@ class LneventApplicationTests {
     @Autowired
     private EditeurRepository editeurRepository;
 
-    @BeforeEach
+    /*@BeforeEach
     void init() {
 
         editeurRepository.deleteAll();
@@ -49,8 +46,9 @@ class LneventApplicationTests {
         EditeurEntity editeurEntity = new EditeurEntity(null,
                 "charlesinit",
                 "mtpinit",
-                new ArrayList<>(),
-                new ArrayList<>(),
+                "adresse",
+                new HashSet<ContactCommercialEditeurEntity>(),
+                new HashSet<ContactTechniqueEditeurEntity>(),
                 null);
         editeurRepository.save(editeurEntity);
 
@@ -148,6 +146,6 @@ class LneventApplicationTests {
         assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getIp()).isEqualTo("231.256.257.2802");
         assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getTypeAcces()).isEqualTo("plage");
         assertThat(etablissementRepository.getFirstBySiren("3555646init").getIps().stream().findFirst().get().getTypeIp()).isEqualTo("ipv4");
-    }
+    }*/
 
 }
