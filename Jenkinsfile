@@ -264,9 +264,9 @@ node {
                                 string(credentialsId: "LN-username-orpins", variable: 'BDusername'),
                                 string(credentialsId: "LN-password-orpins", variable: 'BDpassword'),
                                 string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
-                                string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-site", variable: 'googleRecaptchaKey'),
-                                string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-secret", variable: 'googleRecaptchaSecret'),
-                                string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-threshold", variable: 'googleRecaptchaThreshold'),
+                                string(credentialsId: "LN-google-recaptcha-key-site", variable: 'googleRecaptchaKey'),
+                                string(credentialsId: "LN-google-recaptcha-key-secret", variable: 'googleRecaptchaSecret'),
+                                string(credentialsId: "LN-google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold'),
                                 string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin'),
                                 string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl'),
                         ]) {
