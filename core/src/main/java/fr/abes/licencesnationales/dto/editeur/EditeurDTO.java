@@ -1,9 +1,7 @@
 package fr.abes.licencesnationales.dto.editeur;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -11,8 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 
-@Getter @Setter
-@AllArgsConstructor
+@Data
 public class EditeurDTO {
     @NotBlank
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
