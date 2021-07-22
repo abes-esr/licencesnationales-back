@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.controllers;
 
 
+import fr.abes.licencesnationales.dto.PasswordWebDto;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
@@ -18,15 +19,13 @@ import fr.abes.licencesnationales.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.configurationprocessor.json.JSONException;
-import org.springframework.boot.configurationprocessor.json.JSONObject;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
@@ -71,30 +70,27 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody String userEmailOrSiren) throws JSONException, DonneeIncoherenteBddException {
+    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto userEmailOrSiren) throws DonneeIncoherenteBddException {
 
         log.info("userEmailOrSiren = " + userEmailOrSiren);
-        JSONObject emailOrSiren = new JSONObject(userEmailOrSiren);
-        String param = emailOrSiren.keys().next().toString();
-        log.info("param = " + param);
         String mail = null;
         String siren = null;
         EtablissementEntity user = null;
         String msgErr = "Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales";
-        if(param.equals("email")) {
-            mail = emailOrSiren.getString("email");
+        if(userEmailOrSiren.getEmail() != null) {
+            mail = userEmailOrSiren.getEmail();
             log.info("mail = " + mail);
             user = etablissementRepository.getUserByMail(mail);
         }
         else{
-            siren = emailOrSiren.getString("siren");
+            siren = userEmailOrSiren.getSiren();
             user = etablissementRepository.getFirstBySiren(siren);
         }
-        if (param.equals("email") && user==null) {
+        if (userEmailOrSiren.getEmail() != null && user==null) {
             return ResponseEntity
                     .badRequest()
                     .body(msgErr);
-        }else if(param.equals("siren") && user==null){
+        }else if(userEmailOrSiren.getSiren() != null && user==null){
             return ResponseEntity
                     .badRequest()
                     .body(msgErr);
@@ -112,10 +108,9 @@ public class PasswordController {
     }
 
     @PostMapping("/verifTokenValide")
-    public ResponseEntity<?> verifTokenValide(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+    public ResponseEntity<?> verifTokenValide(@Valid @RequestBody PasswordWebDto requestData) {
         log.info("requestDataVerifTokenValid = " + requestData);
-        JSONObject data = new JSONObject(requestData);
-        String jwtToken = data.getString("jwtToken");
+        String jwtToken = requestData.getToken();
         log.info("token = " + jwtToken);
         if(!tokenProvider.validateToken(jwtToken)){
             return ResponseEntity
@@ -131,14 +126,13 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/enregistrerPassword")
-    public ResponseEntity<?> enregistrerPassword(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
+    public ResponseEntity<?> enregistrerPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) {
         log.info("requestData = " + requestData);
-        JSONObject data = new JSONObject(requestData);
-        String recaptcha = data.getString("fr/abes/licencesnationales/recaptcha");
+        String recaptcha = requestData.getRepatcha();
         log.info("fr.abes.licencesnationales.recaptcha = " + recaptcha);
-        String mdp = data.getString("motDePasse");
+        String mdp = requestData.getPassword();
         log.info("mdp = " + mdp);
-        String token = data.getString("token");
+        String token = requestData.getToken();
         log.info("token = " + token);
         String action = "reinitialisationPass";
 
@@ -169,11 +163,11 @@ public class PasswordController {
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping("/updatePassword")
-    public ResponseEntity<?> updatePassword(HttpServletRequest request, @Valid @RequestBody String requestData) throws JSONException {
-        JSONObject data = new JSONObject(requestData);
+    public ResponseEntity<?> updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) {
+
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(request));
-        String oldPassword = data.getString("oldPassword");
-        String newPasswordHash = passwordEncoder.encode(data.getString("newPassword"));
+        String oldPassword = requestData.getOldPassword();
+        String newPasswordHash = passwordEncoder.encode(requestData.getNewPassword());
 
         EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
         ContactEntity c = e.getContact();
