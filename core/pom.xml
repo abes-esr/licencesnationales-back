@@ -3,17 +3,26 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <version>0.0.1-SNAPSHOT</version>
 
     <parent>
+        <artifactId>licencesnationales-backoffice</artifactId>
         <groupId>fr.abes.licencesnationales</groupId>
-        <artifactId>licencesnationales</artifactId>
         <version>0.0.1-SNAPSHOT</version>
     </parent>
 
+    <!-- =========================================================== -->
+    <!--     Description du module                                   -->
+    <!-- =========================================================== -->
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>core</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>Core</name>
+    <description>Coeur metier de l'application.</description>
 
+    <!-- =========================================================== -->
+    <!--     Gestion des dependances                                 -->
+    <!-- =========================================================== -->
     <dependencies>
         <!--- === DAO === -->
         <dependency>
@@ -37,6 +46,7 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
         </dependency>
+
         <!--- === Contrôle des entités === -->
         <dependency>
             <groupId>javax.validation</groupId>
@@ -45,7 +55,6 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-validation</artifactId>
-
         </dependency>
 
         <!--- === Envoi de mail === -->
