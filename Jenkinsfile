@@ -260,7 +260,7 @@ node {
                     // Module web
                     if ("${candidateModules[moduleIndex]}" == 'web') {
                         withCredentials([
-                                string(credentialsId: "url-orpins-${mavenProfile}", variable: 'url'),
+                                string(credentialsId: "url-orpins-${mavenProfil}", variable: 'url'),
                                 string(credentialsId: "LN-username-orpins", variable: 'BDusername'),
                                 string(credentialsId: "LN-password-orpins", variable: 'BDpassword'),
                                 string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
