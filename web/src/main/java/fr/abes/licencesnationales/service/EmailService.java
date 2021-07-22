@@ -4,11 +4,17 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.constant.Constant;
 import fr.abes.licencesnationales.dto.MailDto;
+import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurDTO;
+import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurDTO;
+import fr.abes.licencesnationales.repository.ContactTechniqueEditeurRepository;
+import fr.abes.licencesnationales.repository.EditeurRepository;
 import io.jsonwebtoken.Jwts;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.StringHttpMessageConverter;
@@ -18,51 +24,81 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
+import java.util.Set;
 
 @Component
 @Slf4j
 public class EmailService {
-
+    @Autowired
+    private EditeurRepository editeurRepository;
 
     @Autowired
-    private MessageSource messages;
+    private ContactTechniqueEditeurRepository contactTechniqueEditeurRepository;
+
+    @Autowired
+    private MessageSource messageSource;
 
     @Value("${mail.ws.url}")
     protected String url;
 
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurDTO> c, Set<ContactTechniqueEditeurDTO> t) {
+        log.info("DEBUT checkDoublonMail ");
+        boolean existeMailCommercial = false;
+        boolean existeMailTechnique = false;
+        String mail = "";
+        for (ContactCommercialEditeurDTO contact : c){
+            mail = contact.getMailContactCommercial();
+            log.info("mail = "+ mail);
+            //existeMailCommercial = editeurRepository.findEditeurEntityByContactCommercialEditeurEntitiesContains(mail)!= null;
+            existeMailCommercial = editeurRepository.existeMail(mail);
+        }
+        for (ContactCommercialEditeurDTO contact : c){
+            mail = contact.getMailContactCommercial();
+            log.info("mail = "+ mail);
+            //existeMailTechnique = editeurRepository.findEditeurEntityByContactTechniqueEditeurEntitiesContains(mail)!= null;
+            contactTechniqueEditeurRepository.existeMail(mail);
+        }
+        log.info("existeMailCommercial = "+ existeMailCommercial);
+        log.info("existeMailTechnique = "+ existeMailTechnique);
+        if (existeMailCommercial || existeMailTechnique) {
+            return true;
+        }
+        else return false;
+    }
+
     public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab){
-        String message = messages.getMessage("message.CreationCompteAdmin", null, locale);
+        String message = messageSource.getMessage("message.CreationCompteAdmin", null, locale);
         message +=nomEtab + " avec le siren " + siren;
-        String jsonRequestConstruct = mailToJSON(emailUser,  messages.getMessage("message.NouveauCompteCree",null,locale), message);
+        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
         sendMail(jsonRequestConstruct);
     }
 
     public void constructCreationCompteEmailUser(Locale locale, String emailUser){
-        String message = messages.getMessage("message.CreationCompteUser", null, locale);
-        String jsonRequestConstruct = mailToJSON(emailUser, messages.getMessage("message.NouveauCompteCree",null,locale), message);
+        String message = messageSource.getMessage("message.CreationCompteUser", null, locale);
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
         sendMail(jsonRequestConstruct);
     }
 
     public void constructResetTokenEmail(String contextPath, Locale locale, String token, String emailUser, String nomEtab) {
         final String url = contextPath + "/reinitialisationPass?token=" + token; //test
-        String objetMsg = messages.getMessage("message.resetTokenEmailObjet",null, locale);
-        String message = messages.getMessage("message.resetTokenEmailDebut",null, locale);
+        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
+        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
         message +=nomEtab + " ";
-        message += messages.getMessage("message.resetTokenEmailMilieu", null, locale);
+        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, locale);
         message += " \r\n" + url;
-        message += " \r\n" + messages.getMessage("message.resetTokenEmailFin", null, locale);
+        message += " \r\n" + messageSource.getMessage("message.resetTokenEmailFin", null, locale);
         String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message);
         sendMail(jsonRequestConstruct);
     }
 
     public void constructValidationNewPassEmail(Locale locale, String emailUser){
-        final String message = messages.getMessage("message.validationNewPass", null, locale);
+        final String message = messageSource.getMessage("message.validationNewPass", null, locale);
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message);
         sendMail(jsonRequestConstruct);
     }
 
     public void constructAccesModifieEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
-        String message = messages.getMessage("message.modificationAcces", null, locale);
+        String message = messageSource.getMessage("message.modificationAcces", null, locale);
         message += "\r\n" + descriptionAcces;
         message += "\r\n Commentaires liés à la modification de l'accès : " + commentaires;
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Modification Acces", message);
@@ -70,7 +106,7 @@ public class EmailService {
     }
 
     public void constructAccesCreeEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser){
-        String message = messages.getMessage("message.creationAcces", null, locale);
+        String message = messageSource.getMessage("message.creationAcces", null, locale);
         message += "\r\n" + descriptionAcces;
         message += "\r\n Commentaires liés à la création de l'accès : " + commentaires;
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Creation Acces", message);
@@ -100,7 +136,7 @@ public class EmailService {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        org.springframework.http.HttpEntity<String> entity = new org.springframework.http.HttpEntity<>(requestJson, headers);
+        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
 
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));

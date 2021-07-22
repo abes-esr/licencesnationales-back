@@ -140,4 +140,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         log.error(ex.getCause().getLocalizedMessage());
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
+
+    /**
+     * Si on ajoute un éditeur dont le mail existe déjà
+     */
+    @ExceptionHandler(MailDoublonException.class)
+    protected ResponseEntity<Object> handleMailDoublonException(MailDoublonException ex) {
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getCause()));
+    }
 }
