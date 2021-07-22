@@ -210,19 +210,19 @@ node {
           newconfig = newconfig.replaceAll("spring.jpa.properties.hibernate.dialect=*", "spring.jpa.properties.hibernate.dialect=${dialect}")
         }
         withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-site", variable: 'googleRecaptchaKey')
+          string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-site", variable: 'googleRecaptchaKey')
         ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.site=*", "google.recaptcha.key.site=${googleRecaptchaKey}")
+          newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.site=*", "google.fr.abes.licencesnationales.recaptcha.key.site=${googleRecaptchaKey}")
         }
         withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-secret", variable: 'googleRecaptchaSecret')
+          string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-secret", variable: 'googleRecaptchaSecret')
         ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.secret=*", "google.recaptcha.key.secret=${googleRecaptchaSecret}")
+          newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.secret=*", "google.fr.abes.licencesnationales.recaptcha.key.secret=${googleRecaptchaSecret}")
         }
         withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
+          string(credentialsId: "LN-google-fr.abes.licencesnationales.recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
         ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.threshold=*", "google.recaptcha.key.threshold=${googleRecaptchaThreshold}")
+          newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.threshold=*", "google.fr.abes.licencesnationales.recaptcha.key.threshold=${googleRecaptchaThreshold}")
         }
         withCredentials([
           string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin')

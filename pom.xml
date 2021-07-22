@@ -8,58 +8,86 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>fr.abes</groupId>
+        <artifactId>abes-spring</artifactId>
+        <version>1.0.7</version>
     </parent>
 
+    <!-- =========================================================== -->
+    <!--     Description des modules                                 -->
+    <!-- =========================================================== -->
+    <modules>
+        <module>batch</module>
+        <module>core</module>
+        <module>web</module>
+    </modules>
+
+    <!-- ===================================================== -->
+    <!--     Proprietes du projet                              -->
+    <!-- ===================================================== -->
     <properties>
-        <java.version>11</java.version>
+        <finalName>licencesnationales-${project.artifactId}-${project.version}</finalName>
+        <warName>licencesnationales</warName>
+        <webBaseDir>./target/</webBaseDir>
+        <batchBaseDir>./target/</batchBaseDir>
     </properties>
 
-    <packaging>war</packaging>
+    <packaging>pom</packaging>
+
+    <!-- =========================================================== -->
+    <!--     Profile                                                 -->
+    <!-- =========================================================== -->
+    <profiles>
+        <profile>
+            <id>localhost</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>localhost</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
     <!-- ===================================================== -->
     <!--     Description du projet                             -->
     <!-- ===================================================== -->
 
-    <groupId>fr.abes</groupId>
-    <artifactId>lnevent</artifactId>
+    <groupId>fr.abes.licencesnationales</groupId>
+    <artifactId>licencesnationales</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>lnevent</name>
+    <name>licencesnationales</name>
     <description>Demo LN Event base</description>
-
-
 
     <!-- =========================================================== -->
     <!--     Gestion des dependances                                 -->
     <!-- =========================================================== -->
 
     <dependencies>
-
-
-        <!-- === Spring web === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-starter-logging</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-
         <!-- === Configuring the Annotation Processor === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
-
-
 
         <!-- === Log === -->
         <!--spring secu starter contient déjà log4j ce qui fait un conflit si on garde les lignes ci-dessous
@@ -70,51 +98,10 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <!--- === DAO === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!--- === bdd === -->
-        <dependency>
-            <groupId>oracle.ojdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>12.1.0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>oracle.ojdbc</groupId>
-            <artifactId>xdb6</artifactId>
-            <version>12.1.0.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <!--- === Contrôle des entités === -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-
-        </dependency>
-
-        <!--- === Envoi de mail === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
 
         <!--- === Annotations === -->
@@ -124,66 +111,25 @@
             <optional>true</optional>
         </dependency>
 
-        <!--- === Csv pour bdd === -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-csv</artifactId>
-            <version>2.5.3</version>
-        </dependency>
-
-        <!--- === Tests === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-
-        <!--- === Securite === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
-        </dependency>
-
-
-        <!--- === Documentation API === -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
     </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>abes</id>
+            <url>${url.doc.abes}doc${doc.root.path}/${doc.root.path}-${project.version}</url>
+        </site>
+    </distributionManagement>
 
     <!-- =========================================================== -->
     <!--     Librairies ABES                        -->
     <!-- =========================================================== -->
+
 
     <repositories>
         <repository>
             <id>artifactory-public</id>
             <name>artifactory-public</name>
             <url>https://artifactory.abes.fr/artifactory/maven-public/</url>
-        </repository>
-        <repository>
-            <id>artifactory-public-ext</id>
-            <name>artifactory-public-ext</name>
-            <url>https://artifactory.abes.fr/artifactory/ext-release-local/</url>
         </repository>
     </repositories>
 
@@ -200,7 +146,7 @@
     <!-- =========================================================== -->
 
     <build>
-        <finalName>licencesnationales</finalName>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
