@@ -54,7 +54,7 @@ public class EditeurController {
 
     @PostMapping("/creationEditeur")
     @PreAuthorize("hasAuthority('admin')")
-    public EventEntity creationEditeur(HttpServletRequest request, @Valid @RequestBody EditeurCreeDTO editeurCreeDTO) throws MailDoublonException {
+    public EventEntity creationEditeur(@Valid @RequestBody EditeurCreeDTO editeurCreeDTO) throws MailDoublonException {
         log.info("DEBUT creationEditeur ");
         //verifier que le mail du contact n'est pas déjà en base
         boolean existeMail = emailService.checkDoublonMail(editeurCreeDTO.getListeContactCommercialEditeurDTO(),editeurCreeDTO.getListeContactTechniqueEditeurDTO());

@@ -26,7 +26,7 @@ public class ResetService {
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public String resetEtablissement() {
+    public void resetEtablissement() {
         etablissementRepository.deleteAll();
         for (EventEntity eventEntity :
                 eventRepository.findAll()) {
@@ -73,6 +73,5 @@ public class ResetService {
                     break;
             }
         }
-        return "done";
     }
 }

@@ -11,8 +11,7 @@ import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.event.etablissement.*;
-import fr.abes.licencesnationales.exception.AccesInterditException;
-import fr.abes.licencesnationales.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.exception.*;
 import fr.abes.licencesnationales.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.repository.ContactRepository;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
@@ -29,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -83,53 +81,29 @@ public class EtablissementController {
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
-
-
     @PostMapping("/creationCompte")
-    public ResponseEntity<?> creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) {
-        log.debug("eventDto = " + eventDTO.toString());
-        log.debug("NomEtab = " + eventDTO.getNom());
-        log.debug("siren = " + eventDTO.getSiren());
-        log.debug("TypeEtablissement = " + eventDTO.getTypeEtablissement());
-        log.debug("NomContact = " + eventDTO.getNomContact());
-        log.debug("PrenomContact = " + eventDTO.getPrenomContact());
-        log.debug("AdresseContact = " + eventDTO.getAdresseContact());
-        log.debug("BPContact = " + eventDTO.getBoitePostaleContact());
-        log.debug("CodePostalContact = " + eventDTO.getCodePostalContact());
-        log.debug("VilleContact = " + eventDTO.getVilleContact());
-        log.debug("CedexContact = " + eventDTO.getCedexContact());
-        log.debug("TelephoneContact = " + eventDTO.getTelephoneContact());
-        log.debug("MailContact = " + eventDTO.getMailContact());
-        log.debug("mdp = " + eventDTO.getMotDePasse());
-        log.debug("recaptcharesponse = " + eventDTO.getRecaptcha());
-
+    public EventEntity creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException {
         String recaptcharesponse = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
         //verifier la réponse fr.abes.licencesnationales.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcharesponse, action);
         if(!reCaptchaResponse.isSuccess()){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
+            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
 
         //verifier que le siren n'est pas déjà en base
         boolean existeSiren = etablissementRepository.existeSiren(eventDTO.getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Cet établissement existe déjà.");
+            throw new SirenExistException("Cet établissement existe déjà.");
         }
         //verifier que le mail du contact n'est pas déjà en base
         //boolean existeMail = etablissementRepository.findEtablissementEntityByContactContains(eventDTO.getMailContact()));
         boolean existeMail = contactRepository.findContactEntityByMail(eventDTO.getMailContact())!=null;
         log.info("existeMail = "+ existeMail);
         if (existeMail) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+            throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
         else{
@@ -143,25 +117,17 @@ public class EtablissementController {
                     new EtablissementCreeEvent(this,
                             eventDTO);
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
-            eventRepository.save(new EventEntity(etablissementCreeEvent));
+            EventEntity event = eventRepository.save(new EventEntity(etablissementCreeEvent));
             String emailUser = eventDTO.getMailContact();
             emailService.constructCreationCompteEmailUser( request.getLocale(), emailUser);
             emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getSiren(), eventDTO.getNom());
-            return ResponseEntity.ok("Creation du compte effectuée.");}
+            return event;
+        }
     }
 
-   /* public String add(@RequestBody EtablissementCreeDTO eventDTO) {
-        EtablissementCreeEvent etablissementCreeEvent =
-                new EtablissementCreeEvent(this,
-                        eventDTO);
-        applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        eventRepository.save(new EventEntity(etablissementCreeEvent));
-
-        return "done";
-    }*/
 
     @PostMapping(value = "/modification")
-    public String edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException {
+    public EventEntity edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
@@ -176,49 +142,30 @@ public class EtablissementController {
                         eventDTO.getVilleContact(),
                         eventDTO.getCedexContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
-        eventRepository.save(new EventEntity(etablissementModifieEvent));
-
-        return "done";
+        return eventRepository.save(new EventEntity(etablissementModifieEvent));
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<String> fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
-        try{
+    public EventEntity fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        eventRepository.save(new EventEntity(etablissementFusionneEvent));
-        return ResponseEntity.ok("Fusion effectuée.");
-
-        } catch(Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Erreur lors de la fusion. Veuillez vérifier les SIREN et les informations renseignées.");
-        }
-
+        return eventRepository.save(new EventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<String> division(@RequestBody EtablissementDiviseDTO eventDTO) {
-        try{
+    public EventEntity division(@RequestBody EtablissementDiviseDTO eventDTO) {
         EtablissementDiviseEvent etablissementDiviseEvent
                 = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        eventRepository.save(new EventEntity(etablissementDiviseEvent));
-        return ResponseEntity.ok("Scission effectuée.");
-
-        } catch(Exception e) {
-            return ResponseEntity
-                    .badRequest()
-                    .body("Erreur lors de la scission. Veuillez vérifier les SIREN et les informations renseignées");
-        }
+        return eventRepository.save(new EventEntity(etablissementDiviseEvent));
     }
 
-    @PostMapping(value = "/suppression/{siren}")
+    @DeleteMapping(value = "/suppression/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public String suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
+    public EventEntity suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
         //envoi du mail de suppression
         EtablissementEntity etab = etablissementRepository.getFirstBySiren(siren);
         UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
@@ -229,29 +176,27 @@ public class EtablissementController {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        eventRepository.save(new EventEntity(etablissementSupprimeEvent));
-
-        return "done";
+        return eventRepository.save(new EventEntity(etablissementSupprimeEvent));
     }
 
     @GetMapping(value = "/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public EtablissementEntity get(@PathVariable String siren) {
-        return etablissementRepository.getFirstBySiren(siren);
+    public EtablissementWebDto get(@PathVariable String siren) {
+        return mapper.map(etablissementRepository.getFirstBySiren(siren), EtablissementWebDto.class);
     }
 
     @PostMapping(value = "/getDerniereDateModificationIp/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public String getDerniereDateModificationIp(@PathVariable String siren) {
+    public String getDerniereDateModificationIp(@PathVariable String siren) throws DateException {
         log.info("debut getDerniereDateModificationIp");
         log.info("siren = " + siren);
         String res = "";
 
         try{
-            ArrayList<String> listDateModifIp = new ArrayList<>();//etablissementRepository.findDateModificationBySiren(siren);
+            ArrayList<String> listDateModifIp = new ArrayList<>();
             Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
             for(IpEntity i:listeIpsEtab) {
-                Date dateModif = null;
+                Date dateModif;
                 if(i.getDateModification()!=null && (!i.getDateModification().equals(""))){
                     dateModif=i.getDateModification();
                     listDateModifIp.add(dateModif.toString());
@@ -266,24 +211,21 @@ public class EtablissementController {
                 log.info("dtaModif = " + listDateModifCourtes.get(0));
                 log.info("dtaModif = " + listDateModifCourtes.get(listDateModifCourtes.size() - 1));
                 res = listDateModifCourtes.get(listDateModifCourtes.size() - 1);
-                for (String date : listDateModifCourtes) log.info(date);
-                return res;
-            }else return res;
-        } catch(Exception e) {
-            res = "Erreur lors de la recupération de la dernière date de modification : " + e;
+            }
             return res;
+        } catch(Exception e) {
+            throw new DateException("Erreur lors de la recupération de la dernière date de modification : " + e);
         }
     }
 
     @GetMapping(value = "/getInfoEtab")
-    public EtablissementEntity getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
-        return etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+    public EtablissementWebDto getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
+        return mapper.map(etablissementRepository.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()), EtablissementWebDto.class);
     }
 
     @GetMapping(value = "/getListEtab")
     @PreAuthorize("hasAuthority('admin')")
     public List<EtablissementWebDto> getListEtab() {
-
         List<EtablissementEntity> liste = etablissementRepository.findAll();
         return mapper.mapList(liste, EtablissementWebDto.class);
 
