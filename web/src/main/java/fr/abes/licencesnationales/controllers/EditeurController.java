@@ -15,14 +15,13 @@ import fr.abes.licencesnationales.repository.ContactCommercialEditeurRepository;
 import fr.abes.licencesnationales.repository.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.repository.EditeurRepository;
 import fr.abes.licencesnationales.repository.EventRepository;
-import fr.abes.licencesnationales.service.EmailService;
+import fr.abes.licencesnationales.services.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
 
