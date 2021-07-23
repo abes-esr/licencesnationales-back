@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.dto.etablissement;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.Email;
@@ -9,6 +10,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
+@NoArgsConstructor
 @Getter @Setter
 @AllArgsConstructor
 public class EtablissementDTO {

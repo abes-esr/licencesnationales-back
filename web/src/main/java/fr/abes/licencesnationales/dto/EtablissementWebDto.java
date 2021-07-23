@@ -21,7 +21,7 @@ public class EtablissementWebDto {
     @JsonProperty("siren")
     private String siren;
 
-    @JsonProperty("id")
+    @JsonProperty("typeEtablissement")
     private String typeEtablissement;
 
     @JsonProperty("statut")
