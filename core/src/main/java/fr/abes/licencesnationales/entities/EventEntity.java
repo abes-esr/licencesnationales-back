@@ -26,6 +26,92 @@ import java.util.Set;
 @Table(name = "Event")
 @NoArgsConstructor
 public class EventEntity {
+    @Id
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "event_Sequence")
+    @SequenceGenerator(name = "event_Sequence", sequenceName = "EVENT_SEQ", allocationSize = 1)
+    public Long id;
+
+    public Date dateCreationEvent;
+
+    public String event;
+
+    public String nomEtab;
+
+    public String adresse;
+
+    public String typeEtablissement;
+
+    public String motDePasse;
+
+    public String idAbes;
+
+    public String mailContact;
+
+    public String nomContact;
+
+    public String prenomContact;
+
+    public String telephoneContact;
+
+    public String adresseContact;
+
+    public String boitePostaleContact;
+
+    public String codePostalContact;
+
+    public String cedexContact;
+
+    public String villeContact;
+
+    public String roleContact;
+
+    public String ancienNomEtab;
+
+    @Lob
+    @Convert(converter = EtablissementDTOConverter.class)
+    public EtablissementDTO etablissementDTOFusion;
+
+    @Lob
+    @Convert(converter = ListEtablissementDTOConverter.class)
+    public List<EtablissementDTO> etablisementsDivise;
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public List<String> etablissementsFusionne;
+
+    public String ip;
+
+    public String siren;
+
+    public String nomEditeur;
+
+    public String identifiantEditeur;
+
+    public String adresseEditeur;
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public List<String> groupesEtabRelies = new ArrayList<>();
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public Set<ContactCommercialEditeurDTO> listeContactCommercialEditeurDTO;
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    public Set<ContactTechniqueEditeurDTO> listeContactTechniqueEditeurDTO;
+
+    /*@Lob
+    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
+    private List<String> mailPourBatchEditeur;
+
+    @Lob
+    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
+    private List<String> mailPourInformationEditeur;*/
+
+    @Lob
+    @Convert(converter = JpaConverterJson.class)
+    private List<Long> idEditeurFusionnes;
 
 
 
@@ -164,92 +250,6 @@ public class EventEntity {
         this.motDePasse = updatePasswordEvent.getNewpasswordHash();
     }
 
-    @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "event_Sequence")
-    @SequenceGenerator(name = "event_Sequence", sequenceName = "EVENT_SEQ", allocationSize = 1)
-    public Long id;
-
-    public Date dateCreationEvent;
-
-    public String event;
-
-    public String nomEtab;
-
-    public String adresse;
-
-    public String typeEtablissement;
-
-    public String motDePasse;
-
-    public String idAbes;
-
-    public String mailContact;
-
-    public String nomContact;
-
-    public String prenomContact;
-
-    public String telephoneContact;
-
-    public String adresseContact;
-
-    public String boitePostaleContact;
-
-    public String codePostalContact;
-
-    public String cedexContact;
-
-    public String villeContact;
-
-    public String roleContact;
-
-    public String ancienNomEtab;
-
-    @Lob
-    @Convert(converter = EtablissementDTOConverter.class)
-    public EtablissementDTO etablissementDTOFusion;
-
-    @Lob
-    @Convert(converter = ListEtablissementDTOConverter.class)
-    public List<EtablissementDTO> etablisementsDivise;
-
-    @Lob
-    @Convert(converter = JpaConverterJson.class)
-    public List<String> etablissementsFusionne;
-
-    public String ip;
-
-    public String siren;
-
-    public String nomEditeur;
-
-    public String identifiantEditeur;
-
-    public String adresseEditeur;
-
-    @Lob
-    @Convert(converter = JpaConverterJson.class)
-    public List<String> groupesEtabRelies = new ArrayList<>();
-
-    @Lob
-    @Convert(converter = JpaConverterJson.class)
-    public Set<ContactCommercialEditeurDTO> listeContactCommercialEditeurDTO;
-
-    @Lob
-    @Convert(converter = JpaConverterJson.class)
-    public Set<ContactTechniqueEditeurDTO> listeContactTechniqueEditeurDTO;
-
-    /*@Lob
-    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
-    private List<String> mailPourBatchEditeur;
-
-    @Lob
-    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
-    private List<String> mailPourInformationEditeur;*/
-
-    @Lob
-    @Convert(converter = JpaConverterJson.class)
-    private List<Long> idEditeurFusionnes;
 
 
 }
