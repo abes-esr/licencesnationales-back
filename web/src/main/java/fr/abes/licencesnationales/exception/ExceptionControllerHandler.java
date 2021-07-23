@@ -142,10 +142,15 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     }
 
     /**
-     * Si on ajoute un éditeur dont le mail existe déjà
+     * Erreur dans la validation du captcha / Etablissement déjà existant
+     * / mail déjà existant / récupération dernière date de modification / IP
+     * @param ex
+     * @return
      */
-    @ExceptionHandler(MailDoublonException.class)
-    protected ResponseEntity<Object> handleMailDoublonException(MailDoublonException ex) {
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class})
+    protected ResponseEntity<Object> handleCaptchaException(CaptchaException ex) {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getCause()));
     }
+
+
 }

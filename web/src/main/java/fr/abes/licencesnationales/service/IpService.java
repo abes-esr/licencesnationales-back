@@ -6,12 +6,12 @@ import fr.abes.licencesnationales.dto.ip.IpAjouteeDTO;
 import fr.abes.licencesnationales.dto.ip.IpContains;
 import fr.abes.licencesnationales.dto.ip.IpModifieeDTO;
 import fr.abes.licencesnationales.entities.IpEntity;
+import fr.abes.licencesnationales.exception.IpException;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.repository.IpRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -77,29 +77,28 @@ public class IpService {
         return isAccesExistInList(acces, ipRepository.findAll());
     }
 
-    public ResponseEntity<?> checkDoublonIpAjouteeDto(IpAjouteeDTO ipAjouteeDTO) {
+    public void checkDoublonIpAjouteeDto(IpAjouteeDTO ipAjouteeDTO) throws IpException {
         log.info("DEBUT checkDoublonIpAjouteeDto ");
-        String ip = ipAjouteeDTO.getIp();
         IpEntity ipEntity = new IpEntity();
         ipEntity.setIp(ipAjouteeDTO.getIp());
         ipEntity.setTypeAcces(ipAjouteeDTO.getTypeAcces());
         ipEntity.setTypeIp(ipAjouteeDTO.getTypeIp());
-        return checkDoublonIp(ipEntity);
+        checkDoublonIp(ipEntity);
     }
 
-    public ResponseEntity<?> checkDoublonIpModifieeDto(IpModifieeDTO ipModifieeDTO) {
+    public void checkDoublonIpModifieeDto(IpModifieeDTO ipModifieeDTO) throws IpException {
         log.info("DEBUT checkDoublonIpModifieeDto ");
         String ip = ipModifieeDTO.getIp();
         IpEntity ipEntity = new IpEntity();
         ipEntity.setIp(ipModifieeDTO.getIp());
         ipEntity.setTypeAcces(ipModifieeDTO.getTypeAcces());
         ipEntity.setTypeIp(ipModifieeDTO.getTypeIp());
-        return checkDoublonIp(ipEntity);
+        checkDoublonIp(ipEntity);
     }
 
-    public ResponseEntity<?> checkDoublonIp(IpEntity ipEntity) {
-        ResponseEntity responseEntity = new ResponseEntity("Contrôle doublon ip/plage ok",HttpStatus.OK);
+    public void checkDoublonIp(IpEntity ipEntity) throws IpException {
         log.info("DEBUT checkDoublonIp");
+        List<String> erreursList = new ArrayList<>();
         List<IpEntity> accesList = new ArrayList<>(); //une liste vide
         List<IpContains> listIpContains = new ArrayList<>();
         List<List<IpContains>> listAllIpContains = new ArrayList<>();
@@ -119,8 +118,6 @@ public class IpService {
         accesList.add(ipEntity);
         if (!listAllIpContains.isEmpty()) {
             String erreurMsg = "";
-            List<String> erreursList = new ArrayList<>();
-
             for (List<IpContains> listIpsContains : listAllIpContains) {
                 for (IpContains ipContains : listIpsContains) {
                     String nomEtab = "";
@@ -130,72 +127,49 @@ public class IpService {
                     catch (Exception e){
                         log.error("Bdd : données incohérentes sur table Etablissement_ips => nomEtab = " + nomEtab);
                     }
-                    //String nomEtab = etablissementRepository.findEtablissementEntityByIpsContains(ipContains.getDBAcces()).getName();
                     erreurMsg = ((ipContains.getErreurAcces().getTypeAcces().equals("ip")) ? "L'adresse IP" : "La plage d'adresses IP") + " '" + ipContains.getErreurAcces().getIp() + "' ";
-                    log.info("erreurMsg = " + erreurMsg);
-                    responseEntity = badRequest(erreurMsg);
+                    erreursList.add(erreurMsg);
                     // Si c'est une IP réservée
                     if (ipContains.getContains() == Constant.IP_RESERVED) {
-                        erreurMsg = erreurMsg + "est une adresse réservée.";
-                        log.info("erreurMsg2 = " + erreurMsg);
-                        responseEntity = badRequest(erreurMsg);
+                        erreursList.add("est une adresse réservée.");
                     } // détermine si l'adresse à déjà été enregistré dans la BDD ou non.
                     else if (ipContains.getDBAcces().getDateCreation() != null) {
                         switch (ipContains.getContains()) {
                             case Constant.IP_SAME:
-                                erreurMsg = erreurMsg + "est déjà déclarée par l'établissement " + nomEtab;
-                                log.info("erreurMsg3 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("est déjà déclarée par l'établissement " + nomEtab);
                                 break;
                             case Constant.IP_CONTAINED:
-                                erreurMsg = erreurMsg + "est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab;
-                                log.info("erreurMsg4 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab);
                                 break;
                             case Constant.IP_CONTAINS:
-                                erreurMsg = erreurMsg + "contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '" + ipContains.getDBAcces().getIp() + "' de l'établissement " + nomEtab;
-                                log.info("erreurMsg5 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '" + ipContains.getDBAcces().getIp() + "' de l'établissement " + nomEtab);
                                 break;
                             case Constant.IP_CROSS:
-                                erreurMsg = erreurMsg + "chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab;
-                                log.info("erreurMsg6 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' de l'établissement  " + nomEtab);
                                 break;
                         }
                     } else {
                         switch (ipContains.getContains()) {
                             case Constant.IP_SAME:
-                                erreurMsg = erreurMsg + "est déjà présente dans votre demande de test en cours.";
-                                log.info("erreurMsg7 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("est déjà présente dans votre demande de test en cours.");
                                 break;
                             case Constant.IP_CONTAINED:
-                                erreurMsg = erreurMsg + "est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.";
-                                log.info("erreurMsg8 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("est contenu dans la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.");
                                 break;
                             case Constant.IP_CONTAINS:
-                                erreurMsg = erreurMsg + "contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.";
-                                log.info("erreurMsg9 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("contient " + ((ipContains.getDBAcces().getTypeAcces().equals("ip")) ? " l'adresse IP" : "la plage d'adresses IP") + " '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.");
                                 break;
                             case Constant.IP_CROSS:
-                                erreurMsg = erreurMsg + "chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.";
-                                log.info("erreurMsg10 = " + erreurMsg);
-                                responseEntity = badRequest(erreurMsg);
+                                erreursList.add("chevauche la plage d'adresse '" + ipContains.getDBAcces().getIp() + "' présente dans votre demande de test en cours.");
                                 break;
                         }
                     }
                 }
             }
         }
-        log.info("ResponseEntity =" + responseEntity.toString());
-        return responseEntity;
+        if (!erreursList.isEmpty()) {
+            throw new IpException(StringUtils.joinWith("\n", erreursList));
+        }
     }
-    public ResponseEntity<?> badRequest(String msgError) {
-        return ResponseEntity
-                .badRequest()
-                .body(msgError);
-    }
+
 }
