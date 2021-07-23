@@ -30,4 +30,7 @@ public class EtablissementWebDto {
     @JsonProperty("idAbes")
     private String idAbes;
 
+    @JsonProperty("contact")
+    private ContactWebDto contact;
+
 }

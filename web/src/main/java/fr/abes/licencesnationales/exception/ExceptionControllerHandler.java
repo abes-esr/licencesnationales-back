@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -144,10 +146,11 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP
+     * / Envoi de mail
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class})
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, RestClientException.class, AuthenticationCredentialsNotFoundException.class})
     protected ResponseEntity<Object> handleCaptchaException(CaptchaException ex) {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getCause()));
     }
