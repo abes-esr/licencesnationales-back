@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.event.password.UpdatePasswordEvent;
+import fr.abes.licencesnationales.exception.CaptchaException;
 import fr.abes.licencesnationales.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.repository.ContactRepository;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
@@ -14,21 +15,25 @@ import fr.abes.licencesnationales.security.exception.DonneeIncoherenteBddExcepti
 import fr.abes.licencesnationales.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsServiceImpl;
-import fr.abes.licencesnationales.service.EmailService;
+import fr.abes.licencesnationales.services.EmailService;
 import fr.abes.licencesnationales.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-
 
 
 @Slf4j
@@ -60,6 +65,9 @@ public class PasswordController {
 
     private String emailUser;
 
+    @Value("${site.url}")
+    private String urlSite;
+
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
@@ -70,55 +78,44 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/resetPassword")
-    public ResponseEntity<?> resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto userEmailOrSiren) throws DonneeIncoherenteBddException {
+    public void resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto userEmailOrSiren) throws DonneeIncoherenteBddException, RestClientException {
 
         log.info("userEmailOrSiren = " + userEmailOrSiren);
         String mail = null;
         String siren = null;
         EtablissementEntity user = null;
         String msgErr = "Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales";
-        if(userEmailOrSiren.getEmail() != null) {
+        if (userEmailOrSiren.getEmail() != null) {
             mail = userEmailOrSiren.getEmail();
             log.info("mail = " + mail);
             user = etablissementRepository.getUserByMail(mail);
-        }
-        else{
+        } else {
             siren = userEmailOrSiren.getSiren();
             user = etablissementRepository.getFirstBySiren(siren);
         }
-        if (userEmailOrSiren.getEmail() != null && user==null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(msgErr);
-        }else if(userEmailOrSiren.getSiren() != null && user==null){
-            return ResponseEntity
-                    .badRequest()
-                    .body(msgErr);
+        if (userEmailOrSiren.getEmail() != null && user == null) {
+            throw new AuthenticationCredentialsNotFoundException(msgErr);
+        } else if (userEmailOrSiren.getSiren() != null && user == null) {
+            throw new AuthenticationCredentialsNotFoundException(msgErr);
         }
         userDetails = new UserDetailsServiceImpl().loadUser(user);
 
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
-        String url = emailService.getAppUrl(request);
         emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        emailService.constructResetTokenEmail(url,
+        emailService.constructResetTokenEmail(urlSite,
                 request.getLocale(), jwt, emailUser, nomEtab);
-
-        return ResponseEntity.ok("Nous venons de vous envoyer un mail de réinitialisation de mot de passe.");
     }
 
     @PostMapping("/verifTokenValide")
-    public ResponseEntity<?> verifTokenValide(@Valid @RequestBody PasswordWebDto requestData) {
+    public boolean verifTokenValide(@Valid @RequestBody PasswordWebDto requestData) {
         log.info("requestDataVerifTokenValid = " + requestData);
         String jwtToken = requestData.getToken();
         log.info("token = " + jwtToken);
-        if(!tokenProvider.validateToken(jwtToken)){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Token invalide" );
-        }
-        else{
-            return ResponseEntity.ok("Token valide");
+        if (!tokenProvider.validateToken(jwtToken)) {
+            return false;
+        } else {
+            return true;
         }
     }
 
@@ -126,39 +123,29 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/enregistrerPassword")
-    public ResponseEntity<?> enregistrerPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) {
-        log.info("requestData = " + requestData);
+    public void enregistrerPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) throws RestClientException, CaptchaException {
         String recaptcha = requestData.getRepatcha();
-        log.info("fr.abes.licencesnationales.recaptcha = " + recaptcha);
         String mdp = requestData.getPassword();
-        log.info("mdp = " + mdp);
         String token = requestData.getToken();
-        log.info("token = " + token);
         String action = "reinitialisationPass";
 
         //verifier la réponse fr.abes.licencesnationales.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcha, action);
-        if(!reCaptchaResponse.isSuccess()){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Erreur ReCaptcha : " +  reCaptchaResponse.getErrors());
+        if (!reCaptchaResponse.isSuccess()) {
+            throw new CaptchaException(StringUtils.joinWith("\n", reCaptchaResponse.getErrors()));
         }
-        if(!tokenProvider.validateToken(token)){
-            return ResponseEntity
-                    .badRequest()
-                    .body("Token invalide" );
+        if (tokenProvider.validateToken(token)) {
+            String siren = tokenProvider.getSirenFromJwtToken(token);
+            log.info("siren = " + siren);
+            String mdphash = passwordEncoder.encode(mdp);
+            log.info("mdphash = " + mdp);
+            EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
+            ContactEntity c = e.getContact();
+            c.setMotDePasse(mdphash);
+            contactRepository.save(c);
+            emailUser = c.getMail();
+            emailService.constructValidationNewPassEmail(request.getLocale(), emailUser);
         }
-        String siren = tokenProvider.getSirenFromJwtToken(token);
-        log.info("siren = " + siren);
-        String mdphash = passwordEncoder.encode(mdp);
-        log.info("mdphash = " + mdp);
-        EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
-        ContactEntity c = e.getContact();
-        c.setMotDePasse(mdphash);
-        contactRepository.save(c);
-        emailUser = c.getMail();
-        emailService.constructValidationNewPassEmail( request.getLocale(), emailUser);
-        return ResponseEntity.ok("Votre mot de passe a bien été réinitialisé. Nous venons de vous envoyer un mail de confirmation de réinitialisation de mot de passe.");
     }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")

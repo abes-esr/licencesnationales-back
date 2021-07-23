@@ -29,7 +29,17 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
-
+        <!-- WEB -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
         <!--- === bdd === -->
         <dependency>
             <groupId>oracle.ojdbc</groupId>
@@ -57,10 +67,11 @@
             <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
 
-        <!--- === Envoi de mail === -->
+        <!-- Utilitaires traitements chaines de caractères -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.9</version>
         </dependency>
 
         <!--- === Csv pour bdd === -->

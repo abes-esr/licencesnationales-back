@@ -15,14 +15,15 @@ import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.repository.EventRepository;
 import fr.abes.licencesnationales.repository.IpRepository;
 import fr.abes.licencesnationales.security.services.FiltrerAccesServices;
-import fr.abes.licencesnationales.service.EmailService;
-import fr.abes.licencesnationales.service.IpService;
+import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.IpService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 
 import javax.validation.Valid;
 import java.util.Locale;
@@ -55,8 +56,6 @@ public class IpController {
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
-
-    private String demandeOk = "Votre demande a été prise en compte.";
 
 
     @PostMapping(value = "/ajoutIpV4")
@@ -103,7 +102,7 @@ public class IpController {
         traiterAjoutIp(event, event.getSiren());
     }
 
-    public void traiterAjoutIp(IpAjouteeDTO event, String siren) throws IpException {
+    public void traiterAjoutIp(IpAjouteeDTO event, String siren) throws IpException, RestClientException {
         ipService.checkDoublonIpAjouteeDto(event);
 
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
@@ -167,7 +166,7 @@ public class IpController {
         traiterModifIp(event, event.getSiren());
     }
 
-    public void traiterModifIp(IpModifieeDTO ipModifieeDTO, String siren) throws IpException {
+    public void traiterModifIp(IpModifieeDTO ipModifieeDTO, String siren) throws IpException, RestClientException {
         ipService.checkDoublonIpModifieeDto(ipModifieeDTO);
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
                 siren,

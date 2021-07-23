@@ -21,7 +21,7 @@ import fr.abes.licencesnationales.security.exception.DonneeIncoherenteBddExcepti
 import fr.abes.licencesnationales.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsServiceImpl;
-import fr.abes.licencesnationales.service.EmailService;
+import fr.abes.licencesnationales.services.EmailService;
 import fr.abes.licencesnationales.service.ReCaptchaService;
 import fr.abes.licencesnationales.services.GenererIdAbes;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +32,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -82,7 +83,7 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public EventEntity creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException {
+    public EventEntity creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String recaptcharesponse = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
@@ -165,7 +166,7 @@ public class EtablissementController {
 
     @DeleteMapping(value = "/suppression/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public EventEntity suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException {
+    public EventEntity suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
         //envoi du mail de suppression
         EtablissementEntity etab = etablissementRepository.getFirstBySiren(siren);
         UserDetails user = new UserDetailsServiceImpl().loadUser(etab);

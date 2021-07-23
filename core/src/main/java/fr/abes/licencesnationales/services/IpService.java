@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.service;
+package fr.abes.licencesnationales.services;
 
 
 import fr.abes.licencesnationales.constant.Constant;
@@ -88,7 +88,6 @@ public class IpService {
 
     public void checkDoublonIpModifieeDto(IpModifieeDTO ipModifieeDTO) throws IpException {
         log.info("DEBUT checkDoublonIpModifieeDto ");
-        String ip = ipModifieeDTO.getIp();
         IpEntity ipEntity = new IpEntity();
         ipEntity.setIp(ipModifieeDTO.getIp());
         ipEntity.setTypeAcces(ipModifieeDTO.getTypeAcces());

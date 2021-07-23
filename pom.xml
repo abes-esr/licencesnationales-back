@@ -80,7 +80,6 @@
     <!-- =========================================================== -->
 
     <dependencies>
-
         <!--- === Annotations === -->
         <dependency>
             <groupId>org.projectlombok</groupId>
