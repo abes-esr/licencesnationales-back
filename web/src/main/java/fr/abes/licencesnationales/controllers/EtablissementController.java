@@ -226,8 +226,7 @@ public class EtablissementController {
     @GetMapping(value = "/getListEtab")
     @PreAuthorize("hasAuthority('admin')")
     public List<EtablissementWebDto> getListEtab() {
-        List<EtablissementEntity> liste = etablissementRepository.findAll();
-        return mapper.mapList(liste, EtablissementWebDto.class);
+        return mapper.mapList(etablissementRepository.findAll(), EtablissementWebDto.class);
 
     }
 

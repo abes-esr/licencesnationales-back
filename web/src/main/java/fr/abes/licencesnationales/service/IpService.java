@@ -117,7 +117,7 @@ public class IpService {
         }
         accesList.add(ipEntity);
         if (!listAllIpContains.isEmpty()) {
-            String erreurMsg = "";
+            String erreurMsg;
             for (List<IpContains> listIpsContains : listAllIpContains) {
                 for (IpContains ipContains : listIpsContains) {
                     String nomEtab = "";
