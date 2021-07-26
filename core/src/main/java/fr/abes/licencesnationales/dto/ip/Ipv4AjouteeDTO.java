@@ -1,12 +1,16 @@
 package fr.abes.licencesnationales.dto.ip;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Getter @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class Ipv4AjouteeDTO extends IpAjouteeDTO {
 
     @NotBlank(message="L'IP est obligatoire")

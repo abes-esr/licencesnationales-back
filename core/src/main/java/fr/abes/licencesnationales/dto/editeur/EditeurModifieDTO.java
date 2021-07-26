@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.dto.editeur;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -8,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class EditeurModifieDTO extends EditeurDTO{
 
     @NotBlank
