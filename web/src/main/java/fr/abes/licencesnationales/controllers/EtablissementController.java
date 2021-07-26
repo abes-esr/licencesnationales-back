@@ -83,7 +83,7 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public EventEntity creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String recaptcharesponse = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
@@ -122,7 +122,6 @@ public class EtablissementController {
             String emailUser = eventDTO.getMailContact();
             emailService.constructCreationCompteEmailUser( request.getLocale(), emailUser);
             emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getSiren(), eventDTO.getNom());
-            return event;
         }
     }
 
