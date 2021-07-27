@@ -36,7 +36,7 @@ public class AuthenticationController {
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
-    public ResponseEntity<JwtAuthenticationResponse> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
