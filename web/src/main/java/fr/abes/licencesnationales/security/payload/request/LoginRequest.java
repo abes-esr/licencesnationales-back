@@ -10,18 +10,12 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 public class LoginRequest {
 
-	@NotBlank(message = "SIREN obligatoire")
+	@NotBlank(message = "SIREN obligatoire (login)")
 	@Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
-	@ApiModelProperty(value = "identifiant siren", name = "userName", dataType = "String", example = "123456789")
+	@ApiModelProperty(value = "identifiant siren", name = "login", dataType = "String", example = "123456789")
 	private String login; //siren
 
-	@NotBlank(message = "Mot de passe obligatoire")
+	@NotBlank(message = "Mot de passe obligatoire (password)")
 	@ApiModelProperty(value = "Mot de passe de l'utilisateur", name = "password", dataType = "String", example = "?Ll2020!")
 	private String password;
-
-	public void setUsername(String username) {
-		this.login = login;
-	}
-
-
 }

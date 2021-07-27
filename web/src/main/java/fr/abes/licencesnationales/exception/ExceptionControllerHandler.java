@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -40,6 +41,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Erreur de lecture / décodage des paramètres d'une requête HTTP
+     *
      * @param ex
      * @param headers
      * @param status
@@ -55,18 +57,20 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
 
             List<JsonMappingException.Reference> errors = ((MismatchedInputException) ex.getCause()).getPath();
-            String property = errors.get(errors.size()-1).getFieldName();
+            String property = errors.get(errors.size() - 1).getFieldName();
 
             log.error(ex.getLocalizedMessage());
-            return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new MismatchedJsonTypeException(property+" need to be type of '"+targetType+"'")));
+            return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new MismatchedJsonTypeException(property + " need to be type of '" + targetType + "'")));
         }
 
         log.error(ex.getLocalizedMessage());
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+
     /**
      * Vérifier les méthodes correspondent avec les URI dans le controller
+     *
      * @param ex
      * @param headers
      * @param status
@@ -82,6 +86,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Vérifier la validité (@Valid) des paramètres de la requête
+     *
      * @param ex
      * @param headers
      * @param status
@@ -93,16 +98,17 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         String error = "The credentials are not valid";
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        String msg = "";
-        for (FieldError fieldError: fieldErrors) {
-            msg += fieldError.getDefaultMessage()+ " ";
+        String msg = "Incorrect fields : ";
+        for (FieldError fieldError : fieldErrors) {
+            msg += fieldError.getDefaultMessage() + ", ";
         }
         log.error(msg);
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new JsonIncorrectException(msg)));
     }
 
     /**
      * Page 404
+     *
      * @param ex
      * @param headers
      * @param status
@@ -118,6 +124,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Erreur de paramètre
+     *
      * @param ex
      * @param headers
      * @param status
@@ -133,6 +140,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Si la transformation DTO a échoué
+     *
      * @param ex MappingException
      * @return
      */
@@ -143,15 +151,22 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
 
+    @ExceptionHandler(UsernameNotFoundException.class)
+    protected ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        String error = "Credentials not valid";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP
      * / Envoi de mail
+     *
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, RestClientException.class, AuthenticationCredentialsNotFoundException.class})
-    protected ResponseEntity<Object> handleCaptchaException(CaptchaException ex) {
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class})
+    protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getCause()));
     }
 
