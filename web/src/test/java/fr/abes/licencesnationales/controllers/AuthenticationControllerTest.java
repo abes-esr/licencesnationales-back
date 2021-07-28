@@ -33,7 +33,7 @@ public class AuthenticationControllerTest  extends LicencesNationalesAPIApplicat
     @MockBean
     private UserDetailsServiceImpl service;
 
-    EtablissementEntity user = MockUserUtil.getMockUser("123456789");
+    EtablissementEntity user = MockUserUtil.getMockUser();
 
     private static ObjectMapper mapper = new ObjectMapper();
 

@@ -157,6 +157,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(UnknownEtablissementException.class)
+    protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
+        String error = "Etablissement inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP
@@ -165,9 +171,9 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class})
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex.getCause()));
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
     }
 
 

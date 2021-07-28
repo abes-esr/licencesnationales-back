@@ -8,6 +8,8 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 @Component
 public class PasswordModifierListener implements ApplicationListener<UpdatePasswordEvent> {
 
@@ -23,9 +25,11 @@ public class PasswordModifierListener implements ApplicationListener<UpdatePassw
 
     @Override
     public void onApplicationEvent(UpdatePasswordEvent updatePasswordEvent) {
-
-        EtablissementEntity etablissementEntity = etablissementRepository.getFirstBySiren(updatePasswordEvent.getSiren());
-        etablissementEntity.getContact().setMotDePasse(updatePasswordEvent.getNewpasswordHash());
-        etablissementRepository.save(etablissementEntity);
+        Optional<EtablissementEntity> etablissementEntity = etablissementRepository.getFirstBySiren(updatePasswordEvent.getSiren());
+        if (etablissementEntity.isPresent()) {
+            EtablissementEntity entity = etablissementEntity.get();
+            entity.getContact().setMotDePasse(updatePasswordEvent.getNewpasswordHash());
+            etablissementRepository.save(entity);
+        }
     }
 }

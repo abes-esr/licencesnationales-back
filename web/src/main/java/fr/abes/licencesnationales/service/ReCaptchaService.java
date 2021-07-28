@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.service;
 
 import fr.abes.licencesnationales.recaptcha.ReCaptchaKeys;
 import fr.abes.licencesnationales.recaptcha.ReCaptchaResponse;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.client.RestTemplate;
@@ -9,12 +10,10 @@ import java.net.URI;
 
 
 @Slf4j
+@NoArgsConstructor
 public class ReCaptchaService {
-
-    @Autowired
-    private ReCaptchaKeys reCaptchaKeys = null;
-    @Autowired
-    private RestTemplate restTemplate = null;
+    private ReCaptchaKeys reCaptchaKeys;
+    private RestTemplate restTemplate;
 
     @Autowired
     public ReCaptchaService(ReCaptchaKeys reCaptchaKeys, RestTemplate restTemplate){
@@ -22,11 +21,6 @@ public class ReCaptchaService {
         this.restTemplate = restTemplate;
     }
 
-    public ReCaptchaService() {
-
-    }
-
-    //@Override
     public ReCaptchaResponse verify(String recaptcharesponse, String action) {
 
         log.info("debut ReCaptchaService - verify()");

@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.controllers;
 
 
 import fr.abes.licencesnationales.dto.DtoMapper;
+import fr.abes.licencesnationales.dto.EditeurWebDto;
 import fr.abes.licencesnationales.dto.editeur.EditeurCreeDTO;
 import fr.abes.licencesnationales.dto.editeur.EditeurDTO;
 import fr.abes.licencesnationales.dto.editeur.EditeurModifieDTO;
@@ -53,7 +54,7 @@ public class EditeurController {
 
     @PostMapping("/creationEditeur")
     @PreAuthorize("hasAuthority('admin')")
-    public EventEntity creationEditeur(@Valid @RequestBody EditeurCreeDTO editeurCreeDTO) throws MailDoublonException {
+    public void creationEditeur(@Valid @RequestBody EditeurCreeDTO editeurCreeDTO) throws MailDoublonException {
         log.info("DEBUT creationEditeur ");
         //verifier que le mail du contact n'est pas déjà en base
         boolean existeMail = emailService.checkDoublonMail(editeurCreeDTO.getListeContactCommercialEditeurDTO(),editeurCreeDTO.getListeContactTechniqueEditeurDTO());
@@ -63,13 +64,13 @@ public class EditeurController {
         else{
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeurCreeDTO);
             applicationEventPublisher.publishEvent(editeurCreeEvent);
-            return eventRepository.save(new EventEntity(editeurCreeEvent));
+            eventRepository.save(new EventEntity(editeurCreeEvent));
         }
     }
 
     @PostMapping(value = "/modificationEditeur")
     @PreAuthorize("hasAuthority('admin')")
-    public EventEntity modificationEditeur (@RequestBody EditeurModifieDTO editeurModifieDTO) throws MailDoublonException {
+    public void modificationEditeur (@RequestBody EditeurModifieDTO editeurModifieDTO) throws MailDoublonException {
         //verifier que le mail du contact n'est pas déjà en base
         boolean existeMail = emailService.checkDoublonMail(editeurModifieDTO.getListeContactCommercialEditeurDTO(),editeurModifieDTO.getListeContactTechniqueEditeurDTO());
         if (existeMail) {
@@ -84,24 +85,21 @@ public class EditeurController {
                     editeurModifieDTO.getListeContactCommercialEditeurDTO(),
                     editeurModifieDTO.getListeContactTechniqueEditeurDTO());
             applicationEventPublisher.publishEvent(editeurModifieEvent);
-            return eventRepository.save(new EventEntity(editeurModifieEvent));
+            eventRepository.save(new EventEntity(editeurModifieEvent));
         }
     }
 
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public EditeurDTO get(@PathVariable String id) {
-        return mapper.map(editeurRepository.getFirstById(id), EditeurDTO.class);
+    public EditeurWebDto get(@PathVariable String id) {
+        return mapper.map(editeurRepository.getFirstById(id), EditeurWebDto.class);
     }
 
 
     @GetMapping(value = "/getListEditeurs")
     @PreAuthorize("hasAuthority('admin')")
-    public List<EditeurDTO> getListEditeurs() {
-        List<EditeurDTO> listeEditeurs = mapper.mapList(editeurRepository.findAll(), EditeurDTO.class);
-        log.info(listeEditeurs.toString());
-        return listeEditeurs;
-
+    public List<EditeurWebDto> getListEditeurs() {
+        return mapper.mapList(editeurRepository.findAll(), EditeurWebDto.class);
     }
 
     @DeleteMapping(value = "/suppression")

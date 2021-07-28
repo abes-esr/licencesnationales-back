@@ -50,7 +50,7 @@ public class JwtTokenProvider {
                 .claim("id", u.getId())
                 .claim("siren", u.getUsername()) //le siren
                 .claim("nameEtab",u.getNameEtab())//nom de l'étab
-                .claim("isAdmin", u.getIsAdmin())
+                .claim("isAdmin", u.isAdmin())
                 .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
