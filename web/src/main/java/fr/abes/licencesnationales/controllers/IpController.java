@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.controllers;
 
 
+import fr.abes.licencesnationales.dto.DtoMapper;
+import fr.abes.licencesnationales.dto.IpWebDto;
 import fr.abes.licencesnationales.dto.ip.*;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
@@ -16,16 +18,19 @@ import fr.abes.licencesnationales.repository.EventRepository;
 import fr.abes.licencesnationales.repository.IpRepository;
 import fr.abes.licencesnationales.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.EtablissementService;
 import fr.abes.licencesnationales.services.IpService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
@@ -37,7 +42,7 @@ public class IpController {
     private EventRepository eventRepository;
 
     @Autowired
-    private EtablissementRepository etablissementRepository;
+    private EtablissementService etablissementService;
 
     @Autowired
     private IpRepository ipRepository;
@@ -46,13 +51,16 @@ public class IpController {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    FiltrerAccesServices filtrerAccesServices;
+    private FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    IpService ipService;
+    private IpService ipService;
+
+    @Autowired
+    private DtoMapper mapper;
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
@@ -114,7 +122,7 @@ public class IpController {
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
         EventEntity eventEntity = eventRepository.save(new EventEntity(ipAjouteeEvent));
 
-        String etab = etablissementRepository.getFirstBySiren(siren).getName();
+        String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
         //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, fr.abes.licencesnationales.event.getCommentaires(), admin));
@@ -178,7 +186,7 @@ public class IpController {
                 ipModifieeDTO.getCommentaires());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         EventEntity eventEntity = eventRepository.save(new EventEntity(ipModifieeEvent));
-        String etab = etablissementRepository.getFirstBySiren(siren).getName();
+        String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = "id = " + ipModifieeDTO.getId() + ", ip ou plage d'ips = " + ipModifieeDTO.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
         emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDTO.getCommentaires(), admin);
@@ -217,21 +225,25 @@ public class IpController {
     }
 
     @GetMapping(value = "/{siren}")
-    public Set<IpEntity> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
+    public List<IpWebDto> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
-        return etablissementRepository.getFirstBySiren(siren).getIps();
+        Set<IpEntity> setIps = etablissementService.getFirstBySiren(siren).getIps();
+        List<IpEntity> listIps = List.copyOf(setIps);
+        return mapper.mapList(listIps, IpWebDto.class);
     }
 
     @GetMapping(value = "/ipsEtab/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public Set<IpEntity> getIpsEtab(@PathVariable String siren) {
-        return etablissementRepository.getFirstBySiren(siren).getIps();
+    public List<IpWebDto> getIpsEtab(@PathVariable String siren) {
+        Set<IpEntity> setIps = etablissementService.getFirstBySiren(siren).getIps();
+        List<IpEntity> listIps = List.copyOf(setIps);
+        return mapper.mapList(listIps, IpWebDto.class);
     }
 
     @PostMapping(value = "/getIpEntity")
-    public IpEntity getIpEntity(@RequestBody IpDTO ipDTO) throws SirenIntrouvableException, AccesInterditException {
+    public IpWebDto getIpEntity(@RequestBody IpDTO ipDTO) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(ipDTO.getSiren());
         Long identifiant = Long.parseLong(ipDTO.getId());
-        return ipRepository.getFirstById(identifiant);
+        return mapper.map(ipRepository.getFirstById(identifiant), IpWebDto.class);
     }
 }

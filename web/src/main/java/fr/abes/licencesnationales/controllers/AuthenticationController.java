@@ -24,8 +24,6 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/v1")
 public class AuthenticationController {
-
-
     @Autowired
     private AuthenticationManager authenticationManager;
 
@@ -37,13 +35,12 @@ public class AuthenticationController {
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager
-                .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //on charge dans user le tuple bdd mis dans authentication
         UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
         String jwt = tokenProvider.generateToken(user);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getIsAdmin()));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.isAdmin()));
 
     }
 }

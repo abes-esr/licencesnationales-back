@@ -16,29 +16,29 @@ public class ContactEntity {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_Sequence")
     @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
-    public Long id;
+    private Long id;
 
-    public String nom;
+    private String nom;
 
-    public String prenom;
+    private String prenom;
 
-    public String mail;
+    private String mail;
 
-    public String motDePasse;
+    private String motDePasse;
 
-    public String telephone;
+    private String telephone;
 
-    public String adresse;
+    private String adresse;
 
-    public String boitePostale;
+    private String boitePostale;
 
-    public String codePostal;
+    private String codePostal;
 
-    public String cedex;
+    private String cedex;
 
-    public String ville;
+    private String ville;
 
-    public  String role;
+    private  String role;
 
 
     public ContactEntity(Long id, String nom, String prenom, String mail, String motDePasse, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville, String role) {

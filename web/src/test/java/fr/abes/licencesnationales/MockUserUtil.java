@@ -11,7 +11,7 @@ public class MockUserUtil {
     /**
      *
      */
-    public static EtablissementEntity getMockUser(String username) {
+    public static EtablissementEntity getMockUser() {
         EtablissementEntity user = new EtablissementEntity();
         user.setId(1L);
         user.setName("test");

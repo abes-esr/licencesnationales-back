@@ -32,12 +32,12 @@ public class UserDetailsImpl implements UserDetails {
 	private String password;
 	private String email;
 	private Collection<? extends GrantedAuthority> authorities;
-	private String isAdmin;
+	private boolean isAdmin;
 
 
 
 	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, String email, Collection<? extends GrantedAuthority> authorities,
-						   String isAdmin) {
+						   boolean isAdmin) {
 		this.id = id;
 		this.siren = siren;
 		this.nameEtab=nameEtab;
@@ -51,18 +51,18 @@ public class UserDetailsImpl implements UserDetails {
     public static UserDetailsImpl build(EtablissementEntity user) throws DonneeIncoherenteBddException {
 
 		log.info("UserDetailsImpl build début");
-		String role = user.getContact().role;
-		String isAdmin = "";
+		String role = user.getContact().getRole();
+		boolean isAdmin;
 		if(role==null || role.equals("")){
 			throw new DonneeIncoherenteBddException("Le role utilisateur est absent de la bdd");
 		}
 		else {
-			isAdmin = role.equals("admin") ? "true" : "false";
+			isAdmin = role.equals("admin") ? true : false;
 		}
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(role));
-		log.info("userPwd = " + user.getContact().motDePasse);
-		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().motDePasse, user.getContact().mail,authorities, isAdmin);
+		log.info("userPwd = " + user.getContact().getMotDePasse());
+		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().getMotDePasse(), user.getContact().getMail(),authorities, isAdmin);
 	}
 
 

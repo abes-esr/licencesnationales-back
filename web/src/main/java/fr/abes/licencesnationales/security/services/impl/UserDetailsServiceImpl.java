@@ -2,8 +2,8 @@ package fr.abes.licencesnationales.security.services.impl;
 
 
 import fr.abes.licencesnationales.entities.EtablissementEntity;
-import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.security.exception.DonneeIncoherenteBddException;
+import fr.abes.licencesnationales.services.EtablissementService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,20 +18,20 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
 	@Autowired
-	EtablissementRepository etablissementRepository;
+	EtablissementService etablissementService;
 
 
 	@SneakyThrows
 	@Override
 	@Transactional
-	public UserDetails loadUserByUsername(String siren) throws UsernameNotFoundException{
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException{
 		log.info("UserDetailsServiceImpl début");
-		log.info("siren = " + siren);
-		EtablissementEntity user = etablissementRepository.getFirstBySiren(siren);
+		log.info("siren = " + username);
+		EtablissementEntity user = etablissementService.getFirstBySiren(username);
 		log.info("user = " + user);
 		if(user == null) {
 			log.info("UsernameNotFoundException");
-			throw new UsernameNotFoundException(siren);
+			throw new UsernameNotFoundException(username);
 		}
 
 		log.info("UserDetailsServiceImpl fin");

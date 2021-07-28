@@ -7,6 +7,7 @@ import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
+import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -18,10 +19,10 @@ import java.util.stream.Collectors;
 @Component
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {
 
-    private final EtablissementRepository etablissementRepository;
+    private final EtablissementService service;
 
-    public EtablissementFusionneListener(EtablissementRepository etablissementRepository) {
-        this.etablissementRepository = etablissementRepository;
+    public EtablissementFusionneListener(EtablissementService service) {
+        this.service = service;
     }
 
     @Override
@@ -33,18 +34,18 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
         for (String siren :
                 etablissementFusionneEvent.getSirenFusionne()) {
-
-            if (etablissementRepository.getFirstBySiren(siren).getIps() != null) {
-                ipEntities.addAll(etablissementRepository.getFirstBySiren(siren).getIps()
+                EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
+            if (etablissementEntity.getIps() != null) {
+                ipEntities.addAll(etablissementEntity.getIps()
                         .stream().map(e -> new IpEntity(null, e.getIp(), e.getTypeAcces(), e.getTypeIp(), e.getCommentaires()))
                         .collect(Collectors.toSet()));
             }
 
-            if (etablissementRepository.getFirstBySiren(siren).getEditeurs() != null) {
-                editeurEntities.addAll(etablissementRepository.getFirstBySiren(siren).getEditeurs());
+            if (etablissementEntity.getEditeurs() != null) {
+                editeurEntities.addAll(etablissementEntity.getEditeurs());
             }
 
-            etablissementRepository.deleteBySiren(siren);
+            service.deleteBySiren(siren);
         }
 
         EtablissementDTO etablissementDTOFusione = etablissementFusionneEvent.getEtablissementDTO();
@@ -71,7 +72,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
                 editeurEntities);
         etablissementEntity.setIps(ipEntities);
 
-        etablissementRepository.save(etablissementEntity);
+        service.save(etablissementEntity);
 
     }
 }

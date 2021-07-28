@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementDiviseEvent;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
+import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -14,16 +15,16 @@ import javax.transaction.Transactional;
 @Component
 public class EtablissementDiviseListener implements ApplicationListener<EtablissementDiviseEvent> {
 
-    private final EtablissementRepository etablissementRepository;
+    private final EtablissementService service;
 
-    public EtablissementDiviseListener(EtablissementRepository etablissementRepository) {
-        this.etablissementRepository = etablissementRepository;
+    public EtablissementDiviseListener(EtablissementService service) {
+        this.service = service;
     }
 
     @Override
     @Transactional
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
-        etablissementRepository.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
+        service.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
         for (EtablissementDTO etablissementDTODivise :
                 etablissementDiviseEvent.getEtablissementDTOS()) {
             ContactEntity contactEntity =
@@ -39,7 +40,7 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
                             etablissementDTODivise.getCedexContact(),
                             etablissementDTODivise.getVilleContact(),
                             etablissementDTODivise.getRoleContact());
-            etablissementRepository.save(new EtablissementEntity(null,
+            service.save(new EtablissementEntity(null,
                     etablissementDTODivise.getNom(),
                     etablissementDTODivise.getSiren(),
                     etablissementDTODivise.getTypeEtablissement(),

@@ -14,8 +14,6 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter @Setter
 public class IpEntity implements Serializable {
-
-
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "ip_Sequence")
     @SequenceGenerator(name = "ip_Sequence", sequenceName = "IP_SEQ", allocationSize = 1)

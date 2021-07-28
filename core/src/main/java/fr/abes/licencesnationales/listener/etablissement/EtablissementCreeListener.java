@@ -6,16 +6,17 @@ import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
+import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EtablissementCreeListener implements ApplicationListener<EtablissementCreeEvent> {
 
-    private final EtablissementRepository etablissementRepository;
+    private final EtablissementService service;
 
-    public EtablissementCreeListener(EtablissementRepository etablissementRepository) {
-        this.etablissementRepository = etablissementRepository;
+    public EtablissementCreeListener(EtablissementService service) {
+        this.service = service;
     }
 
     @Override
@@ -43,7 +44,7 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
                         contactEntity,
                         null);
 
-        etablissementRepository.save(etablissementEntity);
+        service.save(etablissementEntity);
 
     }
 }

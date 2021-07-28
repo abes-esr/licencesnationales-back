@@ -7,16 +7,17 @@ import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.event.password.UpdatePasswordEvent;
 import fr.abes.licencesnationales.exception.CaptchaException;
+import fr.abes.licencesnationales.exception.PasswordMismatchException;
 import fr.abes.licencesnationales.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.repository.ContactRepository;
-import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.repository.EventRepository;
 import fr.abes.licencesnationales.security.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsServiceImpl;
-import fr.abes.licencesnationales.services.EmailService;
 import fr.abes.licencesnationales.service.ReCaptchaService;
+import fr.abes.licencesnationales.services.ContactService;
+import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.EtablissementService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +27,6 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -50,10 +50,10 @@ public class PasswordController {
     EmailService emailService;
 
     @Autowired
-    EtablissementRepository etablissementRepository;
+    EtablissementService etablissementService;
 
     @Autowired
-    ContactRepository contactRepository;
+    private ContactService contactService;
 
     @Autowired
     private ReCaptchaService reCaptchaService;
@@ -79,32 +79,30 @@ public class PasswordController {
             notes = "le ")
     @PostMapping("/resetPassword")
     public void resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto userEmailOrSiren) throws DonneeIncoherenteBddException, RestClientException {
-
-        log.info("userEmailOrSiren = " + userEmailOrSiren);
-        String mail = null;
-        String siren = null;
-        EtablissementEntity user = null;
+        String mail;
+        String siren;
+        EtablissementEntity user;
         String msgErr = "Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales";
         if (userEmailOrSiren.getEmail() != null) {
             mail = userEmailOrSiren.getEmail();
             log.info("mail = " + mail);
-            user = etablissementRepository.getUserByMail(mail);
+            user = etablissementService.getUserByMail(mail);
         } else {
             siren = userEmailOrSiren.getSiren();
-            user = etablissementRepository.getFirstBySiren(siren);
+            user = etablissementService.getFirstBySiren(siren);
         }
         if (userEmailOrSiren.getEmail() != null && user == null) {
             throw new AuthenticationCredentialsNotFoundException(msgErr);
-        } else if (userEmailOrSiren.getSiren() != null && user == null) {
-            throw new AuthenticationCredentialsNotFoundException(msgErr);
+        } else
+            if (userEmailOrSiren.getSiren() != null && user == null) {
+                throw new AuthenticationCredentialsNotFoundException(msgErr);
         }
         userDetails = new UserDetailsServiceImpl().loadUser(user);
 
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
         emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        emailService.constructResetTokenEmail(urlSite,
-                request.getLocale(), jwt, emailUser, nomEtab);
+        emailService.constructResetTokenEmail(urlSite, request.getLocale(), jwt, emailUser, nomEtab);
     }
 
     @PostMapping("/verifTokenValide")
@@ -139,10 +137,10 @@ public class PasswordController {
             log.info("siren = " + siren);
             String mdphash = passwordEncoder.encode(mdp);
             log.info("mdphash = " + mdp);
-            EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
+            EtablissementEntity e = etablissementService.getFirstBySiren(siren);
             ContactEntity c = e.getContact();
             c.setMotDePasse(mdphash);
-            contactRepository.save(c);
+            contactService.save(c);
             emailUser = c.getMail();
             emailService.constructValidationNewPassEmail(request.getLocale(), emailUser);
         }
@@ -150,13 +148,13 @@ public class PasswordController {
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping("/updatePassword")
-    public ResponseEntity<?> updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) {
+    public void updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) throws PasswordMismatchException {
 
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(request));
         String oldPassword = requestData.getOldPassword();
         String newPasswordHash = passwordEncoder.encode(requestData.getNewPassword());
 
-        EtablissementEntity e = etablissementRepository.getFirstBySiren(siren);
+        EtablissementEntity e = etablissementService.getFirstBySiren(siren);
         ContactEntity c = e.getContact();
 
         if (passwordEncoder.matches(oldPassword, c.getMotDePasse())) {
@@ -164,10 +162,8 @@ public class PasswordController {
             applicationEventPublisher.publishEvent(updatePasswordEvent);
             eventRepository.save(new EventEntity(updatePasswordEvent));
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Le mot de passe renseigné ne correspond pas à votre ancien mot de passe.");
+            throw new PasswordMismatchException("Le mot de passe renseigné ne correspond pas à votre ancien mot de passe.");
         }
-
-        return ResponseEntity.ok("Mot de passe mis à jour.");
     }
 }
 
