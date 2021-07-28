@@ -5,7 +5,7 @@ import fr.abes.licencesnationales.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.security.payload.request.LoginRequest;
 import fr.abes.licencesnationales.security.payload.response.JwtAuthenticationResponse;
 import fr.abes.licencesnationales.security.services.impl.UserDetailsImpl;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +13,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -35,7 +34,7 @@ public class AuthenticationController {
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         //on charge dans user le tuple bdd mis dans authentication
         UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal();
