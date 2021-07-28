@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -151,8 +152,8 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    protected ResponseEntity<Object> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+    @ExceptionHandler(AuthenticationException.class)
+    protected ResponseEntity<Object> handleUsernameNotFoundException(AuthenticationException ex) {
         String error = "Credentials not valid";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
