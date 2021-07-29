@@ -14,7 +14,7 @@ public class EtablissementService {
     private EtablissementRepository dao;
 
     public EtablissementEntity getFirstBySiren(String siren) {
-        return dao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException());
+        return dao.getFirstBySiren(siren).orElseThrow(UnknownEtablissementException::new);
     }
 
     public void save(EtablissementEntity entity) {

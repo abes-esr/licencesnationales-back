@@ -1,12 +1,12 @@
 package fr.abes.licencesnationales.controllers;
 
 
-import fr.abes.licencesnationales.dto.DtoMapper;
+import fr.abes.licencesnationales.converter.UtilsMapper;
 import fr.abes.licencesnationales.dto.EtablissementWebDto;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDiviseDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementFusionneDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementModifieDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDiviseEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementFusionneEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementModifieEventDTO;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
@@ -47,7 +47,7 @@ import java.util.*;
 public class EtablissementController {
 
     @Autowired
-    private DtoMapper mapper;
+    private UtilsMapper mapper;
 
     @Autowired
     private EventRepository eventRepository;
@@ -83,7 +83,7 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeEventDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String captcha = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
@@ -122,7 +122,7 @@ public class EtablissementController {
 
 
     @PostMapping(value = "/modification")
-    public void edit(@Valid @RequestBody EtablissementModifieDTO eventDTO) throws SirenIntrouvableException, AccesInterditException {
+    public void edit(@Valid @RequestBody EtablissementModifieEventDTO eventDTO) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
@@ -142,18 +142,18 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneDTO eventDTO) {
+    public void fusion(@RequestBody EtablissementFusionneEventDTO eventDTO) {
         EtablissementFusionneEvent etablissementFusionneEvent
-                = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
+                = new EtablissementFusionneEvent(this, eventDTO.getEtablissementEventDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         eventRepository.save(new EventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseDTO eventDTO) {
+    public void division(@RequestBody EtablissementDiviseEventDTO eventDTO) {
         EtablissementDiviseEvent etablissementDiviseEvent
-                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDTOS());
+                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementEventDTOS());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventRepository.save(new EventEntity(etablissementDiviseEvent));
     }
@@ -192,7 +192,7 @@ public class EtablissementController {
             Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
             for(IpEntity i:listeIpsEtab) {
                 Date dateModif;
-                if(i.getDateModification()!=null && (!i.getDateModification().equals(""))){
+                if(i.getDateModification()!=null){
                     dateModif=i.getDateModification();
                     listDateModifIp.add(dateModif.toString());
                 }

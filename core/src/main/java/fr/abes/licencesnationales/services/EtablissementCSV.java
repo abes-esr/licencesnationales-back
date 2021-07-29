@@ -1,21 +1,24 @@
 package fr.abes.licencesnationales.services;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Getter @Setter
 public class EtablissementCSV {
-    public String IDEtablissement;
-    public String SIRENEtalissement;
-    public String NomEtablissement;
-    public String TypeEtablissement;
-    public String Adresse;
-    public String Adresse2;
-    public String BoitePostale;
-    public String CodePostal;
-    public String Cedex;
-    public String Ville;
-    public String ContactNom;
-    public String ContactEmail;
-    public String ContactTel;
-    public String ListeAcces;
+    private String IDEtablissement;
+    private String SIRENEtalissement;
+    private String NomEtablissement;
+    private String TypeEtablissement;
+    private String Adresse;
+    private String Adresse2;
+    private String BoitePostale;
+    private String CodePostal;
+    private String Cedex;
+    private String Ville;
+    private String ContactNom;
+    private String ContactEmail;
+    private String ContactTel;
+    private String ListeAcces;
 }

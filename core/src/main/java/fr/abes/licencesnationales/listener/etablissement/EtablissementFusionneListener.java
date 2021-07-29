@@ -1,12 +1,11 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EditeurEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementFusionneEvent;
-import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -48,26 +47,26 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
             service.deleteBySiren(siren);
         }
 
-        EtablissementDTO etablissementDTOFusione = etablissementFusionneEvent.getEtablissementDTO();
+        EtablissementEventDTO etablissementEventDTOFusione = etablissementFusionneEvent.getEtablissementEventDTO();
         ContactEntity contactEntity =
                 new ContactEntity(null,
-                        etablissementDTOFusione.getNomContact(),
-                        etablissementDTOFusione.getPrenomContact(),
-                        etablissementDTOFusione.getMailContact(),
-                        etablissementDTOFusione.getMotDePasse(),
-                        etablissementDTOFusione.getTelephoneContact(),
-                        etablissementDTOFusione.getAdresseContact(),
-                        etablissementDTOFusione.getBoitePostaleContact(),
-                        etablissementDTOFusione.getCodePostalContact(),
-                        etablissementDTOFusione.getCedexContact(),
-                        etablissementDTOFusione.getVilleContact(),
-                        etablissementDTOFusione.getRoleContact());
+                        etablissementEventDTOFusione.getNomContact(),
+                        etablissementEventDTOFusione.getPrenomContact(),
+                        etablissementEventDTOFusione.getMailContact(),
+                        etablissementEventDTOFusione.getMotDePasse(),
+                        etablissementEventDTOFusione.getTelephoneContact(),
+                        etablissementEventDTOFusione.getAdresseContact(),
+                        etablissementEventDTOFusione.getBoitePostaleContact(),
+                        etablissementEventDTOFusione.getCodePostalContact(),
+                        etablissementEventDTOFusione.getCedexContact(),
+                        etablissementEventDTOFusione.getVilleContact(),
+                        etablissementEventDTOFusione.getRoleContact());
 
         EtablissementEntity etablissementEntity = new EtablissementEntity(null,
-                etablissementDTOFusione.getNom(),
-                etablissementDTOFusione.getSiren(),
-                etablissementDTOFusione.getTypeEtablissement(),
-                etablissementDTOFusione.getIdAbes(),
+                etablissementEventDTOFusione.getNom(),
+                etablissementEventDTOFusione.getSiren(),
+                etablissementEventDTOFusione.getTypeEtablissement(),
+                etablissementEventDTOFusione.getIdAbes(),
                 contactEntity,
                 editeurEntities);
         etablissementEntity.setIps(ipEntities);

@@ -1,11 +1,10 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementCreeEvent;
-import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -21,7 +20,7 @@ public class EtablissementCreeListener implements ApplicationListener<Etablissem
 
     @Override
     public void onApplicationEvent(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementDTO etablissement = etablissementCreeEvent.getEtablissement();
+        EtablissementEventDTO etablissement = etablissementCreeEvent.getEtablissement();
         ContactEntity contactEntity =
                 new ContactEntity(null,
                         etablissement.getNomContact(),

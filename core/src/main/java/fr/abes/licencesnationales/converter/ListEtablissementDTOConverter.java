@@ -3,7 +3,7 @@ package fr.abes.licencesnationales.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -25,9 +25,9 @@ public class ListEtablissementDTOConverter implements AttributeConverter<Object,
     }
 
     @Override
-    public List<EtablissementDTO> convertToEntityAttribute(String dbData) {
+    public List<EtablissementEventDTO> convertToEntityAttribute(String dbData) {
         try {
-            return objectMapper.readValue(dbData, new TypeReference<List<EtablissementDTO>>(){});
+            return objectMapper.readValue(dbData, new TypeReference<List<EtablissementEventDTO>>(){});
         } catch (IOException ex) {
             return null;
         }

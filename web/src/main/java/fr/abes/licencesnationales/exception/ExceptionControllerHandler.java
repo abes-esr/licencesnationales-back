@@ -10,9 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -20,7 +18,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
@@ -99,12 +96,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         String error = "The credentials are not valid";
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        String msg = "Incorrect fields : ";
+        StringBuilder msg = new StringBuilder("Incorrect fields : ");
         for (FieldError fieldError : fieldErrors) {
-            msg += fieldError.getDefaultMessage() + ", ";
+            msg.append(fieldError.getDefaultMessage() + ", ");
         }
-        log.error(msg);
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new JsonIncorrectException(msg)));
+        log.error(msg.toString());
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new JsonIncorrectException(msg.toString())));
     }
 
     /**
@@ -152,8 +149,13 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    protected ResponseEntity<Object> handleUsernameNotFoundException(AuthenticationException ex) {
+    /**
+     * Gestion des erreurs d'authentification
+     * @param ex
+     * @return
+     */
+    @ExceptionHandler({AuthenticationException.class, AccesInterditException.class, SirenIntrouvableException.class})
+    protected ResponseEntity<Object> handleAuthentificationException(Exception ex) {
         String error = "Credentials not valid";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }

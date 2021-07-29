@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.Date;
-
 /**
  * Représente un exemplaire de Notice au format JSON de l'API
  */

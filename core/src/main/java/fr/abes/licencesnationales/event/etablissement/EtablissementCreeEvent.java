@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.event.etablissement;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.event.Event;
 import lombok.Getter;
 
@@ -10,10 +10,10 @@ public class EtablissementCreeEvent extends Event {
 
     public EtablissementCreeEvent(
             Object source,
-            EtablissementDTO etablissement) {
+            EtablissementEventDTO etablissement) {
         super(source);
         this.etablissement = etablissement;
     }
 
-    private EtablissementDTO etablissement;
+    private EtablissementEventDTO etablissement;
 }

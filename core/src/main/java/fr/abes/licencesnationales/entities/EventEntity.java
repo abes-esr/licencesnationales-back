@@ -1,11 +1,10 @@
 package fr.abes.licencesnationales.entities;
 
 import fr.abes.licencesnationales.converter.*;
-import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurDTO;
-import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurDTO;
-import fr.abes.licencesnationales.dto.editeur.EditeurDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.editeur.*;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.event.editeur.EditeurCreeEvent;
+import fr.abes.licencesnationales.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.event.editeur.EditeurSupprimeEvent;
 import fr.abes.licencesnationales.event.etablissement.*;
@@ -14,6 +13,7 @@ import fr.abes.licencesnationales.event.ip.IpModifieeEvent;
 import fr.abes.licencesnationales.event.ip.IpSupprimeeEvent;
 import fr.abes.licencesnationales.event.ip.IpValideeEvent;
 import fr.abes.licencesnationales.event.password.UpdatePasswordEvent;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -22,9 +22,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+/** TODO : vérifier pourquoi les attributs sont publics
+ * TODO : Voir comment récupérer l'entité concernée par l'event au lieu de l'intégralité des champs
+ */
 @Entity
 @Table(name = "Event")
 @NoArgsConstructor
+@Getter
 public class EventEntity {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "event_Sequence")
@@ -69,11 +73,11 @@ public class EventEntity {
 
     @Lob
     @Convert(converter = EtablissementDTOConverter.class)
-    public EtablissementDTO etablissementDTOFusion;
+    public EtablissementEventDTO etablissementEventDTOFusion;
 
     @Lob
     @Convert(converter = ListEtablissementDTOConverter.class)
-    public List<EtablissementDTO> etablisementsDivise;
+    public List<EtablissementEventDTO> etablisementsDivise;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
@@ -95,19 +99,11 @@ public class EventEntity {
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
-    public Set<ContactCommercialEditeurDTO> listeContactCommercialEditeurDTO;
+    public Set<ContactCommercialEditeurEventDto> listeContactCommercialEditeurEventDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
-    public Set<ContactTechniqueEditeurDTO> listeContactTechniqueEditeurDTO;
-
-    /*@Lob
-    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
-    private List<String> mailPourBatchEditeur;
-
-    @Lob
-    @Convert(fr.abes.licencesnationales.converter = JpaConverterJson.class)
-    private List<String> mailPourInformationEditeur;*/
+    public Set<ContactTechniqueEditeurEventDto> listeContactTechniqueEditeurEventDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
@@ -116,7 +112,7 @@ public class EventEntity {
 
 
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementDTO etablissement = etablissementCreeEvent.getEtablissement();
+        EtablissementEventDTO etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
         this.dateCreationEvent = etablissementCreeEvent.created;
         this.nomEtab = etablissement.getNom();
@@ -162,54 +158,53 @@ public class EventEntity {
         this.event = "divise";
         this.dateCreationEvent = etablissementDiviseEvent.created;
         this.ancienNomEtab = etablissementDiviseEvent.getAncienSiren();
-        this.etablisementsDivise = etablissementDiviseEvent.getEtablissementDTOS();
+        this.etablisementsDivise = etablissementDiviseEvent.getEtablissementEventDTOS();
     }
 
     public EventEntity(EtablissementFusionneEvent etablissementFusionneEvent) {
         this.event = "fusionne";
         this.dateCreationEvent = etablissementFusionneEvent.created;
-        this.etablissementDTOFusion = etablissementFusionneEvent.getEtablissementDTO();
+        this.etablissementEventDTOFusion = etablissementFusionneEvent.getEtablissementEventDTO();
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
     }
 
     public EventEntity(EditeurCreeEvent editeurCreeEvent) {
-        EditeurDTO editeurDTO = editeurCreeEvent.getEditeurDTO();
+        EditeurCreeDto editeur = editeurCreeEvent.getEditeur();
         this.event = "editeurcree";
         this.dateCreationEvent = editeurCreeEvent.created;
-        this.nomEditeur = editeurDTO.getNomEditeur();
-        this.identifiantEditeur = editeurDTO.getIdentifiantEditeur();
-        this.groupesEtabRelies = editeurDTO.getGroupesEtabRelies();
-        this.adresseEditeur = editeurDTO.getAdresseEditeur();
-        this.listeContactCommercialEditeurDTO = editeurDTO.getListeContactCommercialEditeurDTO();
-        this.listeContactTechniqueEditeurDTO = editeurDTO.getListeContactTechniqueEditeurDTO();
+        this.nomEditeur = editeur.getNomEditeur();
+        this.identifiantEditeur = editeur.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeur.getGroupesEtabRelies();
+        this.adresseEditeur = editeur.getAdresseEditeur();
+        this.listeContactCommercialEditeurEventDto = editeur.getListeContactCommercialEditeurEventDto();
+        this.listeContactTechniqueEditeurEventDto = editeur.getListeContactTechniqueEditeurEventDto();
     }
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
+        EditeurModifieDto editeur = editeurModifieEvent.getEditeur();
         this.event = "editeurmodifie";
         this.dateCreationEvent = editeurModifieEvent.created;
-        this.nomEditeur = editeurModifieEvent.getNomEditeur();
-        this.identifiantEditeur = editeurModifieEvent.getIdentifiantEditeur();
-        this.groupesEtabRelies = editeurModifieEvent.getGroupesEtabRelies();
-        this.adresseEditeur = editeurModifieEvent.getAdresseEditeur();
-        this.listeContactCommercialEditeurDTO = editeurModifieEvent.getContactCommercialEditeurDTOS();
-        this.listeContactTechniqueEditeurDTO = editeurModifieEvent.getContactTechniqueEditeurDTOS();
+        this.nomEditeur = editeur.getNomEditeur();
+        this.identifiantEditeur = editeur.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeur.getGroupesEtabRelies();
+        this.adresseEditeur = editeur.getAdresseEditeur();
+        this.listeContactCommercialEditeurEventDto = editeur.getListeContactCommercialEditeurEventDto();
+        this.listeContactTechniqueEditeurEventDto = editeur.getListeContactTechniqueEditeurEventDto();
     }
 
-    /*public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
-        this.fr.abes.licencesnationales.event = "editeurfusione";
+    public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
+        EditeurFusionneDto editeur = editeurFusionneEvent.getEditeur();
+        this.event = "editeurfusione";
         this.dateCreationEvent = editeurFusionneEvent.created;
-        this.nomEditeur = editeurFusionneEvent.getEditeurDTO().getNom();
-        this.adresseEditeur = editeurFusionneEvent.getEditeurDTO().getAdresse();
-        this.mailPourBatchEditeur = editeurFusionneEvent.getEditeurDTO().getMailPourBatch();
-        this.mailPourInformationEditeur = editeurFusionneEvent.getEditeurDTO().getMailPourInformation();
+        this.nomEditeur = editeur.getNomEditeur();
+        this.adresseEditeur = editeur.getAdresseEditeur();
         this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
-    }*/
+    }
 
     public EventEntity(EditeurSupprimeEvent editeurSupprimeEvent) {
         this.event = "editeurSupprime";
         this.dateCreationEvent = editeurSupprimeEvent.created;
         this.id = Long.parseLong(editeurSupprimeEvent.getId());
-        //this.siren = editeurSupprimeEvent.getSiren();
     }
 
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {
