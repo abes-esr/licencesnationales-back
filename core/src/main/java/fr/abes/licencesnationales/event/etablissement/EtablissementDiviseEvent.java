@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.event.etablissement;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.event.Event;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,11 +12,11 @@ import java.util.ArrayList;
 @Setter
 public class EtablissementDiviseEvent extends Event {
     private String ancienSiren;
-    private ArrayList<EtablissementDTO> etablissementDTOS;
+    private ArrayList<EtablissementEventDTO> etablissementEventDTOS;
 
-    public EtablissementDiviseEvent(Object source, String ancienSiren, ArrayList<EtablissementDTO> etablissementDTOS) {
+    public EtablissementDiviseEvent(Object source, String ancienSiren, ArrayList<EtablissementEventDTO> etablissementEventDTOS) {
         super(source);
         this.ancienSiren = ancienSiren;
-        this.etablissementDTOS = etablissementDTOS;
+        this.etablissementEventDTOS = etablissementEventDTOS;
     }
 }

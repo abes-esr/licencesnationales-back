@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.services;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.event.etablissement.EtablissementDiviseEvent;
@@ -34,7 +34,7 @@ public class ResetService {
                 case "cree":
                     EtablissementCreeEvent etablissementCreeEvent =
                             new EtablissementCreeEvent(this,
-                                    new EtablissementDTO(eventEntity.nomEtab,
+                                    new EtablissementEventDTO(eventEntity.nomEtab,
                                             eventEntity.siren,
                                             eventEntity.typeEtablissement,
                                             eventEntity.idAbes,
@@ -61,13 +61,13 @@ public class ResetService {
                             new EtablissementDiviseEvent(
                                     this,
                                     eventEntity.ancienNomEtab,
-                                    (ArrayList<EtablissementDTO>) eventEntity.etablisementsDivise);
+                                    (ArrayList<EtablissementEventDTO>) eventEntity.etablisementsDivise);
                     applicationEventPublisher.publishEvent(etablissementDiviseEvent);
                     break;
                 case "fusionne":
                     EtablissementFusionneEvent etablissementFusionneEvent =
                             new EtablissementFusionneEvent(this,
-                                    eventEntity.etablissementDTOFusion,
+                                    eventEntity.etablissementEventDTOFusion,
                                     (ArrayList<String>) eventEntity.etablissementsFusionne);
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;

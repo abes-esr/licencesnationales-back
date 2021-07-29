@@ -5,24 +5,25 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
 @Table(name = "ContactCommercialEditeur")
 @NoArgsConstructor
 @Getter
 @Setter
-public class ContactCommercialEditeurEntity {
+public class ContactCommercialEditeurEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_editeur_commercial_Sequence")
     @SequenceGenerator(name = "contact_editeur_commercial_Sequence", sequenceName = "CONTACT_EDITEUR_COMMERCIAL_SEQ", allocationSize = 1)
-    public Long id;
+    private Long id;
 
-    public String nomContactCommercial;
+    private String nomContactCommercial;
 
-    public String prenomContactCommercial;
+    private String prenomContactCommercial;
 
-    public String mailContactCommercial;
+    private String mailContactCommercial;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "editeur_id", nullable = false)

@@ -1,11 +1,10 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementDiviseEvent;
-import fr.abes.licencesnationales.repository.EtablissementRepository;
 import fr.abes.licencesnationales.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -25,26 +24,26 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
     @Transactional
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
         service.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
-        for (EtablissementDTO etablissementDTODivise :
-                etablissementDiviseEvent.getEtablissementDTOS()) {
+        for (EtablissementEventDTO etablissementEventDTODivise :
+                etablissementDiviseEvent.getEtablissementEventDTOS()) {
             ContactEntity contactEntity =
                     new ContactEntity(null,
-                            etablissementDTODivise.getNomContact(),
-                            etablissementDTODivise.getPrenomContact(),
-                            etablissementDTODivise.getMailContact(),
-                            etablissementDTODivise.getMotDePasse(),
-                            etablissementDTODivise.getTelephoneContact(),
-                            etablissementDTODivise.getAdresseContact(),
-                            etablissementDTODivise.getBoitePostaleContact(),
-                            etablissementDTODivise.getCodePostalContact(),
-                            etablissementDTODivise.getCedexContact(),
-                            etablissementDTODivise.getVilleContact(),
-                            etablissementDTODivise.getRoleContact());
+                            etablissementEventDTODivise.getNomContact(),
+                            etablissementEventDTODivise.getPrenomContact(),
+                            etablissementEventDTODivise.getMailContact(),
+                            etablissementEventDTODivise.getMotDePasse(),
+                            etablissementEventDTODivise.getTelephoneContact(),
+                            etablissementEventDTODivise.getAdresseContact(),
+                            etablissementEventDTODivise.getBoitePostaleContact(),
+                            etablissementEventDTODivise.getCodePostalContact(),
+                            etablissementEventDTODivise.getCedexContact(),
+                            etablissementEventDTODivise.getVilleContact(),
+                            etablissementEventDTODivise.getRoleContact());
             service.save(new EtablissementEntity(null,
-                    etablissementDTODivise.getNom(),
-                    etablissementDTODivise.getSiren(),
-                    etablissementDTODivise.getTypeEtablissement(),
-                    etablissementDTODivise.getIdAbes(),
+                    etablissementEventDTODivise.getNom(),
+                    etablissementEventDTODivise.getSiren(),
+                    etablissementEventDTODivise.getTypeEtablissement(),
+                    etablissementEventDTODivise.getIdAbes(),
                     contactEntity,
                     null));
 

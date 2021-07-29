@@ -2,9 +2,9 @@ package fr.abes.licencesnationales.services;
 
 
 import fr.abes.licencesnationales.constant.Constant;
-import fr.abes.licencesnationales.dto.ip.IpAjouteeDTO;
+import fr.abes.licencesnationales.dto.ip.IpAjouteeEventDTO;
 import fr.abes.licencesnationales.dto.ip.IpContains;
-import fr.abes.licencesnationales.dto.ip.IpModifieeDTO;
+import fr.abes.licencesnationales.dto.ip.IpModifieeEventDTO;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.exception.IpException;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
@@ -28,19 +28,19 @@ public class IpService {
     @Autowired
     private EtablissementRepository etablissementRepository;
 
-    private IpAjouteeDTO ipAjouteeDTO;
-    private IpModifieeDTO ipModifieeDTO;
+    private IpAjouteeEventDTO ipAjouteeEventDTO;
+    private IpModifieeEventDTO ipModifieeEventDTO;
 
 
     public IpService() {
     }
 
-    public IpService(IpAjouteeDTO ipAjouteeDTO) {
-        this.ipAjouteeDTO = ipAjouteeDTO;
+    public IpService(IpAjouteeEventDTO ipAjouteeEventDTO) {
+        this.ipAjouteeEventDTO = ipAjouteeEventDTO;
     }
 
-    public IpService(IpModifieeDTO ipModifieeDTO) {
-        this.ipModifieeDTO = ipModifieeDTO;
+    public IpService(IpModifieeEventDTO ipModifieeEventDTO) {
+        this.ipModifieeEventDTO = ipModifieeEventDTO;
     }
 
     public List<IpContains> isAccesExistInList(IpEntity acces, List<IpEntity> accesList) {
@@ -77,21 +77,21 @@ public class IpService {
         return isAccesExistInList(acces, ipRepository.findAll());
     }
 
-    public void checkDoublonIpAjouteeDto(IpAjouteeDTO ipAjouteeDTO) throws IpException {
+    public void checkDoublonIpAjouteeDto(IpAjouteeEventDTO ipAjouteeEventDTO) throws IpException {
         log.info("DEBUT checkDoublonIpAjouteeDto ");
         IpEntity ipEntity = new IpEntity();
-        ipEntity.setIp(ipAjouteeDTO.getIp());
-        ipEntity.setTypeAcces(ipAjouteeDTO.getTypeAcces());
-        ipEntity.setTypeIp(ipAjouteeDTO.getTypeIp());
+        ipEntity.setIp(ipAjouteeEventDTO.getIp());
+        ipEntity.setTypeAcces(ipAjouteeEventDTO.getTypeAcces());
+        ipEntity.setTypeIp(ipAjouteeEventDTO.getTypeIp());
         checkDoublonIp(ipEntity);
     }
 
-    public void checkDoublonIpModifieeDto(IpModifieeDTO ipModifieeDTO) throws IpException {
+    public void checkDoublonIpModifieeDto(IpModifieeEventDTO ipModifieeEventDTO) throws IpException {
         log.info("DEBUT checkDoublonIpModifieeDto ");
         IpEntity ipEntity = new IpEntity();
-        ipEntity.setIp(ipModifieeDTO.getIp());
-        ipEntity.setTypeAcces(ipModifieeDTO.getTypeAcces());
-        ipEntity.setTypeIp(ipModifieeDTO.getTypeIp());
+        ipEntity.setIp(ipModifieeEventDTO.getIp());
+        ipEntity.setTypeAcces(ipModifieeEventDTO.getTypeAcces());
+        ipEntity.setTypeIp(ipModifieeEventDTO.getTypeIp());
         checkDoublonIp(ipEntity);
     }
 
@@ -99,7 +99,7 @@ public class IpService {
         log.info("DEBUT checkDoublonIp");
         List<String> erreursList = new ArrayList<>();
         List<IpEntity> accesList = new ArrayList<>(); //une liste vide
-        List<IpContains> listIpContains = new ArrayList<>();
+        List<IpContains> listIpContains;
         List<List<IpContains>> listAllIpContains = new ArrayList<>();
 
         // Check les collisions avec les IP de la BDD

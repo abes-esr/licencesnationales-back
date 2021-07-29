@@ -13,7 +13,7 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
 
     EditeurEntity getFirstByNomEditeur(String nom);
 
-    EditeurEntity getFirstById(String id);
+    EditeurEntity getFirstById(Long id);
 
     EditeurEntity findEditeurEntityByContactCommercialEditeurEntitiesContains(String mail);
 

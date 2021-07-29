@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.services;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.repository.EventRepository;
@@ -25,8 +25,8 @@ public class ArbreService {
     }
 
     public String genereArbre() throws ParseException {
-        StringBuilder builder = new StringBuilder();
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
+        var builder = new StringBuilder();
+        var simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
         for (EventEntity eventEntity :
                 eventRepository.getAllByDateCreationEventBetweenOrderByDateCreationEvent(simpleDateFormat.parse("15-04-2021"),
                         new Date())) {
@@ -45,7 +45,7 @@ public class ArbreService {
                     break;
                 case "divise":
                     builder.append("Divise : ").append(eventEntity.ancienNomEtab).append("\n");
-                    for (EtablissementDTO etab :
+                    for (EtablissementEventDTO etab :
                             eventEntity.etablisementsDivise) {
                         builder.append(etab.getSiren()).append("\n");
                     }

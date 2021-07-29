@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.constant.Constant;
 import fr.abes.licencesnationales.dto.MailDto;
-import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurDTO;
-import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurDTO;
+import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurEventDto;
+import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurEventDto;
 import fr.abes.licencesnationales.repository.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.repository.EditeurRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
@@ -40,29 +39,24 @@ public class EmailService {
     @Value("${mail.ws.url}")
     protected String url;
 
-    public boolean checkDoublonMail(Set<ContactCommercialEditeurDTO> c, Set<ContactTechniqueEditeurDTO> t) {
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurEventDto> c, Set<ContactTechniqueEditeurEventDto> t) {
         log.info("DEBUT checkDoublonMail ");
         boolean existeMailCommercial = false;
         boolean existeMailTechnique = false;
-        String mail = "";
-        for (ContactCommercialEditeurDTO contact : c){
+        String mail;
+        for (ContactCommercialEditeurEventDto contact : c){
             mail = contact.getMailContactCommercial();
             log.info("mail = "+ mail);
-            //existeMailCommercial = editeurRepository.findEditeurEntityByContactCommercialEditeurEntitiesContains(mail)!= null;
             existeMailCommercial = editeurRepository.existeMail(mail);
         }
-        for (ContactCommercialEditeurDTO contact : c){
-            mail = contact.getMailContactCommercial();
+        for (ContactTechniqueEditeurEventDto contact : t){
+            mail = contact.getMailContactTechnique();
             log.info("mail = "+ mail);
-            //existeMailTechnique = editeurRepository.findEditeurEntityByContactTechniqueEditeurEntitiesContains(mail)!= null;
-            contactTechniqueEditeurRepository.existeMail(mail);
+            existeMailTechnique = contactTechniqueEditeurRepository.existeMail(mail);
         }
         log.info("existeMailCommercial = "+ existeMailCommercial);
         log.info("existeMailTechnique = "+ existeMailTechnique);
-        if (existeMailCommercial || existeMailTechnique) {
-            return true;
-        }
-        else return false;
+        return existeMailCommercial || existeMailTechnique;
     }
 
     public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab) throws RestClientException {
