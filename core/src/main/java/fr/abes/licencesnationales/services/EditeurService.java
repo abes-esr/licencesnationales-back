@@ -31,7 +31,7 @@ public class EditeurService {
     private EventRepository eventRepository;
 
     public void addEditeur(EditeurCreeDto editeur) throws MailDoublonException {
-        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurEventDto(),editeur.getListeContactTechniqueEditeurEventDto());
+        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
         if (existeMail) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
@@ -44,7 +44,7 @@ public class EditeurService {
 
     public void updateEditeur(EditeurModifieDto editeur) throws MailDoublonException {
         //verifier que le mail du contact n'est pas déjà en base
-        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurEventDto(),editeur.getListeContactTechniqueEditeurEventDto());
+        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
         if (existeMail) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }

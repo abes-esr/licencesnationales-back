@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.services;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
 import fr.abes.licencesnationales.repository.EventRepository;
@@ -45,7 +45,7 @@ public class ArbreService {
                     break;
                 case "divise":
                     builder.append("Divise : ").append(eventEntity.ancienNomEtab).append("\n");
-                    for (EtablissementEventDTO etab :
+                    for (EtablissementDto etab :
                             eventEntity.etablisementsDivise) {
                         builder.append(etab.getSiren()).append("\n");
                     }

@@ -3,10 +3,10 @@ package fr.abes.licencesnationales.controllers;
 
 import fr.abes.licencesnationales.converter.UtilsMapper;
 import fr.abes.licencesnationales.dto.EtablissementWebDto;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeEventDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDiviseEventDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementFusionneEventDTO;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementModifieEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDiviseDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementFusionneDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementModifieDto;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.entities.IpEntity;
@@ -83,7 +83,7 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeEventDTO eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDto eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String captcha = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
@@ -94,35 +94,35 @@ public class EtablissementController {
         }
 
         //verifier que le siren n'est pas déjà en base
-        boolean existeSiren = etablissementService.existeSiren(eventDTO.getSiren());
+        boolean existeSiren = etablissementService.existeSiren(eventDTO.getEtablissementDTO().getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
             throw new SirenExistException("Cet établissement existe déjà.");
         }
         //verifier que le mail du contact n'est pas déjà en base
-        if (contactService.existeMail(eventDTO.getMailContact())) {
+        if (contactService.existeMail(eventDTO.getEtablissementDTO().getMailContact())) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
         else{
-            log.info("mdp = " + eventDTO.getMotDePasse());
-            eventDTO.setMotDePasse(passwordEncoder.encode(eventDTO.getMotDePasse()));
-            eventDTO.setIdAbes(genererIdAbes.genererIdAbes(GenererIdAbes.generateId()));
-            eventDTO.setRoleContact("etab");
-            log.info("idAbes = " + eventDTO.getIdAbes());
-            log.info("mdphash = " + eventDTO.getMotDePasse());
+            log.info("mdp = " + eventDTO.getEtablissementDTO().getMotDePasse());
+            eventDTO.getEtablissementDTO().setMotDePasse(passwordEncoder.encode(eventDTO.getEtablissementDTO().getMotDePasse()));
+            eventDTO.getEtablissementDTO().setIdAbes(genererIdAbes.genererIdAbes(GenererIdAbes.generateId()));
+            eventDTO.getEtablissementDTO().setRoleContact("etab");
+            log.info("idAbes = " + eventDTO.getEtablissementDTO().getIdAbes());
+            log.info("mdphash = " + eventDTO.getEtablissementDTO().getMotDePasse());
             EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this, eventDTO);
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
             eventRepository.save(new EventEntity(etablissementCreeEvent));
-            String emailUser = eventDTO.getMailContact();
+            String emailUser = eventDTO.getEtablissementDTO().getMailContact();
             emailService.constructCreationCompteEmailUser( request.getLocale(), emailUser);
-            emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getSiren(), eventDTO.getNom());
+            emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getEtablissementDTO().getSiren(), eventDTO.getEtablissementDTO().getNom());
         }
     }
 
 
     @PostMapping(value = "/modification")
-    public void edit(@Valid @RequestBody EtablissementModifieEventDTO eventDTO) throws SirenIntrouvableException, AccesInterditException {
+    public void edit(@Valid @RequestBody EtablissementModifieDto eventDTO) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
@@ -142,18 +142,18 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneEventDTO eventDTO) {
+    public void fusion(@RequestBody EtablissementFusionneDto eventDTO) {
         EtablissementFusionneEvent etablissementFusionneEvent
-                = new EtablissementFusionneEvent(this, eventDTO.getEtablissementEventDTO(), eventDTO.getSirenFusionnes());
+                = new EtablissementFusionneEvent(this, eventDTO.getEtablissementDTO(), eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         eventRepository.save(new EventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseEventDTO eventDTO) {
+    public void division(@RequestBody EtablissementDiviseDto eventDTO) {
         EtablissementDiviseEvent etablissementDiviseEvent
-                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementEventDTOS());
+                = new EtablissementDiviseEvent(this, eventDTO.getAncienSiren(), eventDTO.getEtablissementDtos());
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventRepository.save(new EventEntity(etablissementDiviseEvent));
     }

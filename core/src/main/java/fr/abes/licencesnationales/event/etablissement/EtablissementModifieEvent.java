@@ -6,11 +6,7 @@ import lombok.Getter;
 
 @Getter
 public class EtablissementModifieEvent extends Event {
-
-
-
     private String siren;
-
     private String nomContact;
     private String prenomContact;
     private String mailContact;

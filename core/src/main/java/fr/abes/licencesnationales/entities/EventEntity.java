@@ -2,7 +2,8 @@ package fr.abes.licencesnationales.entities;
 
 import fr.abes.licencesnationales.converter.*;
 import fr.abes.licencesnationales.dto.editeur.*;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.event.editeur.EditeurModifieEvent;
@@ -73,11 +74,11 @@ public class EventEntity {
 
     @Lob
     @Convert(converter = EtablissementDTOConverter.class)
-    public EtablissementEventDTO etablissementEventDTOFusion;
+    public EtablissementDto etablissementFusionneDto;
 
     @Lob
     @Convert(converter = ListEtablissementDTOConverter.class)
-    public List<EtablissementEventDTO> etablisementsDivise;
+    public List<EtablissementDto> etablisementsDivise;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
@@ -99,11 +100,11 @@ public class EventEntity {
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
-    public Set<ContactCommercialEditeurEventDto> listeContactCommercialEditeurEventDto;
+    public Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
-    public Set<ContactTechniqueEditeurEventDto> listeContactTechniqueEditeurEventDto;
+    public Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
@@ -112,24 +113,24 @@ public class EventEntity {
 
 
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementEventDTO etablissement = etablissementCreeEvent.getEtablissement();
+        EtablissementCreeDto etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
         this.dateCreationEvent = etablissementCreeEvent.created;
-        this.nomEtab = etablissement.getNom();
-        this.siren = etablissement.getSiren();
-        this.typeEtablissement = etablissement.getTypeEtablissement();
-        this.motDePasse = etablissement.getMotDePasse();
-        this.idAbes = etablissement.getIdAbes();
-        this.mailContact = etablissement.getMailContact();
-        this.nomContact = etablissement.getNomContact();
-        this.prenomContact = etablissement.getPrenomContact();
-        this.telephoneContact = etablissement.getTelephoneContact();
-        this.adresseContact = etablissement.getAdresseContact();
-        this.boitePostaleContact = etablissement.getBoitePostaleContact();
-        this.codePostalContact = etablissement.getCodePostalContact();
-        this.cedexContact = etablissement.getCedexContact();
-        this.villeContact = etablissement.getVilleContact();
-        this.roleContact = etablissement.getRoleContact();
+        this.nomEtab = etablissement.getEtablissementDTO().getNom();
+        this.siren = etablissement.getEtablissementDTO().getSiren();
+        this.typeEtablissement = etablissement.getEtablissementDTO().getTypeEtablissement();
+        this.motDePasse = etablissement.getEtablissementDTO().getMotDePasse();
+        this.idAbes = etablissement.getEtablissementDTO().getIdAbes();
+        this.mailContact = etablissement.getEtablissementDTO().getMailContact();
+        this.nomContact = etablissement.getEtablissementDTO().getNomContact();
+        this.prenomContact = etablissement.getEtablissementDTO().getPrenomContact();
+        this.telephoneContact = etablissement.getEtablissementDTO().getTelephoneContact();
+        this.adresseContact = etablissement.getEtablissementDTO().getAdresseContact();
+        this.boitePostaleContact = etablissement.getEtablissementDTO().getBoitePostaleContact();
+        this.codePostalContact = etablissement.getEtablissementDTO().getCodePostalContact();
+        this.cedexContact = etablissement.getEtablissementDTO().getCedexContact();
+        this.villeContact = etablissement.getEtablissementDTO().getVilleContact();
+        this.roleContact = etablissement.getEtablissementDTO().getRoleContact();
     }
 
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
@@ -158,13 +159,13 @@ public class EventEntity {
         this.event = "divise";
         this.dateCreationEvent = etablissementDiviseEvent.created;
         this.ancienNomEtab = etablissementDiviseEvent.getAncienSiren();
-        this.etablisementsDivise = etablissementDiviseEvent.getEtablissementEventDTOS();
+        this.etablisementsDivise = etablissementDiviseEvent.getEtablissementDtos();
     }
 
     public EventEntity(EtablissementFusionneEvent etablissementFusionneEvent) {
         this.event = "fusionne";
         this.dateCreationEvent = etablissementFusionneEvent.created;
-        this.etablissementEventDTOFusion = etablissementFusionneEvent.getEtablissementEventDTO();
+        this.etablissementFusionneDto = etablissementFusionneEvent.getEtablissementDto();
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
     }
 
@@ -176,8 +177,8 @@ public class EventEntity {
         this.identifiantEditeur = editeur.getIdentifiantEditeur();
         this.groupesEtabRelies = editeur.getGroupesEtabRelies();
         this.adresseEditeur = editeur.getAdresseEditeur();
-        this.listeContactCommercialEditeurEventDto = editeur.getListeContactCommercialEditeurEventDto();
-        this.listeContactTechniqueEditeurEventDto = editeur.getListeContactTechniqueEditeurEventDto();
+        this.listeContactCommercialEditeurDto = editeur.getListeContactCommercialEditeurDto();
+        this.listeContactTechniqueEditeurDto = editeur.getListeContactTechniqueEditeurDto();
     }
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
@@ -188,8 +189,8 @@ public class EventEntity {
         this.identifiantEditeur = editeur.getIdentifiantEditeur();
         this.groupesEtabRelies = editeur.getGroupesEtabRelies();
         this.adresseEditeur = editeur.getAdresseEditeur();
-        this.listeContactCommercialEditeurEventDto = editeur.getListeContactCommercialEditeurEventDto();
-        this.listeContactTechniqueEditeurEventDto = editeur.getListeContactTechniqueEditeurEventDto();
+        this.listeContactCommercialEditeurDto = editeur.getListeContactCommercialEditeurDto();
+        this.listeContactTechniqueEditeurDto = editeur.getListeContactTechniqueEditeurDto();
     }
 
     public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {

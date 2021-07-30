@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +17,7 @@ public class EditeurModifieDto {
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
     private String adresseEditeur;
-    public Set<ContactCommercialEditeurEventDto> listeContactCommercialEditeurEventDto = new HashSet<>();
-    public Set<ContactTechniqueEditeurEventDto> listeContactTechniqueEditeurEventDto = new HashSet<>();
+    public Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto = new HashSet<>();
+    public Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto = new HashSet<>();
 
 }

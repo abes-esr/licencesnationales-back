@@ -9,7 +9,7 @@ import java.util.ArrayList;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EtablissementFusionneEventDTO {
-    private EtablissementEventDTO etablissementEventDTO;
+public class EtablissementFusionneDto {
+    private EtablissementDto etablissementDTO;
     private ArrayList<String> sirenFusionnes;
 }

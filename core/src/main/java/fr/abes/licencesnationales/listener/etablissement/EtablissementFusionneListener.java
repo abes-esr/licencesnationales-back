@@ -1,6 +1,6 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.converter.UtilsMapper;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EditeurEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
@@ -19,9 +19,11 @@ import java.util.stream.Collectors;
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {
 
     private final EtablissementService service;
+    private final UtilsMapper utilsMapper;
 
-    public EtablissementFusionneListener(EtablissementService service) {
+    public EtablissementFusionneListener(EtablissementService service, UtilsMapper utilsMapper) {
         this.service = service;
+        this.utilsMapper = utilsMapper;
     }
 
     @Override
@@ -46,29 +48,8 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
             service.deleteBySiren(siren);
         }
-
-        EtablissementEventDTO etablissementEventDTOFusione = etablissementFusionneEvent.getEtablissementEventDTO();
-        ContactEntity contactEntity =
-                new ContactEntity(null,
-                        etablissementEventDTOFusione.getNomContact(),
-                        etablissementEventDTOFusione.getPrenomContact(),
-                        etablissementEventDTOFusione.getMailContact(),
-                        etablissementEventDTOFusione.getMotDePasse(),
-                        etablissementEventDTOFusione.getTelephoneContact(),
-                        etablissementEventDTOFusione.getAdresseContact(),
-                        etablissementEventDTOFusione.getBoitePostaleContact(),
-                        etablissementEventDTOFusione.getCodePostalContact(),
-                        etablissementEventDTOFusione.getCedexContact(),
-                        etablissementEventDTOFusione.getVilleContact(),
-                        etablissementEventDTOFusione.getRoleContact());
-
-        EtablissementEntity etablissementEntity = new EtablissementEntity(null,
-                etablissementEventDTOFusione.getNom(),
-                etablissementEventDTOFusione.getSiren(),
-                etablissementEventDTOFusione.getTypeEtablissement(),
-                etablissementEventDTOFusione.getIdAbes(),
-                contactEntity,
-                editeurEntities);
+        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementFusionneEvent.getEtablissementDto(), EtablissementEntity.class);
+        etablissementEntity.setEditeurs(editeurEntities);
         etablissementEntity.setIps(ipEntities);
 
         service.save(etablissementEntity);

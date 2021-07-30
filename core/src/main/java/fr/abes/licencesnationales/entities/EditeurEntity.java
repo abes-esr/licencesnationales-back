@@ -2,8 +2,6 @@ package fr.abes.licencesnationales.entities;
 
 
 import fr.abes.licencesnationales.converter.JpaConverterJson;
-import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurEventDto;
-import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurEventDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
