@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
 
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
@@ -22,9 +22,9 @@ public class EtablissementDTOConverter implements AttributeConverter<Object, Str
     }
 
     @Override
-    public EtablissementEventDTO convertToEntityAttribute(String dbData) {
+    public EtablissementDto convertToEntityAttribute(String dbData) {
         try {
-            return objectMapper.readValue(dbData, EtablissementEventDTO.class);
+            return objectMapper.readValue(dbData, EtablissementDto.class);
         } catch (IOException ex) {
             return null;
         }

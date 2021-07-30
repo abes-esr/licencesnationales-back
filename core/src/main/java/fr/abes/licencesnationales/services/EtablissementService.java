@@ -21,6 +21,8 @@ public class EtablissementService {
         dao.save(entity);
     }
 
+    public void saveAll(List<EtablissementEntity> entities) { dao.saveAll(entities); }
+
     public void deleteBySiren(String siren) {
         dao.deleteBySiren(siren);
     }

@@ -1,7 +1,8 @@
 package fr.abes.licencesnationales.services;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.entities.EventEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.event.etablissement.EtablissementDiviseEvent;
@@ -32,23 +33,25 @@ public class ResetService {
                 eventRepository.findAll()) {
             switch (eventEntity.event) {
                 case "cree":
+                    EtablissementDto etablissementDto = new EtablissementDto(eventEntity.nomEtab,
+                            eventEntity.siren,
+                            eventEntity.typeEtablissement,
+                            eventEntity.idAbes,
+                            eventEntity.mailContact,
+                            eventEntity.motDePasse,
+                            eventEntity.nomContact,
+                            eventEntity.prenomContact,
+                            eventEntity.telephoneContact,
+                            eventEntity.adresseContact,
+                            eventEntity.boitePostaleContact,
+                            eventEntity.codePostalContact,
+                            eventEntity.cedexContact,
+                            eventEntity.roleContact,
+                            eventEntity.villeContact);
+                    EtablissementCreeDto etablissementCreeDto = new EtablissementCreeDto(etablissementDto, "");
                     EtablissementCreeEvent etablissementCreeEvent =
                             new EtablissementCreeEvent(this,
-                                    new EtablissementEventDTO(eventEntity.nomEtab,
-                                            eventEntity.siren,
-                                            eventEntity.typeEtablissement,
-                                            eventEntity.idAbes,
-                                            eventEntity.mailContact,
-                                            eventEntity.motDePasse,
-                                            eventEntity.nomContact,
-                                            eventEntity.prenomContact,
-                                            eventEntity.telephoneContact,
-                                            eventEntity.adresseContact,
-                                            eventEntity.boitePostaleContact,
-                                            eventEntity.codePostalContact,
-                                            eventEntity.cedexContact,
-                                            eventEntity.roleContact,
-                                            eventEntity.villeContact));
+                                    etablissementCreeDto);
                     applicationEventPublisher.publishEvent(etablissementCreeEvent);
                     break;
                 case "supprime":
@@ -61,13 +64,13 @@ public class ResetService {
                             new EtablissementDiviseEvent(
                                     this,
                                     eventEntity.ancienNomEtab,
-                                    (ArrayList<EtablissementEventDTO>) eventEntity.etablisementsDivise);
+                                    (ArrayList<EtablissementDto>) eventEntity.etablisementsDivise);
                     applicationEventPublisher.publishEvent(etablissementDiviseEvent);
                     break;
                 case "fusionne":
                     EtablissementFusionneEvent etablissementFusionneEvent =
                             new EtablissementFusionneEvent(this,
-                                    eventEntity.etablissementEventDTOFusion,
+                                    eventEntity.etablissementFusionneDto,
                                     (ArrayList<String>) eventEntity.etablissementsFusionne);
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;

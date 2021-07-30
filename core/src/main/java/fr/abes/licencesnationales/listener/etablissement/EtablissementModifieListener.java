@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
 
+import fr.abes.licencesnationales.converter.UtilsMapper;
+import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementModifieEvent;
 import fr.abes.licencesnationales.repository.EtablissementRepository;
@@ -15,26 +17,18 @@ import java.util.Optional;
 public class EtablissementModifieListener implements ApplicationListener<EtablissementModifieEvent> {
 
     private final EtablissementService service;
+    private final UtilsMapper utilsMapper;
 
-    public EtablissementModifieListener(EtablissementService service) {
+    public EtablissementModifieListener(EtablissementService service, UtilsMapper utilsMapper) {
         this.service = service;
+        this.utilsMapper = utilsMapper;
     }
 
     @Override
     @Transactional
     public void onApplicationEvent(EtablissementModifieEvent etablissementModifieEvent) {
         EtablissementEntity etablissementEntity = service.getFirstBySiren(etablissementModifieEvent.getSiren());
-
-        etablissementEntity.getContact().setNom(etablissementModifieEvent.getNomContact());
-        etablissementEntity.getContact().setPrenom(etablissementModifieEvent.getPrenomContact());
-        etablissementEntity.getContact().setAdresse(etablissementModifieEvent.getAdresseContact());
-        etablissementEntity.getContact().setMail(etablissementModifieEvent.getMailContact());
-        etablissementEntity.getContact().setTelephone(etablissementModifieEvent.getTelephoneContact());
-        etablissementEntity.getContact().setBoitePostale(etablissementModifieEvent.getBoitePostaleContact());
-        etablissementEntity.getContact().setCodePostal(etablissementModifieEvent.getCodePostalContact());
-        etablissementEntity.getContact().setVille(etablissementModifieEvent.getVilleContact());
-        etablissementEntity.getContact().setCedex(etablissementModifieEvent.getCedexContact());
-
+        etablissementEntity.setContact(utilsMapper.map(etablissementModifieEvent, ContactEntity.class));
         service.save(etablissementEntity);
     }
 }

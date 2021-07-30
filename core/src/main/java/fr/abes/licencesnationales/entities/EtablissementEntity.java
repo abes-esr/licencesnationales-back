@@ -1,11 +1,14 @@
 package fr.abes.licencesnationales.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
@@ -14,6 +17,7 @@ import java.util.Set;
 @Entity
 @Table(name = "Etablissement")
 @NoArgsConstructor
+@AllArgsConstructor
 @Setter
 @Getter
 public class EtablissementEntity implements Serializable {
@@ -23,12 +27,17 @@ public class EtablissementEntity implements Serializable {
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
     private Long id;
 
+    @NotBlank
+    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom d'établissement fourni n'est pas valide")
     private String name;
 
+    @NotBlank
+    @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
     private String siren;
 
     private Date dateCreation;
 
+    @NotBlank
     private String typeEtablissement;
 
     private boolean valide;

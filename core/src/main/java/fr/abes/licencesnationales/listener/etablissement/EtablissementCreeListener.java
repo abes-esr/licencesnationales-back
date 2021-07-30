@@ -1,7 +1,9 @@
 package fr.abes.licencesnationales.listener.etablissement;
 
 
-import fr.abes.licencesnationales.dto.etablissement.EtablissementEventDTO;
+import fr.abes.licencesnationales.converter.UtilsMapper;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.entities.ContactEntity;
 import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.event.etablissement.EtablissementCreeEvent;
@@ -13,36 +15,16 @@ import org.springframework.stereotype.Component;
 public class EtablissementCreeListener implements ApplicationListener<EtablissementCreeEvent> {
 
     private final EtablissementService service;
+    private final UtilsMapper utilsMapper;
 
-    public EtablissementCreeListener(EtablissementService service) {
+    public EtablissementCreeListener(EtablissementService service, UtilsMapper utilsMapper) {
         this.service = service;
+        this.utilsMapper = utilsMapper;
     }
 
     @Override
     public void onApplicationEvent(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementEventDTO etablissement = etablissementCreeEvent.getEtablissement();
-        ContactEntity contactEntity =
-                new ContactEntity(null,
-                        etablissement.getNomContact(),
-                        etablissement.getPrenomContact(),
-                        etablissement.getMailContact(),
-                        etablissement.getMotDePasse(),
-                        etablissement.getTelephoneContact(),
-                        etablissement.getAdresseContact(),
-                        etablissement.getBoitePostaleContact(),
-                        etablissement.getCodePostalContact(),
-                        etablissement.getCedexContact(),
-                        etablissement.getVilleContact(),
-                        etablissement.getRoleContact());
-        EtablissementEntity etablissementEntity =
-                new EtablissementEntity(null,
-                        etablissement.getNom(),
-                        etablissement.getSiren(),
-                        etablissement.getTypeEtablissement(),
-                        etablissement.getIdAbes(),
-                        contactEntity,
-                        null);
-
+        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class);
         service.save(etablissementEntity);
 
     }

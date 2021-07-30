@@ -3,13 +3,12 @@ package fr.abes.licencesnationales.dto.etablissement;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import java.util.ArrayList;
-
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EtablissementDiviseEventDTO {
-    private String ancienSiren;
-    private ArrayList<EtablissementEventDTO> etablissementEventDTOS;
+public class EtablissementCreeDto {
+    private EtablissementDto etablissementDTO;
+    private String recaptcha;
 }

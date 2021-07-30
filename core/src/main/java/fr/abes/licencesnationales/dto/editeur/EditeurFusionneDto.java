@@ -18,6 +18,6 @@ public class EditeurFusionneDto {
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
     private String adresseEditeur;
-    private Set<ContactCommercialEditeurEventDto> listeContactCommercialEditeurEventDto = new HashSet<>();
-    private Set<ContactTechniqueEditeurEventDto> listeContactTechniqueEditeurEventDto = new HashSet<>();
+    private Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto = new HashSet<>();
+    private Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto = new HashSet<>();
 }

@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.constant.Constant;
 import fr.abes.licencesnationales.dto.MailDto;
-import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurEventDto;
-import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurEventDto;
+import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurDto;
+import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.repository.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.repository.EditeurRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -39,17 +39,17 @@ public class EmailService {
     @Value("${mail.ws.url}")
     protected String url;
 
-    public boolean checkDoublonMail(Set<ContactCommercialEditeurEventDto> c, Set<ContactTechniqueEditeurEventDto> t) {
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurDto> c, Set<ContactTechniqueEditeurDto> t) {
         log.info("DEBUT checkDoublonMail ");
         boolean existeMailCommercial = false;
         boolean existeMailTechnique = false;
         String mail;
-        for (ContactCommercialEditeurEventDto contact : c){
+        for (ContactCommercialEditeurDto contact : c){
             mail = contact.getMailContactCommercial();
             log.info("mail = "+ mail);
             existeMailCommercial = editeurRepository.existeMail(mail);
         }
-        for (ContactTechniqueEditeurEventDto contact : t){
+        for (ContactTechniqueEditeurDto contact : t){
             mail = contact.getMailContactTechnique();
             log.info("mail = "+ mail);
             existeMailTechnique = contactTechniqueEditeurRepository.existeMail(mail);
