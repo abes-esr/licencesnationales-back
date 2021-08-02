@@ -1,5 +1,8 @@
 package fr.abes.licencesnationales.core.entities;
 
+import fr.abes.licencesnationales.core.converter.EtablissementDTOConverter;
+import fr.abes.licencesnationales.core.converter.JpaConverterJson;
+import fr.abes.licencesnationales.core.converter.ListEtablissementDTOConverter;
 import fr.abes.licencesnationales.core.dto.editeur.*;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
@@ -234,7 +237,7 @@ public class EventEntity {
     public EventEntity(IpSupprimeeEvent ipSupprimeeEvent) {
         this.event = "ipSupprimee";
         this.dateCreationEvent = ipSupprimeeEvent.created;
-        this.id = Long.parseLong(ipSupprimeeEvent.getId());
+        this.id = ipSupprimeeEvent.getId();
         this.siren = ipSupprimeeEvent.getSiren();
     }
 

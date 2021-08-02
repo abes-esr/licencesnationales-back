@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.service;
 
-import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaKeys;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,8 @@ import java.net.URI;
 @Slf4j
 @NoArgsConstructor
 public class ReCaptchaService {
-    private RecaptchaKeys reCaptchaKeys;
+
+    private ReCaptchaKeys reCaptchaKeys;
     private RestTemplate restTemplate;
 
     @Autowired

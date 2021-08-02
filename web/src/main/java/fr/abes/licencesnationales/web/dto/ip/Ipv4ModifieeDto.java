@@ -18,8 +18,4 @@ public class Ipv4ModifieeDto extends IpModifieeDto {
     @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$", message = "L'IP fournie n'est pas valide")
     private String ip;
 
-    public Ipv4ModifieeDto(String siren, String id, String ip, String validee, String typeIp, String typeAcces, String commentaires) {
-        super(siren, id, ip, validee, typeAcces, typeIp, commentaires);
-        this.ip = ip;
-    }
 }
