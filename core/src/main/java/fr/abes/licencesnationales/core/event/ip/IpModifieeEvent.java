@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.event.ip;
 
+import fr.abes.licencesnationales.core.dto.ip.IpModifieeDto;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
 
@@ -13,14 +14,22 @@ public class IpModifieeEvent extends Event {
     private String typeIp;
     private String commentaires;
 
-    public IpModifieeEvent(Object source, String siren, Long id, String ip, boolean validee, String typeAcces, String typeIp, String commentaires) {
+    public IpModifieeEvent(Object source, String siren, String ip, boolean validee, String typeAcces, String typeIp, String commentaires) {
         super(source);
         this.siren = siren;
-        this.id = id;
         this.ip = ip;
         this.validee=validee;
         this.typeAcces=typeAcces;
         this.typeIp=typeIp;
         this.commentaires=commentaires;
+    }
+
+    public IpModifieeEvent(Object source, IpModifieeDto ipModifieeDto) {
+        super(source);
+        this.siren = ipModifieeDto.getSiren();
+        this.id = ipModifieeDto.getId();
+        this.ip = ipModifieeDto.getIp();
+        this.typeAcces = ipModifieeDto.getTypeAcces();
+        this.typeIp = ipModifieeDto.getTypeIp();
     }
 }

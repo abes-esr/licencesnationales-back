@@ -177,7 +177,6 @@ public class IpController {
         ipService.checkDoublonIpModifieeDto(ipModifieeDto);
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
                 siren,
-                Long.parseLong(ipModifieeDto.getId()),
                 ipModifieeDto.getIp(),
                 ipModifieeDto.isValidee(),
                 ipModifieeDto.getTypeAcces(),

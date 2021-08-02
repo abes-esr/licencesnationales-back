@@ -202,6 +202,7 @@ public class EntityConverter {
             public IpEntity convert(MappingContext<IpModifieeEvent, IpEntity> context) {
                 IpModifieeEvent ipModifieeEvent = context.getSource();
                 IpEntity entity = new IpEntity();
+                entity.setId(ipModifieeEvent.getId());
                 entity.setIp(ipModifieeEvent.getIp());
                 entity.setValidee(ipModifieeEvent.isValidee());
                 entity.setDateModification(new Date());

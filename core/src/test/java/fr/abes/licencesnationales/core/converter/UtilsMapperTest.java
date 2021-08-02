@@ -4,13 +4,13 @@ import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
-import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.ContactEntity;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.dto.ip.IpAjouteeDto;
+import fr.abes.licencesnationales.core.entities.*;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
+import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
+import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -31,7 +31,7 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test création Event Editeur")
-    public void testMapperEditeurCreeEvent() {
+    public void testMapperEditeurEventCree() {
         EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
         editeurCreeDto.setNomEditeur("testNom");
         editeurCreeDto.setAdresseEditeur("testAdresse");
@@ -153,5 +153,38 @@ public class UtilsMapperTest {
         Assert.assertEquals("villeTest", entity.getContact().getVille());
         Assert.assertEquals("roleTest", entity.getContact().getRole());
         Assert.assertEquals("testNom", entity.getName());
+    }
+
+    @Test
+    @DisplayName("test mapper IP créée")
+    public void testMapperIpEventAJoutee() {
+        IpAjouteeDto ipAjouteeDto = new IpAjouteeDto();
+        ipAjouteeDto.setSiren("123456789");
+        ipAjouteeDto.setCommentaires("testCommentaire");
+        ipAjouteeDto.setIp("127.0.0.1");
+        ipAjouteeDto.setTypeIp("IPV4");
+        ipAjouteeDto.setTypeAcces("ip");
+
+        IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this, ipAjouteeDto);
+
+        IpEntity ipEntity = utilsMapper.map(ipAjouteeEvent, IpEntity.class);
+
+        Assert.assertEquals("testCommentaire", ipEntity.getCommentaires());
+        Assert.assertEquals("127.0.0.1", ipEntity.getIp());
+        Assert.assertEquals("IPV4", ipEntity.getTypeIp());
+        Assert.assertEquals("ip", ipEntity.getTypeAcces());
+    }
+
+    @Test
+    @DisplayName("test mapper IP modifiée")
+    public void testMapperIpEventModifiee() {
+        IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,"123456789", "127.0.0.1", true, "ip", "IPV4", "testCommentaire");
+
+        IpEntity ipEntity = utilsMapper.map(ipModifieeEvent, IpEntity.class);
+
+        Assert.assertEquals("testCommentaire", ipEntity.getCommentaires());
+        Assert.assertEquals("127.0.0.1", ipEntity.getIp());
+        Assert.assertEquals("IPV4", ipEntity.getTypeIp());
+        Assert.assertEquals("ip", ipEntity.getTypeAcces());
     }
 }
