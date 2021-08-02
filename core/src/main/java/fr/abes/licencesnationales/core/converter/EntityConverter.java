@@ -57,6 +57,7 @@ public class EntityConverter {
                 EditeurModifieDto dto = source.getEditeur();
 
                 EditeurEntity entity = new EditeurEntity();
+                entity.setId(dto.getId());
                 entity.setNomEditeur(dto.getNomEditeur());
                 entity.setIdentifiantEditeur(dto.getIdentifiantEditeur());
                 entity.setAdresseEditeur(dto.getAdresseEditeur());

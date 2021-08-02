@@ -36,8 +36,9 @@ public class EditeurController {
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void modificationEditeur (@PathVariable String id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException {
+    public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException {
         EditeurModifieDto editeurModifieDto = mapper.map(editeurModifieDTO, EditeurModifieDto.class);
+        editeurModifieDto.setId(id);
         editeurService.updateEditeur(editeurModifieDto);
     }
 

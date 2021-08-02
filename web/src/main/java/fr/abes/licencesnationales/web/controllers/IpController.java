@@ -204,7 +204,6 @@ public class IpController {
 
     @DeleteMapping(value = "/supprime")
     public void delete(@Valid @RequestBody IpSupprimeeDto ipSupprimeeDto) throws SirenIntrouvableException, AccesInterditException {
-        log.info("ipSupprimeeDTO.getId() = " + ipSupprimeeDto.getId());
         IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
                 ipSupprimeeDto.getId(),
                 filtrerAccesServices.getSirenFromSecurityContextUser());
@@ -214,7 +213,7 @@ public class IpController {
 
     @DeleteMapping(value = "/supprimeByAdmin")
     @PreAuthorize("hasAuthority('admin')")
-    public void deleteByAdmin(@Valid @RequestBody IpSupprimeeDto ipSupprimeeDto) throws SirenIntrouvableException, AccesInterditException {
+    public void deleteByAdmin(@Valid @RequestBody IpSupprimeeDto ipSupprimeeDto) {
         IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
                 ipSupprimeeDto.getId(),
                 ipSupprimeeDto.getSiren());
