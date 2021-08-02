@@ -33,7 +33,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     protected EtablissementController controller;
 
     @MockBean
-    private EtablissementService service;
+    private EtablissementService etablissementService;
 
     @MockBean
     private ReCaptchaService reCaptchaService;
@@ -74,7 +74,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
-
+        Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
         Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
 
         Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(Locale.class), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
@@ -111,7 +111,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
-
+        Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
         Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(true);
 
         this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
@@ -127,7 +127,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         etabList.add(new EtablissementEntity(1L, "testNom", "123456789", "testType", "1", null, null));
         etabList.add(new EtablissementEntity(2L, "testNom", "123456789", "testType", "1", null, null));
         etabList.add(new EtablissementEntity(3L, "testNom", "123456789", "testType", "1", null, null));
-        Mockito.when(service.findAll()).thenReturn(etabList);
+        Mockito.when(etablissementService.findAll()).thenReturn(etabList);
 
         this.mockMvc.perform(get("/v1/ln/etablissement/getListEtab")).andExpect(status().isOk());
         this.mockMvc.perform(post("/v1/ln/etablissement/getListEtab")).andExpect(status().isMethodNotAllowed());

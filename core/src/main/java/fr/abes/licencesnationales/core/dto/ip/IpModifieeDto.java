@@ -13,7 +13,7 @@ public class IpModifieeDto {
     //pas besoin dans le cas modif par etab (on le cherche dans le fr.abes.licencesnationales.web.security contextuser
     //mais necessaire dans le cas d'une modif par l'admin (puisque dans le fr.abes.licencesnationales.web.security context c'est le token admin
     private String siren;
-    private String id;
+    private Long id;
     private String ip;
     private boolean validee;
     private String typeAcces;
