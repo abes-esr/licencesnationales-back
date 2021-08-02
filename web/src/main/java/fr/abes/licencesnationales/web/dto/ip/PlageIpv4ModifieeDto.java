@@ -18,8 +18,4 @@ public class PlageIpv4ModifieeDto extends IpModifieeDto {
     @Pattern(regexp = "^(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))$", message = "La plage d'Ips fournie n'est pas valide")
     private String ip;
 
-    public PlageIpv4ModifieeDto(String siren, String id, String ip, String validee, String typeIp, String typeAcces, String commentaires) {
-        super(siren, id, ip, validee, typeAcces, typeIp, commentaires);
-        this.ip = ip;
-    }
 }
