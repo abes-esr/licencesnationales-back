@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import fr.abes.licencesnationales.core.exception.*;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.modelmapper.MappingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -12,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.transaction.TransactionSystemException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -23,7 +26,10 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Gestionnaire des exceptions de l'API.
@@ -167,6 +173,14 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(TransactionSystemException.class)
+    protected ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
+        String error = "Erreur de mise à jour de la base de données";
+        Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
+                .filter(element -> element.getCause() == null)
+                .findFirst();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, rootCause.get()));
+    }
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP

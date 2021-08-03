@@ -84,8 +84,8 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructValidationNewPassEmail(Locale locale, String emailUser) throws RestClientException {
-        final String message = messageSource.getMessage("message.validationNewPass", null, locale);
+    public void constructValidationNewPassEmail(String emailUser) throws RestClientException {
+        final String message = messageSource.getMessage("message.validationNewPass", null, Locale.FRANCE);
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message);
         sendMail(jsonRequestConstruct);
     }
