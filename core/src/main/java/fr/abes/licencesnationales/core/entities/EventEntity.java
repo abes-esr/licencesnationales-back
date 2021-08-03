@@ -38,78 +38,108 @@ public class EventEntity {
     @SequenceGenerator(name = "event_Sequence", sequenceName = "EVENT_SEQ", allocationSize = 1)
     public Long id;
 
+    @Column(name = "DATE_CREATION_EVENT")
     public Date dateCreationEvent;
 
+    @Column(name = "EVENT")
     public String event;
 
+    @Column(name = "NOM_ETAB")
     public String nomEtab;
 
+    @Column(name = "ADRESSE")
     public String adresse;
 
+    @Column(name = "TYPE_ETABLISSEMENT")
     public String typeEtablissement;
 
+    @Column(name = "MOT_DE_PASSE")
     public String motDePasse;
 
+    @Column(name = "ID_ABES")
     public String idAbes;
 
+    @Column(name = "MAIL_CONTACT")
     public String mailContact;
 
+    @Column(name = "NOM_CONTACT")
     public String nomContact;
 
+    @Column(name = "PRENOM_CONTACT")
     public String prenomContact;
 
+    @Column(name = "TELEPHONE_CONTACT")
     public String telephoneContact;
 
+    @Column(name = "ADRESSE_CONTACT")
     public String adresseContact;
 
+    @Column(name = "BOITE_POSTALE_CONTACT")
     public String boitePostaleContact;
 
+    @Column(name = "CODE_POSTAL_CONTACT")
     public String codePostalContact;
 
+    @Column(name = "CEDEX_CONTACT")
     public String cedexContact;
 
+    @Column(name = "VILLE_CONTACT")
     public String villeContact;
 
+    @Column(name = "ROLE_CONTACT")
     public String roleContact;
 
+    @Column(name = "ANCIEN_NOM_ETAB")
     public String ancienNomEtab;
 
     @Lob
     @Convert(converter = EtablissementDTOConverter.class)
+    @Column(name = "ETABLISSEMENTDTOFUSION")
     public EtablissementDto etablissementFusionneDto;
 
     @Lob
     @Convert(converter = ListEtablissementDTOConverter.class)
+    @Column(name = "ETABLISEMENTS_DIVISE")
     public List<EtablissementDto> etablisementsDivise;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
+    @Column(name = "ETABLISSEMENTS_FUSIONNE")
     public List<String> etablissementsFusionne;
 
+    @Column(name = "IP")
     public String ip;
 
+    @Column(name = "SIREN")
     public String siren;
 
+    @Column(name = "NOM_EDITEUR")
     public String nomEditeur;
 
+    @Column(name = "IDENTIFIANT_EDITEUR")
     public String identifiantEditeur;
 
+    @Column(name = "ADRESSE_EDITEUR")
     public String adresseEditeur;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
+    @Column(name = "GROUPES_ETAB_RELIES")
     public List<String> groupesEtabRelies = new ArrayList<>();
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
+    @Column(name = "LISTE_CONTACT_COMMERCIAL_EDITEURDTO")
     public Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
+    @Column(name = "LISTE_CONTACT_TECHNIQUE_EDITEURDTO")
     public Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
+    @Column(name = "ID_EDITEUR_FUSIONNES")
     private List<Long> idEditeurFusionnes;
 
 

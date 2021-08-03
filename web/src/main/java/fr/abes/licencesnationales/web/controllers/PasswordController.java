@@ -1,11 +1,14 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.web.dto.PasswordWebDto;
+import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
+import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;
+import fr.abes.licencesnationales.web.dto.password.PasswordUpdateWebDto;
 import fr.abes.licencesnationales.core.entities.ContactEntity;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
+import fr.abes.licencesnationales.web.dto.password.TokenDto;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
@@ -15,7 +18,6 @@ import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
-import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import io.swagger.annotations.ApiOperation;
@@ -39,19 +41,14 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/v1/ln/reinitialisationMotDePasse")
 public class PasswordController {
-
-
     @Autowired
     private JwtTokenProvider tokenProvider;
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
-    EtablissementService etablissementService;
-
-    @Autowired
-    private ContactService contactService;
+    private EtablissementService etablissementService;
 
     @Autowired
     private ReCaptchaService reCaptchaService;
@@ -60,8 +57,6 @@ public class PasswordController {
     private PasswordEncoder passwordEncoder;
 
     private UserDetails userDetails;
-
-    private String emailUser;
 
     @Value("${site.url}")
     private String urlSite;
@@ -76,7 +71,7 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/resetPassword")
-    public void resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto userEmailOrSiren) throws DonneeIncoherenteBddException, RestClientException {
+    public void resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordResetWebDto userEmailOrSiren) throws DonneeIncoherenteBddException, RestClientException {
         String mail;
         String siren;
         EtablissementEntity user;
@@ -99,12 +94,12 @@ public class PasswordController {
 
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
-        emailUser = ((UserDetailsImpl) userDetails).getEmail();
+        String emailUser = ((UserDetailsImpl) userDetails).getEmail();
         emailService.constructResetTokenEmail(urlSite, request.getLocale(), jwt, emailUser, nomEtab);
     }
 
     @PostMapping("/verifTokenValide")
-    public boolean verifTokenValide(@Valid @RequestBody PasswordWebDto requestData) {
+    public boolean verifTokenValide(@Valid @RequestBody TokenDto requestData) {
         log.info("requestDataVerifTokenValid = " + requestData);
         String jwtToken = requestData.getToken();
         log.info("token = " + jwtToken);
@@ -119,8 +114,8 @@ public class PasswordController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/enregistrerPassword")
-    public void enregistrerPassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) throws RestClientException, CaptchaException {
-        String recaptcha = requestData.getRepatcha();
+    public void enregistrerPassword(@Valid @RequestBody PasswordEnregistrerWebDto requestData) throws RestClientException, CaptchaException {
+        String recaptcha = requestData.getRecaptcha();
         String mdp = requestData.getPassword();
         String token = requestData.getToken();
         String action = "reinitialisationPass";
@@ -132,35 +127,31 @@ public class PasswordController {
         }
         if (tokenProvider.validateToken(token)) {
             String siren = tokenProvider.getSirenFromJwtToken(token);
-            log.info("siren = " + siren);
-            String mdphash = passwordEncoder.encode(mdp);
-            log.info("mdphash = " + mdp);
-            EtablissementEntity e = etablissementService.getFirstBySiren(siren);
-            ContactEntity c = e.getContact();
-            c.setMotDePasse(mdphash);
-            contactService.save(c);
-            emailUser = c.getMail();
-            emailService.constructValidationNewPassEmail(request.getLocale(), emailUser);
+            etablissementService.changePasswordFromSiren(siren, mdp);
         }
     }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping("/updatePassword")
-    public void updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordWebDto requestData) throws PasswordMismatchException {
+    public void updatePassword(HttpServletRequest request, @Valid @RequestBody PasswordUpdateWebDto requestData) throws PasswordMismatchException {
 
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(request));
         String oldPassword = requestData.getOldPassword();
-        String newPasswordHash = passwordEncoder.encode(requestData.getNewPassword());
+        String newPasswordHash = requestData.getNewPassword();
 
         EtablissementEntity e = etablissementService.getFirstBySiren(siren);
         ContactEntity c = e.getContact();
-
+        //le premier mot de passe ne doit pas être encodé, le second oui
         if (passwordEncoder.matches(oldPassword, c.getMotDePasse())) {
-            UpdatePasswordEvent updatePasswordEvent = new UpdatePasswordEvent(this, siren, newPasswordHash);
-            applicationEventPublisher.publishEvent(updatePasswordEvent);
-            eventRepository.save(new EventEntity(updatePasswordEvent));
+            if (!passwordEncoder.matches(newPasswordHash, c.getMotDePasse())) {
+                UpdatePasswordEvent updatePasswordEvent = new UpdatePasswordEvent(this, siren, newPasswordHash);
+                applicationEventPublisher.publishEvent(updatePasswordEvent);
+                eventRepository.save(new EventEntity(updatePasswordEvent));
+            } else {
+                throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");
+            }
         } else {
-            throw new PasswordMismatchException("Le mot de passe renseigné ne correspond pas à votre ancien mot de passe.");
+            throw new PasswordMismatchException("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel.");
         }
     }
 }

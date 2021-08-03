@@ -1,10 +1,13 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.entities.ContactEntity;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 import java.util.List;
 
@@ -12,6 +15,15 @@ import java.util.List;
 public class EtablissementService {
     @Autowired
     private EtablissementRepository dao;
+
+    @Autowired
+    private ContactService contactService;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private EmailService emailService;
 
     public EtablissementEntity getFirstBySiren(String siren) {
         return dao.getFirstBySiren(siren).orElseThrow(UnknownEtablissementException::new);
@@ -37,5 +49,14 @@ public class EtablissementService {
 
     public EtablissementEntity getUserByMail(String mail) {
         return dao.getUserByMail(mail).orElseThrow(UnknownEtablissementException::new);
+    }
+
+    public void changePasswordFromSiren(String siren, String password) throws RestClientException {
+        String mdphash = passwordEncoder.encode(password);
+        EtablissementEntity e = getFirstBySiren(siren);
+        ContactEntity c = e.getContact();
+        c.setMotDePasse(mdphash);
+        contactService.save(c);
+        emailService.constructValidationNewPassEmail(c.getMail());
     }
 }

@@ -13,12 +13,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -28,18 +30,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 public class AuthenticationControllerTest  extends LicencesNationalesAPIApplicationTests {
+    @Autowired
+    private PasswordEncoder passwordEncoder;
     @MockBean
     private AuthenticationManager authenticationManager;
 
     @MockBean
     private UserDetailsServiceImpl service;
 
-    EtablissementEntity user = MockUserUtil.getMockUser();
+    EtablissementEntity user;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     public void init() throws DonneeIncoherenteBddException {
+        user = new MockUserUtil(passwordEncoder).getMockUser();
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken("123456789", "secret"));
         Mockito.when(service.loadUserByUsername(Mockito.anyString())).thenReturn(UserDetailsImpl.build(user));
     }
