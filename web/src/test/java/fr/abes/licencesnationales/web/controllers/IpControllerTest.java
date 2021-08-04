@@ -27,6 +27,7 @@ import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -34,8 +35,10 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,9 +73,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @MockBean
     private SecurityContextHolder securityContextHolder;
 
-    @MockBean
-    private MockUserDetailsImpl userDetails;
-
     /*@MockBean
     private UtilsMapper mapper;*/
 
@@ -84,10 +84,16 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @Test
     @DisplayName("test ajout IPV4")
+    @WithMockUser
     public void testAjoutIPV4() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn(userDetails.getMockUserDetailsImpl().getSiren());
-        //Mockito.when(securityContextHolder.getContext().getAuthentication().getPrincipal()).thenReturn(userDetails);
-        //Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        EtablissementEntity etablissementEntity = new EtablissementEntity();
+        etablissementEntity.setName("testEtab");
+        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
+        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
         dto.setSiren(siren);
@@ -95,7 +101,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV4");
-        this.mockMvc.perform(post("/v1/ln/ip/ajoutIPV4")
+        this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV4")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
