@@ -125,7 +125,7 @@ public class IpController {
         String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
         //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, fr.abes.licencesnationales.core.event.getCommentaires(), admin));
-        emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, event.getCommentaires(), admin);
+        emailService.constructAccesCreeEmail(descriptionAcces, event.getCommentaires(), admin);
 
     }
 
@@ -187,7 +187,7 @@ public class IpController {
         String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = "id = " + ipModifieeDto.getId() + ", ip ou plage d'ips = " + ipModifieeDto.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
-        emailService.constructAccesModifieEmail(new Locale("fr", "FR"), descriptionAcces, ipModifieeDto.getCommentaires(), admin);
+        emailService.constructAccesModifieEmail(descriptionAcces, ipModifieeDto.getCommentaires(), admin);
 
     }
 

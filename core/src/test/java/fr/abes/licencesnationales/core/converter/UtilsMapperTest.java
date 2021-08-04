@@ -11,19 +11,19 @@ import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEven
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {UtilsMapper.class, EntityConverter.class})
 public class UtilsMapperTest {
     @Autowired
@@ -47,12 +47,12 @@ public class UtilsMapperTest {
 
         EditeurEntity entity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
 
-        Assert.assertEquals("testNom", entity.getNomEditeur());
-        Assert.assertEquals("testAdresse", entity.getAdresseEditeur());
-        Assert.assertEquals("123456", entity.getIdentifiantEditeur());
-        Assert.assertEquals(2, entity.getGroupesEtabRelies().size());
+        Assertions.assertEquals("testNom", entity.getNomEditeur());
+        Assertions.assertEquals("testAdresse", entity.getAdresseEditeur());
+        Assertions.assertEquals("123456", entity.getIdentifiantEditeur());
+        Assertions.assertEquals(2, entity.getGroupesEtabRelies().size());
         ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
-        Assert.assertEquals("testNom", commercialEntity.getNomContactCommercial());
+        Assertions.assertEquals("testNom", commercialEntity.getNomContactCommercial());
     }
 
     @Test
@@ -77,20 +77,20 @@ public class UtilsMapperTest {
 
         EtablissementEntity entity = utilsMapper.map(etablissement, EtablissementEntity.class);
 
-        Assert.assertEquals("testType", entity.getTypeEtablissement());
-        Assert.assertEquals("123456789", entity.getSiren());
-        Assert.assertEquals("1234", entity.getIdAbes());
-        Assert.assertEquals("nomContactTest",entity.getContact().getNom());
-        Assert.assertEquals("prenomContactTest", entity.getContact().getPrenom());
-        Assert.assertEquals("mail@test.com", entity.getContact().getMail());
-        Assert.assertEquals("0000000000", entity.getContact().getTelephone());
-        Assert.assertEquals("adresseTest", entity.getContact().getAdresse());
-        Assert.assertEquals("BPTest", entity.getContact().getBoitePostale());
-        Assert.assertEquals("00000", entity.getContact().getCodePostal());
-        Assert.assertEquals("cedexTest", entity.getContact().getCedex());
-        Assert.assertEquals("villeTest", entity.getContact().getVille());
-        Assert.assertEquals("roleTest", entity.getContact().getRole());
-        Assert.assertEquals("testNom", entity.getName());
+        Assertions.assertEquals("testType", entity.getTypeEtablissement());
+        Assertions.assertEquals("123456789", entity.getSiren());
+        Assertions.assertEquals("1234", entity.getIdAbes());
+        Assertions.assertEquals("nomContactTest",entity.getContact().getNom());
+        Assertions.assertEquals("prenomContactTest", entity.getContact().getPrenom());
+        Assertions.assertEquals("mail@test.com", entity.getContact().getMail());
+        Assertions.assertEquals("0000000000", entity.getContact().getTelephone());
+        Assertions.assertEquals("adresseTest", entity.getContact().getAdresse());
+        Assertions.assertEquals("BPTest", entity.getContact().getBoitePostale());
+        Assertions.assertEquals("00000", entity.getContact().getCodePostal());
+        Assertions.assertEquals("cedexTest", entity.getContact().getCedex());
+        Assertions.assertEquals("villeTest", entity.getContact().getVille());
+        Assertions.assertEquals("roleTest", entity.getContact().getRole());
+        Assertions.assertEquals("testNom", entity.getName());
     }
 
     @Test
@@ -100,15 +100,15 @@ public class UtilsMapperTest {
 
         ContactEntity entity = utilsMapper.map(etablissementModifieEvent, ContactEntity.class);
 
-        Assert.assertEquals("nomContactTest",entity.getNom());
-        Assert.assertEquals("prenomContactTest", entity.getPrenom());
-        Assert.assertEquals("mail@test.com", entity.getMail());
-        Assert.assertEquals("0000000000", entity.getTelephone());
-        Assert.assertEquals("adresseTest", entity.getAdresse());
-        Assert.assertEquals("BPTest", entity.getBoitePostale());
-        Assert.assertEquals("00000", entity.getCodePostal());
-        Assert.assertEquals("cedexTest", entity.getCedex());
-        Assert.assertEquals("villeTest", entity.getVille());
+        Assertions.assertEquals("nomContactTest",entity.getNom());
+        Assertions.assertEquals("prenomContactTest", entity.getPrenom());
+        Assertions.assertEquals("mail@test.com", entity.getMail());
+        Assertions.assertEquals("0000000000", entity.getTelephone());
+        Assertions.assertEquals("adresseTest", entity.getAdresse());
+        Assertions.assertEquals("BPTest", entity.getBoitePostale());
+        Assertions.assertEquals("00000", entity.getCodePostal());
+        Assertions.assertEquals("cedexTest", entity.getCedex());
+        Assertions.assertEquals("villeTest", entity.getVille());
     }
 
     @Test
@@ -138,21 +138,21 @@ public class UtilsMapperTest {
 
         EtablissementEntity entity = utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class);
 
-        Assert.assertEquals("testType", entity.getTypeEtablissement());
-        Assert.assertEquals("123456789", entity.getSiren());
-        Assert.assertEquals("1234", entity.getIdAbes());
-        Assert.assertEquals("nomContactTest",entity.getContact().getNom());
-        Assert.assertEquals("prenomContactTest", entity.getContact().getPrenom());
-        Assert.assertEquals("passwordtest", entity.getContact().getMotDePasse());
-        Assert.assertEquals("mail@test.com", entity.getContact().getMail());
-        Assert.assertEquals("0000000000", entity.getContact().getTelephone());
-        Assert.assertEquals("adresseTest", entity.getContact().getAdresse());
-        Assert.assertEquals("BPTest", entity.getContact().getBoitePostale());
-        Assert.assertEquals("00000", entity.getContact().getCodePostal());
-        Assert.assertEquals("cedexTest", entity.getContact().getCedex());
-        Assert.assertEquals("villeTest", entity.getContact().getVille());
-        Assert.assertEquals("roleTest", entity.getContact().getRole());
-        Assert.assertEquals("testNom", entity.getName());
+        Assertions.assertEquals("testType", entity.getTypeEtablissement());
+        Assertions.assertEquals("123456789", entity.getSiren());
+        Assertions.assertEquals("1234", entity.getIdAbes());
+        Assertions.assertEquals("nomContactTest",entity.getContact().getNom());
+        Assertions.assertEquals("prenomContactTest", entity.getContact().getPrenom());
+        Assertions.assertEquals("passwordtest", entity.getContact().getMotDePasse());
+        Assertions.assertEquals("mail@test.com", entity.getContact().getMail());
+        Assertions.assertEquals("0000000000", entity.getContact().getTelephone());
+        Assertions.assertEquals("adresseTest", entity.getContact().getAdresse());
+        Assertions.assertEquals("BPTest", entity.getContact().getBoitePostale());
+        Assertions.assertEquals("00000", entity.getContact().getCodePostal());
+        Assertions.assertEquals("cedexTest", entity.getContact().getCedex());
+        Assertions.assertEquals("villeTest", entity.getContact().getVille());
+        Assertions.assertEquals("roleTest", entity.getContact().getRole());
+        Assertions.assertEquals("testNom", entity.getName());
     }
 
     @Test
@@ -169,10 +169,10 @@ public class UtilsMapperTest {
 
         IpEntity ipEntity = utilsMapper.map(ipAjouteeEvent, IpEntity.class);
 
-        Assert.assertEquals("testCommentaire", ipEntity.getCommentaires());
-        Assert.assertEquals("127.0.0.1", ipEntity.getIp());
-        Assert.assertEquals("IPV4", ipEntity.getTypeIp());
-        Assert.assertEquals("ip", ipEntity.getTypeAcces());
+        Assertions.assertEquals("testCommentaire", ipEntity.getCommentaires());
+        Assertions.assertEquals("127.0.0.1", ipEntity.getIp());
+        Assertions.assertEquals("IPV4", ipEntity.getTypeIp());
+        Assertions.assertEquals("ip", ipEntity.getTypeAcces());
     }
 
     @Test
@@ -182,9 +182,9 @@ public class UtilsMapperTest {
 
         IpEntity ipEntity = utilsMapper.map(ipModifieeEvent, IpEntity.class);
 
-        Assert.assertEquals("testCommentaire", ipEntity.getCommentaires());
-        Assert.assertEquals("127.0.0.1", ipEntity.getIp());
-        Assert.assertEquals("IPV4", ipEntity.getTypeIp());
-        Assert.assertEquals("ip", ipEntity.getTypeAcces());
+        Assertions.assertEquals("testCommentaire", ipEntity.getCommentaires());
+        Assertions.assertEquals("127.0.0.1", ipEntity.getIp());
+        Assertions.assertEquals("IPV4", ipEntity.getTypeIp());
+        Assertions.assertEquals("ip", ipEntity.getTypeAcces());
     }
 }

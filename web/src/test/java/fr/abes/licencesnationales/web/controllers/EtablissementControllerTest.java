@@ -1,33 +1,36 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import org.junit.Assert;
-import org.junit.Test;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
+import fr.abes.licencesnationales.web.service.ReCaptchaService;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 public class EtablissementControllerTest extends LicencesNationalesAPIApplicationTests {
     @InjectMocks
     protected EtablissementController controller;
@@ -44,31 +47,31 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @MockBean
     private EmailService emailService;
 
-    public void contextLoads() {
-        Assert.assertNotNull(controller);
-    }
+    @Autowired
+    private ObjectMapper mapper;
 
     @Test
     @DisplayName("test création de compte")
     public void testCreationCompte() throws Exception {
-        String json = "{\n"
-                    + "\"nom\":\"Etab de test 32\",\n"
-                    + "\"siren\":\"123456789\",\n"
-                    + "\"typeEtablissement\":\"EPIC/EPST\",\n"
-                    + "\"idAbes\":\"\",\n"
-                    + "\"nomContact\":\"teest\",\n"
-                    + "\"prenomContact\":\"tteeest\",\n"
-                    + "\"adresseContact\":\"62 rue du test\",\n"
-                    + "\"boitePostaleContact\":\"\",\n"
-                    + "\"codePostalContact\":\"34000\",\n"
-                    + "\"villeContact\":\"Montpellier\",\n"
-                    + "\"cedexContact\":\"\",\n"
-                    + "\"telephoneContact\":\"0606060606\",\n"
-                    + "\"mailContact\":\"chambon@abes.fr\",\n"
-                    + "\"motDePasse\":\"@Password33\",\n"
-                    + "\"roleContact\":\"\",\n"
-                    + "\"recaptcha\":\"ksdjfklsklfjhskjdfhklf\"\n"
-                    + "}";
+        EtablissementCreeDto dto = new EtablissementCreeDto();
+        dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
+        EtablissementDto etablissementDto = new EtablissementDto();
+        etablissementDto.setNom("Etab de test 32");
+        etablissementDto.setSiren("123456789");
+        etablissementDto.setTypeEtablissement("EPIC/EPST");
+        etablissementDto.setIdAbes("");
+        etablissementDto.setNomContact("testNom");
+        etablissementDto.setPrenomContact("testPrenom");
+        etablissementDto.setAdresseContact("testAdresse");
+        etablissementDto.setBoitePostaleContact("testBP");
+        etablissementDto.setCedexContact("testCedex");
+        etablissementDto.setCodePostalContact("testCP");
+        etablissementDto.setVilleContact("testVille");
+        etablissementDto.setTelephoneContact("0000000000");
+        etablissementDto.setMailContact("test@test.com");
+        etablissementDto.setMotDePasse("testPassword");
+
+        dto.setEtablissementDTO(etablissementDto);
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
@@ -77,35 +80,36 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
         Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
 
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(Locale.class), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(Locale.class), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.anyString());
 
         this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
-                .contentType(MediaType.APPLICATION_JSON).content(json))
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("test création de compte avec Exception")
-    public void testCreationCompteThrow() throws Exception {
-        String json = "{\n"
-                + "\"nom\":\"Etab de test 32\",\n"
-                + "\"siren\":\"123456789\",\n"
-                + "\"typeEtablissement\":\"EPIC/EPST\",\n"
-                + "\"idAbes\":\"\",\n"
-                + "\"nomContact\":\"teest\",\n"
-                + "\"prenomContact\":\"tteeest\",\n"
-                + "\"adresseContact\":\"62 rue du test\",\n"
-                + "\"boitePostaleContact\":\"\",\n"
-                + "\"codePostalContact\":\"34000\",\n"
-                + "\"villeContact\":\"Montpellier\",\n"
-                + "\"cedexContact\":\"\",\n"
-                + "\"telephoneContact\":\"0606060606\",\n"
-                + "\"mailContact\":\"chambon@abes.fr\",\n"
-                + "\"motDePasse\":\"@Password33\",\n"
-                + "\"roleContact\":\"\",\n"
-                + "\"recaptcha\":\"ksdjfklsklfjhskjdfhklf\"\n"
-                + "}";
+    @DisplayName("test création de compte avec erreur sur mail doublon")
+    public void testCreationCompteDoublonMail() throws Exception {
+        EtablissementCreeDto dto = new EtablissementCreeDto();
+        dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
+        EtablissementDto etablissementDto = new EtablissementDto();
+        etablissementDto.setNom("Etab de test 32");
+        etablissementDto.setSiren("123456789");
+        etablissementDto.setTypeEtablissement("EPIC/EPST");
+        etablissementDto.setIdAbes("");
+        etablissementDto.setNomContact("testNom");
+        etablissementDto.setPrenomContact("testPrenom");
+        etablissementDto.setAdresseContact("testAdresse");
+        etablissementDto.setBoitePostaleContact("testBP");
+        etablissementDto.setCedexContact("testCedex");
+        etablissementDto.setCodePostalContact("testCP");
+        etablissementDto.setVilleContact("testVille");
+        etablissementDto.setTelephoneContact("0000000000");
+        etablissementDto.setMailContact("test@test.com");
+        etablissementDto.setMotDePasse("testPassword");
+
+        dto.setEtablissementDTO(etablissementDto);
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
@@ -115,8 +119,49 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(true);
 
         this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
-                .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").isString());
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail."));
+
+    }
+
+    @Test
+    @DisplayName("test création de compte avec erreur sur siren doublon")
+    public void testCreationCompteDoublonSiren() throws Exception {
+        EtablissementCreeDto dto = new EtablissementCreeDto();
+        dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
+        EtablissementDto etablissementDto = new EtablissementDto();
+        etablissementDto.setNom("Etab de test 32");
+        etablissementDto.setSiren("123456789");
+        etablissementDto.setTypeEtablissement("EPIC/EPST");
+        etablissementDto.setIdAbes("");
+        etablissementDto.setNomContact("testNom");
+        etablissementDto.setPrenomContact("testPrenom");
+        etablissementDto.setAdresseContact("testAdresse");
+        etablissementDto.setBoitePostaleContact("testBP");
+        etablissementDto.setCedexContact("testCedex");
+        etablissementDto.setCodePostalContact("testCP");
+        etablissementDto.setVilleContact("testVille");
+        etablissementDto.setTelephoneContact("0000000000");
+        etablissementDto.setMailContact("test@test.com");
+        etablissementDto.setMotDePasse("testPassword");
+
+        dto.setEtablissementDTO(etablissementDto);
+
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction("creationCompte");
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(true);
+        Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
+
+        this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("Cet établissement existe déjà."));
+
     }
 
     @Test

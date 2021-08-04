@@ -15,25 +15,24 @@ import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @Slf4j
 public class PasswordControllerTest extends LicencesNationalesAPIApplicationTests {
     @InjectMocks
@@ -65,7 +64,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
 
     private EtablissementEntity user;
 
-    @Before
+    @BeforeEach
     public void init() {
         user = new MockUserUtil(passwordEncoder).getMockUser();
     }
@@ -75,7 +74,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
     public void testResetPasswordSuccess() throws Exception {
         Mockito.when(etablissementService.getUserByMail(Mockito.anyString())).thenReturn(user);
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(user);
-        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         PasswordResetWebDto dto = new PasswordResetWebDto();
         dto.setSiren("123456789");
@@ -90,14 +89,15 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
     public void testResetPasswordWrongSirenEmail() throws Exception {
         Mockito.when(etablissementService.getUserByMail(Mockito.anyString())).thenReturn(null);
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(null);
-        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         PasswordResetWebDto dto = new PasswordResetWebDto();
         dto.setEmail("mailTest@test.com");
         dto.setSiren("123456789");
         this.mockMvc.perform(post("/v1/ln/reinitialisationMotDePasse/resetPassword")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").isString());
+                .andExpect(jsonPath("$.message").value("Credentials not valid"))
+                .andExpect(jsonPath("$.debugMessage").value("Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales"));
     }
 
     @Test
@@ -155,14 +155,18 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
         dto.setNewPassword("NewPass1Test&");
         this.mockMvc.perform(post("/v1/ln/reinitialisationMotDePasse/updatePassword")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel."))
+                .andExpect(jsonPath("$.debugMessage").value("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel."));
 
         //on teste le cas ou le nouveau mot de passe est identique à l'ancien
         dto.setOldPassword("OldPass1Test&");
         dto.setNewPassword("OldPass1Test&");
         this.mockMvc.perform(post("/v1/ln/reinitialisationMotDePasse/updatePassword")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Votre nouveau mot de passe doit être différent de l'ancien"))
+                .andExpect(jsonPath("$.debugMessage").value("Votre nouveau mot de passe doit être différent de l'ancien"));
     }
 
 }
