@@ -22,12 +22,15 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("/v1")
 public class AuthenticationController {
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+    private final AuthenticationManager authenticationManager;
 
+    private final JwtTokenProvider tokenProvider;
+
+    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+        this.authenticationManager = authenticationManager;
+        this.tokenProvider = jwtTokenProvider;
+    }
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")

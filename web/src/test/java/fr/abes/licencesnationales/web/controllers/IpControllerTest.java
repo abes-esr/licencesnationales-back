@@ -2,9 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.MockUserDetailsImpl;
-import fr.abes.licencesnationales.MockUserUtil;
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.repository.EventRepository;
@@ -13,37 +10,26 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeDto;
-import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
-import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;
-import fr.abes.licencesnationales.web.dto.password.PasswordUpdateWebDto;
-import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
-import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
-import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
-import org.junit.Test;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @Slf4j
 public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @InjectMocks
@@ -93,7 +79,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
         dto.setSiren(siren);

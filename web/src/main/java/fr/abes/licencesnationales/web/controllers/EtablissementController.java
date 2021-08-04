@@ -84,7 +84,7 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public void creationCompte(HttpServletRequest request, @Valid @RequestBody EtablissementCreeDto eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(@Valid @RequestBody EtablissementCreeDto eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String captcha = eventDTO.getRecaptcha();
         String action = "creationCompte";
 
@@ -116,8 +116,8 @@ public class EtablissementController {
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
             eventRepository.save(new EventEntity(etablissementCreeEvent));
             String emailUser = eventDTO.getEtablissementDTO().getMailContact();
-            emailService.constructCreationCompteEmailUser( request.getLocale(), emailUser);
-            emailService.constructCreationCompteEmailAdmin( request.getLocale(), admin, eventDTO.getEtablissementDTO().getSiren(), eventDTO.getEtablissementDTO().getNom());
+            emailService.constructCreationCompteEmailUser(emailUser);
+            emailService.constructCreationCompteEmailAdmin(admin, eventDTO.getEtablissementDTO().getSiren(), eventDTO.getEtablissementDTO().getNom());
         }
     }
 
@@ -167,7 +167,7 @@ public class EtablissementController {
         UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
         String emailUser = ((UserDetailsImpl) user).getEmail();
         String nomEtab = ((UserDetailsImpl) user).getNameEtab();
-        emailService.constructSuppressionMail( request.getLocale(), motif.get("motif"), nomEtab, emailUser);
+        emailService.constructSuppressionMail(motif.get("motif"), nomEtab, emailUser);
 
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);

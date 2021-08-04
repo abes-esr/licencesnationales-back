@@ -95,7 +95,7 @@ public class PasswordController {
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
         String emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        emailService.constructResetTokenEmail(urlSite, request.getLocale(), jwt, emailUser, nomEtab);
+        emailService.constructResetTokenEmail(urlSite, jwt, emailUser, nomEtab);
     }
 
     @PostMapping("/verifTokenValide")
