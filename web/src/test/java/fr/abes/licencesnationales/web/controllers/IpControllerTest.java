@@ -12,6 +12,8 @@ import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.lang.annotation.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +28,16 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import java.lang.reflect.Field;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -59,6 +71,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @MockBean
     private SecurityContextHolder securityContextHolder;
 
+
+    private Validator validator;
+
     /*@MockBean
     private UtilsMapper mapper;*/
 
@@ -66,6 +81,38 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     private ObjectMapper mapper;
 
     private String siren;
+
+    @BeforeEach
+    public void setUp() {
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
+    }
+
+    public void ipv4Regex(String ipv4, boolean validates) throws NoSuchFieldException {
+        Field field = Ipv4AjouteeDto.class.getDeclaredField("ip");
+        javax.validation.constraints.Pattern[] annotations = field.getAnnotationsByType(javax.validation.constraints.Pattern.class);
+        assertEquals(ipv4.matches(annotations[0].regexp()),validates);
+    }
+
+    @Test
+    public void testInvalidIpv4Pattern() throws NoSuchFieldException {
+        ipv4Regex("123456", false);
+    }
+
+
+    @Test
+    @DisplayName("invalid Pattern Ipv4 Fail Validation")
+    public void invalidPatternIpv4FailValidation() {
+
+        Ipv4AjouteeDto ipv4 = new Ipv4AjouteeDto();
+        ipv4.setSiren("123456789");
+        ipv4.setTypeAcces("ip");
+        ipv4.setTypeIp("IPV4");
+        ipv4.setIp("commentaires");
+        ipv4.setCommentaires("comm");
+        Set<ConstraintViolation<Ipv4AjouteeDto>> violations = validator.validate(ipv4);
+        assertFalse(violations.isEmpty());
+    }
 
 
     @Test
@@ -91,5 +138,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
+
+
 
 }
