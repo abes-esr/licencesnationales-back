@@ -22,11 +22,16 @@ import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -50,6 +55,9 @@ public class AuthenticationControllerTest2 {
     Authentication authentication;
 
     @MockBean
+    SecurityContextHolder securityContextHolder;
+
+    @MockBean
     EtablissementRepository etablissementRepository;
 
     @MockBean
@@ -62,19 +70,69 @@ public class AuthenticationControllerTest2 {
     private UserDetailsServiceImpl service;
 
     @MockBean
+    private UserDetailsImpl userDetailsImpl;
+
+
+    @MockBean
     private EtablissementEntity user;
+
+    @MockBean
+    SecurityContext securityContext;
+
+    @MockBean
+    UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
     @BeforeEach
     public void init() throws DonneeIncoherenteBddException {
         EtablissementEntity localUser = new MockUserUtil(passwordEncoder).getMockUser();
-        SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(localUser.getSiren(), localUser.getContact().getMotDePasse()));
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(localUser);
+        Mockito.when(authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(localUser.getSiren(), localUser.getContact().getMotDePasse()))).thenReturn(authentication);
+        //SecurityContextHolder.getContext().setAuthentication(authentication);
+        //Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(localUser);
         //le pb est ici : service.loadUserByUsername(parceque fait appel à EtablissementService qui est à null
-        Mockito.when(service.loadUserByUsername(localUser.getSiren())).thenReturn(UserDetailsImpl.build(localUser));
+
+        //Pour éviter la base de donnée :
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(localUser.getContact().getRole()));
+        UserDetailsImpl userDetails = new UserDetailsImpl(Long.valueOf(localUser.getId()),localUser.getSiren(), localUser.getName(), localUser.getContact().getMotDePasse(), localUser.getContact().getMail(), authorities,false);
+
+        //quand on fait :
+        Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
+        //c'est comme si on faisait :
+        //Mockito.when(service.loadUserByUsername(localUser.getSiren())).thenReturn(UserDetailsImpl.build(localUser));
+
         Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
 
+
+
+        /*EtablissementEntity localUser = new MockUserUtil(passwordEncoder).getMockUser();
+
+        //this.usernamePasswordAuthenticationToken.setAuthenticated(true);
+
+
+        //Mockito.when(usernamePasswordAuthenticationToken.getCredentials()).thenReturn(authentication.isAuthenticated());
+        Mockito.when(authenticationManager
+                .authenticate( new UsernamePasswordAuthenticationToken(localUser.getSiren(), localUser.getContact().getMotDePasse()))).thenReturn(authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        authentication.setAuthenticated(true);
+        //this.usernamePasswordAuthenticationToken.setAuthenticated(true);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        //Mockito.when(securityContextHolder.getContext()).thenReturn(securityContext);
+        //Mockito.when(authentication.getPrincipal()).thenReturn(UserDetailsImpl.build(localUser));
+
+
+        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(localUser);
+        //le pb est ici : service.loadUserByUsername(parceque fait appel à EtablissementService qui est à null
+        //Mockito.when(service.loadUserByUsername(authentication.getPrincipal().toString())).thenReturn(UserDetailsImpl.build(localUser));
+        Mockito.when(service.loadUserByUsername(localUser.getSiren())).thenReturn(UserDetailsImpl.build(localUser));
+        //Mockito.when(passwordEncoder.matches(Mockito.anyString(), Mockito.anyString())).thenReturn(true);*/
+
+    }
+
+    private Authentication usernamePasswordAuthenticationToken(String siren, String motDePasse) {
+        return new UsernamePasswordAuthenticationToken(siren,motDePasse);
     }
 
 
