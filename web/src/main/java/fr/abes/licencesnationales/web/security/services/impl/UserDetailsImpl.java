@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,8 +23,8 @@ import java.util.Objects;
 @NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-	@Autowired
-	EtablissementRepository etablissementRepository;
+	/*@Autowired
+	EtablissementRepository etablissementRepository;*/
 
 
 	private Long id;
@@ -36,7 +37,7 @@ public class UserDetailsImpl implements UserDetails {
 
 
 
-	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, String email, Collection<? extends GrantedAuthority> authorities,
+	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, String email,  Collection<? extends GrantedAuthority> authorities,
 						   boolean isAdmin) {
 		this.id = id;
 		this.siren = siren;
@@ -48,7 +49,7 @@ public class UserDetailsImpl implements UserDetails {
 	}
 
 
-    public static UserDetailsImpl build(EtablissementEntity user) throws DonneeIncoherenteBddException {
+	public static UserDetailsImpl build(EtablissementEntity user) throws DonneeIncoherenteBddException, BadCredentialsException {
 
 		log.info("UserDetailsImpl build début");
 		String role = user.getContact().getRole();
@@ -77,8 +78,14 @@ public class UserDetailsImpl implements UserDetails {
 	@Override
 	public String getUsername() {
 		log.info("getUsername = " + siren);
-		return siren;
+		return this.siren;
 	}
+
+	@Override
+	public String getPassword() {
+		return this.password;
+	}
+
 
 	@Override
 	public boolean isAccountNonExpired() {
