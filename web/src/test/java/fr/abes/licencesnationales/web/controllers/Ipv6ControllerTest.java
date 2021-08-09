@@ -5,6 +5,9 @@ import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.exception.AccesInterditException;
+import fr.abes.licencesnationales.core.exception.IpException;
+import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.repository.EventRepository;
 import fr.abes.licencesnationales.core.repository.IpRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
@@ -20,14 +23,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -36,7 +36,8 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
@@ -69,24 +70,22 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @MockBean
     private IpService ipService;
 
-    @MockBean
-    private SecurityContextHolder securityContextHolder;
-
-
     private Validator validator;
 
-    /*@MockBean
-    private UtilsMapper mapper;*/
+    private static ObjectMapper mapper = new ObjectMapper();
 
-    @Autowired
-    private ObjectMapper mapper;
-
-    private String siren;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws SirenIntrouvableException, AccesInterditException, IpException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        EtablissementEntity etablissementEntity = new EtablissementEntity();
+        etablissementEntity.setName("testEtab");
+        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
     }
 
 
@@ -155,17 +154,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab ajout IPV6 succes")
     @WithMockUser
     public void testEtabAjoutIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6AjouteeDto dto = new Ipv6AjouteeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:2");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
@@ -178,41 +169,30 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab ajout IPV6 failed")
     @WithMockUser
     public void testEtabAjoutIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6AjouteeDto dto = new Ipv6AjouteeDto();
-        dto.setSiren(siren);
-        dto.setIp("2001:470:1f14:10b9:0000:0000:0000:2");
+        //le traitement ne sera pas bloqué car le siren n'est pas obligatoire dans le dto puisqu'il est récupéré via le token
+        //cf : getSirenFromSecurityContextUser()
+        dto.setSiren(null);
+        dto.setIp(null);
         dto.setCommentaires("Cette ip etc");
-        dto.setTypeAcces("ip");
-        dto.setTypeIp("IPV6");
+        dto.setTypeAcces(null);
+        dto.setTypeIp(null);
         this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV6")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields : L'IP est obligatoire, Le type acces est obligatoire, Le type ip est obligatoire, "));
+
     }
 
     @Test
     @DisplayName("test admin ajout IPV6 succes")
-    @WithMockUser
-    public void testadminAjoutIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+    @WithMockUser(authorities = {"admin"})
+    public void testAdminAjoutIPV6Succes() throws Exception {
 
         Ipv6AjouteeDto dto = new Ipv6AjouteeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:2");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
@@ -223,26 +203,18 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     }
     @Test
     @DisplayName("test admin ajout IPV6 failed")
-    @WithMockUser
-    public void testadminAjoutIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+    @WithMockUser // on ne precise pas role admin
+    public void testAdminAjoutIPV6Failed() throws Exception {
 
         Ipv6AjouteeDto dto = new Ipv6AjouteeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:2");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV6");
         this.mockMvc.perform(post("/v1/ln/ip/adminAjoutIpV6")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     //////////////////////////////////////////modif ipv6/////////////////////////////////////////////
@@ -250,17 +222,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab modifier IPV6 succes")
     @WithMockUser
     public void testEtabModifierIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:3");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
@@ -274,17 +238,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab modifier IPV6 failed")
     @WithMockUser
     public void testEtabModifierIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:3");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
@@ -296,19 +252,11 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @Test
     @DisplayName("test Admin modifier IPV6 succes")
-    @WithMockUser
+    @WithMockUser(authorities = {"admin"})
     public void testAdminModifierIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:3");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
@@ -322,24 +270,16 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Admin modifier IPV6 failed")
     @WithMockUser
     public void testAdminModifierIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setIp("2001:470:1f14:10b9:0000:0000:0000:3");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV6");
         this.mockMvc.perform(post("/v1/ln/ip/adminModifIpV6")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
     }
 
     /////////////////////////////////////////suppression ipv6//////////////////////////////
@@ -347,19 +287,11 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab supprimer IPV6 succes")
     @WithMockUser
     public void testEtabSuppIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
-        this.mockMvc.perform(post("/v1/ln/ip/supprime")
+        this.mockMvc.perform(delete("/v1/ln/ip/supprime")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
@@ -368,40 +300,26 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Etab supprimer IPV6 failed")
     @WithMockUser
     public void testEtabSuppIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
-        dto.setSiren(siren);
-        dto.setId(Long.valueOf("1"));
-        this.mockMvc.perform(post("/v1/ln/ip/supprime")
+        dto.setSiren("123456789");
+        dto.setId(null);
+        this.mockMvc.perform(delete("/v1/ln/ip/supprime")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields :  L'id est obligatoire, "));
     }
 
     @Test
     @DisplayName("test Admin supprimer IPV6 succes")
-    @WithMockUser
+    @WithMockUser(authorities = {"admin"})
     public void testAdminSuppIPV6Succes() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
-        this.mockMvc.perform(post("/v1/ln/ip/supprimeByAdmin")
+        this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
@@ -410,21 +328,31 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test Admin supprimer IPV6 failed")
     @WithMockUser
     public void testAdminSuppIPV6Failed() throws Exception {
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
-        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
-        EtablissementEntity etablissementEntity = new EtablissementEntity();
-        etablissementEntity.setName("testEtab");
-        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
-        dto.setSiren(siren);
+        dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
-        this.mockMvc.perform(post("/v1/ln/ip/supprimeByAdmin")
+        this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("test Admin supprimer IPV6 failed 2")
+    @WithMockUser(authorities = {"admin"})
+    public void testAdminSuppIPV6Failed2() throws Exception {
+
+        IpSupprimeeDto dto = new IpSupprimeeDto();
+        dto.setSiren(null); //le siren n'est pas obligatoire vu que en situation etab on va le chercher dans le token
+        //par contre en admin il n'est pas obligatoire alors que est un param indispensable puisqu'on transmet le siren de l'etab dont on veut changer l'ip
+        //donc à voir si il ne faut pas retifier ça, en envoyant malgré tout depuis le front le siren de l'etab qui souhaite supp/modi/ajouter une ip
+        //et faire malgré tout derrière la verif dans le token sans forcément recup le siren dans le token vu qu'on l'aura déjà en param de la request
+        dto.setId(null);
+        this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields :  L'id est obligatoire, "));
     }
 
 }
