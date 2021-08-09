@@ -9,7 +9,6 @@ import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
@@ -21,7 +20,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
@@ -46,17 +44,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
 
-    @InjectMocks
-    private IpController controller;
-
     @MockBean
     private EventRepository eventRepository;
 
     @MockBean
     private EtablissementService etablissementService;
-
-    @MockBean
-    private IpRepository ipRepository;
 
     @MockBean
     private ApplicationEventPublisher applicationEventPublisher;
@@ -65,12 +57,12 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     private FiltrerAccesServices filtrerAccesServices;
 
     @MockBean
-    private EmailService emailService;
-
-    @MockBean
     private IpService ipService;
 
     private Validator validator;
+
+    @MockBean
+    private EmailService emailService;
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -86,6 +78,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
+        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
     }
 
 
@@ -165,6 +158,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
+    //ce test peut apparaitre mauvais mais est bon : c'est l'ordre des arguments du debugMessage qui est aléatoire...
     @Test
     @DisplayName("test Etab ajout IPV6 failed")
     @WithMockUser
@@ -241,13 +235,15 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
         dto.setSiren("123456789");
-        dto.setIp("2001:470:1f14:10b9:0000:0000:0000:3");
+        dto.setIp("2001:470:1f14:10b9:0000:0000:0000-000:3-2");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV6");
         this.mockMvc.perform(post("/v1/ln/ip/modifIpV6")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields : L'IP fournie n'est pas valide, "));
     }
 
     @Test
@@ -268,7 +264,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @Test
     @DisplayName("test Admin modifier IPV6 failed")
-    @WithMockUser
+    @WithMockUser //on ne precise pas le role admin
     public void testAdminModifierIPV6Failed() throws Exception {
 
         Ipv6ModifieeDto dto = new Ipv6ModifieeDto();
@@ -282,11 +278,11 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
                 .andExpect(status().isForbidden());
     }
 
-    /////////////////////////////////////////suppression ipv6//////////////////////////////
+    /////////////////////////////////////////suppression ip//////////////////////////////
     @Test
-    @DisplayName("test Etab supprimer IPV6 succes")
+    @DisplayName("test Etab supprimer IP succes")
     @WithMockUser
-    public void testEtabSuppIPV6Succes() throws Exception {
+    public void testEtabSuppIPSucces() throws Exception {
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
         dto.setSiren("123456789");
@@ -297,9 +293,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("test Etab supprimer IPV6 failed")
+    @DisplayName("test Etab supprimer IP failed")
     @WithMockUser
-    public void testEtabSuppIPV6Failed() throws Exception {
+    public void testEtabSuppIPFailed() throws Exception {
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
         dto.setSiren("123456789");
@@ -312,9 +308,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("test Admin supprimer IPV6 succes")
+    @DisplayName("test Admin supprimer IP succes")
     @WithMockUser(authorities = {"admin"})
-    public void testAdminSuppIPV6Succes() throws Exception {
+    public void testAdminSuppIPSucces() throws Exception {
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
         dto.setSiren("123456789");
@@ -325,9 +321,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("test Admin supprimer IPV6 failed")
+    @DisplayName("test Admin supprimer IP failed")
     @WithMockUser
-    public void testAdminSuppIPV6Failed() throws Exception {
+    public void testAdminSuppIPFailed() throws Exception {
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
         dto.setSiren("123456789");
@@ -338,9 +334,9 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("test Admin supprimer IPV6 failed 2")
+    @DisplayName("test Admin supprimer IP failed 2")
     @WithMockUser(authorities = {"admin"})
-    public void testAdminSuppIPV6Failed2() throws Exception {
+    public void testAdminSuppIPFailed2() throws Exception {
 
         IpSupprimeeDto dto = new IpSupprimeeDto();
         dto.setSiren(null); //le siren n'est pas obligatoire vu que en situation etab on va le chercher dans le token
