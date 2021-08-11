@@ -18,6 +18,7 @@ import java.util.Date;
 
 @Component
 @Slf4j
+//@ConfigurationProperties(prefix = "jwt.token") ===> en comm pour les tests
 @ConfigurationProperties(prefix = "jwt.token")
 @Getter
 @Setter
@@ -26,22 +27,30 @@ public class JwtTokenProvider {
     @Autowired
     private Environment env;
 
+    /* en test
+    private String secret = "secret";
+    private int expirationInMs = 1234567891;*/
+
     private String secret;
     private int expirationInMs;
 
 
     public String generateToken(UserDetailsImpl u) {
 
-        log.debug("expirationInMs = " + expirationInMs);
-        log.debug("secret = " + secret);
+
 
         log.info("JwtTokenProvider");
         log.info("Début generateToken");
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + expirationInMs);
+        log.info("expirationInMs = " + expirationInMs);
+        log.info("secret = " + secret);
         log.info("u.getUsername() = " + u.getUsername());//le siren
         log.info("u.getId() = " + u.getId());
         log.info("u.getAuthorities() = " + u.getAuthorities());
+        log.info("isAdmin = " +  u.isAdmin());
+        log.info("u.getPassword() = " +  u.getPassword());
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + expirationInMs);
+
 
         return Jwts.builder()
                 .setSubject(u.getUsername()) //siren
