@@ -164,7 +164,7 @@ public class EtablissementController {
     public void suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
         //envoi du mail de suppression
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
-        UserDetails user = new UserDetailsServiceImpl().loadUser(etab);
+        UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
         String emailUser = ((UserDetailsImpl) user).getEmail();
         String nomEtab = ((UserDetailsImpl) user).getNameEtab();
         emailService.constructSuppressionMail(motif.get("motif"), nomEtab, emailUser);

@@ -17,9 +17,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
-	@Autowired
-	EtablissementService etablissementService;
 
+	private final EtablissementService etablissementService;
+
+	public UserDetailsServiceImpl(EtablissementService etablissementService) {/**/
+		this.etablissementService = etablissementService;
+	}
 
 	@SneakyThrows
 	@Override

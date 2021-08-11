@@ -90,7 +90,7 @@ public class PasswordController {
             if (userEmailOrSiren.getSiren() != null && user == null) {
                 throw new AuthenticationCredentialsNotFoundException(msgErr);
         }
-        userDetails = new UserDetailsServiceImpl().loadUser(user);
+        userDetails = new UserDetailsServiceImpl(etablissementService).loadUser(user);
 
         String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
         String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
