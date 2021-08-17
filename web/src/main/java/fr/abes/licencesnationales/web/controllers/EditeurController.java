@@ -29,9 +29,11 @@ public class EditeurController {
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
-    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeDTO) throws MailDoublonException {
-        EditeurCreeDto editeurCreeDto = mapper.map(editeurCreeDTO, EditeurCreeDto.class);
-        editeurService.addEditeur(editeurCreeDto);
+    public void creationEditeur(@Valid @RequestBody EditeurCreeDto editeurCreeDTO) throws MailDoublonException {
+        log.info("creationEditeur début");
+        //EditeurCreeDto editeurCreeDto = mapper.map(editeurCreeDTO, EditeurCreeDto.class);
+        //log.info("editeurCreeDTO.getDateCreation() =  " + editeurCreeDTO.getDateCreation());
+        editeurService.addEditeur(editeurCreeDTO);
     }
 
     @PostMapping(value = "/{id}")
@@ -58,6 +60,7 @@ public class EditeurController {
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
     public void suppression(@PathVariable String id)  {
+        log.info("id suppression = " + id);
         editeurService.deleteEditeur(id);
     }
 

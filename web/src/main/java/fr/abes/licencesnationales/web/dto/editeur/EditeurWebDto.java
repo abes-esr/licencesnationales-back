@@ -13,6 +13,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EditeurWebDto {
+
+    @JsonProperty("idEditeur")
+    private String idEditeur;
+
     @JsonProperty("nomEditeur")
     private String nomEditeur;
 
