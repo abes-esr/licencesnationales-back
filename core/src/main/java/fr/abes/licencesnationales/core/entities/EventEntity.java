@@ -203,7 +203,7 @@ public class EventEntity {
 
     public EventEntity(EditeurCreeEvent editeurCreeEvent) {
         EditeurCreeDto editeur = editeurCreeEvent.getEditeur();
-        this.event = "editeurcree";
+        this.event = "editeurCree";
         this.dateCreationEvent = editeurCreeEvent.created;
         this.nomEditeur = editeur.getNomEditeur();
         this.identifiantEditeur = editeur.getIdentifiantEditeur();
@@ -215,7 +215,7 @@ public class EventEntity {
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
         EditeurModifieDto editeur = editeurModifieEvent.getEditeur();
-        this.event = "editeurmodifie";
+        this.event = "editeurModifie";
         this.dateCreationEvent = editeurModifieEvent.created;
         this.nomEditeur = editeur.getNomEditeur();
         this.identifiantEditeur = editeur.getIdentifiantEditeur();
@@ -227,7 +227,7 @@ public class EventEntity {
 
     public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
         EditeurFusionneDto editeur = editeurFusionneEvent.getEditeur();
-        this.event = "editeurfusione";
+        this.event = "editeurFusione";
         this.dateCreationEvent = editeurFusionneEvent.created;
         this.nomEditeur = editeur.getNomEditeur();
         this.adresseEditeur = editeur.getAdresseEditeur();
@@ -237,7 +237,7 @@ public class EventEntity {
     public EventEntity(EditeurSupprimeEvent editeurSupprimeEvent) {
         this.event = "editeurSupprime";
         this.dateCreationEvent = editeurSupprimeEvent.created;
-        this.id = Long.parseLong(editeurSupprimeEvent.getId());
+        //this.id = editeurSupprimeEvent.getId(); ==> Error attempting to apply AttributeConverter
     }
 
     public EventEntity(IpAjouteeEvent ipAjouteeEvent) {

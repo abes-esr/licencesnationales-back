@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,4 +20,5 @@ public class EditeurCreeDto {
     private String adresseEditeur;
     private Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto = new HashSet<>();
     private Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto = new HashSet<>();
+    private Date dateCreation = new Date();
 }

@@ -51,13 +51,14 @@ public class EditeurEntity implements Serializable {
                          String nomEditeur,
                          String identifiantEditeur,
                          String adresseEditeur,
+                         Date dateCreation,
                          Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities,
                          Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities) {
         this.id = id;
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.adresseEditeur = adresseEditeur;
-        this.dateCreation = new Date();
+        this.dateCreation = dateCreation;
         this.contactCommercialEditeurEntities = contactCommercialEditeurEntities;
         this.contactTechniqueEditeurEntities = contactTechniqueEditeurEntities;
     }

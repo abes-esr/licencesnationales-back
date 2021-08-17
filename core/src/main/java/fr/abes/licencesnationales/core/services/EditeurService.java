@@ -11,12 +11,15 @@ import fr.abes.licencesnationales.core.event.editeur.EditeurSupprimeEvent;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import fr.abes.licencesnationales.core.repository.EventRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
+import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @Service
 public class EditeurService {
     @Autowired
@@ -30,14 +33,19 @@ public class EditeurService {
     @Autowired
     private EventRepository eventRepository;
 
-    public void addEditeur(EditeurCreeDto editeur) throws MailDoublonException {
+    public void addEditeur(@Valid EditeurCreeDto editeur) throws MailDoublonException {
+
+        log.info("debut addEditeur");
         boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
         if (existeMail) {
+            log.info("existeMail");
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         else{
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeur);
+            log.info("addEditeur 1");
             applicationEventPublisher.publishEvent(editeurCreeEvent);
+            log.info("addEditeur 2");
             eventRepository.save(new EventEntity(editeurCreeEvent));
         }
     }
@@ -68,8 +76,12 @@ public class EditeurService {
     }
 
     public void deleteEditeur(String id) {
-        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, id);
+        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Long.valueOf(id));
         applicationEventPublisher.publishEvent(editeurSupprimeEvent);
         eventRepository.save(new EventEntity(editeurSupprimeEvent));
+    }
+
+    public void deleteById(Long id) {
+        dao.deleteById(id);
     }
 }
