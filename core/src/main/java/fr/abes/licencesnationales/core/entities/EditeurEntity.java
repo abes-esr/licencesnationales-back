@@ -22,7 +22,7 @@ public class EditeurEntity implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "editeur_Sequence")
     @SequenceGenerator(name = "editeur_Sequence", sequenceName = "EDITEUR_SEQ", allocationSize = 1)
-    private Long id;
+    private Long idEditeur;
 
     @NotBlank
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
@@ -41,10 +41,10 @@ public class EditeurEntity implements Serializable {
     @Convert(converter = JpaConverterJson.class)
     private List<String> groupesEtabRelies = new ArrayList<>();
 
-    @OneToMany(mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity=ContactCommercialEditeurEntity.class, mappedBy = "idEditeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities = new HashSet<>();
 
-    @OneToMany(mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity=ContactTechniqueEditeurEntity.class, mappedBy = "idEditeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities = new HashSet<>();
 
     public EditeurEntity(Long id,
@@ -54,7 +54,7 @@ public class EditeurEntity implements Serializable {
                          Date dateCreation,
                          Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities,
                          Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities) {
-        this.id = id;
+        this.idEditeur = id;
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.adresseEditeur = adresseEditeur;

@@ -1,11 +1,13 @@
 package fr.abes.licencesnationales.web.dto.editeur;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -29,10 +31,12 @@ public class EditeurWebDto {
     @JsonProperty("adresseEditeur")
     private String adresseEditeur;
 
-    @JsonProperty("contactCommercial")
-    public Set<ContactEditeurWebDto> listeContactCommercialEditeurWebDto;
+    @JsonProperty("listeContactCommercialEditeurDTO")
+    public Set<ContactCommercialEditeurWebDto> listeContactCommercialEditeurWebDto;
 
-    @JsonProperty("contactTechnique")
-    public Set<ContactEditeurWebDto> listeContactEditeurWebDto;
+    @JsonProperty("listeContactTechniqueEditeurDTO")
+    public Set<ContactTechniqueEditeurWebDto> listeContactTechniqueEditeurWebDto;
+    
+    public Date dateCreation = new Date();
 
 }

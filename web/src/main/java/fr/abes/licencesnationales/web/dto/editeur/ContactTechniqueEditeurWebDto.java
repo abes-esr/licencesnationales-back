@@ -10,12 +10,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ContactEditeurWebDto {
-    @JsonProperty("nom")
+public class ContactTechniqueEditeurWebDto {
+    @JsonProperty("nomContactTechnique")
     public String nomContactTechnique;
-    @JsonProperty("prenom")
+    @JsonProperty("prenomContactTechnique")
     public String prenomContactTechnique;
-    @JsonProperty("mail")
+    @JsonProperty("mailContactTechnique")
     public String mailContactTechnique;
 
 

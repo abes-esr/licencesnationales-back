@@ -30,8 +30,8 @@ public class ContactTechniqueEditeurEntity implements Serializable {
     private String mailContactTechnique;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "editeur_id", nullable = false)
-    private EditeurEntity editeurEntity;
+    @JoinColumn(name = "idEditeur", nullable = false)
+    private EditeurEntity idEditeur;
 
 
 

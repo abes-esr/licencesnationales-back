@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ContactTechniqueEditeurRepository extends JpaRepository<ContactTechniqueEditeurEntity, Long> {
 
-    @Query(nativeQuery = true, value = "select case when exists(select * from ContactTechniqueEditeurEntity "
+    @Query(nativeQuery = true, value = "select case when exists(select * from ContactTechniqueEditeur "
             + "where mailContactTechnique = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 
