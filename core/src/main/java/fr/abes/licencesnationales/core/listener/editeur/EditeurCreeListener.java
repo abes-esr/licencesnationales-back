@@ -9,7 +9,6 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,6 +29,8 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
         EditeurEntity editeurEntity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
         log.info("editeurCreeEvent.getCC" + editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto());
         log.info("editeurCreeEvent.getCT" + editeurCreeEvent.getEditeur().getListeContactTechniqueEditeurDto());
+        log.info("editeurCreeEvent.getEditeur().getDateCreation()" + editeurCreeEvent.getEditeur().getDateCreation());
+        editeurEntity.setDateCreation(editeurCreeEvent.getEditeur().getDateCreation());
 
         Set<ContactCommercialEditeurDto> cc = editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto();
         Set<ContactTechniqueEditeurDto> ct = editeurCreeEvent.getEditeur().getListeContactTechniqueEditeurDto();
