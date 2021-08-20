@@ -28,12 +28,12 @@ public class ContactCommercialEditeurEntity implements Serializable {
     private String mailContactCommercial;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "editeur_id", nullable = false)
-    private EditeurEntity editeurEntity;
+    @JoinColumn(name = "idEditeur", nullable = false)
+    private EditeurEntity idEditeur;
 
 
 
-    public ContactCommercialEditeurEntity(Long id, String nomContactCommercial, String prenomContactCommercial, String mailContactCommercial) {
+    public ContactCommercialEditeurEntity(Long id, String nomContactCommercial, String prenomContactCommercial, String mailContactCommercial, EditeurEntity idEditeur) {
 
         this.id = id;
         this.nomContactCommercial = nomContactCommercial;

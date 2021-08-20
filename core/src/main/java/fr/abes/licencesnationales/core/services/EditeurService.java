@@ -1,8 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurFusionneDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
+import fr.abes.licencesnationales.core.dto.editeur.*;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
@@ -18,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Service
@@ -36,18 +35,25 @@ public class EditeurService {
     public void addEditeur(@Valid EditeurCreeDto editeur) throws MailDoublonException {
 
         log.info("debut addEditeur");
-        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
+        /*boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
         if (existeMail) {
             log.info("existeMail");
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
-        else{
+        else{*/
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeur);
             log.info("addEditeur 1");
+            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getNomEditeur());
+            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getAdresseEditeur());
+            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getDateCreation());
+            Set<ContactCommercialEditeurDto> s = editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto();
+            for(ContactCommercialEditeurDto c:s) {
+                log.info("editeurCreeEvent.getListeContactCommercialEditeurDto() = " + c.mailContactCommercial + c.prenomContactCommercial + c.nomContactCommercial);
+            }
             applicationEventPublisher.publishEvent(editeurCreeEvent);
             log.info("addEditeur 2");
             eventRepository.save(new EventEntity(editeurCreeEvent));
-        }
+       // }
     }
 
     public void updateEditeur(EditeurModifieDto editeur) throws MailDoublonException {
@@ -68,7 +74,7 @@ public class EditeurService {
     }
 
     public EditeurEntity getFirstEditeurById(Long id) {
-        return dao.getFirstById(id);
+        return dao.getFirstByIdEditeur(id);
     }
 
     public List<EditeurEntity> findAllEditeur() {

@@ -13,13 +13,17 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
 
     EditeurEntity getFirstByNomEditeur(String nom);
 
-    EditeurEntity getFirstById(Long id);
+    EditeurEntity getFirstByIdEditeur(Long id);
 
-    EditeurEntity findEditeurEntityByContactCommercialEditeurEntitiesContains(String mail);
+    EditeurEntity findEditeurEntityByContactCommercialEditeurEntitiesContaining(String mail);
 
     EditeurEntity findEditeurEntityByContactTechniqueEditeurEntitiesContains(String mail);
 
-    @Query(nativeQuery = true, value = "select case when exists(select * from EditeurEntity "
+    /*@Query(nativeQuery = true, value = "select case when exists(select * from Editeur"
             + "where contactCommercialEditeurEntities.mailContactCommercial = :mail) then 'true' else 'false' end from dual")
+    Boolean existeMail(@Param("mail") String mail);*/
+
+    @Query(nativeQuery = true, value = "select case when exists(select * from Editeur "
+            + "where contactCommercialEditeur.mailContactCommercial = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 }
