@@ -6,10 +6,11 @@ import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.MailDto;
 import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
+import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.repository.ContactCommercialEditeurRepository;
 import fr.abes.licencesnationales.core.repository.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -32,9 +33,6 @@ public class EmailService {
     private EditeurRepository editeurRepository;
 
     @Autowired
-    private ContactTechniqueEditeurRepository contactTechniqueEditeurRepository;
-
-    @Autowired
     private MessageSource messageSource;
 
     @Value("${mail.ws.url}")
@@ -44,16 +42,19 @@ public class EmailService {
         log.info("DEBUT checkDoublonMail ");
         boolean existeMailCommercial = false;
         boolean existeMailTechnique = false;
-        String mail;
+        String mail = "";
+        EditeurEntity e = null;
         for (ContactCommercialEditeurDto contact : c){
             mail = contact.getMailContactCommercial();
             log.info("mail = "+ mail);
-            existeMailCommercial = editeurRepository.existeMail(mail);
+            e = editeurRepository.findByContactCommercialEditeurEntities_mailContactCommercial(mail);
+            if(e!=null) existeMailCommercial=true;
         }
         for (ContactTechniqueEditeurDto contact : t){
             mail = contact.getMailContactTechnique();
             log.info("mail = "+ mail);
-            existeMailTechnique = contactTechniqueEditeurRepository.existeMail(mail);
+            e = editeurRepository.findByContactTechniqueEditeurEntities_mailContactTechnique(mail);
+            if(e!=null) existeMailTechnique = true;
         }
         log.info("existeMailCommercial = "+ existeMailCommercial);
         log.info("existeMailTechnique = "+ existeMailTechnique);

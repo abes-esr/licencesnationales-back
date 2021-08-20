@@ -35,12 +35,12 @@ public class EditeurService {
     public void addEditeur(@Valid EditeurCreeDto editeur) throws MailDoublonException {
 
         log.info("debut addEditeur");
-        /*boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
+        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
         if (existeMail) {
             log.info("existeMail");
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
-        else{*/
+        else{
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeur);
             log.info("addEditeur 1");
             log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getNomEditeur());
@@ -53,7 +53,7 @@ public class EditeurService {
             applicationEventPublisher.publishEvent(editeurCreeEvent);
             log.info("addEditeur 2");
             eventRepository.save(new EventEntity(editeurCreeEvent));
-       // }
+        }
     }
 
     public void updateEditeur(EditeurModifieDto editeur) throws MailDoublonException {
