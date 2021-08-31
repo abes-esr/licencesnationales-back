@@ -6,9 +6,14 @@ import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
+import fr.abes.licencesnationales.core.dto.ip.IpDto;
+import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.exception.AccesInterditException;
+import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.web.dto.editeur.*;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
+import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -91,7 +96,10 @@ public class EditeurController {
     @GetMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
     public EditeurWebDto get(@PathVariable Long id) {
-        return mapper.map(editeurService.getFirstEditeurById(id), EditeurWebDto.class);
+        EditeurEntity editeurEntity   = editeurService.getFirstEditeurById(id);
+        editeurEntity.setContactCommercialEditeurEntities(editeurService.getAllCCByIdEditeur(String.valueOf(id)));
+        editeurEntity.setContactTechniqueEditeurEntities(editeurService.getAllCTByIdEditeur(String.valueOf(id)));
+        return mapper.map(editeurEntity, EditeurWebDto.class);
     }
 
 

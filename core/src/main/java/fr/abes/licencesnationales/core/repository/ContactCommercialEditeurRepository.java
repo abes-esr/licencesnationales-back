@@ -6,6 +6,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+import java.util.Set;
+
 @Repository
 public interface ContactCommercialEditeurRepository extends JpaRepository<ContactCommercialEditeurEntity, Long> {
 
@@ -13,4 +16,8 @@ public interface ContactCommercialEditeurRepository extends JpaRepository<Contac
             + "where mailContactCommercial = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 
+
+    //List<ContactCommercialEditeurEntity> getListByIdEditeur(@Param("idEditeur") String idEditeur);
+
+    Set<ContactCommercialEditeurEntity> getAllCCByIdEditeur(String idEditeur);
 }
