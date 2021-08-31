@@ -1,12 +1,16 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.dto.editeur.*;
+import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurSupprimeEvent;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.repository.ContactCommercialEditeurRepository;
+import fr.abes.licencesnationales.core.repository.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import fr.abes.licencesnationales.core.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +27,14 @@ import java.util.Set;
 public class EditeurService {
     @Autowired
     private EditeurRepository dao;
+
+    @Autowired
+    ContactCommercialEditeurRepository daoCC;
+
+    @Autowired
+    ContactTechniqueEditeurRepository daoCT;
+
+
 
     @Autowired EmailService emailService;
 
@@ -75,6 +87,14 @@ public class EditeurService {
 
     public EditeurEntity getFirstEditeurById(Long id) {
         return dao.getFirstByIdEditeur(id);
+    }
+
+    public Set<ContactCommercialEditeurEntity> getAllCCByIdEditeur(String idEditeur) {
+        return daoCC.getAllCCByIdEditeur(idEditeur);
+    }
+
+    public Set<ContactTechniqueEditeurEntity> getAllCTByIdEditeur(String idEditeur) {
+        return daoCT.getAllCTByIdEditeur(idEditeur);
     }
 
     public List<EditeurEntity> findAllEditeur() {
