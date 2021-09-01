@@ -16,8 +16,4 @@ public interface ContactCommercialEditeurRepository extends JpaRepository<Contac
             + "where mailContactCommercial = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 
-
-    //List<ContactCommercialEditeurEntity> getListByIdEditeur(@Param("idEditeur") String idEditeur);
-
-    Set<ContactCommercialEditeurEntity> getAllCCByIdEditeur(String idEditeur);
 }

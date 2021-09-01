@@ -89,13 +89,10 @@ public class EditeurService {
         return dao.getFirstByIdEditeur(id);
     }
 
-    public Set<ContactCommercialEditeurEntity> getAllCCByIdEditeur(String idEditeur) {
-        return daoCC.getAllCCByIdEditeur(idEditeur);
-    }
 
-    public Set<ContactTechniqueEditeurEntity> getAllCTByIdEditeur(String idEditeur) {
-        return daoCT.getAllCTByIdEditeur(idEditeur);
-    }
+    /*public Set<ContactTechniqueEditeurEntity> getAllCTByIdEditeur(EditeurEntity idEditeur) {
+        return daoCT.getAllCTByEditeurEntity(idEditeur);
+    }*/
 
     public List<EditeurEntity> findAllEditeur() {
         return dao.findAll();

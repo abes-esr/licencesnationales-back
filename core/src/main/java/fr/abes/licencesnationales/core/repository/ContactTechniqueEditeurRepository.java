@@ -16,6 +16,5 @@ public interface ContactTechniqueEditeurRepository extends JpaRepository<Contact
             + "where mailContactTechnique = :mail) then 'true' else 'false' end from dual")
     Boolean existeMail(@Param("mail") String mail);
 
-    Set<ContactTechniqueEditeurEntity> getAllCTByIdEditeur(String idEditeur);
 
 }
