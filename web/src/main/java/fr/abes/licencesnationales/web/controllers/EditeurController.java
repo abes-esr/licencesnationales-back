@@ -7,6 +7,8 @@ import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
 import fr.abes.licencesnationales.core.dto.ip.IpDto;
+import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
@@ -97,9 +99,35 @@ public class EditeurController {
     @PreAuthorize("hasAuthority('admin')")
     public EditeurWebDto get(@PathVariable Long id) {
         EditeurEntity editeurEntity   = editeurService.getFirstEditeurById(id);
-        editeurEntity.setContactCommercialEditeurEntities(editeurService.getAllCCByIdEditeur(String.valueOf(id)));
-        editeurEntity.setContactTechniqueEditeurEntities(editeurService.getAllCTByIdEditeur(String.valueOf(id)));
-        return mapper.map(editeurEntity, EditeurWebDto.class);
+        Set<ContactCommercialEditeurEntity> cc = editeurEntity.getContactCommercialEditeurEntities();
+        Set<ContactTechniqueEditeurEntity> ct = editeurEntity.getContactTechniqueEditeurEntities();
+        Set<ContactCommercialEditeurWebDto> CC = new HashSet<>();
+        Set<ContactTechniqueEditeurWebDto> CT = new HashSet<>();
+        for (ContactCommercialEditeurEntity c:cc) {
+            ContactCommercialEditeurWebDto cce = new ContactCommercialEditeurWebDto();
+            cce.nomContactCommercial = c.getNomContactCommercial();
+            cce.prenomContactCommercial = c.getPrenomContactCommercial();
+            cce.mailContactCommercial = c.getMailContactCommercial();
+            CC.add(cce);
+        }
+        for (ContactTechniqueEditeurEntity t:ct) {
+            ContactTechniqueEditeurWebDto cte = new ContactTechniqueEditeurWebDto();
+            cte.nomContactTechnique = t.getNomContactTechnique();
+            cte.prenomContactTechnique = t.getPrenomContactTechnique();
+            cte.mailContactTechnique = t.getMailContactTechnique();
+            CT.add(cte);
+        }
+        //editeurEntity.setContactCommercialEditeurEntities(editeurService.getAllCCByIdEditeur(id));
+        //editeurEntity.setContactTechniqueEditeurEntities(editeurService.getAllCTByIdEditeur(editeurEntity));
+        EditeurWebDto editeurWebDto = new EditeurWebDto();
+        editeurWebDto.setNomEditeur(editeurEntity.getNomEditeur());
+        editeurWebDto.setAdresseEditeur(editeurEntity.getAdresseEditeur());
+        editeurWebDto.setIdentifiantEditeur(editeurEntity.getIdentifiantEditeur());
+        editeurWebDto.setGroupesEtabRelies(editeurEntity.getGroupesEtabRelies());
+        editeurWebDto.setListeContactCommercialEditeurWebDto(CC);
+        editeurWebDto.setListeContactTechniqueEditeurWebDto(CT);
+        return editeurWebDto;
+        //return mapper.map(editeurEntity, EditeurWebDto.class);
     }
 
 

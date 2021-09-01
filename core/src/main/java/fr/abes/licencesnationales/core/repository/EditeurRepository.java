@@ -22,7 +22,4 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
 
     EditeurEntity findByContactTechniqueEditeurEntities_mailContactTechnique(String mail);
 
-    Set<ContactCommercialEditeurEntity> getAllCCByIdEditeur(Long id);
-
-    Set<ContactTechniqueEditeurEntity> getAllCTByIdEditeur(Long id);
 }
