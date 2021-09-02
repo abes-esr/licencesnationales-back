@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
 import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
@@ -164,7 +165,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setListeContactCommercialEditeurWebDto(cc);
         editeurCreeWebDto.setListeContactTechniqueEditeurWebDto(ct);
 
-        Mockito.when(emailService.checkDoublonMail(Mockito.any(),Mockito.any())).thenReturn(true);
+        Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).addEditeur(Mockito.any());
 
         this.mockMvc.perform(put("/v1/ln/editeur/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
