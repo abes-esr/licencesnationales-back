@@ -1,26 +1,64 @@
 //this is the scripted method with groovy engine
+/*
+Ce Jenkinsfile permet de compiler et de deployer la partie web et/ou la partie batch du projet.
+sur les environnements de DEV, TEST et PROD
+Ce script se veut le plus generique possible et comporte 2 zones a editer specifiquement au projet
+ */
 import hudson.model.Result
 
 node {
 
-    //Configuration
+    // **** DEBUT DE ZONE A EDITER n°1 ****
+
+    /*
+    Cette zone contient la definition de la structure interne du projet.
+    Le tableau modulesNames contient les modules concernes par la compilation et le deploiement.
+    Dans cette exemple, il s'agit des modules 'web' et 'batch'
+    Les variables de definition des modules (backTargetDir, backServiceName,...)
+    permettent de renseigner les specifications sur les environements cibles.
+     */
+    // Configuration du projet
     def gitURL = "https://github.com/abes-esr/licencesnationales-back.git"
-    def gitCredentials = ''
-    def warDir = "target/"
-    def warName = "licencesnationales"
-    def tomcatWebappsDir = "/usr/local/tomcat9-licencesNationales/webapps/"
-    def tomcatServiceName = "tomcat9-licencesNationales.service"
+    def gitCredentials = 'Github'
     def slackChannel = "#notif-licencesnationales"
+    def artifactoryBuildName = "licencesnationales"
+    def modulesNames = ["web", "batch"]
+
+    // Definition du module web
+    def backApplicationFileName = "licencesnationales"
+    def backTargetDir = "/usr/local/tomcat9-licencesNationales/webapps/"
+    def backServiceName = "tomcat9-licencesNationales.service"
+
+    // Definition du module batch
+    def batchTargetDir = "/home/batch/licencesnationales/"
+
+    // **** FIN DE ZONE A EDITER n°1 ****
+
+    // Variables de configuration d'execution
+    def candidateModules = []
+    def executeBuild = []
+    def executeTests = false
+    def deployArtifactoy = false
+    def buildNumber = -1
+    def executeDeploy = []
+    def backTargetHostnames = []
+    def batchTargetHostnames = []
 
     // Variables globales
+    def ENV
     def maventool
     def rtMaven
-    def buildInfo
-    def server
-    def ENV
-    def serverHostnames = []
-    def executeTests
-    def mavenProfile
+    def mavenProfil
+    def artifactoryServer
+    def downloadSpec
+
+    // Definition des actions
+    def choiceParams = ['Compiler', 'Compiler & Déployer', 'Déployer un précédent build']
+    for (int moduleIndex = 0; moduleIndex < modulesNames.size(); moduleIndex++) { //Pour chaque module du projet
+        choiceParams.add("[${modulesNames[moduleIndex]}] Compiler le module")
+        choiceParams.add("[${modulesNames[moduleIndex]}] Compiler & Déployer le module")
+        choiceParams.add("[${modulesNames[moduleIndex]}] Déployer un précédent build")
+    }
 
     // Configuration du job Jenkins
     // On garde les 5 derniers builds par branche
@@ -34,39 +72,104 @@ node {
                             numToKeepStr: '5')
             ),
             parameters([
+                    choice(choices: choiceParams.join('\n'), description: 'Que voulez-vous faire ?', name: 'ACTION'),
                     gitParameter(
                             branch: '',
                             branchFilter: 'origin/(.*)',
                             defaultValue: 'develop',
-                            description: 'Sélectionner la branche ou le tag à déployer',
+                            description: 'Sélectionner la branche ou le tag',
                             name: 'BRANCH_TAG',
                             quickFilterEnabled: false,
                             selectedValue: 'NONE',
                             sortMode: 'DESCENDING_SMART',
                             tagFilter: '*',
                             type: 'PT_BRANCH_TAG'),
-                    choice(choices: ['DEV', 'TEST', 'PROD'], description: 'Sélectionner l\'environnement cible', name: 'ENV'),
-                    booleanParam(defaultValue: false, description: 'Voulez-vous exécuter les tests ?', name: 'executeTests')
+                    stringParam(defaultValue: '', description: "Numéro du build à déployer. Retrouvez vos précédents builds sur https://artifactory.abes.fr/artifactory/webapp/#/builds/${artifactoryBuildName}", name: 'BUILD_NUMBER'),
+                    booleanParam(defaultValue: false, description: 'Voulez-vous deployer sur Artifactory ?', name: 'deployArtifactoy'),
+                    booleanParam(defaultValue: false, description: 'Voulez-vous exécuter les tests ?', name: 'executeTests'),
+                    choice(choices: ['DEV', 'TEST', 'PROD'], description: 'Sélectionner l\'environnement cible', name: 'ENV')
             ])
     ])
 
+    //-------------------------------
+    // Etape 1 : Configuration
+    //-------------------------------
     stage('Set environnement variables') {
         try {
+            // Java
             env.JAVA_HOME = "${tool 'Open JDK 11'}"
             env.PATH = "${env.JAVA_HOME}/bin:${env.PATH}"
 
+            // Maven & Artifactory
             maventool = tool 'Maven 3.3.9'
             rtMaven = Artifactory.newMavenBuild()
-            server = Artifactory.server '-1137809952@1458918089773'
+            artifactoryServer = Artifactory.server '-1137809952@1458918089773'
             rtMaven.tool = 'Maven 3.3.9'
-            rtMaven.opts = '-Xms1024m -Xmx4096m'
+            rtMaven.opts = "-Xms1024m -Xmx4096m"
 
+            // Action a faire
+            if (params.ACTION == null) {
+                throw new Exception("Variable ACTION is null")
+            }
+
+            for (int moduleIndex = 0; moduleIndex < modulesNames.size(); moduleIndex++) { //Pour chaque module du projet
+
+                if (params.ACTION == 'Compiler') {
+                    candidateModules.add("${modulesNames[moduleIndex]}")
+                    executeBuild.add(true)
+                    executeDeploy.add(false)
+                } else if (params.ACTION == 'Compiler & Déployer') {
+                    candidateModules.add("${modulesNames[moduleIndex]}")
+                    executeBuild.add(true)
+                    executeDeploy.add(true)
+                } else if (params.ACTION == "[${modulesNames[moduleIndex]}] Compiler & Déployer le module") {
+                    candidateModules.add("${modulesNames[moduleIndex]}")
+                    executeBuild.add(true)
+                    executeDeploy.add(true)
+                } else if (params.ACTION == "[${modulesNames[moduleIndex]}] Compiler le module") {
+                    candidateModules.add("${modulesNames[moduleIndex]}")
+                    executeBuild.add(true)
+                    executeDeploy.add(false)
+                } else if (params.ACTION == "Déployer un précédent build" || params.ACTION == "[${modulesNames[moduleIndex]}] Déployer un précédent build") {
+
+                    if (params.BUILD_NUMBER == null || params.BUILD_NUMBER == -1) {
+                        throw new Exception("No build number specified")
+                    }
+                    buildNumber = params.BUILD_NUMBER
+                    candidateModules.add("${modulesNames[moduleIndex]}")
+                    executeBuild.add(false)
+                    executeDeploy.add(true)
+                }
+            }
+
+            if (candidateModules.size() == 0) {
+                throw new Exception("Unable to decode variable ACTION")
+            }
+
+            // Branche a deployer
             if (params.BRANCH_TAG == null) {
                 throw new Exception("Variable BRANCH_TAG is null")
             } else {
                 echo "Branch to deploy =  ${params.BRANCH_TAG}"
             }
 
+            // Booleen d'execution des tests
+            if (params.executeTests == null) {
+                executeTests = false
+            } else {
+                executeTests = params.executeTests
+            }
+            echo "executeTests =  ${executeTests}"
+
+            // Booleen de deploiement sur Artifactory
+            if (params.deployArtifactoy == null) {
+                deployArtifactoy = false
+            } else {
+                deployArtifactoy = params.deployArtifactoy
+            }
+            echo "deployArtifactoy =  ${deployArtifactoy}"
+
+            // Environnement de deploiement
             if (params.ENV == null) {
                 throw new Exception("Variable ENV is null")
             } else {
@@ -74,316 +177,342 @@ node {
                 echo "Target environnement =  ${ENV}"
             }
 
-             if (ENV == 'DEV') {
-                mavenProfile = "dev"
-                serverHostnames.add('hostname.server-back-1-dev')
-                serverHostnames.add('hostname.server-back-2-dev')
+            if (ENV == 'DEV') {
+                mavenProfil = "dev"
+                backTargetHostnames.add('hostname.server-back-1-dev')
+                backTargetHostnames.add('hostname.server-back-2-dev')
+
+                batchTargetHostnames.add('hostname.server-batch-1-dev')
 
             } else if (ENV == 'TEST') {
-                mavenProfile = "test"
-                serverHostnames.add('hostname.server-back-1-test')
-                serverHostnames.add('hostname.server-back-2-test')
+                mavenProfil = "test"
+                backTargetHostnames.add('hostname.server-back-1-test')
+                backTargetHostnames.add('hostname.server-back-2-test')
+
+                batchTargetHostnames.add('hostname.server-batch-1-test')
 
             } else if (ENV == 'PROD') {
-                mavenProfile = "prod"
-                serverHostnames.add('hostname.server-back-1-prod')
-                serverHostnames.add('hostname.server-back-2-prod')
-            }
+                mavenProfil = "prod"
+                backTargetHostnames.add('hostname.server-back-1-prod')
+                backTargetHostnames.add('hostname.server-back-2-prod')
 
-            if (params.executeTests == null) {
-                executeTests = false
-            } else {
-                executeTests = params.executeTests
+                batchTargetHostnames.add('hostname.server-batch-1-prod')
             }
-
-            echo "executeTests =  ${executeTests}"
 
         } catch (e) {
             currentBuild.result = hudson.model.Result.NOT_BUILT.toString()
-            notifySlack(slackChannel,e.getLocalizedMessage())
+            notifySlack(slackChannel, "Failed to set environnement variables: " + e.getLocalizedMessage())
             throw e
         }
     }
 
-    stage('SCM checkout') {
-        try {
-            checkout([
-                    $class                           : 'GitSCM',
-                    branches                         : [[name: "${params.BRANCH_TAG}"]],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions                       : [],
-                    submoduleCfg                     : [],
-                    userRemoteConfigs                : [[credentialsId: "${gitCredentials}", url: "${gitURL}"]]
-            ])
+    if (buildNumber == -1) {
 
-        } catch (e) {
-            currentBuild.result = hudson.model.Result.FAILURE.toString()
-            notifySlack(slackChannel,e.getLocalizedMessage())
-            throw e
-        }
-    }
-
-    if ("${executeTests}" == 'true') {
-        stage('test') {
+        //-------------------------------
+        // Etape 2 : Recuperation du code
+        //-------------------------------
+        stage('SCM checkout') {
             try {
-
-                rtMaven.run pom: 'pom.xml', goals: 'clean test'
-                junit allowEmptyResults: true, testResults: '/target/surefire-reports/*.xml'
+                checkout([
+                        $class                           : 'GitSCM',
+                        branches                         : [[name: "${params.BRANCH_TAG}"]],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions                       : [],
+                        submoduleCfg                     : [],
+                        userRemoteConfigs                : [[credentialsId: "${gitCredentials}", url: "${gitURL}"]]
+                ])
 
             } catch (e) {
-                currentBuild.result = hudson.model.Result.UNSTABLE.toString()
-                notifySlack(slackChannel,e.getLocalizedMessage())
-                // Si les tests ne passent pas, on mets le build en UNSTABLE et on continue
-                //throw e
+                currentBuild.result = hudson.model.Result.FAILURE.toString()
+                notifySlack(slackChannel, "Failed to fetch SCM: " + e.getLocalizedMessage())
+                throw e
             }
         }
-    } else {
-        echo "Tests are skipped"
     }
 
+    for (int moduleIndex = 0; moduleIndex < candidateModules.size(); moduleIndex++) { //Pour chaque module du projet
 
-    stage("Edit properties files") {
-      try {
-        echo "Edition application-${mavenProfile}.properties"
-        echo "--------------------------"
-        original = readFile "src/main/resources/application-${mavenProfile}.properties"
-        newconfig = original
+        //-------------------------------
+        // Etape 3 : Compilation
+        //-------------------------------
+        if ("${executeBuild[moduleIndex]}" == 'true') {
 
-        withCredentials([
-          string(credentialsId: "url-orpins-${mavenProfile}", variable: 'url')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-username-orpins", variable: 'BDusername')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-password-orpins", variable: 'BDpassword')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${BDpassword}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken')
-        ]) {
-          newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-jwt-token-expirationInMs", variable: 'tokenExpirationInMs')
-        ]) {
-          newconfig = newconfig.replaceAll("jwt.token.expirationInMs=*", "jwt.token.expirationInMs=${tokenExpirationInMs}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-server-port", variable: 'serverPort')
-        ]) {
-          newconfig = newconfig.replaceAll("server.port=*", "server.port=${serverPort}")
-        }
-        withCredentials([
-          string(credentialsId: "smtp-host", variable: 'smtpHost')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.mail.host=*", "spring.mail.host=${smtpHost}")
-        }
-        withCredentials([
-          string(credentialsId: "smtp-port", variable: 'smtpPort')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.mail.port=*", "spring.mail.port=${smtpPort}")
-        }
-        withCredentials([
-          string(credentialsId: "smtp-username", variable: 'smtpUsername')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.mail.username=*", "spring.mail.username=${smtpUsername}")
-        }
-        withCredentials([
-          string(credentialsId: "smtp-password", variable: 'smtpPassword')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.mail.password=*", "spring.mail.password=${smtpPassword}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-orpins-driver", variable: 'driver')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.datasource.driver-class-name=*", "spring.datasource.driver-class-name=${driver}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-orpins-dialect", variable: 'dialect')
-        ]) {
-          newconfig = newconfig.replaceAll("spring.jpa.properties.hibernate.dialect=*", "spring.jpa.properties.hibernate.dialect=${dialect}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-site", variable: 'googleRecaptchaKey')
-        ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.site=*", "google.recaptcha.key.site=${googleRecaptchaKey}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-secret", variable: 'googleRecaptchaSecret')
-        ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.secret=*", "google.recaptcha.key.secret=${googleRecaptchaSecret}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold')
-        ]) {
-          newconfig = newconfig.replaceAll("google.recaptcha.key.threshold=*", "google.recaptcha.key.threshold=${googleRecaptchaThreshold}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin')
-        ]) {
-          newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
-        }
-        withCredentials([
-          string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl')
-        ]) {
-          newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
-        }
+            //-------------------------------
+            // Etape 3.1 : Edition des fichiers de proprietes
+            //-------------------------------
+            stage("[${candidateModules[moduleIndex]}] Edit properties files") {
+                try {
+                    echo "Edition application-${mavenProfil}.properties"
+                    echo "--------------------------"
 
-        writeFile file: "src/main/resources/application.properties", text: "${newconfig}"
+                    original = readFile "${candidateModules[moduleIndex]}/src/main/resources/application-${mavenProfil}.properties"
+                    newconfig = original
 
-      } catch (e) {
-        currentBuild.result = hudson.model.Result.FAILURE.toString()
-        notifySlack(slackChannel, "Failed to edit properties files: " + e.getLocalizedMessage())
-        throw e
-      }
-    }
+                    // **** DEBUT DE ZONE A EDITER n°2 ****
 
-    stage('compile-package') {
-        try {
-            echo "Compile for ${mavenProfile} profile"
-            echo "--------------------------"
+                    /*
+                      Cette zone permet d'editer les fichiers de proprietes pour les environnements cibles.
+                      C'est ici que l'on insere les donnees sensibles dans les fichiers de proprietes (application.properties)
+                      Les donnees sensibles sont stockees dans Jenkins comme des Credentials de type Secret Text.
+                      A vous d'ajouter dans Jenkins vos credentials de donnees sensensibles et de les remplacer ici
+                     */
 
-            sh "'${maventool}/bin/mvn' -Dmaven.test.skip=true clean package -DfinalName='${warName}' -DbaseDir='${tomcatWebappsDir}${warName}' -P${mavenProfile}"
-        } catch(e) {
-            currentBuild.result = hudson.model.Result.FAILURE.toString()
-            notifySlack(slackChannel,e.getLocalizedMessage())
-            throw e
-        }
-    }
-
-    //stage('sonarqube analysis'){
-    //   withSonarQubeEnv('SonarQube Server2'){ cf : jenkins/configuration/sonarQube servers ==> between the quotes put the name we gave to the server
-    //      sh "${maventool}/bin/mvn sonar:sonar"
-    //  }
-    // }
-
-    stage('artifact') {
-        try {
-            archive "${warDir}${warName}.war"
-
-        } catch(e) {
-            currentBuild.result = hudson.model.Result.FAILURE.toString()
-            notifySlack(slackChannel,e.getLocalizedMessage())
-            throw e
-        }
-    }
-
-    stage ('stop tomcat'){
-        for (int i = 0; i < serverHostnames.size(); i++) { //Pour chaque serveur
-            try {
-                    withCredentials([
-                            usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                            string(credentialsId: "${serverHostnames[i]}", variable: 'hostname'),
-                            string(credentialsId: 'service.status', variable: 'status'),
-                            string(credentialsId: 'service.stop', variable: 'stop'),
-                            string(credentialsId: 'service.start', variable: 'start')
-                    ]) {
-                        echo "Stop service on ${serverHostnames[i]}"
-                        echo "--------------------------"
-
-                        try {
-
-                            echo 'get service status'
-                            sh "ssh -tt ${username}@${hostname} \"${status} ${tomcatServiceName}\""
-
-                            echo 'stop the service'
-                            sh "ssh -tt ${username}@${hostname} \"${stop} ${tomcatServiceName}\""
-
-                        } catch(e) {
-                            // Maybe the tomcat is not running
-                            echo 'maybe the service is not running'
-
-                            echo 'we try to start the service'
-                            sh "ssh -tt ${username}@${hostname} \"${start} ${tomcatServiceName}\""
-
-                            echo 'get service status'
-                            sh "ssh -tt ${username}@${hostname} \"${status} ${tomcatServiceName}\""
-
-                            echo 'stop the service'
-                            sh "ssh -tt ${username}@${hostname} \"${stop} ${tomcatServiceName}\""
+                    // Module web
+                    if ("${candidateModules[moduleIndex]}" == 'web') {
+                        withCredentials([
+                                string(credentialsId: "url-orpins-${mavenProfil}", variable: 'url'),
+                                string(credentialsId: "LN-username-orpins", variable: 'BDusername'),
+                                string(credentialsId: "LN-password-orpins", variable: 'BDpassword'),
+                                string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
+                                string(credentialsId: "LN-google-recaptcha-key-site", variable: 'googleRecaptchaKey'),
+                                string(credentialsId: "LN-google-recaptcha-key-secret", variable: 'googleRecaptchaSecret'),
+                                string(credentialsId: "LN-google-recaptcha-key-threshold", variable: 'googleRecaptchaThreshold'),
+                                string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin'),
+                                string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl'),
+                        ]) {
+                            newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
+                            newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
+                            newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${BDpassword}")
+                            newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.site=*", "google.fr.abes.licencesnationales.web.recaptcha.key.site=${googleRecaptchaKey}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.secret=*", "google.fr.abes.licencesnationales.web.recaptcha.key.secret=${googleRecaptchaSecret}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.threshold=*", "google.fr.abes.licencesnationales.web.recaptcha.key.threshold=${googleRecaptchaThreshold}")
+                            newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
+                            newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
                         }
                     }
 
-            } catch(e) {
-                currentBuild.result = hudson.model.Result.FAILURE.toString()
-                notifySlack(slackChannel,e.getLocalizedMessage())
-                throw e
-            }
-        }
-    }
+                    // Module batch
+                    if ("${candidateModules[moduleIndex]}" == 'batch') {
 
-    stage ('deploy to tomcat'){
-        for (int i = 0; i < serverHostnames.size(); i++) { //Pour chaque serveur
-            try {
-                    withCredentials([
-                            usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                            string(credentialsId: "${serverHostnames[i]}", variable: 'hostname')
-                    ]) {
-                        echo "Deploy to ${serverHostnames[i]}"
-                        echo "--------------------------"
-
-                        sh "ssh -tt ${username}@${hostname} \"rm -fr ${tomcatWebappsDir}${warName} ${tomcatWebappsDir}${warName}.war\""
-                        sh "scp ${warDir}${warName}.war ${username}@${hostname}:${tomcatWebappsDir}"
                     }
 
-            } catch(e) {
-                currentBuild.result = hudson.model.Result.FAILURE.toString()
-                notifySlack(slackChannel,e.getLocalizedMessage())
-                throw e
+                    // **** FIN DE ZONE A EDITER n°2 ****
+
+                    writeFile file: "${candidateModules[moduleIndex]}/src/main/resources/application-${mavenProfil}.properties", text: "${newconfig}"
+
+                } catch (e) {
+                    currentBuild.result = hudson.model.Result.FAILURE.toString()
+                    notifySlack(slackChannel, "Failed to edit module ${candidateModules[moduleIndex]} properties files: "+e.getLocalizedMessage())
+                    throw e
+                }
+            }
+
+            //-------------------------------
+            // Etape 3.2 : Compilation
+            //-------------------------------
+            stage("[${candidateModules[moduleIndex]}] Compile package") {
+                try {
+                    sh "'${maventool}/bin/mvn' -Dmaven.test.skip='${!executeTests}' clean package  -pl ${candidateModules[moduleIndex]} -am -P${mavenProfil} -DwarName='${backApplicationFileName}' -DwebBaseDir='${backTargetDir}${backApplicationFileName}' -DbatchBaseDir='${batchTargetDir}${backApplicationFileName}'"
+                    // ATTENTION #1, rtMaven.run ne tient pas compte des arguments de compilation -D
+                    //buildInfo = rtMaven.run pom: 'pom.xml', goals: "clean package -Dmaven.test.skip=${!executeTests} -pl ${candidateModules[moduleIndex]} -am -P${mavenProfil} -DfinalName=${backApplicationFileName} -DwebBaseDir=${backTargetDir}${backApplicationFileName} -DbatchBaseDir=${batchTargetDir}${backApplicationFileName}".toString()
+
+                } catch (e) {
+                    currentBuild.result = hudson.model.Result.FAILURE.toString()
+                    notifySlack(slackChannel, "Failed to build module ${candidateModules[moduleIndex]}: "+e.getLocalizedMessage())
+                    throw e
+                }
             }
         }
-    }
 
-    stage ('restart tomcat'){
-        for (int i = 0; i < serverHostnames.size(); i++) { //Pour chaque serveur
-            try {
-                    withCredentials([
-                            usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
-                            string(credentialsId: "${serverHostnames[i]}", variable: 'hostname'),
-                            string(credentialsId: 'service.status', variable: 'status'),
-                            string(credentialsId: 'service.start', variable: 'start')
-                    ]) {
-                        echo "Restart service on ${serverHostnames[i]}"
-                        echo "--------------------------"
+        if (deployArtifactoy && "${executeBuild[moduleIndex]}" == 'true') {
 
-                        echo 'start service'
-                        sh "ssh -tt ${username}@${hostname} \"${start} ${tomcatServiceName}\""
+            //-------------------------------
+            // Etape 3.3 : Deploiement sur Artifactory
+            //-------------------------------
+            stage("[${candidateModules[moduleIndex]}] Archive to Artifactory") {
+                try {
+                    rtMaven.deployer server: artifactoryServer, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
+                    buildInfo = rtMaven.run pom: 'pom.xml', goals: "clean package -Dmaven.test.skip=${!executeTests} -P${mavenProfil} -DwarName=${backApplicationFileName} -DwebBaseDir=${backTargetDir}${backApplicationFileName} -DbatchBaseDir=${batchTargetDir}".toString()
+                    buildInfo.name = "${artifactoryBuildName}"
+                    rtMaven.deployer.deployArtifacts buildInfo
+                    artifactoryServer.publishBuildInfo buildInfo
 
-                        echo 'get service status'
-                        sh "ssh -tt ${username}@${hostname} \"${status} ${tomcatServiceName}\""
+                } catch (e) {
+                    currentBuild.result = hudson.model.Result.FAILURE.toString()
+                    notifySlack(slackChannel, "Failed to deploy and publish module ${candidateModules[moduleIndex]} to Artifactory: " + e.getLocalizedMessage())
+                    throw e
+                }
+            }
+        }
+
+        //-------------------------------
+        // Etape 4 : Deploiement
+        //-------------------------------
+        if ("${executeDeploy[moduleIndex]}" == 'true') {
+
+            if(buildNumber != -1) {
+
+                //-------------------------------
+                // Etape 4.0 : On recupere depuis Artifactory
+                //-------------------------------
+                try {
+                    // On clean l'espace de travail
+                    sh("${maventool}/bin/mvn clean")
+                    sh("mkdir -p ${candidateModules[moduleIndex]}/target")
+
+                    if ("${candidateModules[moduleIndex]}" == 'web') {
+
+                        downloadSpec = """{                    
+                         "files": [
+                          {  
+                              "aql": {
+                                    "items.find": {
+                                    "archive.item.artifact.module.build.name": {"\$eq":"${artifactoryBuildName}"},
+                                    "archive.item.artifact.module.build.number":{"\$eq":"${buildNumber}"},
+                                    "name":{"\$match":"${candidateModules[moduleIndex]}*.war"}
+                                    }                              
+                                },
+                              "target": "${candidateModules[moduleIndex]}/target/",
+                              "flat": true                      
+                            }
+                         ]
+                        }"""
+
+                        artifactoryServer.download spec: downloadSpec
+                        // Suite au bug #1, on renomme le war
+                        sh("mv ${candidateModules[moduleIndex]}/target/*.war ${candidateModules[moduleIndex]}/target/${backApplicationFileName}.war")
                     }
 
-            } catch(e) {
-                currentBuild.result = hudson.model.Result.FAILURE.toString()
-                notifySlack(slackChannel,e.getLocalizedMessage())
-                throw e
+                    if ("${candidateModules[moduleIndex]}" == 'batch') {
+
+                        downloadSpec = """{                    
+                         "files": [
+                          {  
+                              "aql": {
+                                    "items.find": {
+                                    "archive.item.artifact.module.build.name": {"\$eq":"${artifactoryBuildName}"},
+                                    "archive.item.artifact.module.build.number":{"\$eq":"${buildNumber}"},
+                                    "name":{"\$match":"${candidateModules[moduleIndex]}*.jar"}
+                                    }                              
+                                },
+                              "target": "${candidateModules[moduleIndex]}/target/",
+                              "flat": true                      
+                            }
+                         ]
+                        }"""
+
+                        artifactoryServer.download spec: downloadSpec
+                    }
+
+                } catch (e) {
+                    currentBuild.result = hudson.model.Result.FAILURE.toString()
+                    notifySlack(slackChannel, "Failed to retrieve module ${candidateModules[moduleIndex]} from Artifactory: " + e.getLocalizedMessage())
+                    throw e
+                }
+            }
+
+            //-------------------------------
+            // Etape 4.1 : Serveur Web
+            //-------------------------------
+            if ("${candidateModules[moduleIndex]}" == 'web') {
+
+                stage("Deploy to web servers") {
+
+                    for (int i = 0; i < backTargetHostnames.size(); i++) { //Pour chaque serveur
+                        withCredentials([
+                                usernamePassword(credentialsId: 'tomcatuser', passwordVariable: 'pass', usernameVariable: 'username'),
+                                string(credentialsId: "${backTargetHostnames[i]}", variable: 'hostname'),
+                                string(credentialsId: 'service.status', variable: 'status'),
+                                string(credentialsId: 'service.stop', variable: 'stop'),
+                                string(credentialsId: 'service.start', variable: 'start')
+                        ]) {
+
+                            echo "Stop service on ${backTargetHostnames[i]}"
+                            echo "--------------------------"
+
+                            try {
+
+                                try {
+                                    echo 'get service status'
+                                    sh "ssh -tt ${username}@${hostname} \"${status} ${backServiceName}\""
+
+                                    echo 'stop the service'
+                                    sh "ssh -tt ${username}@${hostname} \"${stop} ${backServiceName}\""
+
+                                } catch (e) {
+                                    // Maybe the tomcat is not running
+                                    echo 'maybe the service is not running'
+
+                                    echo 'we try to start the service'
+                                    sh "ssh -tt ${username}@${hostname} \"${start} ${backServiceName}\""
+
+                                    echo 'get service status'
+                                    sh "ssh -tt ${username}@${hostname} \"${status} ${backServiceName}\""
+
+                                    echo 'stop the service'
+                                    sh "ssh -tt ${username}@${hostname} \"${stop} ${backServiceName}\""
+                                }
+
+                            } catch (e) {
+                                currentBuild.result = hudson.model.Result.FAILURE.toString()
+                                notifySlack(slackChannel, "Failed to stop the web service on ${backTargetHostnames[i]} :" + e.getLocalizedMessage())
+                                throw e
+                            }
+
+                            echo "Deploy to ${backTargetHostnames[i]}"
+                            echo "--------------------------"
+
+                            try {
+                                sh "ssh -tt ${username}@${hostname} \"rm -rf ${backTargetDir}${backApplicationFileName} ${backTargetDir}${backApplicationFileName}.war\""
+                                sh "scp ${candidateModules[moduleIndex]}/target/${backApplicationFileName}.war ${username}@${hostname}:${backTargetDir}"
+
+                            } catch (e) {
+                                currentBuild.result = hudson.model.Result.FAILURE.toString()
+                                notifySlack(slackChannel, "Failed to deploy the webapp to ${backTargetHostnames[i]} :" + e.getLocalizedMessage())
+                                throw e
+                            }
+
+                            echo "Restart service on ${backTargetHostnames[i]}"
+                            echo "--------------------------"
+
+                            try {
+                                echo 'start service'
+                                sh "ssh -tt ${username}@${hostname} \"${start} ${backServiceName}\""
+
+                                echo 'get service status'
+                                sh "ssh -tt ${username}@${hostname} \"${status} ${backServiceName}\""
+
+                            } catch (e) {
+                                currentBuild.result = hudson.model.Result.FAILURE.toString()
+                                notifySlack(slackChannel, "Failed to restrat the web service on ${backTargetHostnames[i]} :" + e.getLocalizedMessage())
+                                throw e
+                            }
+                        }
+
+                    }//Pour chaque serveur
+                }
+            }
+
+            //-------------------------------
+            // Etape 4.2 : Serveur Batch
+            //-------------------------------
+            if ("${candidateModules[moduleIndex]}" == 'batch') {
+
+                stage("Deploy to batch servers") {
+                    for (int i = 0; i < batchTargetHostnames.size(); i++) { //Pour chaque serveur
+                        withCredentials([
+                                usernamePassword(credentialsId: 'batchuserpass', passwordVariable: 'pass', usernameVariable: 'username'),
+                                string(credentialsId: "${batchTargetHostnames[i]}", variable: 'hostname')
+                        ]) {
+                            try {
+                                echo "Deploy to ${batchTargetHostnames[i]}"
+                                echo "--------------------------"
+
+                                sh "ssh -tt ${username}@${hostname} \"rm -rf ${batchTargetDir}${backApplicationFileName}.jar\""
+                                sh "scp ${candidateModules[moduleIndex]}/target/*.jar ${username}@${hostname}:${batchTargetDir}"
+
+                            } catch (e) {
+                                currentBuild.result = hudson.model.Result.FAILURE.toString()
+                                notifySlack(slackChannel, "Failed to deploy batch on ${batchTargetHostnames[i]} :" + e.getLocalizedMessage())
+                                throw e
+                            }
+                        }
+                    }
+                }
             }
         }
-    }
-
-    stage ('Artifactory configuration') {
-        try {
-            rtMaven.deployer server: server, releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local'
-            buildInfo = Artifactory.newBuildInfo()
-            buildInfo = rtMaven.run pom: 'pom.xml', goals: '-U clean install -Dmaven.test.skip=true '
-
-            rtMaven.deployer.deployArtifacts buildInfo
-            buildInfo = rtMaven.run pom: 'pom.xml', goals: 'clean install -Dmaven.repo.local=.m2 -Dmaven.test.skip=true'
-            buildInfo.env.capture = true
-            server.publishBuildInfo buildInfo
-
-        } catch(e) {
-            currentBuild.result = hudson.model.Result.FAILURE.toString()
-            notifySlack(slackChannel,e.getLocalizedMessage())
-            throw e
-        }
-    }
+    } //Pour chaque module du projet
 
     currentBuild.result = hudson.model.Result.SUCCESS.toString()
     notifySlack(slackChannel,"Congratulation !")
