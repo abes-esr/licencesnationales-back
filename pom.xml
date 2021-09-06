@@ -4,42 +4,103 @@
 
         licencesnationales-back
      ======================================================================= -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.4.0</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>fr.abes</groupId>
+        <artifactId>abes-spring</artifactId>
+        <version>1.0.7</version>
     </parent>
-
-    <properties>
-        <java.version>11</java.version>
-    </properties>
-
-    <packaging>war</packaging>
 
     <!-- ===================================================== -->
     <!--     Description du projet                             -->
     <!-- ===================================================== -->
-
-    <groupId>fr.abes</groupId>
-    <artifactId>lnevent</artifactId>
+    <groupId>fr.abes.licencesnationales</groupId>
+    <artifactId>licencesnationales-backoffice</artifactId>
+    <packaging>pom</packaging>
     <version>0.0.1-SNAPSHOT</version>
-    <name>lnevent</name>
-    <description>Demo LN Event base</description>
+    <name>Licences Nationales Back</name>
+    <description>API pour les licences nationales</description>
 
+    <!-- ===================================================== -->
+    <!--     Proprietes du projet                              -->
+    <!-- ===================================================== -->
+    <properties>
+        <finalName>licencesnationales-${project.artifactId}-${project.version}</finalName>
+        <warName>licencesnationales</warName>
+        <webBaseDir>./target/</webBaseDir>
+        <batchBaseDir>./target/</batchBaseDir>
+    </properties>
 
+    <!-- =========================================================== -->
+    <!--     Description des modules                                 -->
+    <!-- =========================================================== -->
+    <modules>
+        <module>core</module>
+        <module>batch</module>
+        <module>web</module>
+    </modules>
+
+    <!-- =========================================================== -->
+    <!--     Profile                                                 -->
+    <!-- =========================================================== -->
+    <profiles>
+        <profile>
+            <id>localhost</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <spring.profiles.active>localhost</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>test</id>
+            <properties>
+                <spring.profiles.active>test</spring.profiles.active>
+            </properties>
+        </profile>
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
     <!-- =========================================================== -->
     <!--     Gestion des dependances                                 -->
     <!-- =========================================================== -->
 
     <dependencies>
+        <!--- === Annotations === -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
 
+        <!-- === Mapping === -->
+        <dependency>
+            <groupId>org.modelmapper</groupId>
+            <artifactId>modelmapper</artifactId>
+            <version>2.3.5</version>
+        </dependency>
 
-        <!-- === Spring web === -->
+        <!-- === Log === -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -52,138 +113,54 @@
         </dependency>
 
 
-        <!-- === Configuring the Annotation Processor === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-configuration-processor</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-
-
-        <!-- === Log === -->
-        <!--spring secu starter contient déjà log4j ce qui fait un conflit si on garde les lignes ci-dessous
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-log4j2</artifactId>
-        </dependency>-->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>${slf4j.version}</version>
-        </dependency>
-
-        <!--- === DAO === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
-        <!--- === bdd === -->
-        <dependency>
-            <groupId>oracle.ojdbc</groupId>
-            <artifactId>ojdbc</artifactId>
-            <version>12.1.0.1.0</version>
-        </dependency>
-        <dependency>
-            <groupId>oracle.ojdbc</groupId>
-            <artifactId>xdb6</artifactId>
-            <version>12.1.0.1.0</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <!--- === Contrôle des entités === -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
-
-        </dependency>
-
-        <!--- === Envoi de mail === -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-mail</artifactId>
-        </dependency>
-
-        <!--- === Annotations === -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
-        </dependency>
-
-        <!--- === Csv pour bdd === -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-csv</artifactId>
-            <version>2.5.3</version>
-        </dependency>
-
         <!--- === Tests === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>junit</groupId>
+                    <artifactId>junit</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
-
         <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!--- === Securite === -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-security</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.5.2</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>io.jsonwebtoken</groupId>
-            <artifactId>jjwt</artifactId>
-            <version>0.9.1</version>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>2.23.4</version>
+            <scope>test</scope>
         </dependency>
-
-
-        <!--- === Documentation API === -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.9.2</version>
-        </dependency>
-
     </dependencies>
+
+    <distributionManagement>
+        <site>
+            <id>abes</id>
+            <url>${url.doc.abes}doc${doc.root.path}/${doc.root.path}-${project.version}</url>
+        </site>
+    </distributionManagement>
 
     <!-- =========================================================== -->
     <!--     Librairies ABES                        -->
     <!-- =========================================================== -->
+
 
     <repositories>
         <repository>
             <id>artifactory-public</id>
             <name>artifactory-public</name>
             <url>https://artifactory.abes.fr/artifactory/maven-public/</url>
-        </repository>
-        <repository>
-            <id>artifactory-public-ext</id>
-            <name>artifactory-public-ext</name>
-            <url>https://artifactory.abes.fr/artifactory/ext-release-local/</url>
         </repository>
     </repositories>
 
@@ -198,9 +175,8 @@
     <!-- =========================================================== -->
     <!--     Configuration de la compilation                         -->
     <!-- =========================================================== -->
-
     <build>
-        <finalName>licencesnationales</finalName>
+        <finalName>${finalName}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -208,5 +184,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>
