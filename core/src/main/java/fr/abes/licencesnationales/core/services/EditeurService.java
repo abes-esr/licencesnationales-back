@@ -54,16 +54,17 @@ public class EditeurService {
         }
         else{
             EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeur);
-            log.info("addEditeur 1");
-            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getNomEditeur());
-            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getAdresseEditeur());
-            log.info("editeurCreeEvent.get" + editeurCreeEvent.getEditeur().getDateCreation());
+            log.debug("editeurCreeEvent nomEditeur" + editeurCreeEvent.getEditeur().getNomEditeur());
+            log.debug("editeurCreeEvent identifiantEditeur" + editeurCreeEvent.getEditeur().getIdentifiantEditeur());
+            log.debug("editeurCreeEvent dateCreation" + editeurCreeEvent.getEditeur().getDateCreation());
+            log.debug("editeurCreeEvent groupesEtabRelies" + editeurCreeEvent.getEditeur().getGroupesEtabRelies());
+            log.debug("editeurCreeEvent adresseEditeur" + editeurCreeEvent.getEditeur().getAdresseEditeur());
+
             Set<ContactCommercialEditeurDto> s = editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto();
             for(ContactCommercialEditeurDto c:s) {
-                log.info("editeurCreeEvent.getListeContactCommercialEditeurDto() = " + c.mailContactCommercial + c.prenomContactCommercial + c.nomContactCommercial);
+                log.debug("editeurCreeEvent.getListeContactCommercialEditeurDto() = " + c.mailContactCommercial + c.prenomContactCommercial + c.nomContactCommercial);
             }
             applicationEventPublisher.publishEvent(editeurCreeEvent);
-            log.info("addEditeur 2");
             eventRepository.save(new EventEntity(editeurCreeEvent));
         }
     }
