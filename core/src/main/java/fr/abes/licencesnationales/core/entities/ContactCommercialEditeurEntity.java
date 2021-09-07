@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -28,8 +29,9 @@ public class ContactCommercialEditeurEntity implements Serializable {
     private String mailContactCommercial;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "idEditeur", nullable = false)
-    private EditeurEntity idEditeur;
+    @JoinColumn(name = "editeurEntity", nullable = false)
+    @JsonIgnore
+    private EditeurEntity editeurEntity;
 
 
 
