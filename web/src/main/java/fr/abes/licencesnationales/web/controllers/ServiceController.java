@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import fr.abes.licencesnationales.core.services.ArbreService;
-import fr.abes.licencesnationales.core.services.ResetService;
+import fr.abes.licencesnationales.services.ArbreService;
+import fr.abes.licencesnationales.services.ResetService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

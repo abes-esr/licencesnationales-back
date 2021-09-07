@@ -1,11 +1,11 @@
 package fr.abes.licencesnationales.web.security.services;
 
 
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.exception.AccesInterditException;
+import fr.abes.licencesnationales.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
-import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.services.EtablissementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
