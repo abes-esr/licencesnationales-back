@@ -2,16 +2,15 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.IpException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.IpService;
+import fr.abes.licencesnationales.entities.EtablissementEntity;
+import fr.abes.licencesnationales.entities.EventEntity;
+import fr.abes.licencesnationales.exception.AccesInterditException;
+import fr.abes.licencesnationales.exception.IpException;
+import fr.abes.licencesnationales.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.repository.EventRepository;
+import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.EtablissementService;
+import fr.abes.licencesnationales.services.IpService;
 import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeDto;
 import fr.abes.licencesnationales.web.dto.ip.Ipv4ModifieeDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
@@ -184,7 +183,6 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test admin ajout IPV4 succes")
     @WithMockUser(authorities = {"admin"})
     public void testAdminAjoutIPV4Succes() throws Exception {
-
         Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20.6");

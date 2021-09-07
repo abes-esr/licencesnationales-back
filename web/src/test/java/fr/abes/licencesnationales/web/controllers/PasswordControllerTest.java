@@ -3,11 +3,11 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.MockUserUtil;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.entities.EtablissementEntity;
+import fr.abes.licencesnationales.entities.EventEntity;
+import fr.abes.licencesnationales.repository.EventRepository;
+import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordUpdateWebDto;
@@ -111,7 +111,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
             return response;
         });
         Mockito.when(tokenProvider.validateToken(Mockito.anyString())).thenReturn(true);
-        Mockito.doNothing().when(etablissementService).changePasswordFromSiren(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(etablissementService).changePasswordFromSiren(Mockito.anyString(), Mockito.anyString(), Mockito.any());
 
         //test success
         dto.setPassword("PassWord1!");

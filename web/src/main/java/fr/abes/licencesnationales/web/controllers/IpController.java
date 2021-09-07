@@ -1,25 +1,25 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.ip.*;
+import fr.abes.licencesnationales.converter.UtilsMapper;
+import fr.abes.licencesnationales.dto.ip.*;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.*;
-import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
-import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
-import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
-import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
-import fr.abes.licencesnationales.core.event.ip.IpValideeEvent;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.IpException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
+import fr.abes.licencesnationales.entities.EventEntity;
+import fr.abes.licencesnationales.entities.IpEntity;
+import fr.abes.licencesnationales.event.ip.IpAjouteeEvent;
+import fr.abes.licencesnationales.event.ip.IpModifieeEvent;
+import fr.abes.licencesnationales.event.ip.IpSupprimeeEvent;
+import fr.abes.licencesnationales.event.ip.IpValideeEvent;
+import fr.abes.licencesnationales.exception.AccesInterditException;
+import fr.abes.licencesnationales.exception.IpException;
+import fr.abes.licencesnationales.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.repository.EventRepository;
+import fr.abes.licencesnationales.repository.IpRepository;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
-import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.IpService;
+import fr.abes.licencesnationales.services.EmailService;
+import fr.abes.licencesnationales.services.EtablissementService;
+import fr.abes.licencesnationales.services.IpService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +30,6 @@ import org.springframework.web.client.RestClientException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 @Log

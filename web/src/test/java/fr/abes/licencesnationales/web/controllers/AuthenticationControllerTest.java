@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.MockUserUtil;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.entities.EtablissementEntity;
 import fr.abes.licencesnationales.web.security.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.web.security.payload.request.LoginRequest;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;

@@ -1,6 +1,6 @@
 package fr.abes.licencesnationales.web.dto.ip;
 
-import fr.abes.licencesnationales.core.dto.ip.IpModifieeDto;
+import fr.abes.licencesnationales.dto.ip.IpModifieeDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,21 +1,17 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
-import fr.abes.licencesnationales.core.dto.ip.IpDto;
-import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.converter.UtilsMapper;
+import fr.abes.licencesnationales.dto.editeur.ContactCommercialEditeurDto;
+import fr.abes.licencesnationales.dto.editeur.ContactTechniqueEditeurDto;
+import fr.abes.licencesnationales.dto.editeur.EditeurCreeDto;
+import fr.abes.licencesnationales.dto.editeur.EditeurModifieDto;
+import fr.abes.licencesnationales.entities.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.entities.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.entities.EditeurEntity;
 import fr.abes.licencesnationales.web.dto.editeur.*;
-import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.services.EditeurService;
-import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
+import fr.abes.licencesnationales.exception.MailDoublonException;
+import fr.abes.licencesnationales.services.EditeurService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
