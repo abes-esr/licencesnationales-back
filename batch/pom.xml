@@ -89,7 +89,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <mainClass>fr.abes.licencesnationales.BatchApplication</mainClass>
+                    <mainClass>fr.abes.licencesnationales.batch.BatchApplication</mainClass>
                 </configuration>
                 <executions>
                     <execution>

@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.web.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
-import fr.abes.licencesnationales.exception.*;
+import fr.abes.licencesnationales.core.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
 import org.springframework.core.Ordered;

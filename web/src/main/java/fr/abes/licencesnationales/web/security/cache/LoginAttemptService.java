@@ -3,7 +3,7 @@ package fr.abes.licencesnationales.web.security.cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import fr.abes.licencesnationales.constant.Constant;
+import fr.abes.licencesnationales.core.constant.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 

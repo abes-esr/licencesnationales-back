@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.security.jwt;
 
 
-import fr.abes.licencesnationales.constant.Constant;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import lombok.Getter;

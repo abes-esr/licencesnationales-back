@@ -1,6 +1,6 @@
 package fr.abes.licencesnationales.web.security.jwt;
 
-import fr.abes.licencesnationales.constant.Constant;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.web.security.cache.LoginAttemptService;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import lombok.extern.slf4j.Slf4j;
