@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.core.dto.editeur;
+package fr.abes.licencesnationales.core.dto.contact;
 
 
 import lombok.AllArgsConstructor;

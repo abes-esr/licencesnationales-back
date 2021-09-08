@@ -12,10 +12,10 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlageIpv4ModifieeDto extends IpModifieeDto {
+public class Ipv4ModifieeWebDto extends IpModifieeDto {
 
-    @NotBlank(message="La plage d'Ips est obligatoire")
-    @Pattern(regexp = "^(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))$", message = "La plage d'Ips fournie n'est pas valide")
+    @NotBlank(message="L'IP est obligatoire")
+    @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$", message = "L'IP fournie n'est pas valide")
     private String ip;
 
 }

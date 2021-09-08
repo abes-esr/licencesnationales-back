@@ -46,7 +46,7 @@ public class ArbreService {
                 case "divise":
                     builder.append("Divise : ").append(eventEntity.ancienNomEtab).append("\n");
                     for (EtablissementDto etab :
-                            eventEntity.etablisementsDivise) {
+                            eventEntity.etablisementsDivises) {
                         builder.append(etab.getSiren()).append("\n");
                     }
                     break;

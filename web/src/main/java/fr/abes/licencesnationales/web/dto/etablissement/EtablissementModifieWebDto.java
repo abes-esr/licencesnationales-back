@@ -1,14 +1,9 @@
-package fr.abes.licencesnationales.core.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class EtablissementModifieDto {
+@Getter
+public class EtablissementModifieWebDto {
     private String siren;
     private String nomContact;
     private String prenomContact;

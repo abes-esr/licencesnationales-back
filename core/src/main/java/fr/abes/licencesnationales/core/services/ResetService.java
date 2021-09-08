@@ -1,7 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
 
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
@@ -33,7 +32,8 @@ public class ResetService {
                 eventRepository.findAll()) {
             switch (eventEntity.event) {
                 case "cree":
-                    EtablissementDto etablissementDto = new EtablissementDto(eventEntity.nomEtab,
+                    EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this,
+                            eventEntity.nomEtab,
                             eventEntity.siren,
                             eventEntity.typeEtablissement,
                             eventEntity.idAbes,
@@ -48,10 +48,7 @@ public class ResetService {
                             eventEntity.cedexContact,
                             eventEntity.roleContact,
                             eventEntity.villeContact);
-                    EtablissementCreeDto etablissementCreeDto = new EtablissementCreeDto(etablissementDto, "");
-                    EtablissementCreeEvent etablissementCreeEvent =
-                            new EtablissementCreeEvent(this,
-                                    etablissementCreeDto);
+
                     applicationEventPublisher.publishEvent(etablissementCreeEvent);
                     break;
                 case "supprime":
@@ -64,13 +61,27 @@ public class ResetService {
                             new EtablissementDiviseEvent(
                                     this,
                                     eventEntity.ancienNomEtab,
-                                    (ArrayList<EtablissementDto>) eventEntity.etablisementsDivise);
+                                    (ArrayList<EtablissementDto>) eventEntity.etablisementsDivises);
                     applicationEventPublisher.publishEvent(etablissementDiviseEvent);
                     break;
                 case "fusionne":
                     EtablissementFusionneEvent etablissementFusionneEvent =
                             new EtablissementFusionneEvent(this,
-                                    eventEntity.etablissementFusionneDto,
+                                    eventEntity.getNomEtab(),
+                                    eventEntity.getSiren(),
+                                    eventEntity.getTypeEtablissement(),
+                                    eventEntity.getIdAbes(),
+                                    eventEntity.getNomContact(),
+                                    eventEntity.getPrenomContact(),
+                                    eventEntity.getAdresseContact(),
+                                    eventEntity.getBoitePostaleContact(),
+                                    eventEntity.getCodePostalContact(),
+                                    eventEntity.getVilleContact(),
+                                    eventEntity.getCedexContact(),
+                                    eventEntity.getTelephoneContact(),
+                                    eventEntity.getMailContact(),
+                                    eventEntity.getMotDePasse(),
+                                    eventEntity.getRoleContact(),
                                     (ArrayList<String>) eventEntity.etablissementsFusionne);
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;

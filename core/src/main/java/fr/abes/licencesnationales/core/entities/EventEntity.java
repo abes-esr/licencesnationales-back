@@ -3,8 +3,7 @@ package fr.abes.licencesnationales.core.entities;
 import fr.abes.licencesnationales.core.converter.EtablissementDTOConverter;
 import fr.abes.licencesnationales.core.converter.JpaConverterJson;
 import fr.abes.licencesnationales.core.converter.ListEtablissementDTOConverter;
-import fr.abes.licencesnationales.core.dto.editeur.*;
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.core.dto.contact.*;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurFusionneEvent;
@@ -95,12 +94,12 @@ public class EventEntity {
     @Lob
     @Convert(converter = EtablissementDTOConverter.class)
     @Column(name = "ETABLISSEMENTDTOFUSION")
-    public EtablissementDto etablissementFusionneDto;
+    public EtablissementDto etablissementsFusionnes;
 
     @Lob
     @Convert(converter = ListEtablissementDTOConverter.class)
     @Column(name = "ETABLISEMENTS_DIVISE")
-    public List<EtablissementDto> etablisementsDivise;
+    public List<EtablissementDto> etablisementsDivises;
 
     @Lob
     @Convert(converter = JpaConverterJson.class)
@@ -145,24 +144,23 @@ public class EventEntity {
 
 
     public EventEntity(EtablissementCreeEvent etablissementCreeEvent) {
-        EtablissementCreeDto etablissement = etablissementCreeEvent.getEtablissement();
         this.event = "cree";
         this.dateCreationEvent = etablissementCreeEvent.created;
-        this.nomEtab = etablissement.getEtablissementDTO().getNom();
-        this.siren = etablissement.getEtablissementDTO().getSiren();
-        this.typeEtablissement = etablissement.getEtablissementDTO().getTypeEtablissement();
-        this.motDePasse = etablissement.getEtablissementDTO().getMotDePasse();
-        this.idAbes = etablissement.getEtablissementDTO().getIdAbes();
-        this.mailContact = etablissement.getEtablissementDTO().getMailContact();
-        this.nomContact = etablissement.getEtablissementDTO().getNomContact();
-        this.prenomContact = etablissement.getEtablissementDTO().getPrenomContact();
-        this.telephoneContact = etablissement.getEtablissementDTO().getTelephoneContact();
-        this.adresseContact = etablissement.getEtablissementDTO().getAdresseContact();
-        this.boitePostaleContact = etablissement.getEtablissementDTO().getBoitePostaleContact();
-        this.codePostalContact = etablissement.getEtablissementDTO().getCodePostalContact();
-        this.cedexContact = etablissement.getEtablissementDTO().getCedexContact();
-        this.villeContact = etablissement.getEtablissementDTO().getVilleContact();
-        this.roleContact = etablissement.getEtablissementDTO().getRoleContact();
+        this.nomEtab = etablissementCreeEvent.getNom();
+        this.siren = etablissementCreeEvent.getSiren();
+        this.typeEtablissement = etablissementCreeEvent.getTypeEtablissement();
+        this.motDePasse = etablissementCreeEvent.getMotDePasse();
+        this.idAbes = etablissementCreeEvent.getIdAbes();
+        this.mailContact = etablissementCreeEvent.getMailContact();
+        this.nomContact = etablissementCreeEvent.getNomContact();
+        this.prenomContact = etablissementCreeEvent.getPrenomContact();
+        this.telephoneContact = etablissementCreeEvent.getTelephoneContact();
+        this.adresseContact = etablissementCreeEvent.getAdresseContact();
+        this.boitePostaleContact = etablissementCreeEvent.getBoitePostaleContact();
+        this.codePostalContact = etablissementCreeEvent.getCodePostalContact();
+        this.cedexContact = etablissementCreeEvent.getCedexContact();
+        this.villeContact = etablissementCreeEvent.getVilleContact();
+        this.roleContact = etablissementCreeEvent.getRoleContact();
     }
 
     public EventEntity(EtablissementModifieEvent etablissementModifieEvent) {
@@ -191,46 +189,46 @@ public class EventEntity {
         this.event = "divise";
         this.dateCreationEvent = etablissementDiviseEvent.created;
         this.ancienNomEtab = etablissementDiviseEvent.getAncienSiren();
-        this.etablisementsDivise = etablissementDiviseEvent.getEtablissementDtos();
+        this.etablisementsDivises = etablissementDiviseEvent.getEtablissementDtos();
     }
 
     public EventEntity(EtablissementFusionneEvent etablissementFusionneEvent) {
         this.event = "fusionne";
         this.dateCreationEvent = etablissementFusionneEvent.created;
-        this.etablissementFusionneDto = etablissementFusionneEvent.getEtablissementDto();
+        this.etablissementsFusionnes = new EtablissementDto(etablissementFusionneEvent.getNom(), etablissementFusionneEvent.getSiren(), etablissementFusionneEvent.getTypeEtablissement(),
+                etablissementFusionneEvent.getIdAbes(), etablissementFusionneEvent.getNomContact(), etablissementFusionneEvent.getPrenomContact(), etablissementFusionneEvent.getAdresseContact(),
+                etablissementFusionneEvent.getBoitePostaleContact(), etablissementFusionneEvent.getCodePostalContact(), etablissementFusionneEvent.getVilleContact(),etablissementFusionneEvent.getCedexContact(),
+                etablissementFusionneEvent.getTelephoneContact(), etablissementFusionneEvent.getMailContact());
         this.etablissementsFusionne = etablissementFusionneEvent.getSirenFusionne();
     }
 
     public EventEntity(EditeurCreeEvent editeurCreeEvent) {
-        EditeurCreeDto editeur = editeurCreeEvent.getEditeur();
         this.event = "editeurCree";
         this.dateCreationEvent = editeurCreeEvent.created;
-        this.nomEditeur = editeur.getNomEditeur();
-        this.identifiantEditeur = editeur.getIdentifiantEditeur();
-        this.groupesEtabRelies = editeur.getGroupesEtabRelies();
-        this.adresseEditeur = editeur.getAdresseEditeur();
-        this.listeContactCommercialEditeurDto = editeur.getListeContactCommercialEditeurDto();
-        this.listeContactTechniqueEditeurDto = editeur.getListeContactTechniqueEditeurDto();
+        this.nomEditeur = editeurCreeEvent.getNomEditeur();
+        this.identifiantEditeur = editeurCreeEvent.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeurCreeEvent.getGroupesEtabRelies();
+        this.adresseEditeur = editeurCreeEvent.getAdresseEditeur();
+        this.listeContactCommercialEditeurDto = editeurCreeEvent.getListeContactCommercialEditeur();
+        this.listeContactTechniqueEditeurDto = editeurCreeEvent.getListeContactTechniqueEditeur();
     }
 
     public EventEntity(EditeurModifieEvent editeurModifieEvent) {
-        EditeurModifieDto editeur = editeurModifieEvent.getEditeur();
         this.event = "editeurModifie";
         this.dateCreationEvent = editeurModifieEvent.created;
-        this.nomEditeur = editeur.getNomEditeur();
-        this.identifiantEditeur = editeur.getIdentifiantEditeur();
-        this.groupesEtabRelies = editeur.getGroupesEtabRelies();
-        this.adresseEditeur = editeur.getAdresseEditeur();
-        this.listeContactCommercialEditeurDto = editeur.getListeContactCommercialEditeurDto();
-        this.listeContactTechniqueEditeurDto = editeur.getListeContactTechniqueEditeurDto();
+        this.nomEditeur = editeurModifieEvent.getNomEditeur();
+        this.identifiantEditeur = editeurModifieEvent.getIdentifiantEditeur();
+        this.groupesEtabRelies = editeurModifieEvent.getGroupesEtabRelies();
+        this.adresseEditeur = editeurModifieEvent.getAdresseEditeur();
+        this.listeContactCommercialEditeurDto = editeurModifieEvent.getListeContactCommercialEditeur();
+        this.listeContactTechniqueEditeurDto = editeurModifieEvent.getListeContactTechniqueEditeur();
     }
 
     public EventEntity(EditeurFusionneEvent editeurFusionneEvent) {
-        EditeurFusionneDto editeur = editeurFusionneEvent.getEditeur();
         this.event = "editeurFusione";
         this.dateCreationEvent = editeurFusionneEvent.created;
-        this.nomEditeur = editeur.getNomEditeur();
-        this.adresseEditeur = editeur.getAdresseEditeur();
+        this.nomEditeur = editeurFusionneEvent.getNomEditeur();
+        this.adresseEditeur = editeurFusionneEvent.getAdresseEditeur();
         this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
     }
 

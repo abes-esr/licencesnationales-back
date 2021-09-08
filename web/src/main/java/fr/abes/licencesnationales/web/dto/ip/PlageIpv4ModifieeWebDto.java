@@ -12,10 +12,10 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class PlageIpv6ModifieeDto extends IpModifieeDto {
+public class PlageIpv4ModifieeWebDto extends IpModifieeDto {
 
     @NotBlank(message="La plage d'Ips est obligatoire")
-    @Pattern(regexp = "^\\s*((([0-9a-fA-F]{1,4}:){6,6}[0-9a-fA-F]{1,4}-[0-9a-fA-F]{1,4}:[0-9a-fA-F]{1,4}-[0-9a-fA-F]{1,4}))\\s*$", message = "La plage d'Ips fournie n'est pas valide")
+    @Pattern(regexp = "^(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})?\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))\\.(([(\\d+)(x+)]){1,3})(-+([(\\d+)(x)]{1,3}))$", message = "La plage d'Ips fournie n'est pas valide")
     private String ip;
 
 }
