@@ -1,12 +1,15 @@
 package fr.abes.licencesnationales.core.converter;
 
 import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
+import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
+import fr.abes.licencesnationales.core.dto.editeur.EditeurSupprimeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.dto.ip.IpAjouteeDto;
 import fr.abes.licencesnationales.core.entities.*;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
+import fr.abes.licencesnationales.core.event.editeur.EditeurSupprimeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
@@ -19,9 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {UtilsMapper.class, EntityConverter.class})
@@ -29,31 +30,176 @@ public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;
 
+    /*
+    1 CC 0 CT
+    {
+    "nomEditeur":"hhhhhh",
+    "identifiantEditeur":"",
+    "groupesEtabRelies":[],
+    "adresseEditeur":"dddddddd",
+    "listeContactCommercialEditeurDTO":[{"nomContactCommercial":"dd","prenomContactCommercial":"dd","mailContactCommercial":"dd@l.m"}],
+    "listeContactTechniqueEditeurDTO":[]}
+
+    2 CC 2 CT
+    {
+        "nomEditeur":"nomEditeur",
+        "identifiantEditeur":"123456",
+        "groupesEtabRelies":["EPIC/EPST","Ecoles d'ingénieurs"],
+        "adresseEditeur":"adressePostale",
+        "listeContactCommercialEditeurDTO":[{"nomContactCommercial":"nomCCA","prenomContactCommercial":"prenomCCA","mailContactCommercial":"mail@CCA.com"},{"nomContactCommercial":"nomCCB","prenomContactCommercial":"prenomCCB","mailContactCommercial":"mail@CCB.com"}],
+        "listeContactTechniqueEditeurDTO":[{"nomContactTechnique":"nomCTA","prenomContactTechnique":"prenomCTA","mailContactTechnique":"mail@CTA.com"},{"nomContactTechnique":"nomCTB","prenomContactTechnique":"prenomCTB","mailContactTechnique":"mail@CTB.com"}]
+    }
+
+     */
+
     @Test
-    @DisplayName("test création Event Editeur")
-    public void testMapperEditeurEventCree() {
+    @DisplayName("test nouvelEditeur 1CC 0CT")
+    public void testMapperEditeurCreeDtoVersEditeurEntity1() {
         EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
-        editeurCreeDto.setNomEditeur("testNom");
-        editeurCreeDto.setAdresseEditeur("testAdresse");
+        editeurCreeDto.setNomEditeur("nomEditeur");
+        editeurCreeDto.setAdresseEditeur("adressePostale");
         editeurCreeDto.setIdentifiantEditeur("123456");
-        editeurCreeDto.setGroupesEtabRelies(Arrays.asList("1", "2"));
+        List<String> groupesEtabRelies = new ArrayList<>();
+        groupesEtabRelies.add("EPIC/EPST");
+        groupesEtabRelies.add("Ecoles d'ingénieurs");
+        editeurCreeDto.setGroupesEtabRelies(groupesEtabRelies);
+
+        //1 CC
+        ContactCommercialEditeurDto cc1 = new ContactCommercialEditeurDto("nomCCA", "prenomCCA", "mail@CCA.com");
+        Set<ContactCommercialEditeurDto> set = new HashSet<>();
+        set.add(cc1);
+        editeurCreeDto.setListeContactCommercialEditeurDto(set);
+
+        //0 CT
+        Set<ContactTechniqueEditeurDto> set2 = new HashSet<>();
+        editeurCreeDto.setListeContactTechniqueEditeurDto(set2);
 
         EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeurCreeDto);
 
-        ContactCommercialEditeurDto commercial = new ContactCommercialEditeurDto("testNom", "testPrenom", "test@test.com");
-        Set<ContactCommercialEditeurDto> set = new HashSet<>();
-        set.add(commercial);
-        editeurCreeDto.setListeContactCommercialEditeurDto(set);
 
         EditeurEntity entity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
 
-        Assertions.assertEquals("testNom", entity.getNomEditeur());
-        Assertions.assertEquals("testAdresse", entity.getAdresseEditeur());
+        Assertions.assertEquals("nomEditeur", entity.getNomEditeur());
+        Assertions.assertEquals("adressePostale", entity.getAdresseEditeur());
         Assertions.assertEquals("123456", entity.getIdentifiantEditeur());
         Assertions.assertEquals(2, entity.getGroupesEtabRelies().size());
         ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
+        Assertions.assertEquals("nomCCA", commercialEntity.getNomContactCommercial());
+        Assertions.assertEquals("prenomCCA", commercialEntity.getPrenomContactCommercial());
+        Assertions.assertEquals("mail@CCA.com", commercialEntity.getMailContactCommercial());
+        Assertions.assertEquals("nomEditeur", commercialEntity.getEditeurEntity().getNomEditeur());
+    }
+
+    @Test
+    @DisplayName("test nouvelEditeur 2CC 2CT")
+    public void testMapperEditeurCreeDtoVersEditeurEntity2() {
+        EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
+        editeurCreeDto.setNomEditeur("nomEditeur");
+        editeurCreeDto.setAdresseEditeur("adressePostale");
+        editeurCreeDto.setIdentifiantEditeur("123456");
+        List<String> groupesEtabRelies = new ArrayList<>();
+        groupesEtabRelies.add("EPIC/EPST");
+        groupesEtabRelies.add("Ecoles d'ingénieurs");
+        editeurCreeDto.setGroupesEtabRelies(groupesEtabRelies);
+
+        //2 CC
+        ContactCommercialEditeurDto cc1 = new ContactCommercialEditeurDto("nomCCA", "prenomCCA", "mail@CCA.com");
+        ContactCommercialEditeurDto cc2 = new ContactCommercialEditeurDto("nomCCB", "prenomCCB", "mail@CCB.com");
+
+        Set<ContactCommercialEditeurDto> set = new HashSet<>();
+        set.add(cc1);
+        set.add(cc2);
+        editeurCreeDto.setListeContactCommercialEditeurDto(set);
+
+        //2 CT
+
+        ContactTechniqueEditeurDto ct1 = new ContactTechniqueEditeurDto("nomCTA", "prenomCTA", "mail@CTA.com");
+        ContactTechniqueEditeurDto ct2 = new ContactTechniqueEditeurDto("nomCTB", "prenomCTB", "mail@CTB.com");
+
+        Set<ContactTechniqueEditeurDto> set2 = new HashSet<>();
+        set2.add(ct1);
+        set2.add(ct2);
+        editeurCreeDto.setListeContactTechniqueEditeurDto(set2);
+
+        EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeurCreeDto);
+
+
+        EditeurEntity entity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
+
+        Assertions.assertEquals("nomEditeur", entity.getNomEditeur());
+        Assertions.assertEquals("adressePostale", entity.getAdresseEditeur());
+        Assertions.assertEquals("123456", entity.getIdentifiantEditeur());
+        Assertions.assertEquals(2, entity.getGroupesEtabRelies().size());
+
+        Assertions.assertEquals(2, entity.getContactCommercialEditeurEntities().size());
+        ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
+        Assertions.assertTrue(isValidNomC(commercialEntity.getNomContactCommercial()));
+        Assertions.assertTrue(isValidPrenomC(commercialEntity.getPrenomContactCommercial()));
+        Assertions.assertTrue(isValidMailC(commercialEntity.getMailContactCommercial()));
+        Assertions.assertEquals("nomEditeur", commercialEntity.getEditeurEntity().getNomEditeur());
+
+        Assertions.assertEquals(2, entity.getContactTechniqueEditeurEntities().size());
+        ContactTechniqueEditeurEntity techniqueEntity = entity.getContactTechniqueEditeurEntities().iterator().next();
+        Assertions.assertTrue(isValidNomT(techniqueEntity.getNomContactTechnique()));
+        Assertions.assertTrue(isValidPrenomT(techniqueEntity.getPrenomContactTechnique()));
+        Assertions.assertTrue(isValidMailT(techniqueEntity.getMailContactTechnique()));
+        Assertions.assertEquals("nomEditeur", techniqueEntity.getEditeurEntity().getNomEditeur());
+
+    }
+    public Boolean isValidNomC(String s) {
+        if(s.equals("nomCCA") || s.equals("nomCCB")) {
+            return true;
+        }
+        return false;
+    }
+    public Boolean isValidNomT(String s) {
+        if(s.equals("nomCTA") || s.equals("nomCTB")) {
+            return true;
+        }
+        return false;
+    }
+    public Boolean isValidPrenomC(String s) {
+        if(s.equals("prenomCCA") || s.equals("prenomCCB")) {
+            return true;
+        }
+        return false;
+    }
+    public Boolean isValidPrenomT(String s) {
+        if(s.equals("prenomCTA") || s.equals("prenomCTB")) {
+            return true;
+        }
+        return false;
+    }
+    public Boolean isValidMailC(String s) {
+        if(s.equals("mail@CCA.com") || s.equals("mail@CCB.com")) {
+            return true;
+        }
+        return false;
+    }
+    public Boolean isValidMailT(String s) {
+        if(s.equals("mail@CTA.com") || s.equals("mail@CTB.com")) {
+            return true;
+        }
+        return false;
+    }
+
+    @Test
+    @DisplayName("test supp Event Editeur")
+    public void testMapperEditeurSupprimeEvent() {
+        /*EditeurSupprimeDto editeurSupprimeDto = new EditeurSupprimeDto();
+        editeurSupprimeDto.setId("21");*/
+
+        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Long.valueOf("21"));
+        EditeurEntity entity = utilsMapper.map(editeurSupprimeEvent, EditeurEntity.class);
+
+        Assertions.assertEquals("aaaaaaaaa", entity.getNomEditeur());
+        Assertions.assertEquals("eeeeee", entity.getAdresseEditeur());
+        Assertions.assertEquals("123", entity.getIdentifiantEditeur());
+        Assertions.assertEquals(1, entity.getGroupesEtabRelies().size());
+        ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
         Assertions.assertEquals("testNom", commercialEntity.getNomContactCommercial());
     }
+
 
     @Test
     @DisplayName("test mapper établissement")
