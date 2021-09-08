@@ -39,51 +39,7 @@ public class EditeurController {
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
     public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException {
-        log.info("creationEditeur début");
-        log.info("editeurCreeDTO.getDateCreation() =  " + editeurCreeWebDTO.getDateCreation());
-        log.info("editeurCreeDTO.getNomEditeur() =  " + editeurCreeWebDTO.getNomEditeur());
-        log.info("editeurCreeDTO.getAdresseCreation() =  " + editeurCreeWebDTO.getAdresseEditeur());
-        log.info("editeurCreeDTO.getGroupesEtabRelies() =  " + editeurCreeWebDTO.getGroupesEtabRelies());
-        Set<ContactCommercialEditeurWebDto> cc = editeurCreeWebDTO.getListeContactCommercialEditeurWebDto();
-        Set<ContactTechniqueEditeurWebDto> ct = editeurCreeWebDTO.getListeContactTechniqueEditeurWebDto();
-        for (ContactCommercialEditeurWebDto c:cc)
-            log.info(" ListeContactCommercialEditeurDto =  " + c.mailContactCommercial + c.nomContactCommercial + c.prenomContactCommercial);
-        for (ContactTechniqueEditeurWebDto t:ct)
-            log.info(" ListeContactCommercialEditeurDto =  " + t.mailContactTechnique + t.nomContactTechnique + t.prenomContactTechnique);
-
-        //EditeurCreeDto editeurCreeDto = mapper.map(editeurCreeWebDTO, EditeurCreeDto.class);
-        //log.info("editeurCreeDTO.getDateCreation() =  " + editeurCreeDto.getDateCreation());
-        EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
-        editeurCreeDto.setNomEditeur(editeurCreeWebDTO.getNomEditeur());
-        editeurCreeDto.setIdentifiantEditeur(editeurCreeWebDTO.getIdentifiantEditeur());
-        editeurCreeDto.setGroupesEtabRelies(editeurCreeWebDTO.getGroupesEtabRelies());
-        editeurCreeDto.setAdresseEditeur(editeurCreeWebDTO.getAdresseEditeur());
-        editeurCreeDto.setDateCreation(editeurCreeWebDTO.getDateCreation());
-
-
-        Set<ContactCommercialEditeurDto> CC = new HashSet<>();
-        Set<ContactTechniqueEditeurDto> CT = new HashSet<>();
-        for (ContactCommercialEditeurWebDto c:cc) {
-            ContactCommercialEditeurDto cce = new ContactCommercialEditeurDto();
-            cce.nomContactCommercial = c.nomContactCommercial;
-            cce.prenomContactCommercial = c.prenomContactCommercial;
-            cce.mailContactCommercial = c.mailContactCommercial;
-            CC.add(cce);
-        }
-        for (ContactTechniqueEditeurWebDto t:ct) {
-            ContactTechniqueEditeurDto cte = new ContactTechniqueEditeurDto();
-            cte.nomContactTechnique = t.nomContactTechnique;
-            cte.prenomContactTechnique = t.prenomContactTechnique;
-            cte.mailContactTechnique = t.mailContactTechnique;
-            CT.add(cte);
-        }
-        for (ContactCommercialEditeurDto C:CC)
-            log.info(" ListeContactCommercialEditeurDto après remplissage =  " + C.mailContactCommercial + C.nomContactCommercial + C.prenomContactCommercial);
-        for (ContactTechniqueEditeurDto T:CT)
-            log.info(" ListeContactCommercialEditeurDto après remplissage =  " + T.mailContactTechnique + T.nomContactTechnique + T.prenomContactTechnique);
-
-        editeurCreeDto.setListeContactCommercialEditeurDto(CC);
-        editeurCreeDto.setListeContactTechniqueEditeurDto(CT);
+        EditeurCreeDto editeurCreeDto = mapper.map(editeurCreeWebDTO, EditeurCreeDto.class);
         editeurService.addEditeur(editeurCreeDto);
     }
 

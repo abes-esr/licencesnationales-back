@@ -14,10 +14,11 @@ import java.util.Set;
 @Getter @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class EditeurWebDto {
+public class
+EditeurWebDto {
 
     @JsonProperty("idEditeur")
-    private String idEditeur;
+    private Long idEditeur;
 
     @JsonProperty("nomEditeur")
     private String nomEditeur;

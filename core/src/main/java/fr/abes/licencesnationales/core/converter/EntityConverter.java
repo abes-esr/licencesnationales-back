@@ -1,8 +1,6 @@
 package fr.abes.licencesnationales.core.converter;
 
-import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurFusionneDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
+import fr.abes.licencesnationales.core.dto.editeur.*;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.entities.*;
@@ -20,6 +18,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Component
 public class EntityConverter {
@@ -39,14 +39,53 @@ public class EntityConverter {
                 entity.setIdentifiantEditeur(dto.getIdentifiantEditeur());
                 entity.setAdresseEditeur(dto.getAdresseEditeur());
                 entity.setGroupesEtabRelies(dto.getGroupesEtabRelies());
+                entity.setDateCreation(dto.getDateCreation());
 
-                entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(dto.getListeContactCommercialEditeurDto(), ContactCommercialEditeurEntity.class));
-                entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(dto.getListeContactTechniqueEditeurDto(), ContactTechniqueEditeurEntity.class));
+                Set<ContactCommercialEditeurDto> listeCCdto = dto.getListeContactCommercialEditeurDto();
+                Set<ContactTechniqueEditeurDto> listeCTdto = dto.getListeContactTechniqueEditeurDto();
+                Set<ContactCommercialEditeurEntity> listeCC = new HashSet<>();
+                Set<ContactTechniqueEditeurEntity> listeCT = new HashSet<>();
+
+
+                for (ContactCommercialEditeurDto ccDto:listeCCdto) {
+                    ContactCommercialEditeurEntity ce = utilsMapper.map(ccDto,ContactCommercialEditeurEntity.class);
+                    ce.setEditeurEntity(entity);
+                    listeCC.add(ce);
+                }
+                for (ContactTechniqueEditeurDto ctDto:listeCTdto) {
+                    ContactTechniqueEditeurEntity ct = utilsMapper.map(ctDto,ContactTechniqueEditeurEntity.class);
+                    ct.setEditeurEntity(entity);
+                    listeCT.add(ct);
+                }
+
+                entity.setContactCommercialEditeurEntities(listeCC);
+                entity.setContactTechniqueEditeurEntities(listeCT);
                 return entity;
             }
         };
         utilsMapper.addConverter(myConverter);
     }
+
+    @Bean
+    public void converterContactCommercialEditeurEntity() {
+        Converter<ContactCommercialEditeurDto, ContactCommercialEditeurEntity> myConverter = new Converter<ContactCommercialEditeurDto, ContactCommercialEditeurEntity>() {
+
+            @Override
+            public ContactCommercialEditeurEntity convert(MappingContext<ContactCommercialEditeurDto, ContactCommercialEditeurEntity> context) {
+
+                ContactCommercialEditeurDto source = context.getSource();
+                ContactCommercialEditeurEntity entity = new ContactCommercialEditeurEntity();
+                entity.setNomContactCommercial(source.getNomContactCommercial());
+                entity.setPrenomContactCommercial(source.getPrenomContactCommercial());
+                entity.setMailContactCommercial(source.getMailContactCommercial());
+
+                return entity;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+
 
     @Bean
     public void converterEditeurModifieEvent() {

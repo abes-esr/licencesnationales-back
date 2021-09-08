@@ -41,20 +41,20 @@ public class EditeurEntity implements Serializable {
     @Convert(converter = JpaConverterJson.class)
     private List<String> groupesEtabRelies = new ArrayList<>();
 
-    @OneToMany(targetEntity=ContactCommercialEditeurEntity.class, mappedBy = "idEditeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity=ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities = new HashSet<>();
 
-    @OneToMany(targetEntity=ContactTechniqueEditeurEntity.class, mappedBy = "idEditeur", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity=ContactTechniqueEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities = new HashSet<>();
 
-    public EditeurEntity(Long id,
+    public EditeurEntity(Long idEditeur,
                          String nomEditeur,
                          String identifiantEditeur,
                          String adresseEditeur,
                          Date dateCreation,
                          Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities,
                          Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities) {
-        this.idEditeur = id;
+        this.idEditeur = idEditeur;
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.adresseEditeur = adresseEditeur;

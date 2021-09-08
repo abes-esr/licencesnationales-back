@@ -14,6 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditeurCreeDto {
+    private Long idEditeur;
     private String nomEditeur;
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
