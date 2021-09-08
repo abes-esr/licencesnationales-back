@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales;
 
-import fr.abes.licencesnationales.entities.ContactEntity;
-import fr.abes.licencesnationales.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ContactEntity;
+import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;

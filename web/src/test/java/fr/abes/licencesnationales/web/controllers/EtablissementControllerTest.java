@@ -2,12 +2,12 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementCreeDto;
-import fr.abes.licencesnationales.dto.etablissement.EtablissementDto;
-import fr.abes.licencesnationales.entities.EtablissementEntity;
-import fr.abes.licencesnationales.services.ContactService;
-import fr.abes.licencesnationales.services.EmailService;
-import fr.abes.licencesnationales.services.EtablissementService;
+import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
+import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
+import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.services.ContactService;
+import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.junit.jupiter.api.DisplayName;
