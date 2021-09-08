@@ -1,15 +1,11 @@
-package fr.abes.licencesnationales.core.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@NoArgsConstructor
+import java.util.ArrayList;
+
 @Getter
-@Setter
-@AllArgsConstructor
-public class EtablissementDto {
+public class EtablissementFusionneWebDto {
     private String nom;
     private String siren;
     private String typeEtablissement;
@@ -23,4 +19,7 @@ public class EtablissementDto {
     private String cedexContact;
     private String telephoneContact;
     private String mailContact;
+    private String motDePasse;
+    private String roleContact;
+    private ArrayList<String> sirenFusionnes;
 }

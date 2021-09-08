@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 @Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Ipv6AjouteeDto extends IpAjouteeDto {
+public class Ipv6AjouteeWebDto extends IpAjouteeDto {
 
     @NotBlank(message="Le type ip est obligatoire")
     private String typeIp;
@@ -23,7 +23,7 @@ public class Ipv6AjouteeDto extends IpAjouteeDto {
     private String typeAcces;
 
 
-    public Ipv6AjouteeDto(String siren, String typeIp, String ip, String typeAcces, String commentaires) {
+    public Ipv6AjouteeWebDto(String siren, String typeIp, String ip, String typeAcces, String commentaires) {
         super(siren, typeIp, ip, typeAcces, commentaires);
         this.typeIp = typeIp;
         this.ip = ip;

@@ -48,7 +48,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
             service.deleteBySiren(siren);
         }
-        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementFusionneEvent.getEtablissementDto(), EtablissementEntity.class);
+        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementFusionneEvent, EtablissementEntity.class);
         etablissementEntity.setEditeurs(editeurEntities);
         etablissementEntity.setIps(ipEntities);
 

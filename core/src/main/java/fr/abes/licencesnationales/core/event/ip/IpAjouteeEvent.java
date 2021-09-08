@@ -11,8 +11,6 @@ import java.util.Date;
 public class IpAjouteeEvent extends Event {
     private String ip;
     private String siren;
-    private Date dateCreation;
-    private Date dateModification;
     private String typeAcces;
     private String typeIp;
     private String commentaires;
@@ -21,19 +19,9 @@ public class IpAjouteeEvent extends Event {
         super(source);
         this.ip = ip;
         this.siren = siren;
-        this.dateCreation = dateCreation;
-        this.dateModification = dateModification;
         this.typeAcces = typeAcces;
         this.typeIp = typeIp;
         this.commentaires=commentaires;
     }
 
-    public IpAjouteeEvent(Object source, IpAjouteeDto ipAjouteeDto) {
-        super(source);
-        this.ip = ipAjouteeDto.getIp();
-        this.siren = ipAjouteeDto.getSiren();
-        this.typeAcces = ipAjouteeDto.getTypeAcces();
-        this.typeIp = ipAjouteeDto.getTypeIp();
-        this.commentaires = ipAjouteeDto.getCommentaires();
-    }
 }

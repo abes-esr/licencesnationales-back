@@ -24,12 +24,4 @@ public class IpModifieeEvent extends Event {
         this.commentaires=commentaires;
     }
 
-    public IpModifieeEvent(Object source, IpModifieeDto ipModifieeDto) {
-        super(source);
-        this.siren = ipModifieeDto.getSiren();
-        this.id = ipModifieeDto.getId();
-        this.ip = ipModifieeDto.getIp();
-        this.typeAcces = ipModifieeDto.getTypeAcces();
-        this.typeIp = ipModifieeDto.getTypeIp();
-    }
 }

@@ -14,6 +14,10 @@ public class EtablissementDiviseEvent extends Event {
     private String ancienSiren;
     private ArrayList<EtablissementDto> etablissementDtos;
 
+    public EtablissementDiviseEvent(Object source) {
+        super(source);
+    }
+
     public EtablissementDiviseEvent(Object source, String ancienSiren, ArrayList<EtablissementDto> etablissementEventDTOS) {
         super(source);
         this.ancienSiren = ancienSiren;

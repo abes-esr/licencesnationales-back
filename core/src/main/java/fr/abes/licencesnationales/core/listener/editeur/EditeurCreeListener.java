@@ -1,7 +1,5 @@
 package fr.abes.licencesnationales.core.listener.editeur;
 
-import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.core.entities.*;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.repository.ContactCommercialEditeurRepository;
@@ -12,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-import java.util.HashSet;
+
 import java.util.Set;
 
 @Component
@@ -37,9 +35,9 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
     @Override
     public void onApplicationEvent(EditeurCreeEvent editeurCreeEvent) {
 
-        log.debug("editeurCreeEvent.getCC" + editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto());
-        log.debug("editeurCreeEvent.getCT" + editeurCreeEvent.getEditeur().getListeContactTechniqueEditeurDto());
-        log.debug("editeurCreeEvent.getEditeur().getDateCreation()" + editeurCreeEvent.getEditeur().getDateCreation());
+        log.debug("editeurCreeEvent.getCC" + editeurCreeEvent.getListeContactCommercialEditeur());
+        log.debug("editeurCreeEvent.getCT" + editeurCreeEvent.getListeContactTechniqueEditeur());
+        log.debug("editeurCreeEvent.getEditeur().getDateCreation()" + editeurCreeEvent.getDateCreation());
 
         EditeurEntity editeurEntity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
 

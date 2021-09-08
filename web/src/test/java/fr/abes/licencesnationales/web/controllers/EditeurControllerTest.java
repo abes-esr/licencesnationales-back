@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
 import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
@@ -50,7 +49,6 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     @WithMockUser // on ne precise pas role admin
     public void testNouvelEditeurPasAdmin() throws Exception {
         EditeurCreeWebDto editeurCreeWebDto = new EditeurCreeWebDto();
-        EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
 
         this.mockMvc.perform(put("/v1/ln/editeur/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
@@ -62,12 +60,10 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     @WithMockUser(authorities = {"admin"})
     public void testNouvelEditeur() throws Exception {
         EditeurCreeWebDto editeurCreeWebDto = new EditeurCreeWebDto();
-        EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
 
         editeurCreeWebDto.setNomEditeur("NomEditeurTestD");
         editeurCreeWebDto.setIdentifiantEditeur("1238975");
         editeurCreeWebDto.setAdresseEditeur("adresse TestD");
-        editeurCreeWebDto.setDateCreation(new Date());
 
         ArrayList groupesEtabRelies = new ArrayList();
         groupesEtabRelies.add("EPCI");
@@ -104,8 +100,8 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         ct.add(ctA);
         ct.add(ctB);
 
-        editeurCreeWebDto.setListeContactCommercialEditeurWebDto(cc);
-        editeurCreeWebDto.setListeContactTechniqueEditeurWebDto(ct);
+        editeurCreeWebDto.setListeContactCommercialEditeur(cc);
+        editeurCreeWebDto.setListeContactTechniqueEditeur(ct);
 
 
         Mockito.when(emailService.checkDoublonMail(Mockito.any(),Mockito.any())).thenReturn(false);
@@ -120,12 +116,10 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     @WithMockUser(authorities = {"admin"})
     public void testNouvelEditeurDoublonMail() throws Exception {
         EditeurCreeWebDto editeurCreeWebDto = new EditeurCreeWebDto();
-        EditeurCreeDto editeurCreeDto = new EditeurCreeDto();
 
         editeurCreeWebDto.setNomEditeur("NomEditeurTestD");
         editeurCreeWebDto.setIdentifiantEditeur("1238975");
         editeurCreeWebDto.setAdresseEditeur("adresse TestD");
-        editeurCreeWebDto.setDateCreation(new Date());
 
         ArrayList groupesEtabRelies = new ArrayList();
         groupesEtabRelies.add("EPCI");
@@ -162,8 +156,8 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         ct.add(ctA);
         ct.add(ctB);
 
-        editeurCreeWebDto.setListeContactCommercialEditeurWebDto(cc);
-        editeurCreeWebDto.setListeContactTechniqueEditeurWebDto(ct);
+        editeurCreeWebDto.setListeContactCommercialEditeur(cc);
+        editeurCreeWebDto.setListeContactTechniqueEditeur(ct);
 
         Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).addEditeur(Mockito.any());
 
