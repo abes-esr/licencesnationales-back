@@ -2,10 +2,9 @@ package fr.abes.licencesnationales.core.listener.ip;
 
 
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

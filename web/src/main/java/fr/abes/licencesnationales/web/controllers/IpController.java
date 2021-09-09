@@ -3,10 +3,11 @@ package fr.abes.licencesnationales.web.controllers;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.ip.*;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.*;
 import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
@@ -15,7 +16,7 @@ import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -30,7 +31,6 @@ import org.springframework.web.client.RestClientException;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 
 @Log
@@ -110,11 +110,10 @@ public class IpController {
     }
 
     public void traiterAjoutIp(IpAjouteeDto event, String siren) throws IpException, RestClientException {
-        ipService.checkDoublonIpAjouteeDto(event);
 
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
                 siren,
-                event.getTypeIp(),
+                IpType.valueOf(event.getTypeIp()),
                 event.getTypeAcces(),
                 event.getIp(),
                 event.getCommentaires());
@@ -174,16 +173,18 @@ public class IpController {
     }
 
     public void traiterModifIp(IpModifieeDto ipModifieeDto, String siren) throws IpException, RestClientException {
-        ipService.checkDoublonIpModifieeDto(ipModifieeDto);
+        //ipService.checkDoublonIpModifieeDto(ipModifieeDto);
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
+                ipModifieeDto.getId(),
                 siren,
                 ipModifieeDto.getIp(),
                 ipModifieeDto.isValidee(),
                 ipModifieeDto.getTypeAcces(),
-                ipModifieeDto.getTypeIp(),
+                IpType.valueOf(ipModifieeDto.getTypeIp()),
                 ipModifieeDto.getCommentaires());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(new EventEntity(ipModifieeEvent));
+
         String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = "id = " + ipModifieeDto.getId() + ", ip ou plage d'ips = " + ipModifieeDto.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);

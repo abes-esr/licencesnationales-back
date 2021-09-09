@@ -1,7 +1,7 @@
-package fr.abes.licencesnationales.core.repository;
+package fr.abes.licencesnationales.core.repository.ip;
 
 
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -27,11 +27,11 @@ import org.springframework.web.util.NestedServletException;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -126,8 +126,9 @@ public class AuthenticationControllerTest
                     .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                     .andExpect(status().isBadRequest())
                     .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                    .andExpect(jsonPath("$.debugMessage").value("Incorrect fields : Le SIREN doit contenir 9 chiffres, SIREN obligatoire (login), Mot de passe obligatoire (password), "));
-
+                    .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")))
+                    .andExpect(content().string(containsString("SIREN obligatoire (login)")))
+                    .andExpect(content().string(containsString("Mot de passe obligatoire (password)")));
     }
 
 

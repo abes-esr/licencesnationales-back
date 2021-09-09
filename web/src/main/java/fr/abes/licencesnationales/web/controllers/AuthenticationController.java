@@ -12,11 +12,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.security.auth.login.CredentialNotFoundException;
 import javax.validation.Valid;
 
 
@@ -38,8 +41,12 @@ public class AuthenticationController {
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws NullPointerException { //wrapped in a NestedServletException
-        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) throws CredentialNotFoundException {
+        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword()));
+
+        if (authentication == null) {
+            throw new AuthenticationServiceException("La méthode d'authentification n'est pas supportée");
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         //on charge dans user le tuple bdd mis dans authentication
