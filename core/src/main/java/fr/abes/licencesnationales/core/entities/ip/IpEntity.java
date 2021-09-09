@@ -32,13 +32,11 @@ public abstract class IpEntity implements Serializable {
      * de retro-compatibilité avec l'ancienne version de l'application
      */
     @NotBlank(message = "L'IP est obligatoire")
-    @Pattern(regexp = "^((25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])\\.){3}(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])$", message = "L'IP fournie n'est pas valide")
     private String ip;
 
     /**
      * Booléen si l'IP est validée par les administrateurs
      */
-    @NotBlank
     private boolean validee;
 
     /**
