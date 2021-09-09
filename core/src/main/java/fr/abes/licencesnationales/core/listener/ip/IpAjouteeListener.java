@@ -3,7 +3,7 @@ package fr.abes.licencesnationales.core.listener.ip;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
