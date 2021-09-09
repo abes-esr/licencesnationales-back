@@ -2,14 +2,14 @@ package fr.abes.licencesnationales.core.entities.ip;
 
 import com.github.jgonian.ipmath.Ipv4;
 import com.github.jgonian.ipmath.Ipv4Range;
+import fr.abes.licencesnationales.core.converter.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.utils.IpUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -28,6 +28,9 @@ public class IpV4 extends IpEntity implements Serializable {
             Ipv4Range.from("172.0.0.0").to("172.31.254.254"),
             Ipv4Range.from("127.0.0.1").to("127.0.0.1"));
 
+
+    @Convert(converter= Ipv4RangeConverter.class)
+    @Lob
     private Ipv4Range ipRange;
 
     /**

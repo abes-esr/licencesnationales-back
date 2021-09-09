@@ -2,14 +2,14 @@ package fr.abes.licencesnationales.core.entities.ip;
 
 import com.github.jgonian.ipmath.Ipv6;
 import com.github.jgonian.ipmath.Ipv6Range;
+import fr.abes.licencesnationales.core.converter.Ipv6RangeConverter;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.utils.IpUtils;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -24,6 +24,8 @@ public class IpV6 extends IpEntity implements Serializable {
 
     public static final List<Ipv6Range> reservedRange = Arrays.asList();
 
+    @Convert(converter= Ipv6RangeConverter.class)
+    @Lob
     private Ipv6Range ipRange;
 
     /**

@@ -2,7 +2,9 @@ package fr.abes.licencesnationales.core.services;
 
 
 import com.github.jgonian.ipmath.Ipv4Range;
+import com.github.jgonian.ipmath.Ipv6;
 import com.github.jgonian.ipmath.Ipv6Range;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
@@ -33,33 +35,83 @@ public class IpService {
     @Autowired
     private EtablissementRepository etablissementRepository;
 
-    public boolean isIpAlreadyExists(Ipv4Range ip) {
+    /**
+     * Récupère toutes les IP V4 et V6 confondus
+     * @return
+     */
+    public List<IpEntity> getAll() {
+        return ipRepository.findAll();
+    }
 
-        List<IpV4> all = ipV4Repository.findAll();
+    /**
+     * Récupère toutes les IP V4
+     * @return
+     */
+    public List<IpV4> getAllIpV4() {
+        return ipV4Repository.findAll();
+    }
+
+    /**
+     * Récupère toutes les IP V6
+     * @return
+     */
+    public List<IpV6> getAllIpV6() {
+        return ipV6Repository.findAll();
+    }
+
+    /**
+     * Vérifies si une adresse IpV4 existe déjà dans la base de données.
+     * L'IP existe si :
+     *  - l'IP ou la plage d'IP est la même
+     *  - L'IP ou la plage d'IP est inclus dans une plage déjà existante
+     * @param ip IP à tester
+     * @return Vrai si l'IP existe déjà, Faux sinon
+     */
+    public boolean isIpAlreadyExists(IpV4 ip) {
+
+        List<IpV4> all = getAllIpV4();
 
         Iterator<IpV4> iter = all.iterator();
         while (iter.hasNext()) {
 
             IpV4 candidate = iter.next();
-            if (candidate.getIpRange().contains(ip)) {
+            if (candidate.getIpRange().contains(ip.getIpRange())) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean isIpAlreadyExists(Ipv6Range ip) {
+    /**
+     * Vérifies si une adresse IpV6 existe déjà dans la base de données.
+     * L'IP existe si :
+     * - l'IP ou la plage d'IP est la même
+     * - L'IP ou la plage d'IP est inclus dans une plage déjà existante
+     * @param ip
+     * @return Vrai si l'IP existe déjà, Faux sinon
+     */
+    public boolean isIpAlreadyExists(IpV6 ip) {
 
-        List<IpV6> all = ipV6Repository.findAll();
+        List<IpV6> all = getAllIpV6();
 
         Iterator<IpV6> iter = all.iterator();
         while (iter.hasNext()) {
 
             IpV6 candidate = iter.next();
-            if (candidate.getIpRange().contains(ip)) {
+            if (candidate.getIpRange().contains(ip.getIpRange())) {
                 return true;
             }
         }
         return false;
     }
+
+    /**
+     * Ajouter une IP
+     * @param ip transitoire (sans id) à enregistrer
+     * @return ip avec un id
+     */
+    public IpEntity save(IpEntity ip) {
+        return ipRepository.save(ip);
+    }
+
 }
