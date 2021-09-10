@@ -8,11 +8,11 @@ import fr.abes.licencesnationales.core.dto.etablissement.EtablissementFusionneDt
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementModifieDto;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.etablissement.*;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;

@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.event.ip;
 
 
 import fr.abes.licencesnationales.core.dto.ip.IpAjouteeDto;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
 
@@ -14,10 +15,10 @@ public class IpAjouteeEvent extends Event {
     private Date dateCreation;
     private Date dateModification;
     private String typeAcces;
-    private String typeIp;
+    private IpType typeIp;
     private String commentaires;
 
-    public IpAjouteeEvent(Object source, String siren, String typeIp, String typeAcces, String ip, String commentaires) {
+    public IpAjouteeEvent(Object source, String siren, IpType typeIp, String typeAcces, String ip, String commentaires) {
         super(source);
         this.ip = ip;
         this.siren = siren;
@@ -26,14 +27,5 @@ public class IpAjouteeEvent extends Event {
         this.typeAcces = typeAcces;
         this.typeIp = typeIp;
         this.commentaires=commentaires;
-    }
-
-    public IpAjouteeEvent(Object source, IpAjouteeDto ipAjouteeDto) {
-        super(source);
-        this.ip = ipAjouteeDto.getIp();
-        this.siren = ipAjouteeDto.getSiren();
-        this.typeAcces = ipAjouteeDto.getTypeAcces();
-        this.typeIp = ipAjouteeDto.getTypeIp();
-        this.commentaires = ipAjouteeDto.getCommentaires();
     }
 }
