@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.core.converter;
 
-import fr.abes.licencesnationales.core.entities.*;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
@@ -22,10 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 
 @Component
 public class EntityConverter {
@@ -45,8 +44,8 @@ public class EntityConverter {
                 entity.setAdresseEditeur(source.getAdresseEditeur());
                 entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
-                entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
-                entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
+                entity.setContactCommercialEditeurEntities(source.getListeContactCommercialEditeur());
+                entity.setContactTechniqueEditeurEntities(source.getListeContactTechniqueEditeur());
                 return entity;
             }
         };
@@ -67,8 +66,8 @@ public class EntityConverter {
                 entity.setAdresseEditeur(source.getAdresseEditeur());
                 entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
-                entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
-                entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
+                entity.setContactCommercialEditeurEntities(source.getListeContactCommercialEditeur());
+                entity.setContactTechniqueEditeurEntities(source.getListeContactTechniqueEditeur());
                 return entity;
             }
         };
@@ -88,8 +87,8 @@ public class EntityConverter {
                 entity.setAdresseEditeur(source.getAdresseEditeur());
                 entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
-                entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
-                entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
+                entity.setContactCommercialEditeurEntities(source.getListeContactCommercialEditeur());
+                entity.setContactTechniqueEditeurEntities(source.getListeContactTechniqueEditeur());
                 return entity;
             }
         };

@@ -4,10 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.MailDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,7 +31,9 @@ import java.util.Set;
 @Slf4j
 public class EmailService {
     @Autowired
-    private EditeurRepository editeurRepository;
+    private ContactCommercialEditeurRepository contactCommercialEditeurRepository;
+    @Autowired
+    private ContactTechniqueEditeurRepository contactTechniqueEditeurRepository;
 
     @Autowired
     private MessageSource messageSource;
@@ -36,22 +41,22 @@ public class EmailService {
     @Value("${mail.ws.url}")
     protected String url;
 
-    public boolean checkDoublonMail(Set<ContactCommercialEditeurDto> c, Set<ContactTechniqueEditeurDto> t) {
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> c, Set<ContactTechniqueEditeurEntity> t) {
         log.info("DEBUT checkDoublonMail ");
         boolean existeMailCommercial = false;
         boolean existeMailTechnique = false;
-        String mail = "";
-        EditeurEntity e = null;
-        for (ContactCommercialEditeurDto contact : c){
-            mail = contact.getMailContactCommercial();
+        String mail;
+        ContactEditeurEntity e;
+        for (ContactCommercialEditeurEntity contact : c){
+            mail = contact.getMailContact();
             log.info("mail = "+ mail);
-            e = editeurRepository.findByContactCommercialEditeurEntities_mailContactCommercial(mail);
+            e = contactCommercialEditeurRepository.findByMailContact(mail);
             if(e!=null) existeMailCommercial=true;
         }
-        for (ContactTechniqueEditeurDto contact : t){
-            mail = contact.getMailContactTechnique();
+        for (ContactTechniqueEditeurEntity contact : t){
+            mail = contact.getMailContact();
             log.info("mail = "+ mail);
-            e = editeurRepository.findByContactTechniqueEditeurEntities_mailContactTechnique(mail);
+            e = contactTechniqueEditeurRepository.findByMailContact(mail);
             if(e!=null) existeMailTechnique = true;
         }
         log.info("existeMailCommercial = "+ existeMailCommercial);

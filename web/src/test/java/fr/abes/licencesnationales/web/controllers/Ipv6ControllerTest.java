@@ -3,12 +3,12 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
@@ -45,7 +45,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
 
     @MockBean
-    private EventRepository eventRepository;
+    private IpEventRepository eventRepository;
 
     @MockBean
     private EtablissementService etablissementService;
@@ -74,7 +74,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
        // Mockito.doNothing().when(ipService).isIpAlreadyExists(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new IpEventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
@@ -158,7 +158,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
     }
-    //ce test peut apparaitre mauvais mais est bon : c'est l'ordre des arguments du debugMessage qui est aléatoire...
+
     @Test
     @DisplayName("test Etab ajout IPV6 failed")
     @WithMockUser
@@ -175,9 +175,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV6")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields : L'IP est obligatoire, Le type acces est obligatoire, Le type ip est obligatoire, "));
-
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"));
     }
 
     @Test

@@ -2,9 +2,9 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import fr.abes.licencesnationales.core.services.EmailService;
@@ -193,27 +193,27 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Set<ContactTechniqueEditeurEntity> setctEA = new HashSet<>();
 
         ContactCommercialEditeurEntity accEA  = new ContactCommercialEditeurEntity();
-        accEA.setNomContactCommercial("nomccEA");
-        accEA.setPrenomContactCommercial("prenomccEA");
-        accEA.setMailContactCommercial("mailccEA");
+        accEA.setNomContact("nomccEA");
+        accEA.setPrenomContact("prenomccEA");
+        accEA.setMailContact("mailccEA");
 
         ContactCommercialEditeurEntity bccEA  = new ContactCommercialEditeurEntity();
-        bccEA.setNomContactCommercial("nomccB");
-        bccEA.setPrenomContactCommercial("prenomccB");
-        bccEA.setMailContactCommercial("mailccB");
+        bccEA.setNomContact("nomccB");
+        bccEA.setPrenomContact("prenomccB");
+        bccEA.setMailContact("mailccB");
 
         setccEA.add(accEA);
         setccEA.add(bccEA);
 
         ContactTechniqueEditeurEntity actEA  = new ContactTechniqueEditeurEntity();
-        actEA.setNomContactTechnique("nomctA");
-        actEA.setPrenomContactTechnique("prenomctA");
-        actEA.setMailContactTechnique("mailctA");
+        actEA.setNomContact("nomctA");
+        actEA.setPrenomContact("prenomctA");
+        actEA.setMailContact("mailctA");
 
         ContactTechniqueEditeurEntity bctEA  = new ContactTechniqueEditeurEntity();
-        bctEA.setNomContactTechnique("nomctB");
-        bctEA.setPrenomContactTechnique("prenomctB");
-        bctEA.setMailContactTechnique("mailctB");
+        bctEA.setNomContact("nomctB");
+        bctEA.setPrenomContact("prenomctB");
+        bctEA.setMailContact("mailctB");
 
         setctEA.add(actEA);
         setctEA.add(bctEA);
@@ -240,27 +240,27 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Set<ContactTechniqueEditeurEntity> setctEB = new HashSet<>();
 
         ContactCommercialEditeurEntity accEB  = new ContactCommercialEditeurEntity();
-        accEB.setNomContactCommercial("nomccEA");
-        accEB.setPrenomContactCommercial("prenomccEA");
-        accEB.setMailContactCommercial("mailccEA");
+        accEB.setNomContact("nomccEA");
+        accEB.setPrenomContact("prenomccEA");
+        accEB.setMailContact("mailccEA");
 
         ContactCommercialEditeurEntity bccEB  = new ContactCommercialEditeurEntity();
-        bccEB.setNomContactCommercial("nomccB");
-        bccEB.setPrenomContactCommercial("prenomccB");
-        bccEB.setMailContactCommercial("mailccB");
+        bccEB.setNomContact("nomccB");
+        bccEB.setPrenomContact("prenomccB");
+        bccEB.setMailContact("mailccB");
 
         setccEB.add(accEA);
         setccEB.add(bccEA);
 
         ContactTechniqueEditeurEntity actEB  = new ContactTechniqueEditeurEntity();
-        actEB.setNomContactTechnique("nomctA");
-        actEB.setPrenomContactTechnique("prenomctA");
-        actEB.setMailContactTechnique("mailctA");
+        actEB.setNomContact("nomctA");
+        actEB.setPrenomContact("prenomctA");
+        actEB.setMailContact("mailctA");
 
         ContactTechniqueEditeurEntity bctEB  = new ContactTechniqueEditeurEntity();
-        bctEB.setNomContactTechnique("nomctB");
-        bctEB.setPrenomContactTechnique("prenomctB");
-        bctEB.setMailContactTechnique("mailctB");
+        bctEB.setNomContact("nomctB");
+        bctEB.setPrenomContact("prenomctB");
+        bctEB.setMailContact("mailctB");
 
         setctEB.add(actEB);
         setctEB.add(bctEB);

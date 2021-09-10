@@ -1,67 +1,72 @@
 package fr.abes.licencesnationales.core.services;
 
 
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementDiviseEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementSupprimeEvent;
+import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
+import java.io.IOException;
+import java.util.Arrays;
 
 @Service
 public class ResetService {
+    @Autowired
+    private ObjectMapper mapper;
     private EtablissementRepository etablissementRepository;
-    private EventRepository eventRepository;
+    private EtablissementEventRepository eventRepository;
     private ApplicationEventPublisher applicationEventPublisher;
 
-    public ResetService(EtablissementRepository etablissementRepository, EventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher) {
+    public ResetService(EtablissementRepository etablissementRepository, EtablissementEventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.etablissementRepository = etablissementRepository;
         this.eventRepository = eventRepository;
         this.applicationEventPublisher = applicationEventPublisher;
     }
 
-    public void resetEtablissement() {
+    public void resetEtablissement() throws IOException {
         etablissementRepository.deleteAll();
-        for (EventEntity eventEntity :
+        for (EtablissementEventEntity eventEntity :
                 eventRepository.findAll()) {
-            switch (eventEntity.event) {
+            switch (eventEntity.getEvent()) {
                 case "cree":
                     EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this,
-                            eventEntity.nomEtab,
-                            eventEntity.siren,
-                            eventEntity.typeEtablissement,
-                            eventEntity.idAbes,
-                            eventEntity.mailContact,
-                            eventEntity.motDePasse,
-                            eventEntity.nomContact,
-                            eventEntity.prenomContact,
-                            eventEntity.telephoneContact,
-                            eventEntity.adresseContact,
-                            eventEntity.boitePostaleContact,
-                            eventEntity.codePostalContact,
-                            eventEntity.cedexContact,
-                            eventEntity.roleContact,
-                            eventEntity.villeContact);
+                            eventEntity.getNomEtab(),
+                            eventEntity.getSiren(),
+                            eventEntity.getTypeEtablissement(),
+                            eventEntity.getIdAbes(),
+                            eventEntity.getMailContact(),
+                            eventEntity.getMotDePasse(),
+                            eventEntity.getNomContact(),
+                            eventEntity.getPrenomContact(),
+                            eventEntity.getTelephoneContact(),
+                            eventEntity.getAdresseContact(),
+                            eventEntity.getBoitePostaleContact(),
+                            eventEntity.getCodePostalContact(),
+                            eventEntity.getCedexContact(),
+                            eventEntity.getRoleContact(),
+                            eventEntity.getVilleContact());
 
                     applicationEventPublisher.publishEvent(etablissementCreeEvent);
                     break;
                 case "supprime":
                     EtablissementSupprimeEvent etablissementSupprimeEvent =
-                            new EtablissementSupprimeEvent(this, eventEntity.nomEtab);
+                            new EtablissementSupprimeEvent(this, eventEntity.getNomEtab());
                     applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
                     break;
                 case "divise":
                     EtablissementDiviseEvent etablissementDiviseEvent =
                             new EtablissementDiviseEvent(
                                     this,
-                                    eventEntity.ancienNomEtab,
-                                    (ArrayList<EtablissementDto>) eventEntity.etablisementsDivises);
+                                    eventEntity.getAncienNomEtab(),
+                                    Arrays.asList(mapper.readValue(eventEntity.getEtablisementsDivises(), EtablissementEntity[].class)));
                     applicationEventPublisher.publishEvent(etablissementDiviseEvent);
                     break;
                 case "fusionne":
@@ -82,7 +87,7 @@ public class ResetService {
                                     eventEntity.getMailContact(),
                                     eventEntity.getMotDePasse(),
                                     eventEntity.getRoleContact(),
-                                    (ArrayList<String>) eventEntity.etablissementsFusionne);
+                                    Arrays.asList(mapper.readValue(eventEntity.getEtablissementsFusionne(), String[].class)));
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;
             }

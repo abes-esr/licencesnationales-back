@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.core.entities;
+package fr.abes.licencesnationales.core.entities.etablissement;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -75,5 +75,17 @@ public class ContactEntity implements Serializable {
         this.cedex = cedex;
         this.ville = ville;
         this.role = role;
+    }
+
+    public ContactEntity(String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.adresse = adresse;
+        this.boitePostale = boitePostale;
+        this.codePostal = codePostal;
+        this.ville = ville;
+        this.cedex = cedex;
+        this.telephone = telephone;
+        this.mail = mail;
     }
 }

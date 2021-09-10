@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.core.listener.etablissement;
 
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementDiviseEvent;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
@@ -26,7 +26,7 @@ public class EtablissementDiviseListener implements ApplicationListener<Etabliss
     @Transactional
     public void onApplicationEvent(EtablissementDiviseEvent etablissementDiviseEvent) {
         service.deleteBySiren(etablissementDiviseEvent.getAncienSiren());
-        List<EtablissementEntity> etablissementEntities = utilsMapper.mapList(etablissementDiviseEvent.getEtablissementDtos(), EtablissementEntity.class);
+        List<EtablissementEntity> etablissementEntities = utilsMapper.mapList(etablissementDiviseEvent.getEtablissements(), EtablissementEntity.class);
         service.saveAll(etablissementEntities);
     }
 }

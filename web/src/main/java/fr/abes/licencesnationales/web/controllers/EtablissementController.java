@@ -1,18 +1,18 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.etablissement.*;
 import fr.abes.licencesnationales.core.exception.*;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
@@ -27,7 +27,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
@@ -47,7 +46,7 @@ public class EtablissementController {
     private UtilsMapper mapper;
 
     @Autowired
-    private EventRepository eventRepository;
+    private EtablissementEventRepository etablissementEventRepository;
 
     @Autowired
     private EtablissementService etablissementService;
@@ -60,12 +59,6 @@ public class EtablissementController {
 
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
-
-    @Autowired
-    private GenererIdAbes genererIdAbes;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ReCaptchaService reCaptchaService;
@@ -104,7 +97,7 @@ public class EtablissementController {
         else{
             EtablissementCreeEvent etablissementCreeEvent = mapper.map(eventDTO, EtablissementCreeEvent.class);
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
-            eventRepository.save(new EventEntity(etablissementCreeEvent));
+            etablissementEventRepository.save(new EtablissementEventEntity(etablissementCreeEvent));
             emailService.constructCreationCompteEmailUser(eventDTO.getContact().getMail());
             emailService.constructCreationCompteEmailAdmin(admin, eventDTO.getSiren(), eventDTO.getName());
         }
@@ -127,12 +120,12 @@ public class EtablissementController {
                         eventDTO.getVilleContact(),
                         eventDTO.getCedexContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
-        eventRepository.save(new EventEntity(etablissementModifieEvent));
+        etablissementEventRepository.save(new EtablissementEventEntity(etablissementModifieEvent));
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto eventDTO) {
+    public void fusion(@RequestBody EtablissementFusionneWebDto eventDTO) throws JsonProcessingException {
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this,
                 eventDTO.getNom(),
@@ -152,15 +145,15 @@ public class EtablissementController {
                 eventDTO.getRoleContact(),
                 eventDTO.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        eventRepository.save(new EventEntity(etablissementFusionneEvent));
+        etablissementEventRepository.save(new EtablissementEventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseWebDto eventDTO) {
+    public void division(@RequestBody EtablissementDiviseWebDto eventDTO) throws JsonProcessingException {
         EtablissementDiviseEvent etablissementDiviseEvent = mapper.map(eventDTO, EtablissementDiviseEvent.class);
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        eventRepository.save(new EventEntity(etablissementDiviseEvent));
+        etablissementEventRepository.save(new EtablissementEventEntity(etablissementDiviseEvent));
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
@@ -176,7 +169,7 @@ public class EtablissementController {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        eventRepository.save(new EventEntity(etablissementSupprimeEvent));
+        etablissementEventRepository.save(new EtablissementEventEntity(etablissementSupprimeEvent));
     }
 
     @GetMapping(value = "/{siren}")

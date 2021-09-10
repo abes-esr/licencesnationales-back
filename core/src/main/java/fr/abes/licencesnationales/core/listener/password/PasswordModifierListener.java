@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.listener.password;
 
 
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import org.springframework.context.ApplicationListener;

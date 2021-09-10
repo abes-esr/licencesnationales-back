@@ -1,12 +1,13 @@
 package fr.abes.licencesnationales.core.event.editeur;
 
 
-import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,11 +20,12 @@ public class EditeurModifieEvent extends Event {
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
     private String adresseEditeur;
-    public Set<ContactCommercialEditeurDto> listeContactCommercialEditeur;
-    public Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeur;
+    public Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur;
+    public Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur;
 
     public EditeurModifieEvent(Object source) {
         super(source);
+        this.groupesEtabRelies = new ArrayList<>();
         this.listeContactTechniqueEditeur = new HashSet<>();
         this.listeContactCommercialEditeur = new HashSet<>();
     }
@@ -31,16 +33,16 @@ public class EditeurModifieEvent extends Event {
     public EditeurModifieEvent(Object source,
                             Long id, String nomEditeur, String identifiantEditeur,
                                List<String> groupesEtabRelies, String adresseEditeur,
-                               Set<ContactCommercialEditeurDto> contactCommercialEditeurDtos,
-                               Set<ContactTechniqueEditeurDto> contactTechniqueEditeurDtos) {
+                               Set<ContactCommercialEditeurEntity> contactCommercialEditeur,
+                               Set<ContactTechniqueEditeurEntity> contactTechniqueEditeur) {
         super(source);
         this.id = id;
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.groupesEtabRelies = groupesEtabRelies;
         this.adresseEditeur = adresseEditeur;
-        this.listeContactCommercialEditeur = contactCommercialEditeurDtos;
-        this.listeContactTechniqueEditeur = contactTechniqueEditeurDtos;
+        this.listeContactCommercialEditeur = contactCommercialEditeur;
+        this.listeContactTechniqueEditeur = contactTechniqueEditeur;
     }
 
 }

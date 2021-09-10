@@ -67,12 +67,12 @@ public class WebDtoConverterTest {
         Assertions.assertEquals(format.format(new Date()), format.format(editeurCreeEvent.getDateCreation()));
         Assertions.assertEquals("etabRelie1", editeurCreeEvent.getGroupesEtabRelies().get(0));
         Assertions.assertEquals("etabRelie2", editeurCreeEvent.getGroupesEtabRelies().get(1));
-        Assertions.assertEquals("testNomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContactCommercial());
-        Assertions.assertEquals("testPrenomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContactCommercial());
-        Assertions.assertEquals("test@test.comm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContactCommercial());
-        Assertions.assertEquals("testNomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContactTechnique());
-        Assertions.assertEquals("testPrenomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContactTechnique());
-        Assertions.assertEquals("test@test.tech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContactTechnique());
+        Assertions.assertEquals("testNomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContact());
+        Assertions.assertEquals("testPrenomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContact());
+        Assertions.assertEquals("test@test.comm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContact());
+        Assertions.assertEquals("testNomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContact());
+        Assertions.assertEquals("testPrenomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContact());
+        Assertions.assertEquals("test@test.tech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContact());
 
     }
 
@@ -109,12 +109,12 @@ public class WebDtoConverterTest {
         Assertions.assertEquals("testId", editeurModifieEvent.getIdentifiantEditeur());
         Assertions.assertEquals("etabRelie1", editeurModifieEvent.getGroupesEtabRelies().get(0));
         Assertions.assertEquals("etabRelie2", editeurModifieEvent.getGroupesEtabRelies().get(1));
-        Assertions.assertEquals("testNomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContactCommercial());
-        Assertions.assertEquals("testPrenomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContactCommercial());
-        Assertions.assertEquals("test@test.comm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContactCommercial());
-        Assertions.assertEquals("testNomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContactTechnique());
-        Assertions.assertEquals("testPrenomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContactTechnique());
-        Assertions.assertEquals("test@test.tech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContactTechnique());
+        Assertions.assertEquals("testNomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContact());
+        Assertions.assertEquals("testPrenomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContact());
+        Assertions.assertEquals("test@test.comm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContact());
+        Assertions.assertEquals("testNomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContact());
+        Assertions.assertEquals("testPrenomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContact());
+        Assertions.assertEquals("test@test.tech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContact());
 
     }
 
