@@ -1,6 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.entities.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.repository.ContactRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

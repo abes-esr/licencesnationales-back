@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,7 +15,7 @@ import java.util.Date;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
-columnDefinition = "SMALLINT(1)")
+columnDefinition = "SMALLINT")
 @DiscriminatorValue("1")
 @Table(name = "Ip")
 @NoArgsConstructor
@@ -53,6 +54,9 @@ public abstract class IpEntity implements Serializable {
      * Commentaire libre
      */
     private String commentaires;
+
+    @ManyToOne(targetEntity = EtablissementEntity.class, optional = false)
+    private EtablissementEntity etablissement;
 
     /**
      * CTOR d'une IP générique sans identifiant connu

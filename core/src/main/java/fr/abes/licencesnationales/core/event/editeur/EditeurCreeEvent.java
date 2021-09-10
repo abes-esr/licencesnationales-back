@@ -1,8 +1,8 @@
 package fr.abes.licencesnationales.core.event.editeur;
 
 
-import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,8 +19,8 @@ public class EditeurCreeEvent extends Event {
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
     private String adresseEditeur;
-    private Set<ContactCommercialEditeurDto> listeContactCommercialEditeur = new HashSet<>();
-    private Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeur = new HashSet<>();
+    private Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur = new HashSet<>();
+    private Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur = new HashSet<>();
     private Date dateCreation = new Date();
 
     public EditeurCreeEvent(Object source) {
@@ -28,15 +28,15 @@ public class EditeurCreeEvent extends Event {
     }
 
     public EditeurCreeEvent(Object source, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies,
-                            String adresseEditeur, Set<ContactCommercialEditeurDto> listeContactCommercialEditeurDto,
-                            Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeurDto) {
+                            String adresseEditeur, Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur,
+                            Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur) {
         super(source);
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.groupesEtabRelies = groupesEtabRelies;
         this.adresseEditeur = adresseEditeur;
-        this.listeContactCommercialEditeur = listeContactCommercialEditeurDto;
-        this.listeContactTechniqueEditeur = listeContactTechniqueEditeurDto;
+        this.listeContactCommercialEditeur = listeContactCommercialEditeur;
+        this.listeContactTechniqueEditeur = listeContactTechniqueEditeur;
         this.dateCreation = new Date();
     }
 }

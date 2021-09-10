@@ -1,12 +1,13 @@
 package fr.abes.licencesnationales.core.event.editeur;
 
 
-import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,18 +20,19 @@ public class EditeurFusionneEvent extends Event {
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
     private String adresseEditeur;
-    private Set<ContactCommercialEditeurDto> listeContactCommercialEditeur;
-    private Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeur;
+    private Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur;
+    private Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur;
 
     public EditeurFusionneEvent(Object source) {
         super(source);
         this.listeContactCommercialEditeur = new HashSet<>();
         this.listeContactTechniqueEditeur = new HashSet<>();
+        this.groupesEtabRelies = new ArrayList<>();
     }
 
     public EditeurFusionneEvent(Object source, List<Long> idEditeurFusionnes, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies,
-                                String adresseEditeur, Set<ContactCommercialEditeurDto> listeContactCommercialEditeur,
-                                Set<ContactTechniqueEditeurDto> listeContactTechniqueEditeur) {
+                                String adresseEditeur, Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur,
+                                Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur) {
         super(source);
         this.idEditeurFusionnes = idEditeurFusionnes;
         this.nomEditeur = nomEditeur;

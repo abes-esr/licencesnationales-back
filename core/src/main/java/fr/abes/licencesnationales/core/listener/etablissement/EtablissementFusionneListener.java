@@ -1,18 +1,12 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Component
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {

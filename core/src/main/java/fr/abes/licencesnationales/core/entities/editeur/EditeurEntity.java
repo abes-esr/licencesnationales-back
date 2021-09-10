@@ -1,11 +1,13 @@
-package fr.abes.licencesnationales.core.entities;
+package fr.abes.licencesnationales.core.entities.editeur;
 
 
-import fr.abes.licencesnationales.core.converter.JpaConverterJson;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -38,13 +40,14 @@ public class EditeurEntity implements Serializable {
     private Date dateCreation;
 
     @Lob
-    @Convert(converter = JpaConverterJson.class)
     private List<String> groupesEtabRelies = new ArrayList<>();
 
-    @OneToMany(targetEntity=ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity= ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @Where(clause = "DTYPE='commercial'")
     private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities = new HashSet<>();
 
-    @OneToMany(targetEntity=ContactTechniqueEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity= ContactTechniqueEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @Where(clause = "DTYPE='technique'")
     private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities = new HashSet<>();
 
     public EditeurEntity(Long idEditeur,

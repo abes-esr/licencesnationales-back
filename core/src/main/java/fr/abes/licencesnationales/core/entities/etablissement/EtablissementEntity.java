@@ -1,6 +1,7 @@
-package fr.abes.licencesnationales.core.entities;
+package fr.abes.licencesnationales.core.entities.etablissement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -73,4 +74,12 @@ public class EtablissementEntity implements Serializable {
     }
 
 
+    public EtablissementEntity(String nom, String siren, String typeEtablissement, String idAbes, ContactEntity contact) {
+        this.name = nom;
+        this.siren = siren;
+        this.typeEtablissement = typeEtablissement;
+        this.idAbes = idAbes;
+        this.setContact(contact);
+
+    }
 }

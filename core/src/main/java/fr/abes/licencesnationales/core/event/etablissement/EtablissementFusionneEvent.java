@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
@@ -25,11 +26,11 @@ public class EtablissementFusionneEvent extends Event {
     private String mailContact;
     private String motDePasse;
     private String roleContact;
-    private ArrayList<String> sirenFusionne;
+    private List<String> sirenFusionne;
 
     public EtablissementFusionneEvent(Object source, String nom, String siren, String typeEtablissement, String idAbes, String nomContact, String prenomContact,
                                       String adresseContact, String boitePostaleContact, String codePostalContact, String villeContact, String cedexContact,
-                                      String telephoneContact, String mailContact, String motDePasse, String roleContact, ArrayList<String> sirenFusionne) {
+                                      String telephoneContact, String mailContact, String motDePasse, String roleContact, List<String> sirenFusionne) {
         super(source);
         this.nom = nom;
         this.siren = siren;
@@ -51,5 +52,6 @@ public class EtablissementFusionneEvent extends Event {
 
     public EtablissementFusionneEvent(Object source) {
         super(source);
+        this.sirenFusionne = new ArrayList<>();
     }
 }

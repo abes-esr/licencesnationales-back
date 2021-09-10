@@ -3,10 +3,11 @@ package fr.abes.licencesnationales.web.controllers;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.ip.*;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.*;
-import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
@@ -15,7 +16,6 @@ import fr.abes.licencesnationales.core.event.ip.IpValideeEvent;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.core.services.EmailService;
@@ -38,7 +38,7 @@ import java.util.Set;
 @RequestMapping("/v1/ln/ip")
 public class IpController {
     @Autowired
-    private EventRepository eventRepository;
+    private IpEventRepository eventRepository;
 
     @Autowired
     private EtablissementService etablissementService;
@@ -118,7 +118,7 @@ public class IpController {
                 event.getIp(),
                 event.getCommentaires());
         applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        eventRepository.save(new EventEntity(ipAjouteeEvent));
+        eventRepository.save(new IpEventEntity(ipAjouteeEvent));
 
         String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
@@ -173,7 +173,6 @@ public class IpController {
     }
 
     public void traiterModifIp(IpModifieeDto ipModifieeDto, String siren) throws IpException, RestClientException {
-        //ipService.checkDoublonIpModifieeDto(ipModifieeDto);
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
                 ipModifieeDto.getId(),
                 siren,
@@ -183,8 +182,7 @@ public class IpController {
                 IpType.valueOf(ipModifieeDto.getTypeIp()),
                 ipModifieeDto.getCommentaires());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
-        eventRepository.save(new EventEntity(ipModifieeEvent));
-
+        eventRepository.save(new IpEventEntity(ipModifieeEvent));
         String etab = etablissementService.getFirstBySiren(siren).getName();
         String descriptionAcces = "id = " + ipModifieeDto.getId() + ", ip ou plage d'ips = " + ipModifieeDto.getIp() + " en provenance de l'établissement " + etab;
         log.info("admin = " + admin);
@@ -200,7 +198,7 @@ public class IpController {
                 ipValideeDto.getIp(),
                 ipValideeDto.getSiren());
         applicationEventPublisher.publishEvent(ipValideeEvent);
-        eventRepository.save(new EventEntity(ipValideeEvent));
+        eventRepository.save(new IpEventEntity(ipValideeEvent));
     }
 
     @DeleteMapping(value = "/supprime")
@@ -209,7 +207,7 @@ public class IpController {
                 ipSupprimeeDto.getId(),
                 filtrerAccesServices.getSirenFromSecurityContextUser());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-        eventRepository.save(new EventEntity(ipSupprimeeEvent));
+        eventRepository.save(new IpEventEntity(ipSupprimeeEvent));
     }
 
     @DeleteMapping(value = "/supprimeByAdmin")
@@ -219,7 +217,7 @@ public class IpController {
                 ipSupprimeeDto.getId(),
                 ipSupprimeeDto.getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-        eventRepository.save(new EventEntity(ipSupprimeeEvent));
+        eventRepository.save(new IpEventEntity(ipSupprimeeEvent));
     }
 
     @GetMapping(value = "/{siren}")

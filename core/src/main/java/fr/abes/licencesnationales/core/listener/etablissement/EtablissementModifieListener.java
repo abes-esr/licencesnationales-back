@@ -2,10 +2,9 @@ package fr.abes.licencesnationales.core.listener.etablissement;
 
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.ContactEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

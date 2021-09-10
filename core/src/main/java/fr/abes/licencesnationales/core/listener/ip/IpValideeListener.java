@@ -1,9 +1,8 @@
 package fr.abes.licencesnationales.core.listener.ip;
 
 
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.ip.IpValideeEvent;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

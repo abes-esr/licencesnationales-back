@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.entities.ContactEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;

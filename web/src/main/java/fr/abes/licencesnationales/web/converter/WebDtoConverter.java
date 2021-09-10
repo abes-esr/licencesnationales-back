@@ -1,9 +1,10 @@
 package fr.abes.licencesnationales.web.converter;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
@@ -45,8 +46,8 @@ public class WebDtoConverter {
                 editeurCreeEvent.setAdresseEditeur(source.getAdresseEditeur());
                 editeurCreeEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
-                editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurDto.class));
-                editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurDto.class));
+                editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
+                editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
 
                 return editeurCreeEvent;
             }
@@ -68,8 +69,8 @@ public class WebDtoConverter {
                 editeurModifieEvent.setAdresseEditeur(source.getAdresseEditeur());
                 editeurModifieEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
-                editeurModifieEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurDto.class));
-                editeurModifieEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurDto.class));
+                editeurModifieEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
+                editeurModifieEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
 
                 return editeurModifieEvent;
             }
@@ -118,21 +119,23 @@ public class WebDtoConverter {
                 EtablissementDiviseEvent etablissementDiviseEvent = new EtablissementDiviseEvent(this);
                 etablissementDiviseEvent.setAncienSiren(source.getAncienSiren());
                 source.getEtablissementDtos().stream().forEach(e -> {
-                    EtablissementDto etablissementDto = new EtablissementDto();
-                    etablissementDto.setNom(e.getName());
-                    etablissementDto.setSiren(e.getSiren());
-                    etablissementDto.setTypeEtablissement(e.getTypeEtablissement());
-                    etablissementDto.setIdAbes(e.getIdAbes());
-                    etablissementDto.setNomContact(e.getContact().getNom());
-                    etablissementDto.setPrenomContact(e.getContact().getPrenom());
-                    etablissementDto.setAdresseContact(e.getContact().getAdresse());
-                    etablissementDto.setBoitePostaleContact(e.getContact().getBoitePostale());
-                    etablissementDto.setCodePostalContact(e.getContact().getCodePostal());
-                    etablissementDto.setVilleContact(e.getContact().getVille());
-                    etablissementDto.setCedexContact(e.getContact().getCedex());
-                    etablissementDto.setTelephoneContact(e.getContact().getTelephone());
-                    etablissementDto.setMailContact(e.getContact().getMail());
-                    etablissementDiviseEvent.getEtablissementDtos().add(etablissementDto);
+                    EtablissementEntity etablissement = new EtablissementEntity();
+                    etablissement.setName(e.getName());
+                    etablissement.setSiren(e.getSiren());
+                    etablissement.setTypeEtablissement(e.getTypeEtablissement());
+                    etablissement.setIdAbes(e.getIdAbes());
+                    ContactEntity contact = new ContactEntity();
+                    contact.setNom(e.getContact().getNom());
+                    contact.setPrenom(e.getContact().getPrenom());
+                    contact.setAdresse(e.getContact().getAdresse());
+                    contact.setBoitePostale(e.getContact().getBoitePostale());
+                    contact.setCodePostal(e.getContact().getCodePostal());
+                    contact.setVille(e.getContact().getVille());
+                    contact.setCedex(e.getContact().getCedex());
+                    contact.setTelephone(e.getContact().getTelephone());
+                    contact.setMail(e.getContact().getMail());
+                    etablissement.setContact(contact);
+                    etablissementDiviseEvent.getEtablissements().add(etablissement);
                 });
                 return etablissementDiviseEvent;
             }

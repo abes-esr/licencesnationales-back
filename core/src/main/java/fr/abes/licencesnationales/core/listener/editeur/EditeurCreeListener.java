@@ -1,9 +1,11 @@
 package fr.abes.licencesnationales.core.listener.editeur;
 
-import fr.abes.licencesnationales.core.entities.*;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
-import fr.abes.licencesnationales.core.repository.ContactCommercialEditeurRepository;
-import fr.abes.licencesnationales.core.repository.ContactTechniqueEditeurRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import lombok.extern.slf4j.Slf4j;
@@ -46,11 +48,11 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
         Set<ContactTechniqueEditeurEntity> CT = editeurEntity.getContactTechniqueEditeurEntities();
 
         for (ContactCommercialEditeurEntity C:CC) {
-            log.debug(" editeurEntity.getContactCommercialEditeurEntities() =  " + C.getMailContactCommercial() + C.getNomContactCommercial() + C.getPrenomContactCommercial());
+            log.debug(" editeurEntity.getContactCommercialEditeurEntities() =  " + C.getMailContact() + C.getNomContact() + C.getPrenomContact());
 
         }
         for (ContactTechniqueEditeurEntity T:CT) {
-            log.debug(" editeurEntity.getContactTechniqueEditeurEntities() =  " + T.getMailContactTechnique() + T.getNomContactTechnique() + T.getPrenomContactTechnique());
+            log.debug(" editeurEntity.getContactTechniqueEditeurEntities() =  " + T.getMailContact() + T.getNomContact() + T.getPrenomContact());
 
         }
 
