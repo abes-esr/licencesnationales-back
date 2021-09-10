@@ -71,7 +71,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
+       // Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();

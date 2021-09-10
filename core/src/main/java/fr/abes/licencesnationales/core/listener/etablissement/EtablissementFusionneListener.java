@@ -1,10 +1,9 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.ContactEntity;
 import fr.abes.licencesnationales.core.entities.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
@@ -30,7 +29,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
     @Transactional
     public void onApplicationEvent(EtablissementFusionneEvent etablissementFusionneEvent) {
 
-        Set<IpEntity> ipEntities = new HashSet<>();
+       /* Set<IpEntity> ipEntities = new HashSet<>();
         Set<EditeurEntity> editeurEntities = new HashSet<>();
 
         for (String siren :
@@ -52,7 +51,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
         etablissementEntity.setEditeurs(editeurEntities);
         etablissementEntity.setIps(ipEntities);
 
-        service.save(etablissementEntity);
+        service.save(etablissementEntity);*/
 
     }
 }
