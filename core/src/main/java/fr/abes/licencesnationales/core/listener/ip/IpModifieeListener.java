@@ -3,9 +3,8 @@ package fr.abes.licencesnationales.core.listener.ip;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;

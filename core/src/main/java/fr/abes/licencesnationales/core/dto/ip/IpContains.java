@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.dto.ip;
 
 
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import lombok.extern.slf4j.Slf4j;
 
 // Stocke les infos retournées après un test d'existence d'ip dans la base.

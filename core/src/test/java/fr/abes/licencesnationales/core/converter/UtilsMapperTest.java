@@ -4,6 +4,7 @@ import fr.abes.licencesnationales.core.dto.contact.ContactCommercialEditeurDto;
 import fr.abes.licencesnationales.core.dto.contact.ContactTechniqueEditeurDto;
 import fr.abes.licencesnationales.core.dto.ip.IpAjouteeDto;
 import fr.abes.licencesnationales.core.entities.*;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
@@ -157,45 +158,21 @@ public class UtilsMapperTest {
 
 
     @Test
-    @DisplayName("test mapper editeur fusionné")
-    public void testMapperEditeurFusionneEvent() {
-        EditeurFusionneEvent editeurFusionneEvent = new EditeurFusionneEvent(this);
-        List<Long> listeId = new ArrayList<>();
-        listeId.add(1L);
-        listeId.add(2L);
-        editeurFusionneEvent.setIdEditeurFusionnes(listeId);
-        editeurFusionneEvent.setNomEditeur("testNom");
-        editeurFusionneEvent.setIdentifiantEditeur("123456789");
-        editeurFusionneEvent.setAdresseEditeur("testAdresse");
+    @DisplayName("test supp Event Editeur")
+    public void testMapperEditeurSupprimeEvent() {
+        EditeurSupprimeDto editeurSupprimeDto = new EditeurSupprimeDto();
+        editeurSupprimeDto.setId("21");
 
-        List<String> listeGroupeEtab = new ArrayList<>();
-        listeGroupeEtab.add("testGroup1");
-        listeGroupeEtab.add("testGroup2");
-        editeurFusionneEvent.setGroupesEtabRelies(listeGroupeEtab);
+        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Long.valueOf("21"));
+        EditeurEntity entity = utilsMapper.map(editeurSupprimeEvent, EditeurEntity.class);
 
-        Set<ContactTechniqueEditeurDto> contactTechniqueEditeurDtoSet = new HashSet<>();
-        contactTechniqueEditeurDtoSet.add(new ContactTechniqueEditeurDto("testNomCT", "testPrenomCT", "test@test.CT"));
-        editeurFusionneEvent.setListeContactTechniqueEditeur(contactTechniqueEditeurDtoSet);
-
-        Set<ContactCommercialEditeurDto> contactCommercialEditeurDtos = new HashSet<>();
-        contactCommercialEditeurDtos.add(new ContactCommercialEditeurDto("testNomCC", "testPrenomCC", "test@test.CC"));
-        editeurFusionneEvent.setListeContactCommercialEditeur(contactCommercialEditeurDtos);
-
-        EditeurEntity entity = utilsMapper.map(editeurFusionneEvent, EditeurEntity.class);
-
-        Assertions.assertEquals("testNom", entity.getNomEditeur());
-        Assertions.assertEquals("123456789", entity.getIdentifiantEditeur());
-        Assertions.assertEquals("testAdresse", entity.getAdresseEditeur());
-        Assertions.assertEquals("testGroup1", entity.getGroupesEtabRelies().get(0));
-        Assertions.assertEquals("testGroup2", entity.getGroupesEtabRelies().get(1));
-        ContactTechniqueEditeurEntity ct = entity.getContactTechniqueEditeurEntities().iterator().next();
-        Assertions.assertEquals("testNomCT", ct.getNomContactTechnique());
-        Assertions.assertEquals("testPrenomCT", ct.getPrenomContactTechnique());
-        Assertions.assertEquals("test@test.CT", ct.getMailContactTechnique());
-        ContactCommercialEditeurEntity cc = entity.getContactCommercialEditeurEntities().iterator().next();
-        Assertions.assertEquals("testNomCC", cc.getNomContactCommercial());
-        Assertions.assertEquals("testPrenomCC", cc.getPrenomContactCommercial());
-        Assertions.assertEquals("test@test.CC", cc.getMailContactCommercial());
+        Assertions.assertEquals("aaaaaaaaa", entity.getNomEditeur());
+        Assertions.assertEquals("eeeeee", entity.getAdresseEditeur());
+        Assertions.assertEquals("123", entity.getIdentifiantEditeur());
+        Assertions.assertEquals(1, entity.getGroupesEtabRelies().size());
+        ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
+        Assertions.assertEquals("testNom", commercialEntity.getNomContactCommercial());
+    }
 
     }
 

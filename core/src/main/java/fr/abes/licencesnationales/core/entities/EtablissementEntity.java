@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -23,7 +24,7 @@ import java.util.Set;
 public class EtablissementEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "etablissement_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "etablissement_Sequence")
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
     private Long id;
 
@@ -58,7 +59,6 @@ public class EtablissementEntity implements Serializable {
             joinColumns = @JoinColumn(name = "etablissement_id"),
             inverseJoinColumns = @JoinColumn(name = "editeur_id"))
     private Set<EditeurEntity> editeurs = new HashSet<>();
-
 
 
     public EtablissementEntity(Long id, String name, String siren, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
