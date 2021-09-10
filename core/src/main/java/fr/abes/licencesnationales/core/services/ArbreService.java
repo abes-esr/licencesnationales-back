@@ -3,9 +3,9 @@ package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
 import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.entities.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.repository.EventRepository;
-import fr.abes.licencesnationales.core.repository.IpRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;

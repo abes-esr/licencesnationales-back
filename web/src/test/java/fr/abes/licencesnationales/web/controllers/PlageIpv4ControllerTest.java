@@ -72,7 +72,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
+        //Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();
@@ -86,31 +86,6 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
         Field field = PlageIpv4AjouteeDto.class.getDeclaredField("ip");
         javax.validation.constraints.Pattern[] annotations = field.getAnnotationsByType(javax.validation.constraints.Pattern.class);
         assertEquals(plageIpv4.matches(annotations[0].regexp()),validates);
-    }
-    //on met des lettres au lieu d'une plage Ipv4
-    @Test
-    public void testInvalidPlageIpv4Pattern1() throws NoSuchFieldException {
-        plageIpv4Regex("abcdefgABCDEFG", false);
-    }
-    //on met une ipv4 au lieu d'une plage Ipv4
-    @Test
-    public void testInvalidPlageIpv4Pattern2() throws NoSuchFieldException {
-        plageIpv4Regex("192.168.20.15", false);
-    }
-    //on met une ipv6 au lieu d'une plage Ipv4
-    @Test
-    public void testInvalidPlageIpv4Pattern3() throws NoSuchFieldException {
-        plageIpv4Regex("5800:10C3:E3C3:F1AA:48E3:D923:D494:AAFF", false);
-    }
-    //on met une plage ipv6 au lieu d'une plage Ipv4
-    @Test
-    public void testInvalidPlageIpv4Pattern4() throws NoSuchFieldException {
-        plageIpv4Regex("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF", false);
-    }
-    //on ne remplit pas le champ plageIpv4
-    @Test
-    public void testEmptyPlageIpv4FailValidation() throws NoSuchFieldException {
-        plageIpv4Regex("", false);
     }
 
 
