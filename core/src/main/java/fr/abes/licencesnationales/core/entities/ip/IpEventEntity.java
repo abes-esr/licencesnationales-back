@@ -19,7 +19,7 @@ import java.util.Date;
 @Setter
 public class IpEventEntity implements Serializable {
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "ipevent_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ipevent_Sequence")
     @SequenceGenerator(name = "ipevent_Sequence", sequenceName = "IPEVENT_SEQ", allocationSize = 1)
     private Long id;
 
@@ -35,6 +35,11 @@ public class IpEventEntity implements Serializable {
     @Column(name = "IP")
     private String ip;
 
+    /**
+     * CTOR à partir d'un événement d'ajout d'IP
+     *
+     * @param ipAjouteeEvent Evénement d'ajout d'IP
+     */
     public IpEventEntity(IpAjouteeEvent ipAjouteeEvent) {
         this.event = "ipAjoutee";
         this.dateCreationEvent = ipAjouteeEvent.created;
@@ -42,6 +47,11 @@ public class IpEventEntity implements Serializable {
         this.siren = ipAjouteeEvent.getSiren();
     }
 
+    /**
+     * CTOR à partir d'un événement de modification d'IP
+     *
+     * @param ipModifieeEvent Evénement de modification d'IP
+     */
     public IpEventEntity(IpModifieeEvent ipModifieeEvent) {
         this.event = "ipModifiee";
         this.dateCreationEvent = ipModifieeEvent.created;
@@ -49,6 +59,11 @@ public class IpEventEntity implements Serializable {
         this.siren = ipModifieeEvent.getSiren();
     }
 
+    /**
+     * CTOR à partir d'un événement de validation d'IP
+     *
+     * @param ipValideeEvent Evénement de validation d'IP
+     */
     public IpEventEntity(IpValideeEvent ipValideeEvent) {
         this.event = "ipValidee";
         this.dateCreationEvent = ipValideeEvent.created;
@@ -56,6 +71,11 @@ public class IpEventEntity implements Serializable {
         this.siren = ipValideeEvent.getSiren();
     }
 
+    /**
+     * CTOR à partir d'un événement de suppression d'IP
+     *
+     * @param ipSupprimeeEvent Evénement de suppression d'IP
+     */
     public IpEventEntity(IpSupprimeeEvent ipSupprimeeEvent) {
         this.event = "ipSupprimee";
         this.dateCreationEvent = ipSupprimeeEvent.created;

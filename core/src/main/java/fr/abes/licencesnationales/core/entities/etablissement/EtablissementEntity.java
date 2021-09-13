@@ -1,7 +1,6 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
@@ -39,7 +38,7 @@ public class EtablissementEntity implements Serializable {
     @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
     private String siren;
 
-    private Date dateCreation;
+    private Date dateCreation = new Date();
 
     @NotBlank
     private String typeEtablissement;
@@ -66,24 +65,68 @@ public class EtablissementEntity implements Serializable {
     private Set<EditeurEntity> editeurs = new HashSet<>();
 
 
+    /**
+     * CTOR d'un établissement avec un identifiant
+     *
+     * @param id                Identifiant de l'établissement
+     * @param name              Nom de l'établissement
+     * @param siren             Numéro SIRENE de l'établissement
+     * @param typeEtablissement Type de l'établissement
+     * @param idAbes            Identifiant ABES de l'établissement
+     * @param contact           Contact de l'établissement
+     * @param editeurs          Liste des éditeurs de l'établissement
+     */
     public EtablissementEntity(Long id, String name, String siren, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
         this.id = id;
         this.name = name;
         this.siren = siren;
-        this.dateCreation = new Date();
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         this.contact = contact;
         this.editeurs = editeurs;
     }
 
-
+    /**
+     * CTOR d'un établissement sans identifiant et sans éditeurs
+     *
+     * @param nom               Nom de l'établissement
+     * @param siren             Numéro SIRENE de l'établissement
+     * @param typeEtablissement Type de l'établissement
+     * @param idAbes            Identifiant ABESZ de l'établissement
+     * @param contact           Contact de l'établissement
+     */
     public EtablissementEntity(String nom, String siren, String typeEtablissement, String idAbes, ContactEntity contact) {
         this.name = nom;
         this.siren = siren;
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         this.setContact(contact);
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return id != null && id.equals(((EtablissementEntity) obj).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 2021;
+    }
+
+    @Override
+    public String toString() {
+        return "EtablissementEntity {" + "id=" + id + ", nom=" + name + ", SIRENE=" + siren + ", type=" + typeEtablissement + " }";
     }
 }

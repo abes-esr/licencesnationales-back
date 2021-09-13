@@ -14,20 +14,24 @@ import java.util.Date;
 
 @Entity
 @Table(name = "EtablissementEvent")
-@NoArgsConstructor @Getter @Setter
+@NoArgsConstructor
+@Getter
+@Setter
 public class EtablissementEventEntity implements Serializable {
+
     @Autowired
     @Transient
     private ObjectMapper mapper;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "etabevent_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "etabevent_Sequence")
     @SequenceGenerator(name = "etabevent_Sequence", sequenceName = "ETABEVENT_SEQ", allocationSize = 1)
     private Long id;
 
     @Column(name = "DATE_CREATION_EVENT")
     private Date dateCreationEvent;
 
+    // TODO : Pourquoi une chaîne et pas un enum ?
     @Column(name = "EVENT")
     private String event;
 
@@ -82,18 +86,25 @@ public class EtablissementEventEntity implements Serializable {
     @Column(name = "ANCIEN_NOM_ETAB")
     private String ancienNomEtab;
 
+    //TODO: Définir la différence avec etablissementsFusionne
     @Lob
     @Column(name = "ETABLISSEMENTDTOFUSION")
     private String etablissementsFusionnes;
+
+    //TODO: Définir la différence avec etablissementsFusionnes
+    @Lob
+    @Column(name = "ETABLISSEMENTS_FUSIONNE")
+    private String etablissementsFusionne;
 
     @Lob
     @Column(name = "ETABLISEMENTS_DIVISE")
     private String etablisementsDivises;
 
-    @Lob
-    @Column(name = "ETABLISSEMENTS_FUSIONNE")
-    private String etablissementsFusionne;
-
+    /**
+     * CTOR à partir d'un événement de création d'établissement
+     *
+     * @param etablissementCreeEvent Evénement de création d'un établissement
+     */
     public EtablissementEventEntity(EtablissementCreeEvent etablissementCreeEvent) {
         this.event = "cree";
         this.dateCreationEvent = etablissementCreeEvent.created;
@@ -114,6 +125,11 @@ public class EtablissementEventEntity implements Serializable {
         this.roleContact = etablissementCreeEvent.getRoleContact();
     }
 
+    /**
+     * CTOR à partir d'un événement de modification d'établissement
+     *
+     * @param etablissementModifieEvent Evénement de modification d'un établissement
+     */
     public EtablissementEventEntity(EtablissementModifieEvent etablissementModifieEvent) {
         this.event = "modifie";
         this.dateCreationEvent = etablissementModifieEvent.created;
@@ -129,12 +145,24 @@ public class EtablissementEventEntity implements Serializable {
         this.cedexContact = etablissementModifieEvent.getCedexContact();
     }
 
+    /**
+     * CTOR à partir d'un événement de suppression d'établissement
+     *
+     * @param etablissementSupprimeEvent Evénement de suppression d'un établissement
+     */
     public EtablissementEventEntity(EtablissementSupprimeEvent etablissementSupprimeEvent) {
         this.event = "supprime";
         this.dateCreationEvent = etablissementSupprimeEvent.created;
         this.nomEtab = etablissementSupprimeEvent.getSiren();
     }
 
+    /**
+     * CTOR à partir d'un événement de division d'établissement
+     *
+     * @param etablissementDiviseEvent Evénement de division d'un établissement
+     * @throws JsonProcessingException Si les établissement divisés n'ont pas pu être transformé
+     *                                 en chaîne de caractère pour l'insertion dans la base de données.
+     */
     public EtablissementEventEntity(EtablissementDiviseEvent etablissementDiviseEvent) throws JsonProcessingException {
         this.event = "divise";
         this.dateCreationEvent = etablissementDiviseEvent.created;
@@ -142,13 +170,47 @@ public class EtablissementEventEntity implements Serializable {
         this.etablisementsDivises = mapper.writeValueAsString(etablissementDiviseEvent.getEtablissements());
     }
 
+    /**
+     * CTOR à partir d'un événement de fusion d'établissement
+     *
+     * @param etablissementFusionneEvent Evénement de la fusion de deux établissements
+     * @throws JsonProcessingException Si les établissement fusionnées n'ont pas pu être transformé
+     *                                 en chaîne de caractère pour l'insertion dans la base de données.
+     */
     public EtablissementEventEntity(EtablissementFusionneEvent etablissementFusionneEvent) throws JsonProcessingException {
         this.event = "fusionne";
         this.dateCreationEvent = etablissementFusionneEvent.created;
         ContactEntity contact = new ContactEntity(etablissementFusionneEvent.getNomContact(), etablissementFusionneEvent.getPrenomContact(), etablissementFusionneEvent.getAdresseContact(),
-                etablissementFusionneEvent.getBoitePostaleContact(), etablissementFusionneEvent.getCodePostalContact(), etablissementFusionneEvent.getVilleContact(),etablissementFusionneEvent.getCedexContact(),
+                etablissementFusionneEvent.getBoitePostaleContact(), etablissementFusionneEvent.getCodePostalContact(), etablissementFusionneEvent.getVilleContact(), etablissementFusionneEvent.getCedexContact(),
                 etablissementFusionneEvent.getTelephoneContact(), etablissementFusionneEvent.getMailContact());
         this.etablissementsFusionnes = mapper.writeValueAsString(etablissementFusionneEvent);
         this.etablissementsFusionne = mapper.writeValueAsString(etablissementFusionneEvent.getSirenFusionne());
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return id != null && id.equals(((EtablissementEventEntity) obj).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 2021;
+    }
+
+    @Override
+    public String toString() {
+        return "EditeurEventEntity {" + "id=" + id + ", événement=" + event + ", nom de l'établissement=" + nomEtab + " }";
     }
 }

@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.core.entities.PasswordEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.PasswordEventEntity;
 import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;

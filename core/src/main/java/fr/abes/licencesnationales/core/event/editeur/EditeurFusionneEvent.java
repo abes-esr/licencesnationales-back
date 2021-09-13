@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Evénement de fusion de deux éditeurs
+ */
 @Getter
 @Setter
 public class EditeurFusionneEvent extends Event {

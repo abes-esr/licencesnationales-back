@@ -21,8 +21,9 @@ import java.io.Serializable;
 @Getter
 @Setter
 public abstract class ContactEditeurEntity implements Serializable {
+
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "contact_editeur_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_editeur_Sequence")
     @SequenceGenerator(name = "contact_editeur_Sequence", sequenceName = "CONTACT_EDITEUR_SEQ", allocationSize = 1)
     protected Long id;
 
@@ -38,16 +39,60 @@ public abstract class ContactEditeurEntity implements Serializable {
     @JsonIgnore
     protected EditeurEntity editeurEntity;
 
+    /**
+     * CTOR d'un contact d'éditeur sans identifiant
+     *
+     * @param nomContact Nom du contact
+     * @param prenomContact Prénom du contact
+     * @param mailContact Email du contact
+     */
     public ContactEditeurEntity(String nomContact, String prenomContact, String mailContact) {
         this.nomContact = nomContact;
         this.prenomContact = prenomContact;
         this.mailContact = mailContact;
     }
 
+    /**
+     * CTOR d'un contact d'éditeur avec identifiant
+     *
+     * @param id Identifiant du contact
+     * @param nomContact Nom du contact
+     * @param prenomContact Prénom du contact
+     * @param mailContact Email du contact
+     */
     public ContactEditeurEntity(Long id, String nomContact, String prenomContact, String mailContact) {
         this.id = id;
         this.nomContact = nomContact;
         this.prenomContact = prenomContact;
         this.mailContact = mailContact;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return (id != null && id.equals(((ContactEditeurEntity) obj).id)) ||
+                (id == null && nomContact.equals(((ContactEditeurEntity) obj).nomContact)
+                        && prenomContact.equals(((ContactEditeurEntity) obj).prenomContact));
+    }
+
+    @Override
+    public int hashCode() {
+        return 2021;
+    }
+
+    @Override
+    public String toString() {
+        return "ContactEditeurEntity {" + "id=" + id + ", nom=" + nomContact + ", prénom=" + prenomContact + " }";
     }
 }
