@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.STRING, columnDefinition = "varchar(5)")
 @Getter @Setter
-public class StatutEntity implements Serializable {
+public abstract class StatutEntity implements Serializable {
     @Id
     protected int idStatut;
 

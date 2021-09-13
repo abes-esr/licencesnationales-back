@@ -23,9 +23,6 @@ public class EtablissementWebDto {
     @JsonProperty("typeEtablissement")
     private String typeEtablissement;
 
-    @JsonProperty("statut")
-    private boolean valide;
-
     @JsonProperty("idAbes")
     private String idAbes;
 
