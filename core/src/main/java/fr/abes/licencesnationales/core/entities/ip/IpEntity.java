@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,7 +10,6 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -55,8 +56,13 @@ public abstract class IpEntity implements Serializable {
      */
     private String commentaires;
 
-    @ManyToOne(targetEntity = EtablissementEntity.class, optional = false)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ref_etablissement")
     private EtablissementEntity etablissement;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ref_statut")
+    private StatutIpEntity statut;
 
     /**
      * CTOR d'une IP générique sans identifiant connu

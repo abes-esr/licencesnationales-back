@@ -24,7 +24,6 @@ public class IpAjouteeListener implements ApplicationListener<IpAjouteeEvent> {
     public void onApplicationEvent(IpAjouteeEvent ipAjouteeEvent) {
         EtablissementEntity etablissementEntity = service.getFirstBySiren(ipAjouteeEvent.getSiren());
         etablissementEntity.getIps().add(utilsMapper.map(ipAjouteeEvent, IpEntity.class));
-
         service.save(etablissementEntity);
     }
 }

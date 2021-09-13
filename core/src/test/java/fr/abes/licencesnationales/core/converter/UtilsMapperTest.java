@@ -5,9 +5,14 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueE
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
+import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
+import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -29,7 +34,7 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test nouvelEditeur 1CC 0CT")
-    public void testMapperEditeurCreeDtoVersEditeurEntity1() {
+    public void testMapperEditeurCreeEventVersEditeurEntity1() {
         EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this);
 
         editeurCreeEvent.setNomEditeur("nomEditeur");
@@ -68,7 +73,7 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test nouvelEditeur 2CC 2CT")
-    public void testMapperEditeurCreeDtoVersEditeurEntity2() {
+    public void testMapperEditeurCreeEventVersEditeurEntity2() {
         EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this);
 
         editeurCreeEvent.setNomEditeur("nomEditeur");
@@ -209,6 +214,22 @@ public class UtilsMapperTest {
         Assertions.assertEquals("villeTest", entity.getContact().getVille());
         Assertions.assertEquals("roleTest", entity.getContact().getRole());
         Assertions.assertEquals("testNom", entity.getName());
+    }
+
+    @Test
+    @DisplayName("test mapper IP créée")
+    public void testMapperIpEventCree() {
+        IpAjouteeEvent ip = new IpAjouteeEvent(this);
+        ip.setSiren("123456789");
+        ip.setTypeIp(IpType.IPV4);
+        ip.setTypeAcces("ip");
+        ip.setIp("192.168.0.1");
+
+        IpEntity ipEntity = utilsMapper.map(ip, IpEntity.class);
+
+        Assertions.assertEquals(ipEntity.getClass(), IpV4.class);
+        Assertions.assertEquals("123456789", ip.getSiren());
+
     }
 
 }

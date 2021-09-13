@@ -1,13 +1,11 @@
 package fr.abes.licencesnationales.core.entities.contactediteur;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.*;
-import javax.validation.constraints.Pattern;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 import java.io.Serializable;
 
 

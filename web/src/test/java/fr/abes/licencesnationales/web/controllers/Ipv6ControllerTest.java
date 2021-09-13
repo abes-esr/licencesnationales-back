@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
@@ -12,6 +11,7 @@ import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
+import fr.abes.licencesnationales.web.dto.ip.IpSupprimeeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.Ipv6AjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.Ipv6ModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
@@ -26,6 +26,7 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
@@ -34,7 +35,8 @@ import java.lang.reflect.Field;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -282,7 +284,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testEtabSuppIPSucces() throws Exception {
 
-        IpSupprimeeDto dto = new IpSupprimeeDto();
+        IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprime")
@@ -295,7 +297,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testEtabSuppIPFailed() throws Exception {
 
-        IpSupprimeeDto dto = new IpSupprimeeDto();
+        IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
         dto.setId(null);
         this.mockMvc.perform(delete("/v1/ln/ip/supprime")
@@ -310,7 +312,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser(authorities = {"admin"})
     public void testAdminSuppIPSucces() throws Exception {
 
-        IpSupprimeeDto dto = new IpSupprimeeDto();
+        IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
@@ -323,7 +325,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testAdminSuppIPFailed() throws Exception {
 
-        IpSupprimeeDto dto = new IpSupprimeeDto();
+        IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
         dto.setId(Long.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
@@ -336,7 +338,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser(authorities = {"admin"})
     public void testAdminSuppIPFailed2() throws Exception {
 
-        IpSupprimeeDto dto = new IpSupprimeeDto();
+        IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren(null); //le siren n'est pas obligatoire vu que en situation etab on va le chercher dans le token
         //par contre en admin il n'est pas obligatoire alors que est un param indispensable puisqu'on transmet le siren de l'etab dont on veut changer l'ip
         //donc à voir si il ne faut pas retifier ça, en envoyant malgré tout depuis le front le siren de l'etab qui souhaite supp/modi/ajouter une ip

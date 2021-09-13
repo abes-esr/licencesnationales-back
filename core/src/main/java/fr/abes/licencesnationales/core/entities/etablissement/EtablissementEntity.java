@@ -1,8 +1,10 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -42,14 +44,16 @@ public class EtablissementEntity implements Serializable {
     @NotBlank
     private String typeEtablissement;
 
-    private boolean valide;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "ref_statut")
+    private StatutEtablissementEntity statut;
 
     private String idAbes;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private ContactEntity contact;
 
-    @OneToMany(cascade = CascadeType.ALL,
+    @OneToMany(mappedBy = "etablissement", cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnore
     private Set<IpEntity> ips = new HashSet<>();

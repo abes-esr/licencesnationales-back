@@ -1,13 +1,14 @@
-package fr.abes.licencesnationales.core.dto.ip;
+package fr.abes.licencesnationales.web.dto.ip;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class IpValideeDto {
+@AllArgsConstructor
+@Setter @Getter
+public class IpValideeWebDto {
     private String ip;
     private String siren;
 }
