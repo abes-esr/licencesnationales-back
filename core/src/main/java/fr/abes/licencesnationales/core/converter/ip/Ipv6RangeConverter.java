@@ -1,9 +1,14 @@
-package fr.abes.licencesnationales.core.converter;
+package fr.abes.licencesnationales.core.converter.ip;
 
 import com.github.jgonian.ipmath.Ipv6Range;
 
 import javax.persistence.AttributeConverter;
 
+/**
+ * Ce convertisseur permet de gérer les entrées/sorties des objets Ipv6Range en base de données.
+ * Les objets Ipv6Range sont stockés sous la forme d'une chaîne de caractère.
+ * Ce convertisseur permet donc de convertir les objets Ipv6Range en chaîne de caractère et vice versa.
+ */
 public class Ipv6RangeConverter implements AttributeConverter<Ipv6Range, String> {
 
     @Override
@@ -13,7 +18,7 @@ public class Ipv6RangeConverter implements AttributeConverter<Ipv6Range, String>
             return null;
         }
 
-       return attr.toString();
+        return attr.toString();
     }
 
     @Override

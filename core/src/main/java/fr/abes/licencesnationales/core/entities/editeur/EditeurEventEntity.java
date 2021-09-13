@@ -18,14 +18,16 @@ import java.util.List;
 
 @Entity
 @Table(name = "EditeurEvent")
-@NoArgsConstructor @Getter
+@NoArgsConstructor
+@Getter
 public class EditeurEventEntity implements Serializable {
+
     @Autowired
     @Transient
     private ObjectMapper mapper;
 
     @Id
-    @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "editeurevent_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeurevent_Sequence")
     @SequenceGenerator(name = "editeurevent_Sequence", sequenceName = "EDITEUREVENT_SEQ", allocationSize = 1)
     public Long id;
 
@@ -60,6 +62,13 @@ public class EditeurEventEntity implements Serializable {
     @Column(name = "ID_EDITEUR_FUSIONNES")
     private List<Long> idEditeurFusionnes;
 
+    /**
+     * CTOR à partir d'un événement de création d'éditeur
+     *
+     * @param editeurCreeEvent Evénement de création d'un éditeur
+     * @throws JsonProcessingException Si le contact commercial ou le contact technique n'a pas pu être transformé
+     *                                 en chaîne de caractère pour l'insertion dans la base de données.
+     */
     public EditeurEventEntity(EditeurCreeEvent editeurCreeEvent) throws JsonProcessingException {
         this.event = "editeurCree";
         this.dateCreationEvent = editeurCreeEvent.created;
@@ -71,6 +80,13 @@ public class EditeurEventEntity implements Serializable {
         this.listeContactTechniqueEditeur = mapper.writeValueAsString(editeurCreeEvent.getListeContactTechniqueEditeur());
     }
 
+    /**
+     * CTOR à partir d'un événement de modification d'éditeur
+     *
+     * @param editeurModifieEvent Evénement de modification d'un éditeur
+     * @throws JsonProcessingException Si le contact commercial ou le contact technique n'a pas pu être transformé
+     *                                 en chaîne de caractère pour l'insertion dans la base de données.
+     */
     public EditeurEventEntity(EditeurModifieEvent editeurModifieEvent) throws JsonProcessingException {
         this.event = "editeurModifie";
         this.dateCreationEvent = editeurModifieEvent.created;
@@ -82,6 +98,11 @@ public class EditeurEventEntity implements Serializable {
         this.listeContactTechniqueEditeur = mapper.writeValueAsString(editeurModifieEvent.getListeContactTechniqueEditeur());
     }
 
+    /**
+     * CTOR à partir d'un événement de fusion d'éditeur
+     *
+     * @param editeurFusionneEvent Evénement de fusion d'un éditeur
+     */
     public EditeurEventEntity(EditeurFusionneEvent editeurFusionneEvent) {
         this.event = "editeurFusione";
         this.dateCreationEvent = editeurFusionneEvent.created;
@@ -90,9 +111,42 @@ public class EditeurEventEntity implements Serializable {
         this.idEditeurFusionnes = editeurFusionneEvent.getIdEditeurFusionnes();
     }
 
+    /**
+     * CTOR à partir d'un événement de suppresion d'éditeur
+     *
+     * @param editeurSupprimeEvent Evénement de supression d'un éditeur
+     */
     public EditeurEventEntity(EditeurSupprimeEvent editeurSupprimeEvent) {
         this.event = "editeurSupprime";
         this.dateCreationEvent = editeurSupprimeEvent.created;
         //this.id = editeurSupprimeEvent.getId(); ==> Error attempting to apply AttributeConverter
+        // TODO : pourquoi cette ligne est commentée ?
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return id != null && id.equals(((EditeurEventEntity) obj).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return 2021;
+    }
+
+    @Override
+    public String toString() {
+        return "EditeurEventEntity {" + "id=" + id + ", événement=" + event + ", nom de l'éditeur=" + nomEditeur + " }";
     }
 }

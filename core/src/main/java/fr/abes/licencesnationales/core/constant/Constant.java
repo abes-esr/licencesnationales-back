@@ -3,7 +3,9 @@ package fr.abes.licencesnationales.core.constant;
 
 import java.io.Serializable;
 
-
+/**
+ * //TODO: Pourquoi il y a du JWT_TOKEN ici dans le core ?
+ */
 public class Constant implements Serializable {
     private static final long serialVersionUID = 1L;
 

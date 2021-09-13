@@ -17,12 +17,14 @@ import java.util.*;
 
 @Entity
 @Table(name = "Editeur")
-@NoArgsConstructor @AllArgsConstructor
-@Getter @Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
 public class EditeurEntity implements Serializable {
 
     @Id
-    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "editeur_Sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeur_Sequence")
     @SequenceGenerator(name = "editeur_Sequence", sequenceName = "EDITEUR_SEQ", allocationSize = 1)
     private Long idEditeur;
 
@@ -42,14 +44,25 @@ public class EditeurEntity implements Serializable {
     @Lob
     private List<String> groupesEtabRelies = new ArrayList<>();
 
-    @OneToMany(targetEntity= ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Where(clause = "DTYPE='commercial'")
     private Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities = new HashSet<>();
 
-    @OneToMany(targetEntity= ContactTechniqueEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY,cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(targetEntity = ContactTechniqueEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Where(clause = "DTYPE='technique'")
     private Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities = new HashSet<>();
 
+    /**
+     * CTOR d'un éditeur avec un identifiant
+     *
+     * @param idEditeur
+     * @param nomEditeur
+     * @param identifiantEditeur
+     * @param adresseEditeur
+     * @param dateCreation
+     * @param contactCommercialEditeurEntities
+     * @param contactTechniqueEditeurEntities
+     */
     public EditeurEntity(Long idEditeur,
                          String nomEditeur,
                          String identifiantEditeur,
@@ -64,5 +77,33 @@ public class EditeurEntity implements Serializable {
         this.dateCreation = dateCreation;
         this.contactCommercialEditeurEntities = contactCommercialEditeurEntities;
         this.contactTechniqueEditeurEntities = contactTechniqueEditeurEntities;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+
+        return (idEditeur != null && idEditeur.equals(((EditeurEntity) obj).idEditeur)) ||
+                (idEditeur == null && nomEditeur.equals(((EditeurEntity) obj).nomEditeur));
+    }
+
+    @Override
+    public int hashCode() {
+        return 2021;
+    }
+
+    @Override
+    public String toString() {
+        return "EditeurEntity {" + "id=" + idEditeur + ", nom=" + nomEditeur + " }";
     }
 }

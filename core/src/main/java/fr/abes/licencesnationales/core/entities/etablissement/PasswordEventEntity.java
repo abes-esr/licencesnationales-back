@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.core.entities;
+package fr.abes.licencesnationales.core.entities.etablissement;
 
 import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
 import lombok.NoArgsConstructor;
@@ -24,6 +24,10 @@ public class PasswordEventEntity implements Serializable {
     @Column(name = "EVENT")
     public String event;
 
+    /**
+     * CTOR à partir d'un événement de modification de mot de passe
+     * @param updatePasswordEvent Evénement de modification de mot de passe
+     */
     public PasswordEventEntity(UpdatePasswordEvent updatePasswordEvent) {
         this.event = "motDePasseMisAJour";
         this.dateCreationEvent = updatePasswordEvent.created;

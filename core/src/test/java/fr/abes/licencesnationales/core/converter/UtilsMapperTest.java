@@ -1,12 +1,12 @@
 package fr.abes.licencesnationales.core.converter;
 
+import fr.abes.licencesnationales.core.converter.etablissement.EtablissementEntityConverter;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, EntityConverter.class})
+@SpringBootTest(classes = {UtilsMapper.class, EtablissementEntityConverter.class})
 public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;

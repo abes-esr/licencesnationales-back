@@ -18,6 +18,7 @@ import java.util.Set;
 @Component
 @Slf4j
 public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent> {
+
     private final EditeurRepository editeurRepository;
 
     @Autowired
@@ -25,7 +26,6 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
 
     @Autowired
     ContactTechniqueEditeurRepository ctRepository;
-
 
     private final UtilsMapper utilsMapper;
 
@@ -42,7 +42,6 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
         log.debug("editeurCreeEvent.getEditeur().getDateCreation()" + editeurCreeEvent.getDateCreation());
 
         EditeurEntity editeurEntity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
-
 
         Set<ContactCommercialEditeurEntity> CC = editeurEntity.getContactCommercialEditeurEntities();
         Set<ContactTechniqueEditeurEntity> CT = editeurEntity.getContactTechniqueEditeurEntities();

@@ -12,6 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Evénement de création d'un éditeur
+ */
 @Getter
 @Setter
 public class EditeurCreeEvent extends Event {
