@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
-import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
@@ -37,11 +36,6 @@ public abstract class IpEntity implements Serializable {
     private String ip;
 
     /**
-     * Booléen si l'IP est validée par les administrateurs
-     */
-    private boolean validee;
-
-    /**
      * Date de création de l'adresse IP
      */
     private Date dateCreation;
@@ -76,7 +70,6 @@ public abstract class IpEntity implements Serializable {
         }
 
         this.ip = ip;
-        this.validee = false;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
     }
@@ -97,7 +90,6 @@ public abstract class IpEntity implements Serializable {
         }
 
         this.ip = ip;
-        this.validee = false;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
     }

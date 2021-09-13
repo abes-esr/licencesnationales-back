@@ -73,8 +73,8 @@ public class EtablissementController {
     private String admin;
 
     @PostMapping("/creationCompte")
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto eventDTO) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
-        String captcha = eventDTO.getRecaptcha();
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+        String captcha = etablissementCreeWebDto.getRecaptcha();
         String action = "creationCompte";
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
@@ -84,81 +84,81 @@ public class EtablissementController {
         }
 
         //verifier que le siren n'est pas déjà en base
-        boolean existeSiren = etablissementService.existeSiren(eventDTO.getSiren());
+        boolean existeSiren = etablissementService.existeSiren(etablissementCreeWebDto.getSiren());
         log.info("existeSiren = "+ existeSiren);
         if (existeSiren) {
             throw new SirenExistException("Cet établissement existe déjà.");
         }
         //verifier que le mail du contact n'est pas déjà en base
-        if (contactService.existeMail(eventDTO.getContact().getMail())) {
+        if (contactService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
         else{
-            EtablissementCreeEvent etablissementCreeEvent = mapper.map(eventDTO, EtablissementCreeEvent.class);
+            EtablissementCreeEvent etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEvent.class);
             applicationEventPublisher.publishEvent(etablissementCreeEvent);
             etablissementEventRepository.save(new EtablissementEventEntity(etablissementCreeEvent));
-            emailService.constructCreationCompteEmailUser(eventDTO.getContact().getMail());
-            emailService.constructCreationCompteEmailAdmin(admin, eventDTO.getSiren(), eventDTO.getName());
+            emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
+            emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
         }
     }
 
 
     @PostMapping(value = "/modification")
-    public void edit(@Valid @RequestBody EtablissementModifieWebDto eventDTO) throws SirenIntrouvableException, AccesInterditException {
+    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut EtablissementController modification");
         EtablissementModifieEvent etablissementModifieEvent =
                 new EtablissementModifieEvent(this,
                         filtrerAccesServices.getSirenFromSecurityContextUser(),
-                        eventDTO.getNomContact(),
-                        eventDTO.getPrenomContact(),
-                        eventDTO.getMailContact(),
-                        eventDTO.getTelephoneContact(),
-                        eventDTO.getAdresseContact(),
-                        eventDTO.getBoitePostaleContact(),
-                        eventDTO.getCodePostalContact(),
-                        eventDTO.getVilleContact(),
-                        eventDTO.getCedexContact());
+                        etablissementModifieWebDto.getNomContact(),
+                        etablissementModifieWebDto.getPrenomContact(),
+                        etablissementModifieWebDto.getMailContact(),
+                        etablissementModifieWebDto.getTelephoneContact(),
+                        etablissementModifieWebDto.getAdresseContact(),
+                        etablissementModifieWebDto.getBoitePostaleContact(),
+                        etablissementModifieWebDto.getCodePostalContact(),
+                        etablissementModifieWebDto.getVilleContact(),
+                        etablissementModifieWebDto.getCedexContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
         etablissementEventRepository.save(new EtablissementEventEntity(etablissementModifieEvent));
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto eventDTO) throws JsonProcessingException {
+    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEvent etablissementFusionneEvent
                 = new EtablissementFusionneEvent(this,
-                eventDTO.getNom(),
-                eventDTO.getSiren(),
-                eventDTO.getTypeEtablissement(),
-                eventDTO.getIdAbes(),
-                eventDTO.getNomContact(),
-                eventDTO.getPrenomContact(),
-                eventDTO.getAdresseContact(),
-                eventDTO.getBoitePostaleContact(),
-                eventDTO.getCodePostalContact(),
-                eventDTO.getVilleContact(),
-                eventDTO.getCedexContact(),
-                eventDTO.getTelephoneContact(),
-                eventDTO.getMailContact(),
-                eventDTO.getMotDePasse(),
-                eventDTO.getRoleContact(),
-                eventDTO.getSirenFusionnes());
+                etablissementFusionneWebDto.getNom(),
+                etablissementFusionneWebDto.getSiren(),
+                etablissementFusionneWebDto.getTypeEtablissement(),
+                etablissementFusionneWebDto.getIdAbes(),
+                etablissementFusionneWebDto.getNomContact(),
+                etablissementFusionneWebDto.getPrenomContact(),
+                etablissementFusionneWebDto.getAdresseContact(),
+                etablissementFusionneWebDto.getBoitePostaleContact(),
+                etablissementFusionneWebDto.getCodePostalContact(),
+                etablissementFusionneWebDto.getVilleContact(),
+                etablissementFusionneWebDto.getCedexContact(),
+                etablissementFusionneWebDto.getTelephoneContact(),
+                etablissementFusionneWebDto.getMailContact(),
+                etablissementFusionneWebDto.getMotDePasse(),
+                etablissementFusionneWebDto.getRoleContact(),
+                etablissementFusionneWebDto.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         etablissementEventRepository.save(new EtablissementEventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseWebDto eventDTO) throws JsonProcessingException {
-        EtablissementDiviseEvent etablissementDiviseEvent = mapper.map(eventDTO, EtablissementDiviseEvent.class);
+    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws JsonProcessingException {
+        EtablissementDiviseEvent etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEvent.class);
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         etablissementEventRepository.save(new EtablissementEventEntity(etablissementDiviseEvent));
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(HttpServletRequest request,  @PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
+    public void suppression(@PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
         //envoi du mail de suppression
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
