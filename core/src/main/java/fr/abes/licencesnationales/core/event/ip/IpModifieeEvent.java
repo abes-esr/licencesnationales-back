@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.core.event.ip;
 
-import fr.abes.licencesnationales.core.dto.ip.IpModifieeDto;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;

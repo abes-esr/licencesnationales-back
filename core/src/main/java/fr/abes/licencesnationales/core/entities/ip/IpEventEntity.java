@@ -4,7 +4,9 @@ import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpValideeEvent;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -13,6 +15,8 @@ import java.util.Date;
 @Entity
 @Table(name = "IpEvent")
 @NoArgsConstructor
+@Getter
+@Setter
 public class IpEventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy= GenerationType.SEQUENCE, generator = "ipevent_Sequence")
@@ -30,8 +34,6 @@ public class IpEventEntity implements Serializable {
 
     @Column(name = "IP")
     private String ip;
-
-
 
     public IpEventEntity(IpAjouteeEvent ipAjouteeEvent) {
         this.event = "ipAjoutee";

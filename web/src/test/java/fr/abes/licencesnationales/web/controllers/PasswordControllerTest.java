@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.MockUserUtil;
+import fr.abes.licencesnationales.MockUserUtilTest;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.PasswordEventEntity;
 import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
@@ -66,7 +66,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
 
     @BeforeEach
     public void init() {
-        user = new MockUserUtil(passwordEncoder).getMockUser();
+        user = new MockUserUtilTest(passwordEncoder).getMockUser();
     }
 
     @Test

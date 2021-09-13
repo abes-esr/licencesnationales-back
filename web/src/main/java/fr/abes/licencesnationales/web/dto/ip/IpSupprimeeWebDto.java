@@ -2,11 +2,13 @@ package fr.abes.licencesnationales.web.dto.ip;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
+@NoArgsConstructor
 @AllArgsConstructor
-public class Ipv4ModifieeWebDto extends IpModifieeWebDto {
-
+@Getter @Setter
+public class IpSupprimeeWebDto {
+    private Long id;
+    private String siren;
 }

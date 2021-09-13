@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.MockUserUtil;
+import fr.abes.licencesnationales.MockUserUtilTest;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.web.security.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.web.security.payload.request.LoginRequest;
@@ -58,7 +58,7 @@ public class AuthenticationControllerTest
 
     @BeforeEach
     public void init() throws DonneeIncoherenteBddException {
-        EtablissementEntity localUser = new MockUserUtil(passwordEncoder).getMockUser();
+        EtablissementEntity localUser = new MockUserUtilTest(passwordEncoder).getMockUser();
         Mockito.when(authenticationManager
                 .authenticate(new UsernamePasswordAuthenticationToken(localUser.getSiren(), localUser.getContact().getMotDePasse()))).thenReturn(authentication);
 

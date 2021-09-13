@@ -2,13 +2,9 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.ip.*;
-import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
-import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
-import fr.abes.licencesnationales.core.entities.ip.IpType;
-import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
-import fr.abes.licencesnationales.web.dto.ip.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
@@ -16,11 +12,12 @@ import fr.abes.licencesnationales.core.event.ip.IpValideeEvent;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
-import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.IpService;
+import fr.abes.licencesnationales.web.dto.ip.*;
+import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,9 +51,6 @@ public class IpController {
 
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private IpService ipService;
 
     @Autowired
     private UtilsMapper mapper;
@@ -109,8 +103,7 @@ public class IpController {
         traiterAjoutIp(event, event.getSiren());
     }
 
-    public void traiterAjoutIp(IpAjouteeDto event, String siren) throws IpException, RestClientException {
-
+    public void traiterAjoutIp(IpAjouteeWebDto event, String siren) throws IpException, RestClientException {
         IpAjouteeEvent ipAjouteeEvent = new IpAjouteeEvent(this,
                 siren,
                 IpType.valueOf(event.getTypeIp()),
@@ -172,7 +165,7 @@ public class IpController {
         traiterModifIp(event, event.getSiren());
     }
 
-    public void traiterModifIp(IpModifieeDto ipModifieeDto, String siren) throws IpException, RestClientException {
+    public void traiterModifIp(IpModifieeWebDto ipModifieeDto, String siren) throws IpException, RestClientException {
         IpModifieeEvent ipModifieeEvent = new IpModifieeEvent(this,
                 ipModifieeDto.getId(),
                 siren,
@@ -192,7 +185,7 @@ public class IpController {
 
 
     @PostMapping(value = "/valide")
-    public void validate(@RequestBody IpValideeDto ipValideeDto) throws SirenIntrouvableException, AccesInterditException {
+    public void validate(@RequestBody IpValideeWebDto ipValideeDto) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(ipValideeDto.getSiren());
         IpValideeEvent ipValideeEvent = new IpValideeEvent(this,
                 ipValideeDto.getIp(),
@@ -202,7 +195,7 @@ public class IpController {
     }
 
     @DeleteMapping(value = "/supprime")
-    public void delete(@Valid @RequestBody IpSupprimeeDto ipSupprimeeDto) throws SirenIntrouvableException, AccesInterditException {
+    public void delete(@Valid @RequestBody IpSupprimeeWebDto ipSupprimeeDto) throws SirenIntrouvableException, AccesInterditException {
         IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
                 ipSupprimeeDto.getId(),
                 filtrerAccesServices.getSirenFromSecurityContextUser());
@@ -212,7 +205,7 @@ public class IpController {
 
     @DeleteMapping(value = "/supprimeByAdmin")
     @PreAuthorize("hasAuthority('admin')")
-    public void deleteByAdmin(@Valid @RequestBody IpSupprimeeDto ipSupprimeeDto) {
+    public void deleteByAdmin(@Valid @RequestBody IpSupprimeeWebDto ipSupprimeeDto) {
         IpSupprimeeEvent ipSupprimeeEvent = new IpSupprimeeEvent(this,
                 ipSupprimeeDto.getId(),
                 ipSupprimeeDto.getSiren());
@@ -237,9 +230,8 @@ public class IpController {
     }
 
     @PostMapping(value = "/getIpEntity")
-    public IpWebDto getIpEntity(@RequestBody IpDto ipDto) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(ipDto.getSiren());
-        Long identifiant = Long.parseLong(ipDto.getId());
-        return mapper.map(ipRepository.getFirstById(identifiant), IpWebDto.class);
+    public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException {
+        filtrerAccesServices.autoriserServicesParSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+        return mapper.map(ipRepository.getFirstById(ipDto.getId()), IpWebDto.class);
     }
 }

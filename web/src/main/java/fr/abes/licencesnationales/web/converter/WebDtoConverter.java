@@ -2,8 +2,8 @@ package fr.abes.licencesnationales.web.converter;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
@@ -142,6 +142,5 @@ public class WebDtoConverter {
         };
         utilsMapper.addConverter(myConverter);
     }
-
 
 }
