@@ -1,18 +1,18 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import fr.abes.licencesnationales.core.entities.etablissement.PasswordEventEntity;
+import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordUpdateWebDto;
-import fr.abes.licencesnationales.core.entities.ContactEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
 import fr.abes.licencesnationales.web.dto.password.TokenDto;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.core.repository.EventRepository;
 import fr.abes.licencesnationales.web.security.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
@@ -65,7 +65,7 @@ public class PasswordController {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    private EventRepository eventRepository;
+    private PasswordEventRepository eventRepository;
 
 
     @ApiOperation(value = "permet de ",
@@ -146,7 +146,7 @@ public class PasswordController {
             if (!passwordEncoder.matches(newPasswordHash, c.getMotDePasse())) {
                 UpdatePasswordEvent updatePasswordEvent = new UpdatePasswordEvent(this, siren, newPasswordHash);
                 applicationEventPublisher.publishEvent(updatePasswordEvent);
-                eventRepository.save(new EventEntity(updatePasswordEvent));
+                eventRepository.save(new PasswordEventEntity(updatePasswordEvent));
             } else {
                 throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");
             }

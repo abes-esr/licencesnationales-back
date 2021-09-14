@@ -1,12 +1,11 @@
 package fr.abes.licencesnationales.web.security.services.impl;
 
 
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.web.security.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

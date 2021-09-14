@@ -1,5 +1,7 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -7,14 +9,13 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
-columnDefinition = "SMALLINT(1)")
+        columnDefinition = "SMALLINT")
 @DiscriminatorValue("1")
 @Table(name = "Ip")
 @NoArgsConstructor
@@ -35,11 +36,6 @@ public abstract class IpEntity implements Serializable {
     private String ip;
 
     /**
-     * Booléen si l'IP est validée par les administrateurs
-     */
-    private boolean validee;
-
-    /**
      * Date de création de l'adresse IP
      */
     private Date dateCreation;
@@ -54,29 +50,40 @@ public abstract class IpEntity implements Serializable {
      */
     private String commentaires;
 
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ref_etablissement")
+    private EtablissementEntity etablissement;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "ref_statut")
+    private StatutIpEntity statut;
+
     /**
      * CTOR d'une IP générique sans identifiant connu
      *
-     * @param ip
-     * @param commentaires
+     * @param ip           IP ou plage d'IP en chaîne de caractère selon la norme de l'application
+     *                     XXX.XX-XX.XXX.XXX
+     * @param commentaires Commentaire libre
+     * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
     public IpEntity(String ip, String commentaires) throws IpException {
-        if (ip==null || ip.isEmpty()) {
+        if (ip == null || ip.isEmpty()) {
             throw new IpException("Ip ne peut pas être nulle");
         }
 
         this.ip = ip;
-        this.validee = false;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
     }
 
     /**
      * CTOR d'une IP générique avec un identifiant connu
-     * @param id
-     * @param ip
-     * @param commentaires
-     * @throws IpException
+     *
+     * @param id           Identifiant de l'IP
+     * @param ip           IP ou plage d'IP en chaîne de caractère selon la norme de l'application
+     *                     XXX.XX-XX.XXX.XXX
+     * @param commentaires Commentaire libre
+     * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
     public IpEntity(Long id, String ip, String commentaires) throws IpException {
 
@@ -87,7 +94,6 @@ public abstract class IpEntity implements Serializable {
         }
 
         this.ip = ip;
-        this.validee = false;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
     }

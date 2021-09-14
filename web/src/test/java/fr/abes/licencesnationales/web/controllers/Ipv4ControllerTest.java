@@ -2,18 +2,17 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
-import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeDto;
-import fr.abes.licencesnationales.web.dto.ip.Ipv4ModifieeDto;
+import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.Ipv4ModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
 
 
     @MockBean
-    private EventRepository eventRepository;
+    private IpEventRepository eventRepository;
 
     @MockBean
     private EtablissementService etablissementService;
@@ -74,7 +73,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         //Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new IpEventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
@@ -83,7 +82,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
 
 
     public void ipv4Regex(String ipv4, boolean validates) throws NoSuchFieldException {
-        Field field = Ipv4AjouteeDto.class.getDeclaredField("ip");
+        Field field = Ipv4AjouteeWebDto.class.getDeclaredField("ip");
         javax.validation.constraints.Pattern[] annotations = field.getAnnotationsByType(javax.validation.constraints.Pattern.class);
         assertEquals(ipv4.matches(annotations[0].regexp()),validates);
     }
@@ -119,36 +118,36 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("invalid Pattern Ipv4 Fail Validation")
     public void invalidPatternIpv4FailValidation() {
 
-        Ipv4AjouteeDto ipv4 = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto ipv4 = new Ipv4AjouteeWebDto();
         ipv4.setSiren("123456789");
         ipv4.setTypeAcces("ip");
         ipv4.setTypeIp("IPV4");
         ipv4.setIp("mmmmmmmmmm");
         ipv4.setCommentaires("comm");
-        Set<ConstraintViolation<Ipv4AjouteeDto>> violations = validator.validate(ipv4);
+        Set<ConstraintViolation<Ipv4AjouteeWebDto>> violations = validator.validate(ipv4);
         assertFalse(violations.isEmpty());
     }
     @Test
     @DisplayName("validPatternIpv4Validation")
     public void validPatternIpv4Validation() {
 
-        Ipv4AjouteeDto ipv4 = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto ipv4 = new Ipv4AjouteeWebDto();
         ipv4.setSiren("123456789");
         ipv4.setTypeAcces("ip");
         ipv4.setTypeIp("IPV4");
         ipv4.setIp("192.168.10.2");
         ipv4.setCommentaires("comm");
-        Set<ConstraintViolation<Ipv4AjouteeDto>> violations = validator.validate(ipv4);
+        Set<ConstraintViolation<Ipv4AjouteeWebDto>> violations = validator.validate(ipv4);
         assertTrue(violations.isEmpty());
     }
 
     ////////////////////////////////////ajout ipv4//////////////////////////////////////////////////
     @Test
-    @DisplayName("test Etab ajout IPV4 succes")
+    @DisplayName("test Etab ajout IPV4 réservée")
     @WithMockUser
-    public void testEtabAjoutIPV4Succes() throws Exception {
+    public void testEtabAjoutIPV4Reserved() throws Exception {
 
-        Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto dto = new Ipv4AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20.6");
         dto.setCommentaires("Cette ip etc");
@@ -156,7 +155,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
         dto.setTypeIp("IPV4");
         this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV4")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-                .andExpect(status().isOk());
+                .andExpect(status().isBadRequest()).andExpect(jsonPath("$.message").value("192.168.20.6/32 est inclus dans les IP réservées 192.168.0.0-192.168.254.254"));
     }
     //ce test peut apparaitre mauvais mais est bon : c'est l'ordre des arguments du debugMessage qui est aléatoire...
     @Test
@@ -164,7 +163,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testEtabAjoutIPV4Failed() throws Exception {
 
-        Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto dto = new Ipv4AjouteeWebDto();
         //le traitement ne sera pas bloqué car le siren n'est pas obligatoire dans le dto puisqu'il est récupéré via le token
         //cf : getSirenFromSecurityContextUser()
         dto.setSiren(null);
@@ -175,9 +174,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV4")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(jsonPath("$.debugMessage").value("Incorrect fields : L'IP est obligatoire, Le type acces est obligatoire, Le type ip est obligatoire, "));
-
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"));
     }
 
     @Test
@@ -185,9 +182,9 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser(authorities = {"admin"})
     public void testAdminAjoutIPV4Succes() throws Exception {
 
-        Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto dto = new Ipv4AjouteeWebDto();
         dto.setSiren("123456789");
-        dto.setIp("192.168.20.6");
+        dto.setIp("123.123.123.123");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV4");
@@ -200,7 +197,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser // on ne precise pas role admin
     public void testAdminAjoutIPV4Failed() throws Exception {
 
-        Ipv4AjouteeDto dto = new Ipv4AjouteeDto();
+        Ipv4AjouteeWebDto dto = new Ipv4AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20.6");
         dto.setCommentaires("Cette ip etc");
@@ -217,9 +214,9 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testEtabModifierIPV4Succes() throws Exception {
 
-        Ipv4ModifieeDto dto = new Ipv4ModifieeDto();
+        Ipv4ModifieeWebDto dto = new Ipv4ModifieeWebDto();
         dto.setSiren("123456789");
-        dto.setIp("192.168.20.6");
+        dto.setIp("123.123.123.123");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV4");
@@ -233,7 +230,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser
     public void testEtabModifierIPV4Failed() throws Exception {
 
-        Ipv4ModifieeDto dto = new Ipv4ModifieeDto();
+        Ipv4ModifieeWebDto dto = new Ipv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-1.6-2");
         dto.setCommentaires("Cette ip etc");
@@ -253,9 +250,9 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser(authorities = {"admin"})
     public void testAdminModifierIPV4Succes() throws Exception {
 
-        Ipv4ModifieeDto dto = new Ipv4ModifieeDto();
+        Ipv4ModifieeWebDto dto = new Ipv4ModifieeWebDto();
         dto.setSiren("123456789");
-        dto.setIp("192.168.20.6");
+        dto.setIp("123.123.123.123");
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces("ip");
         dto.setTypeIp("IPV4");
@@ -269,7 +266,7 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
     @WithMockUser //on ne precise pas le role admin
     public void testAdminModifierIPV4Failed() throws Exception {
 
-        Ipv4ModifieeDto dto = new Ipv4ModifieeDto();
+        Ipv4ModifieeWebDto dto = new Ipv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20.6");
         dto.setCommentaires("Cette ip etc");

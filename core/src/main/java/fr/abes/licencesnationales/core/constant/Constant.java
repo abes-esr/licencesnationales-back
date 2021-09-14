@@ -3,7 +3,9 @@ package fr.abes.licencesnationales.core.constant;
 
 import java.io.Serializable;
 
-
+/**
+ * //TODO: Pourquoi il y a du JWT_TOKEN ici dans le core ?
+ */
 public class Constant implements Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -37,15 +39,19 @@ public class Constant implements Serializable {
     public static final String JWT_TOKEN_INVALID = "Invalid JWT token : {}";
     public static final String JWT_SIGNATURE_INVALID = "Invalid JWT signature : {}";
 
-    /**Ip service */
+    /** Statuts établissement */
+    public static final int STATUT_ETAB_NOUVEAU = 1;
+    public static final int STATUT_ETAB_AUCUNEIP = 2;
+    public static final int STATUT_ETAB_ENVALIDATION = 3;
+    public static final int STATUT_ETAB_ATTESTATION = 4;
+    public static final int STATUT_ETAB_VALIDE = 5;
 
-    public static final int IP_NOT_CONTAINED = 0;
-    public static final int IP_CONTAINED = 1;
-    public static final int IP_CONTAINS = 2;
-    public static final int IP_CROSS = 3;
-    public static final int IP_SAME = 4;
-    public static final int IP_RESERVED = 5;
-    public static final int IP_NOT_RESERVED = 0;
+    /** Statuts IP */
+    public static final int STATUT_IP_NOUVELLE = 6;
+    public static final int STATUT_IP_ATTESTATION = 7;
+    public static final int STATUT_IP_VALIDEE = 8;
+    public static final int STATUT_IP_AUCUNEIP = 9;
+
 
     /**Email service */
     public static final String ERROR_CONVERSION_MAIL_TO_JSON = "Erreur lors de la conversion Mail-Json";

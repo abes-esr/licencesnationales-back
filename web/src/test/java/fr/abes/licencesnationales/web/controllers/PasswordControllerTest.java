@@ -2,10 +2,10 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.MockUserUtil;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.MockUserUtilTest;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.PasswordEventEntity;
+import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
@@ -54,7 +54,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
     private ApplicationEventPublisher applicationEventPublisher;
 
     @MockBean
-    private EventRepository eventRepository;
+    private PasswordEventRepository eventRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -66,7 +66,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
 
     @BeforeEach
     public void init() {
-        user = new MockUserUtil(passwordEncoder).getMockUser();
+        user = new MockUserUtilTest(passwordEncoder).getMockUser();
     }
 
     @Test
@@ -131,7 +131,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
         Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.any())).thenReturn("123456789");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(user);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new PasswordEventEntity());
 
         dto.setOldPassword("OldPass1Test&");
         dto.setNewPassword("NewPass1Test&");
@@ -148,7 +148,7 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
         Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.any())).thenReturn("123456789");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(user);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new PasswordEventEntity());
 
         //on teste le cas ou l'ancien mot de passe ne correspond pas à celui en base
         dto.setOldPassword("OldPass1&");

@@ -1,18 +1,17 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.dto.editeur.*;
-import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEventEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
+import fr.abes.licencesnationales.core.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurSupprimeEvent;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.repository.ContactCommercialEditeurRepository;
-import fr.abes.licencesnationales.core.repository.ContactTechniqueEditeurRepository;
+import fr.abes.licencesnationales.core.repository.EditeurEventRepository;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
-import fr.abes.licencesnationales.core.repository.EventRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,60 +28,53 @@ public class EditeurService {
     private EditeurRepository dao;
 
     @Autowired
-    ContactCommercialEditeurRepository daoCC;
-
-    @Autowired
-    ContactTechniqueEditeurRepository daoCT;
-
-
-
-    @Autowired EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
-    private EventRepository eventRepository;
+    private EditeurEventRepository eventRepository;
 
-    public void addEditeur(@Valid EditeurCreeDto editeur) throws MailDoublonException {
+    @Autowired
+    private UtilsMapper mapper;
+
+    public void addEditeur(@Valid EditeurCreeEvent editeur) throws MailDoublonException, JsonProcessingException {
 
         log.info("debut addEditeur");
-        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
+        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeur(),editeur.getListeContactTechniqueEditeur());
         if (existeMail) {
             log.info("existeMail");
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         else{
-            EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this, editeur);
-            log.debug("editeurCreeEvent nomEditeur" + editeurCreeEvent.getEditeur().getNomEditeur());
-            log.debug("editeurCreeEvent identifiantEditeur" + editeurCreeEvent.getEditeur().getIdentifiantEditeur());
-            log.debug("editeurCreeEvent dateCreation" + editeurCreeEvent.getEditeur().getDateCreation());
-            log.debug("editeurCreeEvent groupesEtabRelies" + editeurCreeEvent.getEditeur().getGroupesEtabRelies());
-            log.debug("editeurCreeEvent adresseEditeur" + editeurCreeEvent.getEditeur().getAdresseEditeur());
-
-            Set<ContactCommercialEditeurDto> s = editeurCreeEvent.getEditeur().getListeContactCommercialEditeurDto();
-            for(ContactCommercialEditeurDto c:s) {
-                log.debug("editeurCreeEvent.getListeContactCommercialEditeurDto() = " + c.mailContactCommercial + c.prenomContactCommercial + c.nomContactCommercial);
+            log.info("addEditeur 1");
+            log.info("editeurCreeEvent.get" + editeur.getNomEditeur());
+            log.info("editeurCreeEvent.get" + editeur.getAdresseEditeur());
+            log.info("editeurCreeEvent.get" + editeur.getDateCreation());
+            Set<ContactCommercialEditeurEntity> s = editeur.getListeContactCommercialEditeur();
+            for(ContactCommercialEditeurEntity c:s) {
+                log.info("editeurCreeEvent.getListeContactCommercialEditeurDto() = " + c.getMailContact() + c.getPrenomContact() + c.getNomContact());
             }
-            applicationEventPublisher.publishEvent(editeurCreeEvent);
-            eventRepository.save(new EventEntity(editeurCreeEvent));
+            applicationEventPublisher.publishEvent(editeur);
+            log.info("addEditeur 2");
+            eventRepository.save(new EditeurEventEntity(editeur));
         }
     }
 
-    public void updateEditeur(EditeurModifieDto editeur) throws MailDoublonException {
+    public void updateEditeur(EditeurModifieEvent editeur) throws MailDoublonException, JsonProcessingException {
         //verifier que le mail du contact n'est pas déjà en base
-        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeurDto(),editeur.getListeContactTechniqueEditeurDto());
+        boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeur(),editeur.getListeContactTechniqueEditeur());
         if (existeMail) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         else {
-            EditeurModifieEvent editeurModifieEvent = new EditeurModifieEvent(this, editeur);
-            applicationEventPublisher.publishEvent(editeurModifieEvent);
-            eventRepository.save(new EventEntity(editeurModifieEvent));
+            applicationEventPublisher.publishEvent(editeur);
+            eventRepository.save(new EditeurEventEntity(editeur));
         }
     }
 
-    public void fusionEditeur(EditeurFusionneDto editeur) {
+    public void fusionEditeur(EditeurFusionneEvent editeur) {
         //TODO : coder méthode fusion éditeur couche service
     }
 
@@ -102,7 +94,7 @@ public class EditeurService {
     public void deleteEditeur(String id) {
         EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Long.valueOf(id));
         applicationEventPublisher.publishEvent(editeurSupprimeEvent);
-        eventRepository.save(new EventEntity(editeurSupprimeEvent));
+        eventRepository.save(new EditeurEventEntity(editeurSupprimeEvent));
     }
 
     public void deleteById(Long id) {

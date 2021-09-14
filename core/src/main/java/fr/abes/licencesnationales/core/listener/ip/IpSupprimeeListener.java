@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.listener.ip;
 
 
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;

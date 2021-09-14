@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Convertisseurs entre les DTO et les Entités
+ * Cette classe utilitaire permet de convertir des objets d'un type source vers un type cible.
  */
 @Component
 @Slf4j

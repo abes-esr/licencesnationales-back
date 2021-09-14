@@ -1,21 +1,16 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.editeur.ContactCommercialEditeurDto;
-import fr.abes.licencesnationales.core.dto.editeur.ContactTechniqueEditeurDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurCreeDto;
-import fr.abes.licencesnationales.core.dto.editeur.EditeurModifieDto;
-import fr.abes.licencesnationales.core.dto.ip.IpDto;
-import fr.abes.licencesnationales.core.entities.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
+import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
+import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.web.dto.editeur.*;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
-import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,17 +33,16 @@ public class EditeurController {
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
-    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException {
-        EditeurCreeDto editeurCreeDto = mapper.map(editeurCreeWebDTO, EditeurCreeDto.class);
-        editeurService.addEditeur(editeurCreeDto);
+    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
+        EditeurCreeEvent editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEvent.class);
+        editeurService.addEditeur(editeurCreeEvent);
     }
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException {
-        EditeurModifieDto editeurModifieDto = mapper.map(editeurModifieDTO, EditeurModifieDto.class);
-        editeurModifieDto.setId(id);
-        editeurService.updateEditeur(editeurModifieDto);
+    public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException, JsonProcessingException {
+        EditeurModifieEvent editeurModifieEvent = mapper.map(editeurModifieDTO, EditeurModifieEvent.class);
+        editeurService.updateEditeur(editeurModifieEvent);
     }
 
     @GetMapping(value = "/{id}")
@@ -61,16 +55,16 @@ public class EditeurController {
         Set<ContactTechniqueEditeurWebDto> CT = new HashSet<>();
         for (ContactCommercialEditeurEntity c:cc) {
             ContactCommercialEditeurWebDto cce = new ContactCommercialEditeurWebDto();
-            cce.nomContactCommercial = c.getNomContactCommercial();
-            cce.prenomContactCommercial = c.getPrenomContactCommercial();
-            cce.mailContactCommercial = c.getMailContactCommercial();
+            cce.nomContactCommercial = c.getNomContact();
+            cce.prenomContactCommercial = c.getPrenomContact();
+            cce.mailContactCommercial = c.getMailContact();
             CC.add(cce);
         }
         for (ContactTechniqueEditeurEntity t:ct) {
             ContactTechniqueEditeurWebDto cte = new ContactTechniqueEditeurWebDto();
-            cte.nomContactTechnique = t.getNomContactTechnique();
-            cte.prenomContactTechnique = t.getPrenomContactTechnique();
-            cte.mailContactTechnique = t.getMailContactTechnique();
+            cte.nomContactTechnique = t.getNomContact();
+            cte.prenomContactTechnique = t.getPrenomContact();
+            cte.mailContactTechnique = t.getMailContact();
             CT.add(cte);
         }
         //editeurEntity.setContactCommercialEditeurEntities(editeurService.getAllCCByIdEditeur(id));
