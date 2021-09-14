@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.entities.etablissement;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.etablissement.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -17,7 +18,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class EtablissementEventEntity implements Serializable {
+public class EtablissementEventEntity extends EventEntity implements Serializable {
 
     @Autowired
     @Transient
@@ -27,13 +28,6 @@ public class EtablissementEventEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "etabevent_Sequence")
     @SequenceGenerator(name = "etabevent_Sequence", sequenceName = "ETABEVENT_SEQ", allocationSize = 1)
     private Long id;
-
-    @Column(name = "DATE_CREATION_EVENT")
-    private Date dateCreationEvent;
-
-    // TODO : Pourquoi une chaîne et pas un enum ?
-    @Column(name = "EVENT")
-    private String event;
 
     @Column(name = "NOM_ETAB")
     private String nomEtab;

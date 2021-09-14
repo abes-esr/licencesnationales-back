@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
 import fr.abes.licencesnationales.core.event.ip.IpSupprimeeEvent;
@@ -17,17 +18,11 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public class IpEventEntity implements Serializable {
+public class IpEventEntity extends EventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ipevent_Sequence")
     @SequenceGenerator(name = "ipevent_Sequence", sequenceName = "IPEVENT_SEQ", allocationSize = 1)
     private Long id;
-
-    @Column(name = "DATE_CREATION_EVENT")
-    private Date dateCreationEvent;
-
-    @Column(name = "EVENT")
-    private String event;
 
     @Column(name = "SIREN")
     private String siren;
