@@ -15,6 +15,7 @@
     <!-- =========================================================== -->
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>web</artifactId>
+    <packaging>war</packaging>
     <name>Web API</name>
     <description>API RESTful de l'application.</description>
 
