@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.entities.editeur;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
@@ -20,7 +21,7 @@ import java.util.List;
 @Table(name = "EditeurEvent")
 @NoArgsConstructor
 @Getter
-public class EditeurEventEntity implements Serializable {
+public class EditeurEventEntity extends EventEntity implements Serializable {
 
     @Autowired
     @Transient
@@ -29,34 +30,28 @@ public class EditeurEventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeurevent_Sequence")
     @SequenceGenerator(name = "editeurevent_Sequence", sequenceName = "EDITEUREVENT_SEQ", allocationSize = 1)
-    public Long id;
-
-    @Column(name = "DATE_CREATION_EVENT")
-    public Date dateCreationEvent;
-
-    @Column(name = "EVENT")
-    public String event;
+    private Long id;
 
     @Column(name = "NOM_EDITEUR")
-    public String nomEditeur;
+    private String nomEditeur;
 
     @Column(name = "IDENTIFIANT_EDITEUR")
-    public String identifiantEditeur;
+    private String identifiantEditeur;
 
     @Column(name = "ADRESSE_EDITEUR")
-    public String adresseEditeur;
+    private String adresseEditeur;
 
     @Lob
     @Column(name = "GROUPES_ETAB_RELIES")
-    public List<String> groupesEtabRelies = new ArrayList<>();
+    private List<String> groupesEtabRelies = new ArrayList<>();
 
     @Lob
     @Column(name = "LISTE_CONTACT_COMMERCIAL_EDITEURDTO", columnDefinition = "CLOB")
-    public String listeContactCommercialEditeur;
+    private String listeContactCommercialEditeur;
 
     @Lob
     @Column(name = "LISTE_CONTACT_TECHNIQUE_EDITEURDTO")
-    public String listeContactTechniqueEditeur;
+    private String listeContactTechniqueEditeur;
 
     @Lob
     @Column(name = "ID_EDITEUR_FUSIONNES")

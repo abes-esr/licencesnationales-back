@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
+import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
 import lombok.NoArgsConstructor;
 
@@ -10,7 +11,7 @@ import java.util.Date;
 @Entity
 @Table(name = "PasswordEvent")
 @NoArgsConstructor
-public class PasswordEventEntity implements Serializable {
+public class PasswordEventEntity extends EventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "passwordevent_Sequence")
     @SequenceGenerator(name = "passwordevent_Sequence", sequenceName = "PASSWORDEVENT_SEQ", allocationSize = 1)
@@ -18,11 +19,7 @@ public class PasswordEventEntity implements Serializable {
 
     String siren;
     String motDePasse;
-    @Column(name = "DATE_CREATION_EVENT")
-    public Date dateCreationEvent;
 
-    @Column(name = "EVENT")
-    public String event;
 
     /**
      * CTOR à partir d'un événement de modification de mot de passe
