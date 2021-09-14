@@ -2,15 +2,14 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementCreeDto;
-import fr.abes.licencesnationales.core.dto.etablissement.EtablissementDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.web.dto.ContactWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,25 +52,25 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @Test
     @DisplayName("test création de compte")
     public void testCreationCompte() throws Exception {
-        EtablissementCreeDto dto = new EtablissementCreeDto();
+        EtablissementCreeWebDto dto = new EtablissementCreeWebDto();
         dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
-        EtablissementDto etablissementDto = new EtablissementDto();
-        etablissementDto.setNom("Etab de test 32");
-        etablissementDto.setSiren("123456789");
-        etablissementDto.setTypeEtablissement("EPIC/EPST");
-        etablissementDto.setIdAbes("");
-        etablissementDto.setNomContact("testNom");
-        etablissementDto.setPrenomContact("testPrenom");
-        etablissementDto.setAdresseContact("testAdresse");
-        etablissementDto.setBoitePostaleContact("testBP");
-        etablissementDto.setCedexContact("testCedex");
-        etablissementDto.setCodePostalContact("testCP");
-        etablissementDto.setVilleContact("testVille");
-        etablissementDto.setTelephoneContact("0000000000");
-        etablissementDto.setMailContact("test@test.com");
-        etablissementDto.setMotDePasse("testPassword");
+        dto.setName("Etab de test 32");
+        dto.setSiren("123456789");
+        dto.setTypeEtablissement("EPIC/EPST");
+        dto.setIdAbes("123456789");
+        ContactWebDto contact = new ContactWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        dto.setContact(contact);
+        dto.setMotDePasse("testPassword");
 
-        dto.setEtablissementDTO(etablissementDto);
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
@@ -91,25 +90,24 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @Test
     @DisplayName("test création de compte avec erreur sur mail doublon")
     public void testCreationCompteDoublonMail() throws Exception {
-        EtablissementCreeDto dto = new EtablissementCreeDto();
+        EtablissementCreeWebDto dto = new EtablissementCreeWebDto();
         dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
-        EtablissementDto etablissementDto = new EtablissementDto();
-        etablissementDto.setNom("Etab de test 32");
-        etablissementDto.setSiren("123456789");
-        etablissementDto.setTypeEtablissement("EPIC/EPST");
-        etablissementDto.setIdAbes("");
-        etablissementDto.setNomContact("testNom");
-        etablissementDto.setPrenomContact("testPrenom");
-        etablissementDto.setAdresseContact("testAdresse");
-        etablissementDto.setBoitePostaleContact("testBP");
-        etablissementDto.setCedexContact("testCedex");
-        etablissementDto.setCodePostalContact("testCP");
-        etablissementDto.setVilleContact("testVille");
-        etablissementDto.setTelephoneContact("0000000000");
-        etablissementDto.setMailContact("test@test.com");
-        etablissementDto.setMotDePasse("testPassword");
-
-        dto.setEtablissementDTO(etablissementDto);
+        dto.setName("Etab de test 32");
+        dto.setSiren("123456789");
+        dto.setTypeEtablissement("EPIC/EPST");
+        dto.setIdAbes("");
+        ContactWebDto contact = new ContactWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        dto.setContact(contact);
+        dto.setMotDePasse("testPassword");
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
@@ -129,25 +127,24 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @Test
     @DisplayName("test création de compte avec erreur sur siren doublon")
     public void testCreationCompteDoublonSiren() throws Exception {
-        EtablissementCreeDto dto = new EtablissementCreeDto();
+        EtablissementCreeWebDto dto = new EtablissementCreeWebDto();
         dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
-        EtablissementDto etablissementDto = new EtablissementDto();
-        etablissementDto.setNom("Etab de test 32");
-        etablissementDto.setSiren("123456789");
-        etablissementDto.setTypeEtablissement("EPIC/EPST");
-        etablissementDto.setIdAbes("");
-        etablissementDto.setNomContact("testNom");
-        etablissementDto.setPrenomContact("testPrenom");
-        etablissementDto.setAdresseContact("testAdresse");
-        etablissementDto.setBoitePostaleContact("testBP");
-        etablissementDto.setCedexContact("testCedex");
-        etablissementDto.setCodePostalContact("testCP");
-        etablissementDto.setVilleContact("testVille");
-        etablissementDto.setTelephoneContact("0000000000");
-        etablissementDto.setMailContact("test@test.com");
-        etablissementDto.setMotDePasse("testPassword");
-
-        dto.setEtablissementDTO(etablissementDto);
+        dto.setName("Etab de test 32");
+        dto.setSiren("123456789");
+        dto.setTypeEtablissement("EPIC/EPST");
+        dto.setIdAbes("");
+        ContactWebDto contact = new ContactWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        dto.setContact(contact);
+        dto.setMotDePasse("testPassword");
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);

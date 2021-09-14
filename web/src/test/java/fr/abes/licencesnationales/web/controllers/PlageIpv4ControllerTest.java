@@ -2,18 +2,17 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
-import fr.abes.licencesnationales.web.dto.ip.PlageIpv4AjouteeDto;
-import fr.abes.licencesnationales.web.dto.ip.PlageIpv4ModifieeDto;
+import fr.abes.licencesnationales.web.dto.ip.PlageIpv4AjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.PlageIpv4ModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
 
 
     @MockBean
-    private EventRepository eventRepository;
+    private IpEventRepository eventRepository;
 
     @MockBean
     private EtablissementService etablissementService;
@@ -74,7 +73,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         //Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new IpEventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
@@ -83,7 +82,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
 
 
     public void plageIpv4Regex(String plageIpv4, boolean validates) throws NoSuchFieldException {
-        Field field = PlageIpv4AjouteeDto.class.getDeclaredField("ip");
+        Field field = PlageIpv4AjouteeWebDto.class.getDeclaredField("ip");
         javax.validation.constraints.Pattern[] annotations = field.getAnnotationsByType(javax.validation.constraints.Pattern.class);
         assertEquals(plageIpv4.matches(annotations[0].regexp()),validates);
     }
@@ -94,26 +93,26 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @DisplayName("invalid Pattern PlageIpv4 Fail Validation")
     public void invalidPatternPlageIpv4FailValidation() {
 
-        PlageIpv4AjouteeDto plageIpv4 = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto plageIpv4 = new PlageIpv4AjouteeWebDto();
         plageIpv4.setSiren("123456789");
         plageIpv4.setTypeAcces("plage");
         plageIpv4.setTypeIp("IPV4");
         plageIpv4.setIp("mmmmmmmmmm");
         plageIpv4.setCommentaires("comm");
-        Set<ConstraintViolation<PlageIpv4AjouteeDto>> violations = validator.validate(plageIpv4);
+        Set<ConstraintViolation<PlageIpv4AjouteeWebDto>> violations = validator.validate(plageIpv4);
         assertFalse(violations.isEmpty());
     }
     @Test
     @DisplayName("validPatternPlageIpv4Validation")
     public void validPatternPlageIpv4Validation() {
 
-        PlageIpv4AjouteeDto plageIpv4 = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto plageIpv4 = new PlageIpv4AjouteeWebDto();
         plageIpv4.setSiren("123456789");
         plageIpv4.setTypeAcces("plage");
         plageIpv4.setTypeIp("IPV4");
         plageIpv4.setIp("192.168.10-2.2-1");
         plageIpv4.setCommentaires("comm");
-        Set<ConstraintViolation<PlageIpv4AjouteeDto>> violations = validator.validate(plageIpv4);
+        Set<ConstraintViolation<PlageIpv4AjouteeWebDto>> violations = validator.validate(plageIpv4);
         assertTrue(violations.isEmpty());
     }
 
@@ -123,7 +122,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabAjoutPlageIPV4Succes() throws Exception {
 
-        PlageIpv4AjouteeDto dto = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto dto = new PlageIpv4AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-2.6-1");
         dto.setCommentaires("Cette plage ip etc");
@@ -139,7 +138,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabAjoutPlageIPV4Failed() throws Exception {
 
-        PlageIpv4AjouteeDto dto = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto dto = new PlageIpv4AjouteeWebDto();
         //le traitement ne sera pas bloqué car le siren n'est pas obligatoire dans le dto puisqu'il est récupéré via le token
         //cf : getSirenFromSecurityContextUser()
         dto.setSiren(null);
@@ -160,7 +159,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser(authorities = {"admin"})
     public void testAdminAjoutPlageIPV4Succes() throws Exception {
 
-        PlageIpv4AjouteeDto dto = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto dto = new PlageIpv4AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-6.6-2");
         dto.setCommentaires("Cette plage ip etc");
@@ -175,7 +174,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser // on ne precise pas role admin
     public void testAdminAjoutPlageIPV4Failed() throws Exception {
 
-        PlageIpv4AjouteeDto dto = new PlageIpv4AjouteeDto();
+        PlageIpv4AjouteeWebDto dto = new PlageIpv4AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-6.6-2");
         dto.setCommentaires("Cette plage ip etc");
@@ -192,7 +191,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabModifierPlageIPV4Succes() throws Exception {
 
-        PlageIpv4ModifieeDto dto = new PlageIpv4ModifieeDto();
+        PlageIpv4ModifieeWebDto dto = new PlageIpv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-6.6-2");
         dto.setCommentaires("Cette plage ip etc");
@@ -208,7 +207,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabModifierPlageIPV4Failed() throws Exception {
 
-        PlageIpv4ModifieeDto dto = new PlageIpv4ModifieeDto();
+        PlageIpv4ModifieeWebDto dto = new PlageIpv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20.6");
         dto.setCommentaires("Cette plage ip etc");
@@ -228,7 +227,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser(authorities = {"admin"})
     public void testAdminModifierPlageIPV4Succes() throws Exception {
 
-        PlageIpv4ModifieeDto dto = new PlageIpv4ModifieeDto();
+        PlageIpv4ModifieeWebDto dto = new PlageIpv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-6.6-2");
         dto.setCommentaires("Cette plage ip etc");
@@ -244,7 +243,7 @@ public class PlageIpv4ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser //on ne precise pas le role admin
     public void testAdminModifierPlageIPV4Failed() throws Exception {
 
-        PlageIpv4ModifieeDto dto = new PlageIpv4ModifieeDto();
+        PlageIpv4ModifieeWebDto dto = new PlageIpv4ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("192.168.20-6.6-2");
         dto.setCommentaires("Cette plage ip etc");

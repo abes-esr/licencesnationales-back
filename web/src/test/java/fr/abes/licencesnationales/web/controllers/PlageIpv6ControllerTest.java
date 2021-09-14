@@ -2,18 +2,17 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
-import fr.abes.licencesnationales.core.dto.ip.IpSupprimeeDto;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.repository.EventRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
-import fr.abes.licencesnationales.web.dto.ip.PlageIpv6AjouteeDto;
-import fr.abes.licencesnationales.web.dto.ip.PlageIpv6ModifieeDto;
+import fr.abes.licencesnationales.web.dto.ip.PlageIpv6AjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.PlageIpv6ModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
 
 
     @MockBean
-    private EventRepository eventRepository;
+    private IpEventRepository eventRepository;
 
     @MockBean
     private EtablissementService etablissementService;
@@ -74,7 +73,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
        // Mockito.doNothing().when(ipService).checkDoublonIpAjouteeDto(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new EventEntity());
+        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new IpEventEntity());
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
@@ -83,7 +82,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
 
 
     public void plageIpv6Regex(String plageIpv6, boolean validates) throws NoSuchFieldException {
-        Field field = PlageIpv6AjouteeDto.class.getDeclaredField("ip");
+        Field field = PlageIpv6AjouteeWebDto.class.getDeclaredField("ip");
         javax.validation.constraints.Pattern[] annotations = field.getAnnotationsByType(javax.validation.constraints.Pattern.class);
         assertEquals(plageIpv6.matches(annotations[0].regexp()),validates);
     }
@@ -119,26 +118,26 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @DisplayName("invalid Pattern PlageIpv6 Fail Validation")
     public void invalidPatternPlageIpv6FailValidation() {
 
-        PlageIpv6AjouteeDto plageIpv6 = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto plageIpv6 = new PlageIpv6AjouteeWebDto();
         plageIpv6.setSiren("123456789");
         plageIpv6.setTypeAcces("plage");
         plageIpv6.setTypeIp("IPV6");
         plageIpv6.setIp("mmmmmmmmmm");
         plageIpv6.setCommentaires("comm");
-        Set<ConstraintViolation<PlageIpv6AjouteeDto>> violations = validator.validate(plageIpv6);
+        Set<ConstraintViolation<PlageIpv6AjouteeWebDto>> violations = validator.validate(plageIpv6);
         assertFalse(violations.isEmpty());
     }
     @Test
     @DisplayName("validPatternPlageIpv6Validation")
     public void validPatternPlageIpv6Validation() {
 
-        PlageIpv6AjouteeDto plageIpv6 = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto plageIpv6 = new PlageIpv6AjouteeWebDto();
         plageIpv6.setSiren("123456789");
         plageIpv6.setTypeAcces("plage");
         plageIpv6.setTypeIp("IPV6");
         plageIpv6.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         plageIpv6.setCommentaires("comm");
-        Set<ConstraintViolation<PlageIpv6AjouteeDto>> violations = validator.validate(plageIpv6);
+        Set<ConstraintViolation<PlageIpv6AjouteeWebDto>> violations = validator.validate(plageIpv6);
         assertTrue(violations.isEmpty());
     }
 
@@ -148,7 +147,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabAjoutPlageIPV6Succes() throws Exception {
 
-        PlageIpv6AjouteeDto dto = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto dto = new PlageIpv6AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -164,7 +163,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabAjoutPlageIPV6Failed() throws Exception {
 
-        PlageIpv6AjouteeDto dto = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto dto = new PlageIpv6AjouteeWebDto();
         //le traitement ne sera pas bloqué car le siren n'est pas obligatoire dans le dto puisqu'il est récupéré via le token
         //cf : getSirenFromSecurityContextUser()
         dto.setSiren(null);
@@ -185,7 +184,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser(authorities = {"admin"})
     public void testAdminAjoutPlageIPV6Succes() throws Exception {
 
-        PlageIpv6AjouteeDto dto = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto dto = new PlageIpv6AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -200,7 +199,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser // on ne precise pas role admin
     public void testAdminAjoutPlageIPV6Failed() throws Exception {
 
-        PlageIpv6AjouteeDto dto = new PlageIpv6AjouteeDto();
+        PlageIpv6AjouteeWebDto dto = new PlageIpv6AjouteeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -217,7 +216,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabModifierPlageIPV6Succes() throws Exception {
 
-        PlageIpv6ModifieeDto dto = new PlageIpv6ModifieeDto();
+        PlageIpv6ModifieeWebDto dto = new PlageIpv6ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -233,7 +232,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser
     public void testEtabModifierPlageIPV6Failed() throws Exception {
 
-        PlageIpv6ModifieeDto dto = new PlageIpv6ModifieeDto();
+        PlageIpv6ModifieeWebDto dto = new PlageIpv6ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494:AAFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -253,7 +252,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser(authorities = {"admin"})
     public void testAdminModifierPlageIPV6Succes() throws Exception {
 
-        PlageIpv6ModifieeDto dto = new PlageIpv6ModifieeDto();
+        PlageIpv6ModifieeWebDto dto = new PlageIpv6ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");
@@ -269,7 +268,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
     @WithMockUser //on ne precise pas le role admin
     public void testAdminModifierPlageIPV6Failed() throws Exception {
 
-        PlageIpv6ModifieeDto dto = new PlageIpv6ModifieeDto();
+        PlageIpv6ModifieeWebDto dto = new PlageIpv6ModifieeWebDto();
         dto.setSiren("123456789");
         dto.setIp("5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF");
         dto.setCommentaires("Cette plage ip etc");

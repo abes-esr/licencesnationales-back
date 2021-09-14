@@ -2,7 +2,7 @@ package fr.abes.licencesnationales.core.listener.editeur;
 
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import org.springframework.context.ApplicationListener;
