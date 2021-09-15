@@ -53,15 +53,13 @@ public class ContactEntity implements Serializable {
     @Pattern(regexp = "^\\d{5}$", message = "Le code postal fourni n'est pas valide")
     private String codePostal;
 
-    //TODO: Pas de règle sur le cedex ?
     private String cedex;
 
     @NotBlank
     @Pattern(regexp = "^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$", message = "La ville fournie n'est pas valide")
     private String ville;
 
-    //TODO: Pas de règle sur le rôle ? Même pas un enum ?
-    private String role;
+    private String role = "etab";
 
     /**
      * CTOR d'un contact
@@ -93,8 +91,7 @@ public class ContactEntity implements Serializable {
     }
 
     /**
-     * CTOR d'un contact sans mot de passe et sans rôle.
-     * //TODO pourquoi cette fonction existe ?? Ne faut-il pas initiliaser le mot de passe et le rôle ?
+     * CTOR d'un contact sans le rôle est par défaut à 'etab'.
      *
      * @param prenom       Prénom du contact
      * @param mail         Email du contact
@@ -104,10 +101,12 @@ public class ContactEntity implements Serializable {
      * @param codePostal   Code postal du contact
      * @param cedex        Numéro du cedex du contact
      * @param ville        Ville du contact
+     * @param motDePasse   Mot de passe du contact
      */
-    public ContactEntity(String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail) {
+    public ContactEntity(String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail, String motDePasse) {
         this.nom = nom;
         this.prenom = prenom;
+        this.motDePasse = motDePasse;
         this.mail = mail;
         this.telephone = telephone;
         this.adresse = adresse;

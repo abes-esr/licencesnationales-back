@@ -8,6 +8,8 @@ import java.util.Date;
 import java.util.List;
 
 @Repository
-public interface EtablissementEventRepository extends JpaRepository<EtablissementEventEntity, Long> {
+public interface EtablissementEventRepository extends JpaRepository<EtablissementEventEntity, Integer> {
     List<EtablissementEventEntity> getAllByDateCreationEventBetweenOrderByDateCreationEvent(Date dateDebut, Date dateFin);
+
+
 }

@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EtablissementCreeEvent extends Event {
+
     private String nom;
     private String siren;
     private String typeEtablissement;
@@ -23,7 +24,6 @@ public class EtablissementCreeEvent extends Event {
     private String mailContact;
     private String motDePasse;
     private String roleContact;
-    private String recaptcha;
 
     public EtablissementCreeEvent(Object source) {
         super(source);

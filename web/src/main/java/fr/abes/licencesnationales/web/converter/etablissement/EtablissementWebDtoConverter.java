@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.converter;
+package fr.abes.licencesnationales.web.converter.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -30,63 +30,10 @@ import java.util.Optional;
 
 
 @Component
-public class WebDtoConverter {
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+public class EtablissementWebDtoConverter {
 
     @Autowired
     private UtilsMapper utilsMapper;
-
-    @Autowired
-    private GenererIdAbes genererIdAbes;
-
-    @Autowired
-    private TypeEtablissementRepository repository;
-
-    @Bean
-    public void converterEditeurCreeWebDto() {
-        Converter<EditeurCreeWebDto, EditeurCreeEvent> myConverter = new Converter<EditeurCreeWebDto, EditeurCreeEvent>() {
-
-            public EditeurCreeEvent convert(MappingContext<EditeurCreeWebDto, EditeurCreeEvent> context) {
-                EditeurCreeWebDto source = context.getSource();
-
-                EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this);
-                editeurCreeEvent.setNomEditeur(source.getNomEditeur());
-                editeurCreeEvent.setIdentifiantEditeur(source.getIdentifiantEditeur());
-                editeurCreeEvent.setAdresseEditeur(source.getAdresseEditeur());
-                editeurCreeEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
-
-                editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
-                editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
-
-                return editeurCreeEvent;
-            }
-        };
-        utilsMapper.addConverter(myConverter);
-    }
-
-    @Bean
-    public void converterEditeurModifieWebDto() {
-        Converter<EditeurModifieWebDto, EditeurModifieEvent> myConverter = new Converter<EditeurModifieWebDto, EditeurModifieEvent>() {
-
-            public EditeurModifieEvent convert(MappingContext<EditeurModifieWebDto, EditeurModifieEvent> context) {
-                EditeurModifieWebDto source = context.getSource();
-
-                EditeurModifieEvent editeurModifieEvent = new EditeurModifieEvent(this);
-                editeurModifieEvent.setId(source.getIdEditeur());
-                editeurModifieEvent.setNomEditeur(source.getNomEditeur());
-                editeurModifieEvent.setIdentifiantEditeur(source.getIdentifiantEditeur());
-                editeurModifieEvent.setAdresseEditeur(source.getAdresseEditeur());
-                editeurModifieEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
-
-                editeurModifieEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
-                editeurModifieEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
-
-                return editeurModifieEvent;
-            }
-        };
-        utilsMapper.addConverter(myConverter);
-    }
 
     @Bean
     public void converterEtablissementCreeWebDto() {
@@ -99,7 +46,6 @@ public class WebDtoConverter {
                 etablissementCreeEvent.setNom(source.getName());
                 etablissementCreeEvent.setSiren(source.getSiren());
                 etablissementCreeEvent.setTypeEtablissement(source.getTypeEtablissement());
-                etablissementCreeEvent.setIdAbes(genererIdAbes.genererIdAbes(source.getIdAbes()));
                 etablissementCreeEvent.setNomContact(source.getContact().getNom());
                 etablissementCreeEvent.setPrenomContact(source.getContact().getPrenom());
                 etablissementCreeEvent.setAdresseContact(source.getContact().getAdresse());
@@ -109,9 +55,6 @@ public class WebDtoConverter {
                 etablissementCreeEvent.setCedexContact(source.getContact().getCedex());
                 etablissementCreeEvent.setTelephoneContact(source.getContact().getTelephone());
                 etablissementCreeEvent.setMailContact(source.getContact().getMail());
-                etablissementCreeEvent.setMotDePasse(passwordEncoder.encode(source.getMotDePasse()));
-                etablissementCreeEvent.setRoleContact("etab");
-                etablissementCreeEvent.setRecaptcha(source.getRecaptcha());
 
                 return etablissementCreeEvent;
             }
@@ -132,11 +75,11 @@ public class WebDtoConverter {
                     EtablissementEntity etablissement = new EtablissementEntity();
                     etablissement.setName(e.getName());
                     etablissement.setSiren(e.getSiren());
-                    Optional<TypeEtablissementEntity> type = repository.findFirstByLibelle(e.getTypeEtablissement());
+                   /* Optional<TypeEtablissementEntity> type = repository.findFirstByLibelle(e.getTypeEtablissement());
                     if (!type.isPresent()) {
                         throw new Errors().errorMapping(source, context.getDestinationType(), new UnknownTypeEtablissementException("Type d'établissement inconnu")).toMappingException();
                     }
-                    etablissement.setTypeEtablissement(type.get());
+                    etablissement.setTypeEtablissement(type.get());*/
                     etablissement.setIdAbes(e.getIdAbes());
                     ContactEntity contact = new ContactEntity();
                     contact.setNom(e.getContact().getNom());

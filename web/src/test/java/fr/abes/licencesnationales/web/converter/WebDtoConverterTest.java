@@ -5,7 +5,7 @@ import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.services.GenererIdAbes;
-import fr.abes.licencesnationales.web.dto.ContactWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.ContactWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactTechniqueEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;

@@ -5,10 +5,10 @@ import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
-import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.web.dto.ContactWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.ContactCreeWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.ContactWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
@@ -43,9 +43,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     private ReCaptchaService reCaptchaService;
 
     @MockBean
-    private ContactService contactService;
-
-    @MockBean
     private EmailService emailService;
 
     @MockBean
@@ -62,8 +59,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         dto.setName("Etab de test 32");
         dto.setSiren("123456789");
         dto.setTypeEtablissement("EPIC/EPST");
-        dto.setIdAbes("123456789");
-        ContactWebDto contact = new ContactWebDto();
+        ContactCreeWebDto contact = new ContactCreeWebDto();
         contact.setNom("testNom");
         contact.setPrenom("testPrenom");
         contact.setAdresse("testAdresse");
@@ -73,16 +69,15 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setVille("testVille");
         contact.setTelephone("0000000000");
         contact.setMail("test@test.com");
+        contact.setMotDePasse("12345*:KKk");
         dto.setContact(contact);
-        dto.setMotDePasse("testPassword");
-
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
         Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
-        Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
+        Mockito.when(etablissementService.existeMail(Mockito.anyString())).thenReturn(false);
         Mockito.when(typeEtablissementRepository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "EPIC/EPST")));
 
         Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
@@ -101,10 +96,10 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         dto.setName("Etab de test 32");
         dto.setSiren("123456789");
         dto.setTypeEtablissement("EPIC/EPST");
-        dto.setIdAbes("");
-        ContactWebDto contact = new ContactWebDto();
+        ContactCreeWebDto contact = new ContactCreeWebDto();
         contact.setNom("testNom");
         contact.setPrenom("testPrenom");
+        contact.setMotDePasse("12345*:KKk");
         contact.setAdresse("testAdresse");
         contact.setBoitePostale("testBP");
         contact.setCedex("testCedex");
@@ -113,14 +108,13 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setTelephone("0000000000");
         contact.setMail("test@test.com");
         dto.setContact(contact);
-        dto.setMotDePasse("testPassword");
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
         Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
-        Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(true);
+        Mockito.when(etablissementService.existeMail(Mockito.anyString())).thenReturn(true);
 
         this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -138,8 +132,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         dto.setName("Etab de test 32");
         dto.setSiren("123456789");
         dto.setTypeEtablissement("EPIC/EPST");
-        dto.setIdAbes("");
-        ContactWebDto contact = new ContactWebDto();
+        ContactCreeWebDto contact = new ContactCreeWebDto();
         contact.setNom("testNom");
         contact.setPrenom("testPrenom");
         contact.setAdresse("testAdresse");
@@ -149,15 +142,15 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setVille("testVille");
         contact.setTelephone("0000000000");
         contact.setMail("test@test.com");
+        contact.setMotDePasse("12345*:KKk");
         dto.setContact(contact);
-        dto.setMotDePasse("testPassword");
 
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
         Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(true);
-        Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
+        Mockito.when(etablissementService.existeMail(Mockito.anyString())).thenReturn(false);
 
         this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
