@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.editeur.EditeurEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
 import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurFusionneEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
@@ -39,7 +42,7 @@ public class EditeurService {
     @Autowired
     private UtilsMapper mapper;
 
-    public void addEditeur(@Valid EditeurCreeEvent editeur) throws MailDoublonException, JsonProcessingException {
+    public void addEditeur(@Valid EditeurCreeEventEntity editeur) throws MailDoublonException, JsonProcessingException {
 
         log.info("debut addEditeur");
         boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeur(),editeur.getListeContactTechniqueEditeur());
@@ -62,7 +65,7 @@ public class EditeurService {
         }
     }
 
-    public void updateEditeur(EditeurModifieEvent editeur) throws MailDoublonException, JsonProcessingException {
+    public void updateEditeur(EditeurModifieEventEntity editeur) throws MailDoublonException, JsonProcessingException {
         //verifier que le mail du contact n'est pas déjà en base
         boolean existeMail = emailService.checkDoublonMail(editeur.getListeContactCommercialEditeur(),editeur.getListeContactTechniqueEditeur());
         if (existeMail) {
@@ -91,10 +94,10 @@ public class EditeurService {
         return dao.findAll();
     }
 
-    public void deleteEditeur(String id) {
-        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Integer.parseInt(id));
+    public void deleteEditeur(String id) throws JsonProcessingException {
+        EditeurSupprimeEventEntity editeurSupprimeEvent = new EditeurSupprimeEventEntity(this, Integer.parseInt(id));
         applicationEventPublisher.publishEvent(editeurSupprimeEvent);
-        eventRepository.save(new EditeurEventEntity(editeurSupprimeEvent));
+        eventRepository.save(editeurSupprimeEvent);
     }
 
     public void deleteById(Integer id) {
