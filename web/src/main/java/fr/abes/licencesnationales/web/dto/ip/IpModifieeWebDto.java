@@ -10,7 +10,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class IpModifieeWebDto {
-    protected Long id;
+    protected Integer id;
     protected String siren;
     protected String ip;
     protected boolean validee;

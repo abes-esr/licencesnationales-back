@@ -55,7 +55,7 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
 
     @Lob
     @Column(name = "ID_EDITEUR_FUSIONNES")
-    private List<Long> idEditeurFusionnes;
+    private List<Integer> idEditeurFusionnes;
 
     /**
      * CTOR à partir d'un événement de création d'éditeur
@@ -99,7 +99,7 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
      * @param editeurFusionneEvent Evénement de fusion d'un éditeur
      */
     public EditeurEventEntity(EditeurFusionneEvent editeurFusionneEvent) {
-        this.event = "editeurFusione";
+        this.event = "editeurFusionne";
         this.dateCreationEvent = editeurFusionneEvent.created;
         this.nomEditeur = editeurFusionneEvent.getNomEditeur();
         this.adresseEditeur = editeurFusionneEvent.getAdresseEditeur();

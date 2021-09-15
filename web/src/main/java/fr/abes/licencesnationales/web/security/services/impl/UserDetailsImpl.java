@@ -25,7 +25,7 @@ public class UserDetailsImpl implements UserDetails {
 	EtablissementRepository etablissementRepository;*/
 
 
-	private Long id;
+	private Integer id;
 	private String siren;
 	private String nameEtab;//nom etab
 	private String password;
@@ -35,7 +35,7 @@ public class UserDetailsImpl implements UserDetails {
 
 
 
-	public UserDetailsImpl(Long id, String siren, String nameEtab, String password, String email,  Collection<? extends GrantedAuthority> authorities,
+	public UserDetailsImpl(Integer id, String siren, String nameEtab, String password, String email,  Collection<? extends GrantedAuthority> authorities,
 						   boolean isAdmin) {
 		this.id = id;
 		this.siren = siren;

@@ -5,9 +5,9 @@ import lombok.Getter;
 
 @Getter
 public class EditeurSupprimeEvent extends Event {
-    private Long id;
+    private Integer id;
 
-    public EditeurSupprimeEvent(Object source, Long id) {
+    public EditeurSupprimeEvent(Object source, Integer id) {
         super(source);
         this.id = id;
     }

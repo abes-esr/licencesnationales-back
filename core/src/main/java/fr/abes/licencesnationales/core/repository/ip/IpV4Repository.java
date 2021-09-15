@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface IpV4Repository extends JpaRepository<IpV4, Long> {
+public interface IpV4Repository extends JpaRepository<IpV4, Integer> {
 
 }

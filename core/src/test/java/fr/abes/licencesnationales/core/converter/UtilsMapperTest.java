@@ -1,6 +1,11 @@
 package fr.abes.licencesnationales.core.converter;
 
+import fr.abes.licencesnationales.core.converter.editeur.EditeurEntityConverter;
 import fr.abes.licencesnationales.core.converter.etablissement.EtablissementEntityConverter;
+import fr.abes.licencesnationales.core.converter.ip.IpEntityConverter;
+import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
+import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
@@ -13,12 +18,19 @@ import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
 import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
+import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mockito;
+import org.modelmapper.MappingException;
+import org.modelmapper.spi.ErrorMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
@@ -27,10 +39,16 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, EtablissementEntityConverter.class})
+@SpringBootTest(classes = {UtilsMapper.class, EtablissementEntityConverter.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class, EditeurEntityConverter.class})
 public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;
+
+    @InjectMocks
+    private EtablissementEntityConverter etablissementEntityConverter;
+
+    @MockBean
+    private TypeEtablissementRepository repository;
 
     @Test
     @DisplayName("test nouvelEditeur 1CC 0CT")
@@ -179,6 +197,7 @@ public class UtilsMapperTest {
     @Test
     @DisplayName("test mapper etablissement créé")
     public void testMapperEtablissementEventCree() {
+        Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "testType")));
         EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this);
 
         etablissementCreeEvent.setNom("testNom");
@@ -199,7 +218,7 @@ public class UtilsMapperTest {
 
         EtablissementEntity entity = utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class);
 
-        Assertions.assertEquals("testType", entity.getTypeEtablissement());
+        Assertions.assertEquals("testType", entity.getTypeEtablissement().getLibelle());
         Assertions.assertEquals("123456789", entity.getSiren());
         Assertions.assertEquals("1234", entity.getIdAbes());
         Assertions.assertEquals("nomContactTest",entity.getContact().getNom());
@@ -217,13 +236,39 @@ public class UtilsMapperTest {
     }
 
     @Test
+    @DisplayName("test mapper etablissement créé avec type inconnu")
+    public void testMapperEtablissementEventCreeWithUnknownType() {
+        Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenThrow(new MappingException(Lists.newArrayList(new ErrorMessage("Type d'établissement inconnu"))));
+        EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this);
+
+        etablissementCreeEvent.setNom("testNom");
+        etablissementCreeEvent.setTypeEtablissement("testType");
+        etablissementCreeEvent.setSiren("123456789");
+        etablissementCreeEvent.setIdAbes("1234");
+        etablissementCreeEvent.setNomContact("nomContactTest");
+        etablissementCreeEvent.setPrenomContact("prenomContactTest");
+        etablissementCreeEvent.setMailContact("mail@test.com");
+        etablissementCreeEvent.setMotDePasse("passwordtest");
+        etablissementCreeEvent.setTelephoneContact("0000000000");
+        etablissementCreeEvent.setAdresseContact("adresseTest");
+        etablissementCreeEvent.setBoitePostaleContact("BPTest");
+        etablissementCreeEvent.setCodePostalContact("00000");
+        etablissementCreeEvent.setCedexContact("cedexTest");
+        etablissementCreeEvent.setVilleContact("villeTest");
+        etablissementCreeEvent.setRoleContact("roleTest");
+
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class));
+
+    }
+
+    @Test
     @DisplayName("test mapper IP créée")
     public void testMapperIpEventCree() {
         IpAjouteeEvent ip = new IpAjouteeEvent(this);
         ip.setSiren("123456789");
         ip.setTypeIp(IpType.IPV4);
         ip.setTypeAcces("ip");
-        ip.setIp("192.168.0.1");
+        ip.setIp("200.200.200.200");
 
         IpEntity ipEntity = utilsMapper.map(ip, IpEntity.class);
 

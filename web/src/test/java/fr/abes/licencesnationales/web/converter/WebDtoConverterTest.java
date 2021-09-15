@@ -80,7 +80,7 @@ public class WebDtoConverterTest {
     @DisplayName("test converter EditeurModifieWebDto / EditeurModifieEvent")
     public void testConverterEditeurModifieWebDto() {
         EditeurModifieWebDto editeur = new EditeurModifieWebDto();
-        editeur.setIdEditeur(1L);
+        editeur.setIdEditeur(1);
         editeur.setNomEditeur("testNom");
         editeur.setAdresseEditeur("testAdresse");
         editeur.setIdentifiantEditeur("testId");

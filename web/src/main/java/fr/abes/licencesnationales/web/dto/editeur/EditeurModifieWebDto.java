@@ -12,7 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditeurModifieWebDto {
-    private Long idEditeur;
+    private Integer idEditeur;
     private String nomEditeur;
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;

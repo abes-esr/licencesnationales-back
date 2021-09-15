@@ -1,16 +1,23 @@
 package fr.abes.licencesnationales.core.converter.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
+import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
+import lombok.SneakyThrows;
 import org.modelmapper.Converter;
+import org.modelmapper.internal.Errors;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 /**
  * Cette classe recense tous les convertisseurs d'objet événement d'un établissement vers les objets d'entité
@@ -21,6 +28,9 @@ public class EtablissementEntityConverter {
     @Autowired
     private UtilsMapper utilsMapper;
 
+    @Autowired
+    private TypeEtablissementRepository repository;
+
     /**
      * Bean de conversion d'un événement de création d'établissement
      */
@@ -28,13 +38,18 @@ public class EtablissementEntityConverter {
     public void converterEtablissementCreeEvent() {
         Converter<EtablissementCreeEvent, EtablissementEntity> myConverter = new Converter<EtablissementCreeEvent, EtablissementEntity>() {
 
+            @SneakyThrows
             public EtablissementEntity convert(MappingContext<EtablissementCreeEvent, EtablissementEntity> context) {
                 EtablissementCreeEvent source = context.getSource();
 
                 EtablissementEntity etablissementEntity = new EtablissementEntity();
                 etablissementEntity.setName(source.getNom());
                 etablissementEntity.setSiren(source.getSiren());
-                etablissementEntity.setTypeEtablissement(source.getTypeEtablissement());
+                Optional<TypeEtablissementEntity> type = repository.findFirstByLibelle(source.getTypeEtablissement());
+                if (!type.isPresent()) {
+                    throw new Errors().errorMapping(source, context.getDestinationType(), new UnknownTypeEtablissementException("type d'établissement inconnu")).toMappingException();
+                }
+                etablissementEntity.setTypeEtablissement(type.get());
                 etablissementEntity.setIdAbes(source.getIdAbes());
 
                 ContactEntity contactEntity = new ContactEntity(source.getNomContact(),
@@ -91,12 +106,17 @@ public class EtablissementEntityConverter {
     public void converterEtablissementFusionneEvent() {
         Converter<EtablissementFusionneEvent, EtablissementEntity> myConverter = new Converter<EtablissementFusionneEvent, EtablissementEntity>() {
 
+            @SneakyThrows
             public EtablissementEntity convert(MappingContext<EtablissementFusionneEvent, EtablissementEntity> context) {
                 EtablissementFusionneEvent source = context.getSource();
                 EtablissementEntity etablissementEntity = new EtablissementEntity();
                 etablissementEntity.setName(source.getNom());
                 etablissementEntity.setSiren(source.getSiren());
-                etablissementEntity.setTypeEtablissement(source.getTypeEtablissement());
+                Optional<TypeEtablissementEntity> type = repository.findFirstByLibelle(source.getTypeEtablissement());
+                if (!type.isPresent()) {
+                    throw new Errors().errorMapping(source, context.getDestinationType(), new UnknownTypeEtablissementException("Type d'établissement inconnu")).toMappingException();
+                }
+                etablissementEntity.setTypeEtablissement(type.get());
                 etablissementEntity.setIdAbes(source.getIdAbes());
 
                 ContactEntity contactEntity = new ContactEntity();

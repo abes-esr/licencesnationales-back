@@ -26,7 +26,7 @@ public class EditeurEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeur_Sequence")
     @SequenceGenerator(name = "editeur_Sequence", sequenceName = "EDITEUR_SEQ", allocationSize = 1)
-    private Long idEditeur;
+    private Integer idEditeur;
 
     @NotBlank
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
@@ -63,7 +63,7 @@ public class EditeurEntity implements Serializable {
      * @param contactCommercialEditeurEntities
      * @param contactTechniqueEditeurEntities
      */
-    public EditeurEntity(Long idEditeur,
+    public EditeurEntity(Integer idEditeur,
                          String nomEditeur,
                          String identifiantEditeur,
                          String adresseEditeur,

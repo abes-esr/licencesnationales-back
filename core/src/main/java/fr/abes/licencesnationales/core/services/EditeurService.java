@@ -92,12 +92,12 @@ public class EditeurService {
     }
 
     public void deleteEditeur(String id) {
-        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Long.valueOf(id));
+        EditeurSupprimeEvent editeurSupprimeEvent = new EditeurSupprimeEvent(this, Integer.parseInt(id));
         applicationEventPublisher.publishEvent(editeurSupprimeEvent);
         eventRepository.save(new EditeurEventEntity(editeurSupprimeEvent));
     }
 
-    public void deleteById(Long id) {
+    public void deleteById(Integer id) {
         dao.deleteById(id);
     }
 }

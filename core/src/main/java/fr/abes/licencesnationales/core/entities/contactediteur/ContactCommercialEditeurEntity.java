@@ -34,7 +34,7 @@ public class ContactCommercialEditeurEntity extends ContactEditeurEntity impleme
      * @param prenomContactCommercial Prénom du contact
      * @param mailContactCommercial   Email du contact
      */
-    public ContactCommercialEditeurEntity(Long id, String nomContactCommercial, String prenomContactCommercial, String mailContactCommercial) {
+    public ContactCommercialEditeurEntity(Integer id, String nomContactCommercial, String prenomContactCommercial, String mailContactCommercial) {
         super(id, nomContactCommercial, prenomContactCommercial, mailContactCommercial);
     }
 

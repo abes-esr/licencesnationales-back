@@ -25,7 +25,7 @@ public abstract class ContactEditeurEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_editeur_Sequence")
     @SequenceGenerator(name = "contact_editeur_Sequence", sequenceName = "CONTACT_EDITEUR_SEQ", allocationSize = 1)
-    protected Long id;
+    protected Integer id;
 
     @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le nom fourni n'est pas valide")
     protected String nomContact;
@@ -60,7 +60,7 @@ public abstract class ContactEditeurEntity implements Serializable {
      * @param prenomContact Prénom du contact
      * @param mailContact Email du contact
      */
-    public ContactEditeurEntity(Long id, String nomContact, String prenomContact, String mailContact) {
+    public ContactEditeurEntity(Integer id, String nomContact, String prenomContact, String mailContact) {
         this.id = id;
         this.nomContact = nomContact;
         this.prenomContact = prenomContact;

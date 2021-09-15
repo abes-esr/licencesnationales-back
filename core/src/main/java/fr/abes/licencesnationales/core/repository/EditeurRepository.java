@@ -7,9 +7,9 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface EditeurRepository extends JpaRepository<EditeurEntity, Long> {
+public interface EditeurRepository extends JpaRepository<EditeurEntity, Integer> {
 
-    void deleteById(Long id);
+    void deleteById(Integer id);
 
     EditeurEntity getFirstByNomEditeur(String nom);
 

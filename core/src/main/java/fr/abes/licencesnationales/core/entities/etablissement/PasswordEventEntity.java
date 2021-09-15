@@ -15,7 +15,7 @@ public class PasswordEventEntity extends EventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator = "passwordevent_Sequence")
     @SequenceGenerator(name = "passwordevent_Sequence", sequenceName = "PASSWORDEVENT_SEQ", allocationSize = 1)
-    public Long id;
+    public Integer id;
 
     String siren;
     String motDePasse;

@@ -2,7 +2,9 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -46,6 +48,9 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @MockBean
     private EmailService emailService;
 
+    @MockBean
+    private TypeEtablissementRepository typeEtablissementRepository;
+
     @Autowired
     private ObjectMapper mapper;
 
@@ -78,6 +83,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
         Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
         Mockito.when(contactService.existeMail(Mockito.anyString())).thenReturn(false);
+        Mockito.when(typeEtablissementRepository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "EPIC/EPST")));
 
         Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.anyString());
@@ -165,10 +171,13 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @DisplayName("test liste établissements")
     @WithMockUser(authorities = {"admin"})
     public void testListEtab() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity();
+        type.setId(1);
+        type.setLibelle("typeEtab");
         List<EtablissementEntity> etabList = new ArrayList<>();
-        etabList.add(new EtablissementEntity(1L, "testNom", "123456789", "testType", "1", null, null));
-        etabList.add(new EtablissementEntity(2L, "testNom", "123456789", "testType", "1", null, null));
-        etabList.add(new EtablissementEntity(3L, "testNom", "123456789", "testType", "1", null, null));
+        etabList.add(new EtablissementEntity(1, "testNom", "123456789", type, "1", null, null));
+        etabList.add(new EtablissementEntity(2, "testNom", "123456789", type, "1", null, null));
+        etabList.add(new EtablissementEntity(3, "testNom", "123456789", type, "1", null, null));
         Mockito.when(etablissementService.findAll()).thenReturn(etabList);
 
         this.mockMvc.perform(get("/v1/ln/etablissement/getListEtab")).andExpect(status().isOk());

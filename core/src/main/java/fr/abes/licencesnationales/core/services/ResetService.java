@@ -10,6 +10,7 @@ import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionne
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementSupprimeEvent;
 import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.EtablissementRepository;
+import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,13 @@ public class ResetService {
     private ObjectMapper mapper;
     private EtablissementRepository etablissementRepository;
     private EtablissementEventRepository eventRepository;
+    private TypeEtablissementRepository typeRepository;
     private ApplicationEventPublisher applicationEventPublisher;
 
-    public ResetService(EtablissementRepository etablissementRepository, EtablissementEventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher) {
+    public ResetService(EtablissementRepository etablissementRepository, EtablissementEventRepository eventRepository, TypeEtablissementRepository typeRepository, ApplicationEventPublisher applicationEventPublisher) {
         this.etablissementRepository = etablissementRepository;
         this.eventRepository = eventRepository;
+        this.typeRepository = typeRepository;
         this.applicationEventPublisher = applicationEventPublisher;
     }
 

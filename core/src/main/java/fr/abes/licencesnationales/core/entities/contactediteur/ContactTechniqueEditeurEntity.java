@@ -35,7 +35,7 @@ public class ContactTechniqueEditeurEntity extends ContactEditeurEntity implemen
      * @param prenomContactTechnique Prénom du contact
      * @param mailContactTechnique Email du contact
      */
-    public ContactTechniqueEditeurEntity(Long id, String nomContactTechnique, String prenomContactTechnique, String mailContactTechnique) {
+    public ContactTechniqueEditeurEntity(Integer id, String nomContactTechnique, String prenomContactTechnique, String mailContactTechnique) {
         super(id, nomContactTechnique, prenomContactTechnique, mailContactTechnique);
     }
 

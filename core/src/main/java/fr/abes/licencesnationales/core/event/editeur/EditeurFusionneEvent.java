@@ -18,7 +18,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class EditeurFusionneEvent extends Event {
-    private List<Long> idEditeurFusionnes;
+    private List<Integer> idEditeurFusionnes;
     private String nomEditeur;
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
@@ -33,7 +33,7 @@ public class EditeurFusionneEvent extends Event {
         this.groupesEtabRelies = new ArrayList<>();
     }
 
-    public EditeurFusionneEvent(Object source, List<Long> idEditeurFusionnes, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies,
+    public EditeurFusionneEvent(Object source, List<Integer> idEditeurFusionnes, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies,
                                 String adresseEditeur, Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur,
                                 Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur) {
         super(source);
