@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 public class IpSupprimeeEvent extends Event {
-    private Long id;
+    private Integer id;
     private String siren;
 
-    public IpSupprimeeEvent(Object source, Long id, String siren) {
+    public IpSupprimeeEvent(Object source, Integer id, String siren) {
         super(source);
         this.id = id;
         this.siren = siren;

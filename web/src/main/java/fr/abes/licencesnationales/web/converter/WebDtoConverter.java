@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.converter;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
@@ -9,17 +10,23 @@ import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
 import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementDiviseEvent;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
+import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.EtablissementDiviseWebDto;
+import lombok.SneakyThrows;
 import org.modelmapper.Converter;
+import org.modelmapper.internal.Errors;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+
+import java.util.Optional;
 
 
 @Component
@@ -32,6 +39,9 @@ public class WebDtoConverter {
 
     @Autowired
     private GenererIdAbes genererIdAbes;
+
+    @Autowired
+    private TypeEtablissementRepository repository;
 
     @Bean
     public void converterEditeurCreeWebDto() {
@@ -112,7 +122,7 @@ public class WebDtoConverter {
     @Bean
     public void converterEtablissementDiviseWebDto() {
         Converter<EtablissementDiviseWebDto, EtablissementDiviseEvent> myConverter = new Converter<EtablissementDiviseWebDto, EtablissementDiviseEvent>() {
-
+            @SneakyThrows
             public EtablissementDiviseEvent convert(MappingContext<EtablissementDiviseWebDto, EtablissementDiviseEvent> context) {
                 EtablissementDiviseWebDto source = context.getSource();
 
@@ -122,7 +132,11 @@ public class WebDtoConverter {
                     EtablissementEntity etablissement = new EtablissementEntity();
                     etablissement.setName(e.getName());
                     etablissement.setSiren(e.getSiren());
-                    etablissement.setTypeEtablissement(e.getTypeEtablissement());
+                    Optional<TypeEtablissementEntity> type = repository.findFirstByLibelle(e.getTypeEtablissement());
+                    if (!type.isPresent()) {
+                        throw new Errors().errorMapping(source, context.getDestinationType(), new UnknownTypeEtablissementException("Type d'établissement inconnu")).toMappingException();
+                    }
+                    etablissement.setTypeEtablissement(type.get());
                     etablissement.setIdAbes(e.getIdAbes());
                     ContactEntity contact = new ContactEntity();
                     contact.setNom(e.getContact().getNom());

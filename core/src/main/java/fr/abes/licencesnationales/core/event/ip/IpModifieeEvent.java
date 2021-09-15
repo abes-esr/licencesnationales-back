@@ -7,14 +7,14 @@ import lombok.Getter;
 @Getter
 public class IpModifieeEvent extends Event {
     private String siren;
-    private Long id;
+    private Integer id;
     private String ip;
     private boolean validee;
     private String typeAcces;
     private IpType typeIp;
     private String commentaires;
 
-    public IpModifieeEvent(Object source, Long id, String siren, String ip, boolean validee, String typeAcces, IpType typeIp, String commentaires) {
+    public IpModifieeEvent(Object source, Integer id, String siren, String ip, boolean validee, String typeAcces, IpType typeIp, String commentaires) {
         super(source);
         this.id = id;
         this.siren = siren;

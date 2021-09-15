@@ -3,7 +3,10 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
+import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
@@ -15,21 +18,23 @@ import fr.abes.licencesnationales.web.dto.ip.Ipv4AjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.Ipv4ModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.util.Sets;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+
+import javax.validation.*;
 import java.lang.reflect.Field;
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -170,11 +175,17 @@ public class Ipv4ControllerTest extends LicencesNationalesAPIApplicationTests {
         dto.setIp(null);
         dto.setCommentaires("Cette ip etc");
         dto.setTypeAcces(null);
-        dto.setTypeIp(null);
+        dto.setTypeIp("IPV4");
+        EtablissementEntity etab = new EtablissementEntity();
+        etab.setName("testName");
+        Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etab);
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any(IpAjouteeEvent.class));
+        Mockito.when(eventRepository.save(Mockito.any(IpEventEntity.class))).thenThrow(new ConstraintViolationException(validator.validate(dto)));
         this.mockMvc.perform(post("/v1/ln/ip/ajoutIpV4")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"));
+                .andExpect(jsonPath("$.debugMessage", Matchers.containsString("Ip ne peut pas être nulle")));
     }
 
     @Test

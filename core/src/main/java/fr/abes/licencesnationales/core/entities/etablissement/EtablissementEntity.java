@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
@@ -28,7 +29,7 @@ public class EtablissementEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "etablissement_Sequence")
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
-    private Long id;
+    private Integer id;
 
     @NotBlank
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom d'établissement fourni n'est pas valide")
@@ -41,7 +42,9 @@ public class EtablissementEntity implements Serializable {
     private Date dateCreation = new Date();
 
     @NotBlank
-    private String typeEtablissement;
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
+    @JoinColumn(name = "ref_typeEtablissement")
+    private TypeEtablissementEntity typeEtablissement;
 
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ref_statut")
@@ -76,7 +79,7 @@ public class EtablissementEntity implements Serializable {
      * @param contact           Contact de l'établissement
      * @param editeurs          Liste des éditeurs de l'établissement
      */
-    public EtablissementEntity(Long id, String name, String siren, String typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
+    public EtablissementEntity(Integer id, String name, String siren, TypeEtablissementEntity typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
         this.id = id;
         this.name = name;
         this.siren = siren;
@@ -95,7 +98,7 @@ public class EtablissementEntity implements Serializable {
      * @param idAbes            Identifiant ABESZ de l'établissement
      * @param contact           Contact de l'établissement
      */
-    public EtablissementEntity(String nom, String siren, String typeEtablissement, String idAbes, ContactEntity contact) {
+    public EtablissementEntity(String nom, String siren, TypeEtablissementEntity typeEtablissement, String idAbes, ContactEntity contact) {
         this.name = nom;
         this.siren = siren;
         this.typeEtablissement = typeEtablissement;

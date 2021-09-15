@@ -22,7 +22,7 @@ public class IpEventEntity extends EventEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ipevent_Sequence")
     @SequenceGenerator(name = "ipevent_Sequence", sequenceName = "IPEVENT_SEQ", allocationSize = 1)
-    private Long id;
+    private Integer id;
 
     @Column(name = "SIREN")
     private String siren;

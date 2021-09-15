@@ -60,7 +60,7 @@ public class IpV4 extends IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpV4(Long id, String ip, String commentaires) throws IpException {
+    public IpV4(Integer id, String ip, String commentaires) throws IpException {
         super(id, ip, commentaires);
         // On transforme la chaîne de caractère normée en Objet Java
         this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));

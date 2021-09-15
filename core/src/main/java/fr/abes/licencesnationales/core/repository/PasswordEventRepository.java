@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface PasswordEventRepository extends JpaRepository<PasswordEventEntity, Long> {
+public interface PasswordEventRepository extends JpaRepository<PasswordEventEntity, Integer> {
 }

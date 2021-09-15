@@ -15,7 +15,7 @@ import java.util.Set;
 @Getter
 @Setter
 public class EditeurModifieEvent extends Event {
-    private Long id;
+    private Integer id;
     private String nomEditeur;
     private String identifiantEditeur;
     private List<String> groupesEtabRelies;
@@ -31,7 +31,7 @@ public class EditeurModifieEvent extends Event {
     }
 
     public EditeurModifieEvent(Object source,
-                            Long id, String nomEditeur, String identifiantEditeur,
+                            Integer id, String nomEditeur, String identifiantEditeur,
                                List<String> groupesEtabRelies, String adresseEditeur,
                                Set<ContactCommercialEditeurEntity> contactCommercialEditeur,
                                Set<ContactTechniqueEditeurEntity> contactTechniqueEditeur) {

@@ -26,7 +26,7 @@ public abstract class IpEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ip_Sequence")
     @SequenceGenerator(name = "ip_Sequence", sequenceName = "IP_SEQ", allocationSize = 1)
-    private Long id;
+    private Integer id;
 
     /**
      * L'IP est stockée sous forme de chaîne de caractère pour les bessoins
@@ -85,7 +85,7 @@ public abstract class IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpEntity(Long id, String ip, String commentaires) throws IpException {
+    public IpEntity(Integer id, String ip, String commentaires) throws IpException {
 
         this.id = id;
 

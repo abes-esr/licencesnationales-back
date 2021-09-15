@@ -286,7 +286,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
         IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
-        dto.setId(Long.valueOf("1"));
+        dto.setId(Integer.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprime")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
@@ -314,7 +314,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
         IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
-        dto.setId(Long.valueOf("1"));
+        dto.setId(Integer.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
@@ -327,7 +327,7 @@ public class Ipv6ControllerTest extends LicencesNationalesAPIApplicationTests {
 
         IpSupprimeeWebDto dto = new IpSupprimeeWebDto();
         dto.setSiren("123456789");
-        dto.setId(Long.valueOf("1"));
+        dto.setId(Integer.valueOf("1"));
         this.mockMvc.perform(delete("/v1/ln/ip/supprimeByAdmin")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isForbidden());

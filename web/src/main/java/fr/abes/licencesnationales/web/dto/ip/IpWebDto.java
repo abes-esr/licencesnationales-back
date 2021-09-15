@@ -10,7 +10,7 @@ import java.util.Date;
 @Setter
 public class IpWebDto {
     @JsonProperty("id")
-    private Long id;
+    private Integer id;
     @JsonProperty("ip")
     private String ip;
     @JsonProperty("validee")
