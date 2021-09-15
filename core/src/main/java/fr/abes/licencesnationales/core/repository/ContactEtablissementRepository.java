@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface ContactRepository extends JpaRepository<ContactEntity, String> {
-    Optional<ContactEntity> findContactEntityByMail(String mail);
+public interface ContactEtablissementRepository extends JpaRepository<ContactEntity, String> {
+    Optional<ContactEntity> findByMail(String mail);
 
 }

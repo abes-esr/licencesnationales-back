@@ -1,18 +1,25 @@
 package fr.abes.licencesnationales.web.dto.etablissement;
 
-import fr.abes.licencesnationales.web.dto.ContactWebDto;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
 public class EtablissementCreeWebDto {
+
+    @JsonProperty("nom")
     private String name;
+
+    @JsonProperty("siren")
     private String siren;
+
+    @JsonProperty("typeEtablissement")
     private String typeEtablissement;
-    private String motDePasse;
-    private String idAbes;
-    private ContactWebDto contact;
-    private String roleContact;
+
+    @JsonProperty("contact")
+    private ContactCreeWebDto contact;
+
+    @JsonProperty("recaptcha")
     private String recaptcha;
 }

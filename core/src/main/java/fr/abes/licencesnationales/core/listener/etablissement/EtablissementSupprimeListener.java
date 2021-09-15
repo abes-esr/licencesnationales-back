@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.listener.etablissement;
 
 
 import fr.abes.licencesnationales.core.event.etablissement.EtablissementSupprimeEvent;
-import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;

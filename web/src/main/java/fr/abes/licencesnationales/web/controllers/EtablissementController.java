@@ -10,9 +10,10 @@ import fr.abes.licencesnationales.core.event.etablissement.*;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
-import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.EventService;
+import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
@@ -27,10 +28,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -39,23 +40,20 @@ import java.util.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/ln/etablissement")
+@RequestMapping("/v1/etablissements")
 public class EtablissementController {
 
     @Autowired
     private UtilsMapper mapper;
 
     @Autowired
-    private EtablissementEventRepository etablissementEventRepository;
+    private EventService eventService;
 
     @Autowired
     private EtablissementService etablissementService;
 
     @Autowired
     private IpRepository ipRepository;
-
-    @Autowired
-    private ContactService contactService;
 
     @Autowired
     private  ApplicationEventPublisher applicationEventPublisher;
@@ -69,38 +67,42 @@ public class EtablissementController {
     @Autowired
     EmailService emailService;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private GenererIdAbes genererIdAbes;
+
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
-    @PostMapping("/creationCompte")
+    @PutMapping("/")
     public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String captcha = etablissementCreeWebDto.getRecaptcha();
-        String action = "creationCompte";
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, action);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
         if(!reCaptchaResponse.isSuccess()){
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
 
-        //verifier que le siren n'est pas déjà en base
-        boolean existeSiren = etablissementService.existeSiren(etablissementCreeWebDto.getSiren());
-        log.info("existeSiren = "+ existeSiren);
-        if (existeSiren) {
-            throw new SirenExistException("Cet établissement existe déjà.");
-        }
-        //verifier que le mail du contact n'est pas déjà en base
-        if (contactService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
-            throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
-        }
-        //on crypte le mot de passe + on génère un idAbes + on déclenche la méthode add du controlleur etab
-        else{
-            EtablissementCreeEvent etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEvent.class);
-            applicationEventPublisher.publishEvent(etablissementCreeEvent);
-            etablissementEventRepository.save(new EtablissementEventEntity(etablissementCreeEvent));
-            emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
-            emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
-        }
+        // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
+        EtablissementCreeEvent etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEvent.class);
+
+        // On genère un identifiant Abes
+        etablissementCreeEvent.setIdAbes(GenererIdAbes.generateId());
+        // On crypte le mot de passe
+        etablissementCreeEvent.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
+
+        // On publie l'événement et on le sauvegarde
+        applicationEventPublisher.publishEvent(etablissementCreeEvent);
+        eventService.save((etablissementCreeEvent));
+
+
+        /*******************************************/
+        emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
+        emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
+
     }
 
 
@@ -120,7 +122,7 @@ public class EtablissementController {
                         etablissementModifieWebDto.getVilleContact(),
                         etablissementModifieWebDto.getCedexContact());
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
-        etablissementEventRepository.save(new EtablissementEventEntity(etablissementModifieEvent));
+        eventService.save(etablissementModifieEvent);
     }
 
     @PostMapping(value = "/fusion")
@@ -145,7 +147,7 @@ public class EtablissementController {
                 etablissementFusionneWebDto.getRoleContact(),
                 etablissementFusionneWebDto.getSirenFusionnes());
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        etablissementEventRepository.save(new EtablissementEventEntity(etablissementFusionneEvent));
+        //etablissementEventRepository.save(new EtablissementEventEntity(etablissementFusionneEvent));
     }
 
     @PostMapping(value = "/division")
@@ -153,7 +155,7 @@ public class EtablissementController {
     public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws JsonProcessingException {
         EtablissementDiviseEvent etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEvent.class);
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-        etablissementEventRepository.save(new EtablissementEventEntity(etablissementDiviseEvent));
+       // etablissementEventRepository.save(new EtablissementEventEntity(etablissementDiviseEvent));
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
@@ -169,7 +171,7 @@ public class EtablissementController {
         EtablissementSupprimeEvent etablissementSupprimeEvent
                 = new EtablissementSupprimeEvent(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        etablissementEventRepository.save(new EtablissementEventEntity(etablissementSupprimeEvent));
+        //etablissementEventRepository.save(new EtablissementEventEntity(etablissementSupprimeEvent));
     }
 
     @GetMapping(value = "/{siren}")
