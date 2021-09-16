@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.ContactService;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;

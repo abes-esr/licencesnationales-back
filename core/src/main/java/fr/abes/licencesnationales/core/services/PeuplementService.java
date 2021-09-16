@@ -8,7 +8,7 @@ import fr.abes.lnevent.fr.abes.licencesnationales.web.dto.etablissement.Etabliss
 import fr.abes.lnevent.fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.lnevent.fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
 import fr.abes.lnevent.fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
-import fr.abes.lnevent.fr.abes.licencesnationales.core.repository.EtablissementRepository;
+import fr.abes.lnevent.fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.lnevent.fr.abes.licencesnationales.core.repository.EventRepository;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.ClassPathResource;

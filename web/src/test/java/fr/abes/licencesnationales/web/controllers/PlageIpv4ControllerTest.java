@@ -3,7 +3,7 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;

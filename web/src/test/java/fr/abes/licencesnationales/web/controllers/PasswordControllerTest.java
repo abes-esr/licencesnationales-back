@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.MockUserUtilTest;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.PasswordEventEntity;
-import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
@@ -52,9 +50,6 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
 
     @MockBean
     private ApplicationEventPublisher applicationEventPublisher;
-
-    @MockBean
-    private PasswordEventRepository eventRepository;
 
     @Autowired
     private ObjectMapper mapper;
@@ -131,7 +126,6 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
         Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.any())).thenReturn("123456789");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(user);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new PasswordEventEntity());
 
         dto.setOldPassword("OldPass1Test&");
         dto.setNewPassword("NewPass1Test&");
@@ -148,7 +142,6 @@ public class PasswordControllerTest extends LicencesNationalesAPIApplicationTest
         Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.any())).thenReturn("123456789");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(user);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
-        Mockito.when(eventRepository.save(Mockito.any())).thenReturn(new PasswordEventEntity());
 
         //on teste le cas ou l'ancien mot de passe ne correspond pas à celui en base
         dto.setOldPassword("OldPass1&");

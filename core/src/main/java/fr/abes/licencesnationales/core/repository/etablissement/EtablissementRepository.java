@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.core.repository;
+package fr.abes.licencesnationales.core.repository.etablissement;
 
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;

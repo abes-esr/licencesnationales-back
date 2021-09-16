@@ -1,27 +1,24 @@
 package fr.abes.licencesnationales.core.entities.editeur.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
 
+@Entity
+@DiscriminatorValue("cree")
+@NoArgsConstructor
+@Getter @Setter
 public class EditeurCreeEventEntity extends EditeurEventEntity {
+    @Autowired
+    private transient UtilsMapper mapper;
 
-
-    public EditeurCreeEventEntity(Object source, String nomEditeur, String identifiantEditeur, List<String> groupesEtabRelies,
-                              String adresseEditeur, Set<ContactCommercialEditeurEntity> listeContactCommercialEditeur,
-                              Set<ContactTechniqueEditeurEntity> listeContactTechniqueEditeur) throws JsonProcessingException {
+    public EditeurCreeEventEntity(Object source) {
         super(source);
-        this.event = "editeurCree";
-        this.dateCreationEvent = new Date();
-        this.nomEditeur = nomEditeur;
-        this.identifiantEditeur = identifiantEditeur;
-        this.groupesEtabRelies =groupesEtabRelies;
-        this.adresseEditeur = adresseEditeur;
-        this.listeContactCommercialEditeur = mapper.writeValueAsString(listeContactCommercialEditeur);
-        this.listeContactTechniqueEditeur = mapper.writeValueAsString(listeContactTechniqueEditeur);
     }
+
 }

@@ -1,11 +1,11 @@
 package fr.abes.licencesnationales.core.entities.editeur.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.converter.contactediteur.ContactEditeurConverter;
+import fr.abes.licencesnationales.core.dto.ContactEditeurDto;
 import fr.abes.licencesnationales.core.entities.EventEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import lombok.Getter;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,12 +15,11 @@ import java.util.Set;
 
 @Entity
 @Table(name = "EditeurEvent")
-@Getter
+@NoArgsConstructor
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "event", columnDefinition = "varchar(20)", discriminatorType = DiscriminatorType.STRING)
+@Getter @Setter
 public class EditeurEventEntity extends EventEntity implements Serializable {
-
-    @Autowired
-    @Transient
-    protected ObjectMapper mapper;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeurevent_Sequence")
@@ -41,18 +40,20 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
     protected List<String> groupesEtabRelies = new ArrayList<>();
 
     @Lob
+    @Convert(converter = ContactEditeurConverter.class)
     @Column(name = "LISTE_CONTACT_COMMERCIAL_EDITEURDTO", columnDefinition = "CLOB")
-    protected String listeContactCommercialEditeur;
+    protected Set<ContactEditeurDto> listeContactCommercialEditeur;
 
     @Lob
+    @Convert(converter = ContactEditeurConverter.class)
     @Column(name = "LISTE_CONTACT_TECHNIQUE_EDITEURDTO", columnDefinition = "CLOB")
-    protected String listeContactTechniqueEditeur;
+    protected Set<ContactEditeurDto> listeContactTechniqueEditeur;
 
     @Lob
     @Column(name = "ID_EDITEUR_FUSIONNES")
     protected List<Integer> idEditeurFusionnes;
 
-    public EditeurEventEntity(Object source) throws JsonProcessingException {
+    public EditeurEventEntity(Object source) {
         super(source);
     }
 
@@ -81,6 +82,6 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "EditeurEventEntity {" + "id=" + id + ", événement=" + event + ", nom de l'éditeur=" + nomEditeur + " }";
+        return "EditeurEventEntity {" + "id=" + id + ", nom de l'éditeur=" + nomEditeur + " }";
     }
 }
