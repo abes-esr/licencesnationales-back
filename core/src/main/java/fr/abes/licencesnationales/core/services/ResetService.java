@@ -2,21 +2,14 @@ package fr.abes.licencesnationales.core.services;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementDiviseEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementSupprimeEvent;
-import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
-import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 @Service
 public class ResetService {
@@ -35,7 +28,8 @@ public class ResetService {
     }
 
     public void resetEtablissement() throws IOException {
-        etablissementRepository.deleteAll();
+        /** TODO : resetEtablissement : méthode bien utile pour les besoins fonctionnels ? */
+        /*etablissementRepository.deleteAll();
         for (EtablissementEventEntity eventEntity :
                 eventRepository.findAll()) {
             switch (eventEntity.getEvent()) {
@@ -94,6 +88,6 @@ public class ResetService {
                     applicationEventPublisher.publishEvent(etablissementFusionneEvent);
                     break;
             }
-        }
+        }*/
     }
 }

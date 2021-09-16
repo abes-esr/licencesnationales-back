@@ -1,14 +1,11 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.core.entities.etablissement.PasswordEventEntity;
-import fr.abes.licencesnationales.core.repository.PasswordEventRepository;
 import fr.abes.licencesnationales.web.dto.password.PasswordEnregistrerWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordResetWebDto;
 import fr.abes.licencesnationales.web.dto.password.PasswordUpdateWebDto;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.event.password.UpdatePasswordEvent;
 import fr.abes.licencesnationales.web.dto.password.TokenDto;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
@@ -64,8 +61,6 @@ public class PasswordController {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-    @Autowired
-    private PasswordEventRepository eventRepository;
 
 
     @ApiOperation(value = "permet de ",
@@ -86,9 +81,8 @@ public class PasswordController {
         }
         if (userEmailOrSiren.getEmail() != null && user == null) {
             throw new AuthenticationCredentialsNotFoundException(msgErr);
-        } else
-            if (userEmailOrSiren.getSiren() != null && user == null) {
-                throw new AuthenticationCredentialsNotFoundException(msgErr);
+        } else if (userEmailOrSiren.getSiren() != null && user == null) {
+            throw new AuthenticationCredentialsNotFoundException(msgErr);
         }
         userDetails = new UserDetailsServiceImpl(etablissementService).loadUser(user);
 
@@ -144,9 +138,9 @@ public class PasswordController {
         //le premier mot de passe ne doit pas être encodé, le second oui
         if (passwordEncoder.matches(oldPassword, c.getMotDePasse())) {
             if (!passwordEncoder.matches(newPasswordHash, c.getMotDePasse())) {
-                UpdatePasswordEvent updatePasswordEvent = new UpdatePasswordEvent(this, siren, newPasswordHash);
-                applicationEventPublisher.publishEvent(updatePasswordEvent);
-                eventRepository.save(new PasswordEventEntity(updatePasswordEvent));
+                EtablissementEntity etablissementEntity = etablissementService.getFirstBySiren(siren);
+                etablissementEntity.getContact().setMotDePasse(newPasswordHash);
+                etablissementService.save(etablissementEntity);
             } else {
                 throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");
             }
