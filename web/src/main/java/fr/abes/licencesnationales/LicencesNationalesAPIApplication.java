@@ -34,14 +34,6 @@ public class LicencesNationalesAPIApplication extends SpringBootServletInitializ
 
     @Override
     public void run(String... args) throws Exception {
-
-        EtablissementCreeEventEntity entity = new EtablissementCreeEventEntity(this);
-
-        entity.setAdresse("test");
-
-        etablissementEventRepository.save(entity);
-
-        System.out.println(entity);
     }
 
     @Bean

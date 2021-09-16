@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -58,8 +59,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 .antMatchers("/v1/login").permitAll()
-                .antMatchers("/v1/ln/etablissement/creationCompte").permitAll()
-                .antMatchers("/v1/ln/reinitialisationMotDePasse/**").permitAll()
+                .antMatchers(HttpMethod.PUT, "/v1/etablissements").permitAll()
+                .antMatchers("/v1/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/v1/applicationVersion").permitAll()
                 .antMatchers("/v2/api-docs", "/v3/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**","/swagger-ui.html**", "/swagger-ui/**","/webjars/**").permitAll()

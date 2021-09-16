@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
@@ -167,9 +168,12 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         type.setId(1);
         type.setLibelle("typeEtab");
         List<EtablissementEntity> etabList = new ArrayList<>();
-        etabList.add(new EtablissementEntity(1, "testNom", "123456789", type, "1", null, null));
-        etabList.add(new EtablissementEntity(2, "testNom", "123456789", type, "1", null, null));
-        etabList.add(new EtablissementEntity(3, "testNom", "123456789", type, "1", null, null));
+
+        ContactEntity contact = new ContactEntity("testNom","testPrenom","testAdresse","testBP","testCedex","testCP","testVille","0000000000","test@test.com","12345*:KKk");
+
+        etabList.add(new EtablissementEntity(1, "testNom", "123456789", type, "1", contact));
+        etabList.add(new EtablissementEntity(2, "testNom", "123456789", type, "1", contact));
+        etabList.add(new EtablissementEntity(3, "testNom", "123456789", type, "1", contact));
         Mockito.when(etablissementService.findAll()).thenReturn(etabList);
 
         this.mockMvc.perform(get("/v1/ln/etablissement/getListEtab")).andExpect(status().isOk());
