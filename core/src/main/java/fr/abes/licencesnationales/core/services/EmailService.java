@@ -7,8 +7,6 @@ import fr.abes.licencesnationales.core.dto.MailDto;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.repository.EditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import lombok.extern.slf4j.Slf4j;

@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.listener.editeur;
 
 
-import fr.abes.licencesnationales.core.event.editeur.EditeurSupprimeEvent;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 
 @Component
-public class EditeurSupprimeListener implements ApplicationListener<EditeurSupprimeEvent> {
+public class EditeurSupprimeListener implements ApplicationListener<EditeurSupprimeEventEntity> {
 
     private final EditeurService editeurService;
 
@@ -19,7 +19,7 @@ public class EditeurSupprimeListener implements ApplicationListener<EditeurSuppr
 
     @Override
     @Transactional
-    public void onApplicationEvent(EditeurSupprimeEvent editeurSupprimeEvent) {
+    public void onApplicationEvent(EditeurSupprimeEventEntity editeurSupprimeEvent) {
         editeurService.deleteById(editeurSupprimeEvent.getId());
     }
 }

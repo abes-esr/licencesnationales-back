@@ -5,8 +5,8 @@ import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
-import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
-import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
+import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
@@ -32,18 +32,18 @@ public class IpEntityConverter {
      */
     @Bean
     public void converterIpAjouteeEvent() {
-        Converter<IpAjouteeEvent, IpEntity> myConverter = new Converter<IpAjouteeEvent, IpEntity>() {
+        Converter<IpCreeEventEntity, IpEntity> myConverter = new Converter<IpCreeEventEntity, IpEntity>() {
 
-            public IpEntity convert(MappingContext<IpAjouteeEvent, IpEntity> context) {
+            public IpEntity convert(MappingContext<IpCreeEventEntity, IpEntity> context) {
                 try {
-                    IpAjouteeEvent ipAjouteeEvent = context.getSource();
+                    IpCreeEventEntity ipCreeEvent = context.getSource();
                     IpEntity entity;
-                    if (ipAjouteeEvent.getTypeIp() == IpType.IPV4) {
-                        entity = new IpV4(ipAjouteeEvent.getIp(), ipAjouteeEvent.getCommentaires());
-                    } else if (ipAjouteeEvent.getTypeIp() == IpType.IPV6) {
-                        entity = new IpV6(ipAjouteeEvent.getIp(), ipAjouteeEvent.getCommentaires());
+                    if (ipCreeEvent.getTypeIp() == IpType.IPV4) {
+                        entity = new IpV4(ipCreeEvent.getIp(), ipCreeEvent.getCommentaires());
+                    } else if (ipCreeEvent.getTypeIp() == IpType.IPV6) {
+                        entity = new IpV6(ipCreeEvent.getIp(), ipCreeEvent.getCommentaires());
                     } else {
-                        throw new UnsupportedOperationException("Le type IP n'est pas supporté : " + ipAjouteeEvent.getTypeIp());
+                        throw new UnsupportedOperationException("Le type IP n'est pas supporté : " + ipCreeEvent.getTypeIp());
                     }
 
                     return entity;
@@ -60,11 +60,11 @@ public class IpEntityConverter {
      */
     @Bean
     public void converterIpModifieeEvent() {
-        Converter<IpModifieeEvent, IpEntity> myConverter = new Converter<IpModifieeEvent, IpEntity>() {
+        Converter<IpModifieeEventEntity, IpEntity> myConverter = new Converter<IpModifieeEventEntity, IpEntity>() {
 
-            public IpEntity convert(MappingContext<IpModifieeEvent, IpEntity> context) {
+            public IpEntity convert(MappingContext<IpModifieeEventEntity, IpEntity> context) {
                 try {
-                    IpModifieeEvent ipModifieeEvent = context.getSource();
+                    IpModifieeEventEntity ipModifieeEvent = context.getSource();
                     IpEntity entity;
                     if (ipModifieeEvent.getTypeIp() == IpType.IPV4) {
                         entity = new IpV4(ipModifieeEvent.getId(), ipModifieeEvent.getIp(), ipModifieeEvent.getCommentaires());
@@ -82,4 +82,6 @@ public class IpEntityConverter {
         };
         utilsMapper.addConverter(myConverter); //On ajoute le convertisseur à la liste des convertisseurs
     }
+
+
 }

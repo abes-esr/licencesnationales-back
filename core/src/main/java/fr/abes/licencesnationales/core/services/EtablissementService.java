@@ -3,7 +3,7 @@ package fr.abes.licencesnationales.core.services;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
