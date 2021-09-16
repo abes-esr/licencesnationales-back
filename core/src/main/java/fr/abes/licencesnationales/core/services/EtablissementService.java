@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -49,14 +50,9 @@ public class EtablissementService {
      */
     public void save(EtablissementEntity entity) throws SirenExistException, MailDoublonException {
 
-        if (entity.getId() == null) {
-            // Initialisation du statut à nouvel établisssement
-           entity.setStatut((StatutEtablissementEntity) statutRepository.findById(Constant.STATUT_ETAB_NOUVEAU).get());
-        }
-
         //verifier que le siren n'est pas déjà en base
         boolean existeSiren = existeSiren(entity.getSiren());
-        log.debug("existeSiren = "+ existeSiren);
+        log.debug("existeSiren = " + existeSiren);
         if (existeSiren) {
             throw new SirenExistException("Cet établissement existe déjà.");
         }
@@ -66,10 +62,22 @@ public class EtablissementService {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
 
+        if (entity.getId() == null) {
+            // Création d'un nouvel établisssement
+            entity.setStatut((StatutEtablissementEntity) statutRepository.findById(Constant.STATUT_ETAB_NOUVEAU).get());
+        }
+
         etablissementDao.save(entity);
     }
 
-    public void saveAll(List<EtablissementEntity> entities) { etablissementDao.saveAll(entities); }
+    public void saveAll(List<EtablissementEntity> entities) throws MailDoublonException, SirenExistException {
+
+        Iterator<EtablissementEntity> iter = entities.listIterator();
+        while (iter.hasNext()) {
+            this.save(iter.next());
+        }
+
+    }
 
     public void deleteBySiren(String siren) {
         etablissementDao.deleteBySiren(siren);

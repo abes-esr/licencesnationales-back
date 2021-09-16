@@ -1,14 +1,16 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
-import lombok.NoArgsConstructor;
-
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("modifie")
-@NoArgsConstructor
 public class EtablissementModifieEventEntity  extends EtablissementEventEntity {
+
+    @Deprecated
+    public EtablissementModifieEventEntity() {
+        super();
+    }
     public EtablissementModifieEventEntity(Object source, Integer id) {
         super(source);
         this.id = id;

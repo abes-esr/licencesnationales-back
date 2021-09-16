@@ -11,13 +11,13 @@ import java.util.Date;
 @Getter
 public abstract class EventEntity extends ApplicationEvent {
 
-
     @Column(name = "DATE_CREATION_EVENT")
     protected Date dateCreationEvent;
 
-    public EventEntity(Object source, Date created) {
-        super(source);
-        this.dateCreationEvent = created;
+    @Deprecated
+    public EventEntity() {
+        super(new Object());
+        this.dateCreationEvent = new Date();
     }
 
     public EventEntity(Object source) {
@@ -25,9 +25,9 @@ public abstract class EventEntity extends ApplicationEvent {
         dateCreationEvent = new Date();
     }
 
-    public EventEntity() {
-        super(new Object());
-        this.dateCreationEvent = new Date();
+    public EventEntity(Object source, Date created) {
+        super(source);
+        this.dateCreationEvent = created;
     }
 
     public void setSource(Object source) {
