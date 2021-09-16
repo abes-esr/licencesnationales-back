@@ -20,8 +20,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "Etablissement")
-@NoArgsConstructor
-@AllArgsConstructor
 @Setter
 @Getter
 public class EtablissementEntity implements Serializable {
@@ -67,6 +65,11 @@ public class EtablissementEntity implements Serializable {
             inverseJoinColumns = @JoinColumn(name = "editeur_id"))
     private Set<EditeurEntity> editeurs = new HashSet<>();
 
+    @Deprecated
+    public EtablissementEntity() {
+
+    }
+
 
     /**
      * CTOR d'un établissement avec un identifiant
@@ -77,16 +80,18 @@ public class EtablissementEntity implements Serializable {
      * @param typeEtablissement Type de l'établissement
      * @param idAbes            Identifiant ABES de l'établissement
      * @param contact           Contact de l'établissement
-     * @param editeurs          Liste des éditeurs de l'établissement
      */
-    public EtablissementEntity(Integer id, String name, String siren, TypeEtablissementEntity typeEtablissement, String idAbes, ContactEntity contact, Set<EditeurEntity> editeurs) {
+    public EtablissementEntity(Integer id, String name, String siren, TypeEtablissementEntity typeEtablissement, String idAbes, ContactEntity contact) {
         this.id = id;
         this.name = name;
         this.siren = siren;
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
+
+        if (contact == null) {
+            throw new IllegalArgumentException("Le contact est obligatoire");
+        }
         this.contact = contact;
-        this.editeurs = editeurs;
     }
 
     /**
@@ -103,7 +108,18 @@ public class EtablissementEntity implements Serializable {
         this.siren = siren;
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
-        this.setContact(contact);
+        if (contact == null) {
+            throw new IllegalArgumentException("Le contact est obligatoire");
+        }
+        this.contact = contact;
+    }
+
+    public void ajouterEditeur(EditeurEntity editeur) {
+        this.editeurs.add(editeur);
+    }
+
+    public void ajouterIp(IpEntity ip) {
+        this.ips.add(ip);
     }
 
     @Override

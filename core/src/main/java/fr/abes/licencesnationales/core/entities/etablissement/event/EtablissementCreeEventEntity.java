@@ -9,10 +9,14 @@ import javax.persistence.Entity;
 
 @Entity
 @DiscriminatorValue("cree")
-@NoArgsConstructor
 @Getter
 @Setter
 public class EtablissementCreeEventEntity  extends EtablissementEventEntity {
+
+    @Deprecated
+    public EtablissementCreeEventEntity() {
+        super();
+    }
 
     public EtablissementCreeEventEntity(Object source) {
         super(source);

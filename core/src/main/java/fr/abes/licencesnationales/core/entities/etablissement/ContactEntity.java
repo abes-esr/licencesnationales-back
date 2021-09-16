@@ -13,8 +13,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "Contact")
-@NoArgsConstructor
-@AllArgsConstructor
 @Getter
 @Setter
 public class ContactEntity implements Serializable {
@@ -61,33 +59,9 @@ public class ContactEntity implements Serializable {
 
     private String role = "etab";
 
-    /**
-     * CTOR d'un contact
-     *
-     * @param nom          Nom du contact
-     * @param prenom       Prénom du contact
-     * @param mail         Email du contact
-     * @param motDePasse   Mot de passe du contact
-     * @param telephone    Numéro de téléphone du contact
-     * @param adresse      Adresse postale du contact
-     * @param boitePostale Numéro de boîte postale du contact
-     * @param codePostal   Code postal du contact
-     * @param cedex        Numéro du cedex du contact
-     * @param ville        Ville du contact
-     * @param role         Rôle du contact
-     */
-    public ContactEntity(String nom, String prenom, String mail, String motDePasse, String telephone, String adresse, String boitePostale, String codePostal, String cedex, String ville, String role) {
-        this.nom = nom;
-        this.prenom = prenom;
-        this.mail = mail;
-        this.motDePasse = motDePasse;
-        this.telephone = telephone;
-        this.adresse = adresse;
-        this.boitePostale = boitePostale;
-        this.codePostal = codePostal;
-        this.cedex = cedex;
-        this.ville = ville;
-        this.role = role;
+    @Deprecated
+    public ContactEntity() {
+
     }
 
     /**
@@ -104,6 +78,34 @@ public class ContactEntity implements Serializable {
      * @param motDePasse   Mot de passe du contact
      */
     public ContactEntity(String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail, String motDePasse) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.motDePasse = motDePasse;
+        this.mail = mail;
+        this.telephone = telephone;
+        this.adresse = adresse;
+        this.boitePostale = boitePostale;
+        this.codePostal = codePostal;
+        this.ville = ville;
+        this.cedex = cedex;
+    }
+
+    /**
+     * CTOR d'un contact avec un identifiant et le rôle par défaut à 'etab'.
+     *
+     * @param id           Identifiant du contact
+     * @param prenom       Prénom du contact
+     * @param mail         Email du contact
+     * @param telephone    Numéro de téléphone du contact
+     * @param adresse      Adresse postale du contact
+     * @param boitePostale Numéro de boîte postale du contact
+     * @param codePostal   Code postal du contact
+     * @param cedex        Numéro du cedex du contact
+     * @param ville        Ville du contact
+     * @param motDePasse   Mot de passe du contact
+     */
+    public ContactEntity(Integer id, String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail, String motDePasse) {
+        this.id = id;
         this.nom = nom;
         this.prenom = prenom;
         this.motDePasse = motDePasse;

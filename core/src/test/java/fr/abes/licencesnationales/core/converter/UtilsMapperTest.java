@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.editeur.EditeurEntityConverter;
-import fr.abes.licencesnationales.core.converter.etablissement.EtablissementEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.IpEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
@@ -41,13 +40,11 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, EtablissementEntityConverter.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class, EditeurEntityConverter.class})
+@SpringBootTest(classes = {UtilsMapper.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class, EditeurEntityConverter.class})
 public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;
 
-    @InjectMocks
-    private EtablissementEntityConverter etablissementEntityConverter;
 
     @MockBean
     private TypeEtablissementRepository repository;

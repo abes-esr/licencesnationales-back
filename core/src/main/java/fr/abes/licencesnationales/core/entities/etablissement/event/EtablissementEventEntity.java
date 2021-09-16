@@ -10,7 +10,6 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "EtablissementEvent")
-@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "event", columnDefinition = "varchar(20)", discriminatorType = DiscriminatorType.STRING)
 @Getter
@@ -28,9 +27,6 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
     @Column(name = "SIREN")
     protected String siren;
 
-    @Column(name = "ADRESSE")
-    protected String adresse;
-
     @Column(name = "TYPE_ETABLISSEMENT")
     protected String typeEtablissement;
 
@@ -39,6 +35,9 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
 
     @Column(name = "ID_ABES")
     protected String idAbes;
+
+    @Column(name = "IDL_CONTACT")
+    protected Integer idContact;
 
     @Column(name = "MAIL_CONTACT")
     protected String mailContact;
@@ -70,11 +69,14 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
     @Column(name = "ROLE_CONTACT")
     protected String roleContact;
 
+    @Deprecated
+    public EtablissementEventEntity() {
+        super();
+    }
 
     public EtablissementEventEntity(Object source) {
         super(source);
     }
-
 
     @Override
     public boolean equals(Object obj) {
