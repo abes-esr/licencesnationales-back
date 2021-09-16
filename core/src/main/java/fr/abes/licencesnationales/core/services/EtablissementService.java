@@ -7,10 +7,10 @@ import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
-import fr.abes.licencesnationales.core.repository.ContactEtablissementRepository;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import lombok.extern.slf4j.Slf4j;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class EtablissementService {
     private EtablissementRepository etablissementDao;
 
     @Autowired
-    private ContactEtablissementRepository contactEtablissementDao;
+    private ContactRepository contactEtablissementDao;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

@@ -1,14 +1,11 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.event.etablissement.*;
 import fr.abes.licencesnationales.core.exception.*;
-import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -87,7 +84,7 @@ public class EtablissementController {
         }
 
         // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
-        EtablissementCreeEvent etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEvent.class);
+        EtablissementCreeEventEntity etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEventEntity.class);
 
         // On genère un identifiant Abes
         etablissementCreeEvent.setIdAbes(GenererIdAbes.generateId());
@@ -96,66 +93,47 @@ public class EtablissementController {
 
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        eventService.save((etablissementCreeEvent));
+        eventService.save(etablissementCreeEvent);
 
 
         /*******************************************/
         emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
         emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
-
     }
 
 
     @PostMapping(value = "/modification")
     public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
         log.info("debut EtablissementController modification");
-        EtablissementModifieEvent etablissementModifieEvent =
-                new EtablissementModifieEvent(this,
-                        filtrerAccesServices.getSirenFromSecurityContextUser(),
-                        etablissementModifieWebDto.getNomContact(),
-                        etablissementModifieWebDto.getPrenomContact(),
-                        etablissementModifieWebDto.getMailContact(),
-                        etablissementModifieWebDto.getTelephoneContact(),
-                        etablissementModifieWebDto.getAdresseContact(),
-                        etablissementModifieWebDto.getBoitePostaleContact(),
-                        etablissementModifieWebDto.getCodePostalContact(),
-                        etablissementModifieWebDto.getVilleContact(),
-                        etablissementModifieWebDto.getCedexContact());
+        String siren = filtrerAccesServices.getSirenFromSecurityContextUser();
+        EtablissementEntity etablissement = etablissementService.getFirstBySiren(siren);
+        EtablissementModifieEventEntity etablissementModifieEvent = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        //on initialise les champs non modifiable à la valeur originale trouvée dans la base
+        etablissementModifieEvent.setNomEtab(etablissement.getName());
+        etablissementModifieEvent.setTypeEtablissement(etablissement.getTypeEtablissement().getLibelle());
+        etablissementModifieEvent.setSiren(etablissement.getSiren());
+        etablissementModifieEvent.setMotDePasse(etablissement.getContact().getMotDePasse());
+        etablissementModifieEvent.setRoleContact(etablissement.getContact().getRole());
+
         applicationEventPublisher.publishEvent(etablissementModifieEvent);
+
         eventService.save(etablissementModifieEvent);
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
-        EtablissementFusionneEvent etablissementFusionneEvent
-                = new EtablissementFusionneEvent(this,
-                etablissementFusionneWebDto.getNom(),
-                etablissementFusionneWebDto.getSiren(),
-                etablissementFusionneWebDto.getTypeEtablissement(),
-                etablissementFusionneWebDto.getIdAbes(),
-                etablissementFusionneWebDto.getNomContact(),
-                etablissementFusionneWebDto.getPrenomContact(),
-                etablissementFusionneWebDto.getAdresseContact(),
-                etablissementFusionneWebDto.getBoitePostaleContact(),
-                etablissementFusionneWebDto.getCodePostalContact(),
-                etablissementFusionneWebDto.getVilleContact(),
-                etablissementFusionneWebDto.getCedexContact(),
-                etablissementFusionneWebDto.getTelephoneContact(),
-                etablissementFusionneWebDto.getMailContact(),
-                etablissementFusionneWebDto.getMotDePasse(),
-                etablissementFusionneWebDto.getRoleContact(),
-                etablissementFusionneWebDto.getSirenFusionnes());
+    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) {
+        EtablissementFusionneEventEntity etablissementFusionneEvent = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        //etablissementEventRepository.save(new EtablissementEventEntity(etablissementFusionneEvent));
+        eventService.save(etablissementFusionneEvent);
     }
 
     @PostMapping(value = "/division")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws JsonProcessingException {
-        EtablissementDiviseEvent etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEvent.class);
+    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) {
+        EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
-       // etablissementEventRepository.save(new EtablissementEventEntity(etablissementDiviseEvent));
+        eventService.save(etablissementDiviseEvent);
     }
 
     @DeleteMapping(value = "/suppression/{siren}")
@@ -168,10 +146,10 @@ public class EtablissementController {
         String nomEtab = ((UserDetailsImpl) user).getNameEtab();
         emailService.constructSuppressionMail(motif.get("motif"), nomEtab, emailUser);
 
-        EtablissementSupprimeEvent etablissementSupprimeEvent
-                = new EtablissementSupprimeEvent(this, siren);
+        EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        //etablissementEventRepository.save(new EtablissementEventEntity(etablissementSupprimeEvent));
+        eventService.save(etablissementSupprimeEvent);
+
     }
 
     @GetMapping(value = "/{siren}")

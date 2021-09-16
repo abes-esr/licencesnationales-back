@@ -29,4 +29,5 @@ public class ContactWebDto {
     private String ville;
     @JsonProperty("role")
     private String role;
+
 }
