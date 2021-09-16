@@ -23,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -73,28 +74,31 @@ public class EtablissementController {
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
-    @PutMapping("/")
+    @PutMapping
     public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
-        //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
-        if(!reCaptchaResponse.isSuccess()){
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+        if(captcha==null){
+            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
         }
 
-        // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
-        EtablissementCreeEventEntity etablissementCreeEvent = mapper.map(etablissementCreeWebDto, EtablissementCreeEventEntity.class);
+        //verifier la réponse fr.abes.licencesnationales.web.recaptcha
+       /* ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
+        if(!reCaptchaResponse.isSuccess()){
+            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+        }*/
 
+        // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
+        EtablissementCreeEventEntity event = mapper.map(etablissementCreeWebDto, EtablissementCreeEventEntity.class);
+        event.setSource(this);
         // On genère un identifiant Abes
-        etablissementCreeEvent.setIdAbes(GenererIdAbes.generateId());
+        event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
-        etablissementCreeEvent.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
+        event.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
 
         // On publie l'événement et on le sauvegarde
-        applicationEventPublisher.publishEvent(etablissementCreeEvent);
-        eventService.save(etablissementCreeEvent);
-
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
 
         /*******************************************/
         emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
@@ -102,22 +106,19 @@ public class EtablissementController {
     }
 
 
-    @PostMapping(value = "/modification")
-    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
-        log.info("debut EtablissementController modification");
-        String siren = filtrerAccesServices.getSirenFromSecurityContextUser();
-        EtablissementEntity etablissement = etablissementService.getFirstBySiren(siren);
-        EtablissementModifieEventEntity etablissementModifieEvent = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
-        //on initialise les champs non modifiable à la valeur originale trouvée dans la base
-        etablissementModifieEvent.setNomEtab(etablissement.getName());
-        etablissementModifieEvent.setTypeEtablissement(etablissement.getTypeEtablissement().getLibelle());
-        etablissementModifieEvent.setSiren(etablissement.getSiren());
-        etablissementModifieEvent.setMotDePasse(etablissement.getContact().getMotDePasse());
-        etablissementModifieEvent.setRoleContact(etablissement.getContact().getRole());
+    @PostMapping(value = "{siren}")
+    public void edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
 
-        applicationEventPublisher.publishEvent(etablissementModifieEvent);
+        String sirenUtilisateur = filtrerAccesServices.getSirenFromSecurityContextUser();
 
-        eventService.save(etablissementModifieEvent);
+        if (!siren.equalsIgnoreCase(sirenUtilisateur)) {
+            throw  new AccessDeniedException("Il ne s'agit pas de votre établissement");
+        }
+
+        EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        event.setSource(this);
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
     }
 
     @PostMapping(value = "/fusion")
@@ -136,7 +137,7 @@ public class EtablissementController {
         eventService.save(etablissementDiviseEvent);
     }
 
-    @DeleteMapping(value = "/suppression/{siren}")
+    @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public void suppression(@PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
         //envoi du mail de suppression

@@ -26,7 +26,7 @@ public class MockUserUtilTest {
         user.setSiren("123456789");
         user.setStatut(new StatutEtablissementEntity());
         user.setTypeEtablissement(new TypeEtablissementEntity(1, "test"));
-        ContactEntity contact = new ContactEntity(1, "nomTest", "prenomTest", "mailTest@test.com", passwordEncoder.encode("OldPass1Test&"), "TelTest", "adresseTest", "BPTest", "CPTest", "CedexTest", "villeTest", "etab");
+        ContactEntity contact = new ContactEntity(1, "nomTest", "prenomTest", "mailTest@test.com", passwordEncoder.encode("OldPass1Test&"), "TelTest", "adresseTest", "BPTest", "CPTest", "CedexTest", "villeTest");
         user.setContact(contact);
         return user;
     }
