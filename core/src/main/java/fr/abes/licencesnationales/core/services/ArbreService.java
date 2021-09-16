@@ -3,9 +3,9 @@ package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.repository.EtablissementEventRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +27,8 @@ public class ArbreService {
     }
 
     public String genereArbre() throws ParseException, IOException {
-        var builder = new StringBuilder();
+        /** TODO : a revoir */
+        /*var builder = new StringBuilder();
         var simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy", Locale.FRENCH);
         for (EtablissementEventEntity eventEntity :
                 eventRepository.getAllByDateCreationEventBetweenOrderByDateCreationEvent(simpleDateFormat.parse("15-04-2021"),
@@ -61,6 +62,7 @@ public class ArbreService {
                     break;
             }
         }
-        return builder.toString();
+        return builder.toString();*/
+        return "";
     }
 }

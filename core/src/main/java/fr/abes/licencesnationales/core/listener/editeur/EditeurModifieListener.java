@@ -3,13 +3,13 @@ package fr.abes.licencesnationales.core.listener.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
-import fr.abes.licencesnationales.core.repository.EditeurRepository;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
+import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EditeurModifieListener implements ApplicationListener<EditeurModifieEvent> {
+public class EditeurModifieListener implements ApplicationListener<EditeurModifieEventEntity> {
 
     private final EditeurRepository editeurRepository;
 
@@ -21,7 +21,7 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
     }
 
     @Override
-    public void onApplicationEvent(EditeurModifieEvent editeurModifieEvent) {
+    public void onApplicationEvent(EditeurModifieEventEntity editeurModifieEvent) {
         EditeurEntity editeurEntity = utilsMapper.map(editeurModifieEvent, EditeurEntity.class);
         editeurRepository.save(editeurEntity);
     }

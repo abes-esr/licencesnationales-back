@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class EtablissementModifieWebDto {
+    private Integer id;
     private String siren;
     private String nomContact;
     private String prenomContact;
@@ -14,4 +15,5 @@ public class EtablissementModifieWebDto {
     private String codePostalContact;
     private String villeContact;
     private String cedexContact;
+    private String roleContact;
 }
