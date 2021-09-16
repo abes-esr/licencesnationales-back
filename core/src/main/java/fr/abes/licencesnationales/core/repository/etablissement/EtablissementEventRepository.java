@@ -1,6 +1,6 @@
-package fr.abes.licencesnationales.core.repository;
+package fr.abes.licencesnationales.core.repository.etablissement;
 
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

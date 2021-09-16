@@ -4,7 +4,7 @@ package fr.abes.licencesnationales.core.listener.ip;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.event.ip.IpModifieeEvent;
+import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
-public class IpModifieeListener implements ApplicationListener<IpModifieeEvent> {
+public class IpModifieeListener implements ApplicationListener<IpModifieeEventEntity> {
 
     private final EtablissementService service;
     private final UtilsMapper utilsMapper;
@@ -25,7 +25,7 @@ public class IpModifieeListener implements ApplicationListener<IpModifieeEvent> 
 
     @SneakyThrows
     @Override
-    public void onApplicationEvent(IpModifieeEvent ipModifieeEvent) {
+    public void onApplicationEvent(IpModifieeEventEntity ipModifieeEvent) {
         log.info("ipModifieeEvent.getSiren()= " + ipModifieeEvent.getSiren());
         EtablissementEntity etablissementEntity = service.getFirstBySiren(ipModifieeEvent.getSiren());
         etablissementEntity.getIps().removeIf(entity -> entity.getId().equals(ipModifieeEvent.getId()));

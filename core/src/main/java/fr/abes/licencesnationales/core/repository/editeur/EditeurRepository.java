@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.core.repository;
+package fr.abes.licencesnationales.core.repository.editeur;
 
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,13 +1,10 @@
 package fr.abes.licencesnationales.core.services;
 
 
-import com.github.jgonian.ipmath.Ipv4Range;
-import com.github.jgonian.ipmath.Ipv6;
-import com.github.jgonian.ipmath.Ipv6Range;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
-import fr.abes.licencesnationales.core.repository.EtablissementRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpV4Repository;
 import fr.abes.licencesnationales.core.repository.ip.IpV6Repository;

@@ -1,9 +1,9 @@
 package fr.abes.licencesnationales.web.converter;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
-import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.ContactWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
@@ -26,7 +26,7 @@ import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class WebDtoConverterTest {
+public class EtablissementWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
     @Autowired
@@ -59,12 +59,12 @@ public class WebDtoConverterTest {
         setContactTech.add(contactTechnique);
         editeur.setListeContactTechniqueEditeur(setContactTech);
 
-        EditeurCreeEvent editeurCreeEvent = utilsMapper.map(editeur, EditeurCreeEvent.class);
+        EditeurCreeEventEntity editeurCreeEvent = utilsMapper.map(editeur, EditeurCreeEventEntity.class);
 
         Assertions.assertEquals("testNom", editeurCreeEvent.getNomEditeur());
         Assertions.assertEquals("testAdresse", editeurCreeEvent.getAdresseEditeur());
         Assertions.assertEquals("testId", editeurCreeEvent.getIdentifiantEditeur());
-        Assertions.assertEquals(format.format(new Date()), format.format(editeurCreeEvent.getDateCreation()));
+        Assertions.assertEquals(format.format(new Date()), format.format(editeurCreeEvent.getDateCreationEvent()));
         Assertions.assertEquals("etabRelie1", editeurCreeEvent.getGroupesEtabRelies().get(0));
         Assertions.assertEquals("etabRelie2", editeurCreeEvent.getGroupesEtabRelies().get(1));
         Assertions.assertEquals("testNomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContact());
@@ -101,7 +101,7 @@ public class WebDtoConverterTest {
         setContactTech.add(contactTechnique);
         editeur.setListeContactTechniqueEditeur(setContactTech);
 
-        EditeurModifieEvent editeurModifieEvent = utilsMapper.map(editeur, EditeurModifieEvent.class);
+        EditeurModifieEventEntity editeurModifieEvent = utilsMapper.map(editeur, EditeurModifieEventEntity.class);
 
         Assertions.assertEquals(Long.toString(1L), editeurModifieEvent.getId().toString());
         Assertions.assertEquals("testNom", editeurModifieEvent.getNomEditeur());
@@ -140,9 +140,9 @@ public class WebDtoConverterTest {
         etablissement.setRoleContact("etab");
         etablissement.setRecaptcha("testRecaptcha");
 
-        EtablissementCreeEvent event = utilsMapper.map(etablissement, EtablissementCreeEvent.class);
+        EtablissementCreeEventEntity event = utilsMapper.map(etablissement, EtablissementCreeEventEntity.class);
 
-        Assertions.assertEquals("testNom", event.getNom());
+        Assertions.assertEquals("testNom", event.getNomEtab());
         Assertions.assertEquals("123456789", event.getSiren());
         Assertions.assertEquals("testType", event.getTypeEtablissement());
         Assertions.assertTrue(passwordEncoder.matches("testPassword", event.getMotDePasse()));
@@ -156,7 +156,6 @@ public class WebDtoConverterTest {
         Assertions.assertEquals("0000000000", event.getTelephoneContact());
         Assertions.assertEquals("test@test.com", event.getMailContact());
         Assertions.assertEquals("etab", event.getRoleContact());
-        Assertions.assertEquals("testRecaptcha", event.getRecaptcha());
 
 
     }

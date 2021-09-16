@@ -6,18 +6,20 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
-import fr.abes.licencesnationales.core.event.editeur.EditeurModifieEvent;
-import fr.abes.licencesnationales.web.dto.editeur.*;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
+import fr.abes.licencesnationales.web.dto.editeur.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Slf4j
@@ -34,14 +36,14 @@ public class EditeurController {
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
     public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
-        EditeurCreeEvent editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEvent.class);
+        EditeurCreeEventEntity editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
         editeurService.addEditeur(editeurCreeEvent);
     }
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
     public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException, JsonProcessingException {
-        EditeurModifieEvent editeurModifieEvent = mapper.map(editeurModifieDTO, EditeurModifieEvent.class);
+        EditeurModifieEventEntity editeurModifieEvent = mapper.map(editeurModifieDTO, EditeurModifieEventEntity.class);
         editeurService.updateEditeur(editeurModifieEvent);
     }
 
@@ -89,7 +91,7 @@ public class EditeurController {
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String id)  {
+    public void suppression(@PathVariable String id) throws JsonProcessingException {
         log.info("id suppression = " + id);
         editeurService.deleteEditeur(id);
     }

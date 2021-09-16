@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementFusionneEvent;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 import javax.transaction.Transactional;
 
 @Component
-public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEvent> {
+public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEventEntity> {
 
     private final EtablissementService service;
     private final UtilsMapper utilsMapper;
@@ -21,7 +21,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
     @Override
     @Transactional
-    public void onApplicationEvent(EtablissementFusionneEvent etablissementFusionneEvent) {
+    public void onApplicationEvent(EtablissementFusionneEventEntity etablissementFusionneEvent) {
 
        /* Set<IpEntity> ipEntities = new HashSet<>();
         Set<EditeurEntity> editeurEntities = new HashSet<>();

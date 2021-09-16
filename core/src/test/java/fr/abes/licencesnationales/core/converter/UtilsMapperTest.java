@@ -1,24 +1,26 @@
 package fr.abes.licencesnationales.core.converter;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.editeur.EditeurEntityConverter;
 import fr.abes.licencesnationales.core.converter.etablissement.EtablissementEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.IpEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
+import fr.abes.licencesnationales.core.dto.ContactEditeurDto;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
-import fr.abes.licencesnationales.core.event.editeur.EditeurCreeEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementCreeEvent;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
-import fr.abes.licencesnationales.core.event.ip.IpAjouteeEvent;
-import fr.abes.licencesnationales.core.repository.TypeEtablissementRepository;
+import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -52,8 +54,8 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test nouvelEditeur 1CC 0CT")
-    public void testMapperEditeurCreeEventVersEditeurEntity1() {
-        EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this);
+    void testMapperEditeurCreeEventVersEditeurEntity1() throws JsonProcessingException {
+        EditeurCreeEventEntity editeurCreeEvent = new EditeurCreeEventEntity(this);
 
         editeurCreeEvent.setNomEditeur("nomEditeur");
         editeurCreeEvent.setAdresseEditeur("adressePostale");
@@ -66,12 +68,12 @@ public class UtilsMapperTest {
         ContactCommercialEditeurEntity contactComm = new ContactCommercialEditeurEntity("nomCCA", "prenomCCA", "mail@CCA.com");
         Set<ContactCommercialEditeurEntity> setComm = new HashSet<>();
         setComm.add(contactComm);
-        editeurCreeEvent.setListeContactCommercialEditeur(setComm);
+        editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(setComm, ContactEditeurDto.class));
 
         ContactTechniqueEditeurEntity contactTech = new ContactTechniqueEditeurEntity("testNomTech", "testPrenomTech", "test@test.tech");
         Set<ContactTechniqueEditeurEntity> setTech = new HashSet<>();
         setTech.add(contactTech);
-        editeurCreeEvent.setListeContactTechniqueEditeur(setTech);
+        editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(setTech, ContactEditeurDto.class));
 
         EditeurEntity entity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
 
@@ -91,8 +93,8 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test nouvelEditeur 2CC 2CT")
-    public void testMapperEditeurCreeEventVersEditeurEntity2() {
-        EditeurCreeEvent editeurCreeEvent = new EditeurCreeEvent(this);
+    void testMapperEditeurCreeEventVersEditeurEntity2() {
+        EditeurCreeEventEntity editeurCreeEvent = new EditeurCreeEventEntity(this);
 
         editeurCreeEvent.setNomEditeur("nomEditeur");
         editeurCreeEvent.setAdresseEditeur("adressePostale");
@@ -108,7 +110,7 @@ public class UtilsMapperTest {
         Set<ContactCommercialEditeurEntity> set = new HashSet<>();
         set.add(cc1);
         set.add(cc2);
-        editeurCreeEvent.setListeContactCommercialEditeur(set);
+        editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(set, ContactEditeurDto.class));
 
         ContactTechniqueEditeurEntity ct1 = new ContactTechniqueEditeurEntity("nomCTA", "prenomCTA", "mail@CTA.com");
         ContactTechniqueEditeurEntity ct2 = new ContactTechniqueEditeurEntity("nomCTB", "prenomCTB", "mail@CTB.com");
@@ -116,7 +118,7 @@ public class UtilsMapperTest {
         Set<ContactTechniqueEditeurEntity> set2 = new HashSet<>();
         set2.add(ct1);
         set2.add(ct2);
-        editeurCreeEvent.setListeContactTechniqueEditeur(set2);
+        editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(set2, ContactEditeurDto.class));
 
 
         EditeurEntity entity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
@@ -139,50 +141,43 @@ public class UtilsMapperTest {
         Assertions.assertTrue(isValidMailT(techniqueEntity.getMailContact()));
 
     }
-    public Boolean isValidNomC(String s) {
-        if(s.equals("nomCCA") || s.equals("nomCCB")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidNomC(String s) {
+        return (s.equals("nomCCA") || s.equals("nomCCB"));
     }
-    public Boolean isValidNomT(String s) {
-        if(s.equals("nomCTA") || s.equals("nomCTB")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidNomT(String s) {
+        return (s.equals("nomCTA") || s.equals("nomCTB"));
     }
-    public Boolean isValidPrenomC(String s) {
-        if(s.equals("prenomCCA") || s.equals("prenomCCB")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidPrenomC(String s) {
+        return (s.equals("prenomCCA") || s.equals("prenomCCB"));
     }
-    public Boolean isValidPrenomT(String s) {
-        if(s.equals("prenomCTA") || s.equals("prenomCTB")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidPrenomT(String s) {
+        return (s.equals("prenomCTA") || s.equals("prenomCTB"));
     }
-    public Boolean isValidMailC(String s) {
-        if(s.equals("mail@CCA.com") || s.equals("mail@CCB.com")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidMailC(String s) {
+        return ("mail@CCA.com".equals(s) || "mail@CCB.com".equals(s));
     }
-    public Boolean isValidMailT(String s) {
-        if(s.equals("mail@CTA.com") || s.equals("mail@CTB.com")) {
-            return true;
-        }
-        return false;
+    private Boolean isValidMailT(String s) {
+        return ("mail@CTA.com".equals(s) || "mail@CTB.com".equals(s));
     }
 
     @Test
     @DisplayName("test mapper établissement modifié")
-    public void testMapperEtablissementModifieEvent() {
-        EtablissementModifieEvent etablissementModifieEvent = new EtablissementModifieEvent(this, "123456789", "nomContactTest", "prenomContactTest", "mail@test.com", "0000000000", "adresseTest", "BPTest", "00000", "villeTest", "cedexTest");
+    void testMapperEtablissementModifieEvent() {
+        EtablissementModifieEventEntity etablissementModifieEvent = new EtablissementModifieEventEntity(this, 1);
+        etablissementModifieEvent.setSiren("123456789");
+        etablissementModifieEvent.setNomContact("nomContactTest");
+        etablissementModifieEvent.setPrenomContact("prenomContactTest");
+        etablissementModifieEvent.setMailContact("mail@test.com");
+        etablissementModifieEvent.setTelephoneContact("0000000000");
+        etablissementModifieEvent.setAdresseContact("adresseTest");
+        etablissementModifieEvent.setBoitePostaleContact("BPTest");
+        etablissementModifieEvent.setCodePostalContact("00000");
+        etablissementModifieEvent.setVilleContact("villeTest");
+        etablissementModifieEvent.setCedexContact("cedexTest");
 
         ContactEntity entity = utilsMapper.map(etablissementModifieEvent, ContactEntity.class);
 
+        Assertions.assertEquals(1, entity.getId().intValue());
         Assertions.assertEquals("nomContactTest",entity.getNom());
         Assertions.assertEquals("prenomContactTest", entity.getPrenom());
         Assertions.assertEquals("mail@test.com", entity.getMail());
@@ -196,11 +191,11 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test mapper etablissement créé")
-    public void testMapperEtablissementEventCree() {
+    void testMapperEtablissementEventCree() {
         Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "testType")));
-        EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this);
+        EtablissementCreeEventEntity etablissementCreeEvent = new EtablissementCreeEventEntity(this);
 
-        etablissementCreeEvent.setNom("testNom");
+        etablissementCreeEvent.setNomEtab("testNom");
         etablissementCreeEvent.setTypeEtablissement("testType");
         etablissementCreeEvent.setSiren("123456789");
         etablissementCreeEvent.setIdAbes("1234");
@@ -237,11 +232,11 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test mapper etablissement créé avec type inconnu")
-    public void testMapperEtablissementEventCreeWithUnknownType() {
+    void testMapperEtablissementEventCreeWithUnknownType() {
         Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenThrow(new MappingException(Lists.newArrayList(new ErrorMessage("Type d'établissement inconnu"))));
-        EtablissementCreeEvent etablissementCreeEvent = new EtablissementCreeEvent(this);
+        EtablissementCreeEventEntity etablissementCreeEvent = new EtablissementCreeEventEntity(this);
 
-        etablissementCreeEvent.setNom("testNom");
+        etablissementCreeEvent.setNomEtab("testNom");
         etablissementCreeEvent.setTypeEtablissement("testType");
         etablissementCreeEvent.setSiren("123456789");
         etablissementCreeEvent.setIdAbes("1234");
@@ -263,8 +258,8 @@ public class UtilsMapperTest {
 
     @Test
     @DisplayName("test mapper IP créée")
-    public void testMapperIpEventCree() {
-        IpAjouteeEvent ip = new IpAjouteeEvent(this);
+    void testMapperIpEventCree() {
+        IpCreeEventEntity ip = new IpCreeEventEntity(this);
         ip.setSiren("123456789");
         ip.setTypeIp(IpType.IPV4);
         ip.setTypeAcces("ip");

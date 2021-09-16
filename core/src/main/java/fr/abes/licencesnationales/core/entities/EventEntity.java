@@ -1,23 +1,37 @@
 package fr.abes.licencesnationales.core.entities;
 
-import fr.abes.licencesnationales.core.event.Event;
 import lombok.Getter;
+import org.springframework.context.ApplicationEvent;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.*;
 import java.util.Date;
+
 
 @MappedSuperclass
 @Getter
-public abstract class EventEntity extends Event {
+public abstract class EventEntity extends ApplicationEvent {
+
 
     @Column(name = "DATE_CREATION_EVENT")
     protected Date dateCreationEvent;
 
-    @Column(name = "EVENT")
-    protected String event;
+    public EventEntity(Object source, Date created) {
+        super(source);
+        this.dateCreationEvent = created;
+    }
 
     public EventEntity(Object source) {
         super(source);
+        dateCreationEvent = new Date();
     }
+
+    public EventEntity() {
+        super(new Object());
+        this.dateCreationEvent = new Date();
+    }
+
+    public void setSource(Object source) {
+        this.source = source;
+    }
+
 }
