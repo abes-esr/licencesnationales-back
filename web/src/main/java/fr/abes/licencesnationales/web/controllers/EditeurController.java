@@ -37,14 +37,12 @@ public class EditeurController {
     @PreAuthorize("hasAuthority('admin')")
     public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
         EditeurCreeEventEntity editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
-        editeurService.addEditeur(editeurCreeEvent);
     }
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
     public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException, JsonProcessingException {
         EditeurModifieEventEntity editeurModifieEvent = mapper.map(editeurModifieDTO, EditeurModifieEventEntity.class);
-        editeurService.updateEditeur(editeurModifieEvent);
     }
 
     @GetMapping(value = "/{id}")

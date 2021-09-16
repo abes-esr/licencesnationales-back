@@ -14,8 +14,6 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @Getter @Setter
 public class EditeurCreeEventEntity extends EditeurEventEntity {
-    @Autowired
-    private transient UtilsMapper mapper;
 
     public EditeurCreeEventEntity(Object source) {
         super(source);
