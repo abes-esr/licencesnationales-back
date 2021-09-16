@@ -159,7 +159,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setListeContactCommercialEditeur(cc);
         editeurCreeWebDto.setListeContactTechniqueEditeur(ct);
 
-        Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).addEditeur(Mockito.any());
+        Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).save(Mockito.any());
 
         this.mockMvc.perform(put("/v1/ln/editeur/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))

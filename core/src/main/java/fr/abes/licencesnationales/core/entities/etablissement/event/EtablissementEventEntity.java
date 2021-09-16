@@ -1,11 +1,9 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -18,10 +16,6 @@ import java.io.Serializable;
 @Getter
 @Setter
 public abstract class EtablissementEventEntity extends EventEntity implements Serializable {
-
-    @Autowired
-    @Transient
-    private ObjectMapper mapper;
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "etabevent_Sequence")

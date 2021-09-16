@@ -22,8 +22,6 @@ import java.util.List;
 @Getter
 @Setter
 public class EtablissementFusionneEventEntity  extends EtablissementEventEntity {
-    @Autowired
-    private ObjectMapper mapper;
 
     //TODO: Définir la différence avec etablissementsFusionne
     @Lob
