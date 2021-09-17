@@ -83,10 +83,10 @@ public class EtablissementController {
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-       /* ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
         if(!reCaptchaResponse.isSuccess()){
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
-        }*/
+        }
 
         // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
         EtablissementCreeEventEntity event = mapper.map(etablissementCreeWebDto, EtablissementCreeEventEntity.class);
