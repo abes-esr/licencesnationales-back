@@ -3,14 +3,18 @@ package fr.abes.licencesnationales.web.service;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaKeys;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import lombok.NoArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
+
 import java.net.URI;
 
 
 @Slf4j
 @NoArgsConstructor
+@Service
 public class ReCaptchaService {
 
     private ReCaptchaKeys reCaptchaKeys;
@@ -22,6 +26,7 @@ public class ReCaptchaService {
         this.restTemplate = restTemplate;
     }
 
+    @SneakyThrows
     public ReCaptchaResponse verify(String recaptcharesponse, String action) {
 
         log.info("debut ReCaptchaService - verify()");
@@ -29,12 +34,12 @@ public class ReCaptchaService {
         log.info("reCaptchaKeys.getSecret() = " + reCaptchaKeys.getSecret());
 
         //requête à l'API google
-        URI verifGoogleAdr = URI.create
-        (String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
-                reCaptchaKeys.getSecret(), recaptcharesponse));
+        URI verifGoogleAdr = URI.create(String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
+                        reCaptchaKeys.getSecret(), recaptcharesponse));
 
-        //appel http via rest
-        ReCaptchaResponse reCaptchaResponse = restTemplate.getForObject(verifGoogleAdr, ReCaptchaResponse.class);
+        //appel http via post
+        ReCaptchaResponse reCaptchaResponse = restTemplate.postForObject(verifGoogleAdr, "", ReCaptchaResponse.class);
+
         log.info("reCaptchaResponse = " + reCaptchaResponse);
 
         if(reCaptchaResponse!=null){
