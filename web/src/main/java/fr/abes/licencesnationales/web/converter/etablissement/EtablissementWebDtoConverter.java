@@ -111,10 +111,7 @@ public class EtablissementWebDtoConverter {
                     }
                     event.setAdresseContact(source.getContact().getAdresse());
 
-                    // Contact - boîte postale
-                    if (source.getContact().getBoitePostale() == null) {
-                        throw new IllegalArgumentException("Le champs 'boitePostale' du contact est obligatoire");
-                    }
+                    // Contact Boite Postale
                     event.setBoitePostaleContact(source.getContact().getBoitePostale());
 
                     // Contact - code postal
@@ -124,9 +121,6 @@ public class EtablissementWebDtoConverter {
                     event.setCodePostalContact(source.getContact().getCodePostal());
 
                     // Contact - cedex
-                    if (source.getContact().getCedex() == null) {
-                        throw new IllegalArgumentException("Le champs 'cedex' du contact est obligatoire");
-                    }
                     event.setCedexContact(source.getContact().getCedex());
 
                     // Contact - ville

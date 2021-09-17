@@ -47,7 +47,4 @@ public class ContactCreeWebDto {
     @NotNull
     private String ville;
 
-    @JsonProperty("role")
-    @NotNull
-    private String role;
 }

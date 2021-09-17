@@ -1,24 +1,18 @@
-package fr.abes.licencesnationales.web.converter;
+package fr.abes.licencesnationales.web.converter.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
-import fr.abes.licencesnationales.core.services.GenererIdAbes;
-import fr.abes.licencesnationales.web.dto.etablissement.ContactCreeWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.ContactWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactTechniqueEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.text.DateFormat;
@@ -27,13 +21,9 @@ import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
-public class EtablissementWebDtoConverterTest {
+public class EditeurWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-    @Autowired
-    private GenererIdAbes genererIdAbes;
 
     @Test
     @DisplayName("test converter EditeurCreeWebDto / EditeurCreeEvent")
@@ -116,49 +106,6 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("testNomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContact());
         Assertions.assertEquals("testPrenomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContact());
         Assertions.assertEquals("test@test.tech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContact());
-
-    }
-
-    @Test
-    @DisplayName("Test converter EtablissementCreeWebDto / EtablissementCreeEvent")
-    public void testConverterEtabCreeWebDto() {
-        EtablissementCreeWebDto etablissement = new EtablissementCreeWebDto();
-        etablissement.setName("testNom");
-        etablissement.setSiren("123456789");
-        etablissement.setTypeEtablissement("testType");
-        etablissement.setRecaptcha("testRecaptcha");
-
-        ContactCreeWebDto contact = new ContactCreeWebDto();
-
-        contact.setNom("testNomContact");
-        contact.setPrenom("testPrenomContact");
-        contact.setAdresse("testAdresseContact");
-        contact.setBoitePostale("testBP");
-        contact.setCodePostal("testCP");
-        contact.setVille("testVille");
-        contact.setTelephone("0000000000");
-        contact.setMail("test@test.com");
-        contact.setMotDePasse("testPassword");
-        contact.setRole("etab");
-        etablissement.setContact(contact);
-
-        EtablissementCreeEventEntity event = utilsMapper.map(etablissement, EtablissementCreeEventEntity.class);
-
-        Assertions.assertEquals("testNom", event.getNomEtab());
-        Assertions.assertEquals("123456789", event.getSiren());
-        Assertions.assertEquals("testType", event.getTypeEtablissement());
-        Assertions.assertTrue(passwordEncoder.matches("testPassword", event.getMotDePasse()));
-        Assertions.assertEquals(genererIdAbes.genererIdAbes("123456789"), event.getIdAbes());
-        Assertions.assertEquals("testNomContact", event.getNomContact());
-        Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
-        Assertions.assertEquals("testAdresseContact", event.getAdresseContact());
-        Assertions.assertEquals("testBP", event.getBoitePostaleContact());
-        Assertions.assertEquals("testCP", event.getCodePostalContact());
-        Assertions.assertEquals("testVille", event.getVilleContact());
-        Assertions.assertEquals("0000000000", event.getTelephoneContact());
-        Assertions.assertEquals("test@test.com", event.getMailContact());
-        Assertions.assertEquals("etab", event.getRoleContact());
-
 
     }
 }

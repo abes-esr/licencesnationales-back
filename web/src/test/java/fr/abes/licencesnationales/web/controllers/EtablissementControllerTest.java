@@ -5,9 +5,11 @@ import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.web.dto.etablissement.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
@@ -16,9 +18,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,8 +30,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -44,6 +47,15 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
     @MockBean
     private EmailService emailService;
+
+    @MockBean
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @MockBean
+    private EventService eventService;
+
+    @MockBean
+    private EtablissementCreeListener listener;
 
     @MockBean
     private TypeEtablissementRepository typeEtablissementRepository;
@@ -76,16 +88,17 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         response.setSuccess(true);
         response.setAction("creationCompte");
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
-        Mockito.when(etablissementService.existeSiren(Mockito.anyString())).thenReturn(false);
-        Mockito.when(etablissementService.existeMail(Mockito.anyString())).thenReturn(false);
-        Mockito.when(typeEtablissementRepository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "EPIC/EPST")));
-
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.doNothing().when(listener).onApplicationEvent(Mockito.any());
         Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.anyString());
 
-        this.mockMvc.perform(post("/v1/ln/etablissement/creationCompte")
+        this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+
+
     }
 
     @Test

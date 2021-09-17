@@ -32,9 +32,6 @@ public class EtablissementService {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    private EmailService emailService;
-
-    @Autowired
     private StatutRepository statutRepository;
 
     public EtablissementEntity getFirstBySiren(String siren) {
@@ -64,6 +61,7 @@ public class EtablissementService {
 
         if (entity.getId() == null) {
             // Création d'un nouvel établisssement
+            entity.getContact().setRole("etab");
             entity.setStatut((StatutEtablissementEntity) statutRepository.findById(Constant.STATUT_ETAB_NOUVEAU).get());
         }
 
