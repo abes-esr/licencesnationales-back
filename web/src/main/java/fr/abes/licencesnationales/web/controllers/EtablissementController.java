@@ -106,15 +106,19 @@ public class EtablissementController {
     }
 
 
-    @PostMapping(value = "{siren}")
-    public void edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
+    @PostMapping(value = "")
+    @PreAuthorize(value = "etab")
+    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
+        etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+        EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        event.setSource(this);
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
+    }
 
-        String sirenUtilisateur = filtrerAccesServices.getSirenFromSecurityContextUser();
-
-        if (!siren.equalsIgnoreCase(sirenUtilisateur)) {
-            throw  new AccessDeniedException("Il ne s'agit pas de votre établissement");
-        }
-
+    @PostMapping(value = "")
+    @PreAuthorize(value = "admin")
+    public void editAdmin(@Valid @RequestBody EtablissementModifieAdminWebDto etablissementModifieWebDto) {
         EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);

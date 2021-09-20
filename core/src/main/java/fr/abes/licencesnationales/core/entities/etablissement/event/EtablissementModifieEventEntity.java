@@ -11,9 +11,9 @@ public class EtablissementModifieEventEntity  extends EtablissementEventEntity {
     public EtablissementModifieEventEntity() {
         super();
     }
-    public EtablissementModifieEventEntity(Object source, Integer id) {
+    public EtablissementModifieEventEntity(Object source, String siren) {
         super(source);
-        this.id = id;
+        this.siren = siren;
     }
 
     @Override

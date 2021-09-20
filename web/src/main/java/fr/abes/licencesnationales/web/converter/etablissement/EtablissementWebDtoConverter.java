@@ -7,12 +7,11 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementDiviseWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementModifieWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.*;
 import lombok.SneakyThrows;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
@@ -75,59 +74,49 @@ public class EtablissementWebDtoConverter {
                         throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
                     }
 
-                    // Contact - nom
-                    if (source.getContact().getNom() == null) {
-                        throw new IllegalArgumentException("Le champs 'nom' du contact est obligatoire");
+                    setContact(source.getContact(), event);
+
+                    return event;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterEtablissementModifieAdminWebDto() {
+        Converter<EtablissementModifieAdminWebDto, EtablissementModifieEventEntity> myConverter = new Converter<EtablissementModifieAdminWebDto, EtablissementModifieEventEntity>() {
+
+            public EtablissementModifieEventEntity convert(MappingContext<EtablissementModifieAdminWebDto, EtablissementModifieEventEntity> context) {
+
+                try {
+                    EtablissementModifieAdminWebDto source = context.getSource();
+
+
+                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
+
+                    // Nom
+                    if (source.getName() == null) {
+                        throw new IllegalArgumentException("Le champs 'nom' est obligatoire");
                     }
-                    event.setNomContact(source.getContact().getNom());
+                    event.setNomEtab(source.getName());
 
-                    // Contact - prénom
-                    if (source.getContact().getPrenom() == null) {
-                        throw new IllegalArgumentException("Le champs 'prenom' du contact est obligatoire");
+                    // Siren
+                    if (source.getSiren() == null) {
+                        throw new IllegalArgumentException("Le champs 'siren' est obligatoire");
                     }
-                    event.setPrenomContact(source.getContact().getPrenom());
+                    event.setSiren(source.getSiren());
 
-                    // Contact - téléphone
-                    if (source.getContact().getTelephone() == null) {
-                        throw new IllegalArgumentException("Le champs 'telephone' du contact est obligatoire");
+                    // Type d'établissement
+                    if (source.getTypeEtablissement() == null) {
+                        throw new IllegalArgumentException("Le champs 'typeEtablissement' est obligatoire");
                     }
-                    event.setTelephoneContact(source.getContact().getTelephone());
+                    event.setTypeEtablissement(source.getTypeEtablissement());
 
-                    // Contact - mail
-                    if (source.getContact().getMail() == null) {
-                        throw new IllegalArgumentException("Le champs 'mail' du contact est obligatoire");
-                    }
-                    event.setMailContact(source.getContact().getMail());
-
-                    // Contact - mot de passe
-                    if (source.getContact().getMotDePasse() == null) {
-                        throw new IllegalArgumentException("Le champs 'motDePasse' du contact est obligatoire");
-                    }
-                    event.setMotDePasse(source.getContact().getMotDePasse());
-
-                    // Contact - adresse
-                    if (source.getContact().getAdresse() == null) {
-                        throw new IllegalArgumentException("Le champs 'adresse' du contact est obligatoire");
-                    }
-                    event.setAdresseContact(source.getContact().getAdresse());
-
-                    // Contact Boite Postale
-                    event.setBoitePostaleContact(source.getContact().getBoitePostale());
-
-                    // Contact - code postal
-                    if (source.getContact().getCodePostal() == null) {
-                        throw new IllegalArgumentException("Le champs 'codePostal' du contact est obligatoire");
-                    }
-                    event.setCodePostalContact(source.getContact().getCodePostal());
-
-                    // Contact - cedex
-                    event.setCedexContact(source.getContact().getCedex());
-
-                    // Contact - ville
-                    if (source.getContact().getVille() == null) {
-                        throw new IllegalArgumentException("Le champs 'ville' du contact est obligatoire");
-                    }
-                    event.setVilleContact(source.getContact().getVille());
+                    // Pour le contact
+                    setContact(source.getContact(), event);
 
                     return event;
                 } catch (IllegalArgumentException ex) {
@@ -147,52 +136,14 @@ public class EtablissementWebDtoConverter {
                 try {
                     EtablissementModifieWebDto source = context.getSource();
 
-                    if (source.getId() == null) {
-                        throw new IllegalArgumentException("Le champs 'id' est obligatoire");
-                    }
-
-                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getId());
-
-                    // Nom
-                    event.setNomEtab(source.getName());
-
-                    // Siren
-                    event.setSiren(source.getSiren());
-
-                    // Type d'établissement
-                    event.setTypeEtablissement(source.getTypeEtablissement());
+                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
 
                     // Pour le contact
+                    if (source.getContact() == null) {
+                        throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                    }
 
-                    // Contact - nom
-                    event.setNomContact(source.getContact().getNom());
-
-                    // Contact - prénom
-                    event.setPrenomContact(source.getContact().getPrenom());
-
-                    // Contact - téléphone
-                    event.setTelephoneContact(source.getContact().getTelephone());
-
-                    // Contact - mail
-                    event.setMailContact(source.getContact().getMail());
-
-                    // Contact - mot de passe
-                    event.setMotDePasse(source.getContact().getMotDePasse());
-
-                    // Contact - adresse
-                    event.setAdresseContact(source.getContact().getAdresse());
-
-                    // Contact - boîte postale
-                    event.setBoitePostaleContact(source.getContact().getBoitePostale());
-
-                    // Contact - code postal
-                    event.setCodePostalContact(source.getContact().getCodePostal());
-
-                    // Contact - cedex
-                    event.setCedexContact(source.getContact().getCedex());
-
-                    // Contact - ville
-                    event.setVilleContact(source.getContact().getVille());
+                    setContact(source.getContact(), event);
 
                     return event;
                 } catch (IllegalArgumentException ex) {
@@ -201,6 +152,63 @@ public class EtablissementWebDtoConverter {
             }
         };
         utilsMapper.addConverter(myConverter);
+    }
+
+    private void setContact(ContactCreeWebDto source, EtablissementEventEntity event) {
+
+        // Contact - nom
+        if (source.getNom() == null) {
+            throw new IllegalArgumentException("Le champs 'nom' du contact est obligatoire");
+        }
+        event.setNomContact(source.getNom());
+
+        // Contact - prénom
+        if (source.getPrenom() == null) {
+            throw new IllegalArgumentException("Le champs 'prenom' du contact est obligatoire");
+        }
+        event.setPrenomContact(source.getPrenom());
+
+        // Contact - téléphone
+        if (source.getTelephone() == null) {
+            throw new IllegalArgumentException("Le champs 'telephone' du contact est obligatoire");
+        }
+        event.setTelephoneContact(source.getTelephone());
+
+        // Contact - mail
+        if (source.getMail() == null) {
+            throw new IllegalArgumentException("Le champs 'mail' du contact est obligatoire");
+        }
+        event.setMailContact(source.getMail());
+
+        // Contact - mot de passe
+        if (source.getMotDePasse() == null) {
+            throw new IllegalArgumentException("Le champs 'motDePasse' du contact est obligatoire");
+        }
+        event.setMotDePasse(source.getMotDePasse());
+
+        // Contact - adresse
+        if (source.getAdresse() == null) {
+            throw new IllegalArgumentException("Le champs 'adresse' du contact est obligatoire");
+        }
+        event.setAdresseContact(source.getAdresse());
+
+        // Contact Boite Postale
+        event.setBoitePostaleContact(source.getBoitePostale());
+
+        // Contact - code postal
+        if (source.getCodePostal() == null) {
+            throw new IllegalArgumentException("Le champs 'codePostal' du contact est obligatoire");
+        }
+        event.setCodePostalContact(source.getCodePostal());
+
+        // Contact - cedex
+        event.setCedexContact(source.getCedex());
+
+        // Contact - ville
+        if (source.getVille() == null) {
+            throw new IllegalArgumentException("Le champs 'ville' du contact est obligatoire");
+        }
+        event.setVilleContact(source.getVille());
     }
 
     @Bean

@@ -160,8 +160,8 @@ public class UtilsMapperTest {
     @Test
     @DisplayName("test mapper établissement modifié")
     void testMapperEtablissementModifieEvent() {
-        EtablissementModifieEventEntity etablissementModifieEvent = new EtablissementModifieEventEntity(this, 1);
-        etablissementModifieEvent.setSiren("123456789");
+        EtablissementModifieEventEntity etablissementModifieEvent = new EtablissementModifieEventEntity(this, "123456789");
+        etablissementModifieEvent.setId(1);
         etablissementModifieEvent.setNomContact("nomContactTest");
         etablissementModifieEvent.setPrenomContact("prenomContactTest");
         etablissementModifieEvent.setMailContact("mail@test.com");

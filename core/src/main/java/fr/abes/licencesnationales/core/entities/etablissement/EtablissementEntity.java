@@ -34,6 +34,7 @@ public class EtablissementEntity implements Serializable {
     private String name;
 
     @NotBlank
+    @Column(name = "siren", unique = true)
     @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
     private String siren;
 
@@ -50,7 +51,7 @@ public class EtablissementEntity implements Serializable {
 
     private String idAbes;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private ContactEntity contact;
 
     @OneToMany(mappedBy = "etablissement", cascade = CascadeType.ALL,
