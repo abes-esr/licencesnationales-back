@@ -73,6 +73,10 @@ public class FiltrerAccesServices {
         return sirenFromSecurityContextUser;
     }
 
+    public boolean getRoleFromSecurityContextUser() {
+            return ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).isAdmin();
+    }
+
 }
 
 
