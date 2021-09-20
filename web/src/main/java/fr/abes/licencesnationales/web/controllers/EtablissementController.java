@@ -105,21 +105,15 @@ public class EtablissementController {
         emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
     }
 
-
     @PostMapping(value = "")
-    @PreAuthorize(value = "etab")
     public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
-        etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
-        EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
-        event.setSource(this);
-        applicationEventPublisher.publishEvent(event);
-        eventService.save(event);
-    }
-
-    @PostMapping(value = "")
-    @PreAuthorize(value = "admin")
-    public void editAdmin(@Valid @RequestBody EtablissementModifieAdminWebDto etablissementModifieWebDto) {
-        EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        EtablissementModifieEventEntity event;
+        if(filtrerAccesServices.getRoleFromSecurityContextUser()){
+            event = mapper.map((EtablissementModifieAdminWebDto)etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        } else {
+            etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+            event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        }
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
