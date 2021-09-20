@@ -173,6 +173,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(UnknownTypeEtablissementException.class)
+    protected ResponseEntity<Object> handleUnknowTypeEtablissementException(UnknownTypeEtablissementException ex) {
+        String error = "Type d'établissement inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     @ExceptionHandler(TransactionSystemException.class)
     protected ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
         String error = "Erreur de mise à jour de la base de données";
