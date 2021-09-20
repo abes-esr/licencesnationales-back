@@ -77,9 +77,9 @@ class EtablissementServiceTest {
         Assertions.assertThrows(UnknownEtablissementException.class, ()->service.getFirstBySiren("000000000"));
     }
 
-    @DisplayName("test save établissement")
+    @DisplayName("test save établissement sur création")
     @Test
-    void save() throws MailDoublonException, SirenExistException {
+    void saveCreation() throws MailDoublonException, SirenExistException {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         StatutEntity statut = new StatutEtablissementEntity(Constant.STATUT_ETAB_NOUVEAU, "Nouveau");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
@@ -97,5 +97,23 @@ class EtablissementServiceTest {
         Mockito.when(etablissementDao.existeSiren("000000000")).thenReturn(false);
         Mockito.when(contactEtablissementDao.findByMail("mail@mail.com")).thenReturn(Optional.of(contact));
         Assertions.assertThrows(MailDoublonException.class, () -> service.save(etabIn));
+    }
+
+    @DisplayName("test save établissement sur modification")
+    @Test
+    void saveModification() throws MailDoublonException, SirenExistException {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        StatutEntity statut = new StatutEtablissementEntity(Constant.STATUT_ETAB_VALIDE, "Validé");
+        ContactEntity contact = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn = new EtablissementEntity( 1, "testNom", "000000000", type, "12345", contact);
+        Mockito.when(contactEtablissementDao.findByMail("mail@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(statutRepository.findById(Constant.STATUT_ETAB_VALIDE)).thenReturn(Optional.of(statut));
+        Mockito.when(etablissementDao.save(etabIn)).thenReturn(etabIn);
+
+        service.save(etabIn);
+
+        Mockito.when(contactEtablissementDao.findByMail("mail@mail.com")).thenReturn(Optional.of(contact));
+        Assertions.assertThrows(MailDoublonException.class, () -> service.save(etabIn));
+
     }
 }

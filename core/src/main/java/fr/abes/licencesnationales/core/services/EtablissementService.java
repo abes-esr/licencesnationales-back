@@ -46,25 +46,24 @@ public class EtablissementService {
      * @throws MailDoublonException
      */
     public void save(EtablissementEntity entity) throws SirenExistException, MailDoublonException {
-
-        //verifier que le siren n'est pas déjà en base
-        boolean existeSiren = existeSiren(entity.getSiren());
-        log.debug("existeSiren = " + existeSiren);
-        if (existeSiren) {
-            throw new SirenExistException("Cet établissement existe déjà.");
-        }
-
         //verifier que le mail du contact n'est pas déjà en base
         if (existeMail(entity.getContact().getMail())) {
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
 
         if (entity.getId() == null) {
+            //Création d'un nouvel établissement
+            //verifier que le siren n'est pas déjà en base
+            boolean existeSiren = existeSiren(entity.getSiren());
+            log.debug("existeSiren = " + existeSiren);
+            if (existeSiren) {
+                throw new SirenExistException("Cet établissement existe déjà.");
+            }
+
             // Création d'un nouvel établisssement
             entity.getContact().setRole("etab");
             entity.setStatut((StatutEtablissementEntity) statutRepository.findById(Constant.STATUT_ETAB_NOUVEAU).get());
         }
-
         etablissementDao.save(entity);
     }
 
