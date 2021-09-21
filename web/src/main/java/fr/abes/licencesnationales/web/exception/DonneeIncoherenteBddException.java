@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.security.exception;
+package fr.abes.licencesnationales.web.exception;
 
 public class DonneeIncoherenteBddException extends Exception{
 
