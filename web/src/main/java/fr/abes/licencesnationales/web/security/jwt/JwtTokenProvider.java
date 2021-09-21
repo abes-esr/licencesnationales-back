@@ -46,7 +46,7 @@ public class JwtTokenProvider {
         log.info("u.getUsername() = " + u.getUsername());//le siren
         log.info("u.getId() = " + u.getId());
         log.info("u.getAuthorities() = " + u.getAuthorities());
-        log.info("isAdmin = " +  u.isAdmin());
+        log.info("role = " +  u.getRole());
         log.info("u.getPassword() = " +  u.getPassword());
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationInMs);
@@ -59,7 +59,7 @@ public class JwtTokenProvider {
                 .claim("id", u.getId())
                 .claim("siren", u.getUsername()) //le siren
                 .claim("nameEtab",u.getNameEtab())//nom de l'étab
-                .claim("isAdmin", u.isAdmin())
+                .claim("role", u.getRole())
                 .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
@@ -106,7 +106,7 @@ public class JwtTokenProvider {
     }*/
 
     public String getSirenFromJwtToken(String token) {
-        log.info("token = " + token);
+        log.debug("token = " + token);
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 }

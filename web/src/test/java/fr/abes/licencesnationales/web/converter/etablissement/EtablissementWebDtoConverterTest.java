@@ -2,17 +2,10 @@ package fr.abes.licencesnationales.web.converter.etablissement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
-import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
-import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
-import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.ContactTechniqueEditeurWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,12 +15,7 @@ import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {UtilsMapper.class, EtablissementWebDtoConverter.class, ObjectMapper.class})
@@ -202,7 +190,7 @@ public class EtablissementWebDtoConverterTest {
     @Test
     @DisplayName("Test success converter EtablissementModifieWebDto / EtablissementModifieEvent")
     public void testSuccessConverterEtabModifieWebDto() {
-        EtablissementModifieWebDto etablissement = new EtablissementModifieWebDto();
+        EtablissementModifieUserWebDto etablissement = new EtablissementModifieUserWebDto();
 
         ContactModifieWebDto contact = new ContactModifieWebDto();
         contact.setMotDePasse("testPassword");
@@ -231,7 +219,7 @@ public class EtablissementWebDtoConverterTest {
     @Test
     @DisplayName("Test converter EtablissementModifieWebDto / EtablissementModifieEvent avec champs manquants")
     public void testMissingFieldsConverterEtabModifieWebDto() {
-        EtablissementModifieWebDto etablissement = new EtablissementModifieWebDto();
+        EtablissementModifieUserWebDto etablissement = new EtablissementModifieUserWebDto();
 
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
 

@@ -48,7 +48,7 @@ public class AuthenticationController {
         //on charge dans user le tuple bdd mis dans authentication
         UserDetailsImpl user = (UserDetailsImpl) authentication.getPrincipal(); //ici si mauvais credentials NestedServletException
         String jwt = tokenProvider.generateToken(user);
-        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.isAdmin()));
+        return ResponseEntity.ok(new JwtAuthenticationResponse(jwt, Long.toString(user.getId()), user.getUsername(), user.getNameEtab(), user.getRole()));
 
     }
 }

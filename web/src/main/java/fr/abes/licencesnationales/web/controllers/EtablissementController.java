@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -54,13 +53,13 @@ public class EtablissementController {
     private IpRepository ipRepository;
 
     @Autowired
-    private  ApplicationEventPublisher applicationEventPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Autowired
     private ReCaptchaService reCaptchaService;
 
     @Autowired
-    FiltrerAccesServices filtrerAccesServices;
+    private FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
     EmailService emailService;
@@ -74,17 +73,17 @@ public class EtablissementController {
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
-    @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    @PutMapping(value = "")
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, RestClientException {
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
-        if(captcha==null){
+        if (captcha == null) {
             throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
-        if(!reCaptchaResponse.isSuccess()){
+        if (!reCaptchaResponse.isSuccess()) {
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
 
@@ -107,13 +106,14 @@ public class EtablissementController {
 
     @PostMapping(value = "")
     public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
-        EtablissementModifieEventEntity event;
-        if(filtrerAccesServices.getRoleFromSecurityContextUser()){
-            event = mapper.map((EtablissementModifieAdminWebDto)etablissementModifieWebDto, EtablissementModifieEventEntity.class);
-        } else {
+        if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
-            event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
+        } else {
+            if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
+                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
+            }
         }
+        EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
@@ -164,17 +164,17 @@ public class EtablissementController {
         log.info("siren = " + siren);
         String res = "";
 
-        try{
+        try {
             ArrayList<String> listDateModifIp = new ArrayList<>();
             Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
-            for(IpEntity i:listeIpsEtab) {
+            for (IpEntity i : listeIpsEtab) {
                 Date dateModif;
-                if(i.getDateModification()!=null){
-                    dateModif=i.getDateModification();
+                if (i.getDateModification() != null) {
+                    dateModif = i.getDateModification();
                     listDateModifIp.add(dateModif.toString());
                 }
             }
-            if(!listeIpsEtab.isEmpty() && listeIpsEtab.size()>1) {
+            if (!listeIpsEtab.isEmpty() && listeIpsEtab.size() > 1) {
                 ArrayList<String> listDateModifCourtes = new ArrayList<>();
                 for (String date : listDateModifIp) listDateModifCourtes.add(date.substring(0, 10));
                 log.info("dtaModif = " + listDateModifCourtes.get(0));
@@ -185,7 +185,7 @@ public class EtablissementController {
                 res = listDateModifCourtes.get(listDateModifCourtes.size() - 1);
             }
             return res;
-        } catch(Exception e) {
+        } catch (Exception e) {
             throw new DateException("Erreur lors de la recupération de la dernière date de modification : " + e);
         }
     }

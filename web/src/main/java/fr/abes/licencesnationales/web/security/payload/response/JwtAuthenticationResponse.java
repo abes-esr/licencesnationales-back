@@ -6,18 +6,18 @@ public class JwtAuthenticationResponse {
     private String userId;
     private String userSiren;
     private String userNameEtab;
-    private boolean isAdmin;
+    private String role;
 
 
     public JwtAuthenticationResponse() {
     }
 
-    public JwtAuthenticationResponse(String accessToken, String id, String siren, String nameEtab, boolean isAdmin) {
+    public JwtAuthenticationResponse(String accessToken, String id, String siren, String nameEtab, String role) {
         this.accessToken = accessToken;
         this.userId = id;
         this.userSiren = siren;
         this.userNameEtab = nameEtab;
-        this.isAdmin = isAdmin;
+        this.role = role;
     }
 
     public String getAccessToken() {
@@ -35,8 +35,8 @@ public class JwtAuthenticationResponse {
     public String getNameEtab() {
         return userNameEtab;
     }
-    public boolean isAdmin() {
-        return isAdmin;
+    public String getRole() {
+        return role;
     }
 
 }

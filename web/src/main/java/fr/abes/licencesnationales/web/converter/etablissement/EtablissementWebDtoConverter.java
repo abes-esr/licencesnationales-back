@@ -129,12 +129,12 @@ public class EtablissementWebDtoConverter {
 
     @Bean
     public void converterEtablissementModifieWebDto() {
-        Converter<EtablissementModifieWebDto, EtablissementModifieEventEntity> myConverter = new Converter<EtablissementModifieWebDto, EtablissementModifieEventEntity>() {
+        Converter<EtablissementModifieUserWebDto, EtablissementModifieEventEntity> myConverter = new Converter<EtablissementModifieUserWebDto, EtablissementModifieEventEntity>() {
 
-            public EtablissementModifieEventEntity convert(MappingContext<EtablissementModifieWebDto, EtablissementModifieEventEntity> context) {
+            public EtablissementModifieEventEntity convert(MappingContext<EtablissementModifieUserWebDto, EtablissementModifieEventEntity> context) {
 
                 try {
-                    EtablissementModifieWebDto source = context.getSource();
+                    EtablissementModifieUserWebDto source = context.getSource();
 
                     EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
 

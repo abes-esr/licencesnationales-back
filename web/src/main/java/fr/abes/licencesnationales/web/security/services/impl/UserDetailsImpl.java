@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,47 +22,42 @@ import java.util.Objects;
 @NoArgsConstructor
 public class UserDetailsImpl implements UserDetails {
 
-	/*@Autowired
-	EtablissementRepository etablissementRepository;*/
-
-
 	private Integer id;
 	private String siren;
 	private String nameEtab;//nom etab
 	private String password;
 	private String email;
 	private Collection<? extends GrantedAuthority> authorities;
-	private boolean isAdmin;
+	private String role;
 
 
+	public UserDetailsImpl(User user) {
+		this.siren = user.getUsername();
+		this.password = user.getPassword();
+		this.authorities = user.getAuthorities();
+	}
 
 	public UserDetailsImpl(Integer id, String siren, String nameEtab, String password, String email,  Collection<? extends GrantedAuthority> authorities,
-						   boolean isAdmin) {
+						   String role) {
 		this.id = id;
 		this.siren = siren;
 		this.nameEtab=nameEtab;
 		this.password = password;
 		this.email = email;
 		this.authorities = authorities;
-		this.isAdmin = isAdmin;
+		this.role = role;
 	}
 
 
 	public static UserDetailsImpl build(EtablissementEntity user) throws DonneeIncoherenteBddException, BadCredentialsException {
 
-		log.info("UserDetailsImpl build début");
+		log.debug("UserDetailsImpl build début");
 		String role = user.getContact().getRole();
-		boolean isAdmin;
-		if(role==null || role.equals("")){
-			throw new DonneeIncoherenteBddException("Le role utilisateur est absent de la bdd");
-		}
-		else {
-			isAdmin = role.equals("admin") ? true : false;
-		}
+
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(role));
-		log.info("userPwd = " + user.getContact().getMotDePasse());
-		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().getMotDePasse(), user.getContact().getMail(),authorities, isAdmin);
+		log.debug("userPwd = " + user.getContact().getMotDePasse());
+		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().getMotDePasse(), user.getContact().getMail(),authorities, role);
 	}
 
 
