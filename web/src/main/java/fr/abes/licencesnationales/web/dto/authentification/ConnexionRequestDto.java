@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.security.payload.request;
+package fr.abes.licencesnationales.web.dto.authentification;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Getter;
@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Getter @Setter
-public class LoginRequest {
+public class ConnexionRequestDto {
 
 	@NotBlank(message = "SIREN obligatoire (login)")
 	@Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
