@@ -65,7 +65,7 @@ public class AuthenticationControllerTest
         //Pour éviter la base de donnée :
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(localUser.getContact().getRole()));
-        UserDetailsImpl userDetails = new UserDetailsImpl(localUser.getId(),localUser.getSiren(), localUser.getName(), localUser.getContact().getMotDePasse(), localUser.getContact().getMail(), authorities,false);
+        UserDetailsImpl userDetails = new UserDetailsImpl(localUser.getId(),localUser.getSiren(), localUser.getName(), localUser.getContact().getMotDePasse(), localUser.getContact().getMail(), authorities,"user");
 
         //quand on fait :
         Mockito.when(authentication.getPrincipal()).thenReturn(userDetails);
