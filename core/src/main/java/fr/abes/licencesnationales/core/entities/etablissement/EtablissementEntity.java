@@ -16,6 +16,7 @@ import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -122,6 +123,10 @@ public class EtablissementEntity implements Serializable {
     public void ajouterIp(IpEntity ip) {
         this.ips.add(ip);
     }
+
+    public void ajouterIps(Set<IpEntity> ips) { this.ips.addAll(ips); }
+
+    public void ajouterEditeurs(Set<EditeurEntity> editeurs) { this.editeurs.addAll(editeurs); }
 
     @Override
     public boolean equals(Object obj) {

@@ -5,10 +5,7 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
@@ -93,8 +90,6 @@ public class EtablissementWebDtoConverter {
 
                 try {
                     EtablissementModifieAdminWebDto source = context.getSource();
-
-
                     EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
 
                     // Nom
@@ -209,6 +204,39 @@ public class EtablissementWebDtoConverter {
             throw new IllegalArgumentException("Le champs 'ville' du contact est obligatoire");
         }
         event.setVilleContact(source.getVille());
+    }
+
+    @Bean
+    public void converterEtablissementFusionneWebDto() {
+        Converter<EtablissementFusionneWebDto, EtablissementFusionneEventEntity> myConverter = new Converter<EtablissementFusionneWebDto, EtablissementFusionneEventEntity>() {
+            @SneakyThrows
+            public EtablissementFusionneEventEntity convert(MappingContext<EtablissementFusionneWebDto, EtablissementFusionneEventEntity> context) {
+                EtablissementFusionneWebDto source = context.getSource();
+                if (source.getSirenFusionnes().size() < 2) {
+                    throw new IllegalArgumentException("La fusion doit porter sur au moins 2 établissements");
+                }
+                if (source.getNouveauEtab().getSiren() == null) {
+                    throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                }
+                EtablissementFusionneEventEntity event = new EtablissementFusionneEventEntity(this, source.getNouveauEtab().getSiren(), source.getSirenFusionnes());
+                if (source.getNouveauEtab().getNom() == null) {
+                    throw new IllegalArgumentException("Le champ 'nom' est obligatoire");
+                }
+                event.setNomEtab(source.getNouveauEtab().getNom());
+                event.setTypeEtablissement(source.getNouveauEtab().getTypeEtablissement());
+
+                // Pour le contact
+                if (source.getNouveauEtab().getContact() == null) {
+                    throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                }
+
+                setContact(source.getNouveauEtab().getContact(), event);
+                return event;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+
+
     }
 
     @Bean

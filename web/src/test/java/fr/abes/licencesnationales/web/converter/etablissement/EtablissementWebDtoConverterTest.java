@@ -3,9 +3,11 @@ package fr.abes.licencesnationales.web.converter.etablissement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -248,6 +250,92 @@ public class EtablissementWebDtoConverterTest {
 
         etablissement.getContact().setVille("villeTest");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
+
+    }
+
+    @Test
+    @DisplayName("Test success converter EtablissementFusionneWebDto / EtablissementFusionneEvent")
+    public void testSuccessConverterEtabFusionneWebDto() {
+        EtablissementFusionneWebDto dto = new EtablissementFusionneWebDto();
+        dto.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
+        EtablissementFusionneNouveauEtabWebDto dtoNouvelEtab = new EtablissementFusionneNouveauEtabWebDto();
+        dtoNouvelEtab.setNom("testNom");
+        dtoNouvelEtab.setTypeEtablissement("testType");
+        dtoNouvelEtab.setSiren("654987321");
+        ContactCreeWebDto dtoContact = new ContactCreeWebDto();
+        dtoContact.setNom("testNomContact");
+        dtoContact.setPrenom("testPrenomContact");
+        dtoContact.setMail("test@test.com");
+        dtoContact.setMotDePasse("testPassword");
+        dtoContact.setAdresse("testAdresseContact");
+        dtoContact.setCodePostal("testCP");
+        dtoContact.setVille("testVille");
+        dtoContact.setBoitePostale("BPContact");
+        dtoContact.setTelephone("0000000000");
+        dtoContact.setCedex("cedexContact");
+        dtoNouvelEtab.setContact(dtoContact);
+        dto.setNouveauEtab(dtoNouvelEtab);
+
+        EtablissementFusionneEventEntity event = utilsMapper.map(dto, EtablissementFusionneEventEntity.class);
+
+        Assertions.assertEquals("testNom", event.getNomEtab());
+        Assertions.assertEquals("654987321", event.getSiren());
+        Assertions.assertEquals("testType", event.getTypeEtablissement());
+        Assertions.assertEquals("testPassword", event.getMotDePasse());
+        Assertions.assertEquals("testNomContact", event.getNomContact());
+        Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
+        Assertions.assertEquals("testAdresseContact", event.getAdresseContact());
+        Assertions.assertEquals("testCP", event.getCodePostalContact());
+        Assertions.assertEquals("testVille", event.getVilleContact());
+        Assertions.assertEquals("0000000000", event.getTelephoneContact());
+        Assertions.assertEquals("test@test.com", event.getMailContact());
+        Assertions.assertEquals(2, event.getSirenAnciensEtablissements().size());
+        Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().get(0));
+        Assertions.assertEquals("987654321", event.getSirenAnciensEtablissements().get(1));
+    }
+
+    @Test
+    @DisplayName("Test converter EtablissementFusionneWebDto / EtablissementFusionneEvent avec champs manquants")
+    public void testMissingFieldsConverterEtabFusionneWebDto() {
+        EtablissementFusionneWebDto etablissement = new EtablissementFusionneWebDto();
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("La fusion doit porter sur au moins 2 établissements");
+        etablissement.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
+
+        EtablissementFusionneNouveauEtabWebDto nouvelEtab = new EtablissementFusionneNouveauEtabWebDto();
+        etablissement.setNouveauEtab(nouvelEtab);
+
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");
+        etablissement.getNouveauEtab().setSiren("654321987");
+
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
+
+        etablissement.getNouveauEtab().setNom("nomEtab");
+
+        ContactCreeWebDto contact = new ContactCreeWebDto();
+        etablissement.getNouveauEtab().setContact(contact);
+
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setNom("testNom");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'prenom' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setPrenom("testPrenom");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'telephone' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setTelephone("0000000000");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'mail' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setMail("test@test.com");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setMotDePasse("testPassword");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'adresse' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setCodePostal("00000");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
+
+        etablissement.getNouveauEtab().getContact().setVille("villeTest");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
 
     }
 }

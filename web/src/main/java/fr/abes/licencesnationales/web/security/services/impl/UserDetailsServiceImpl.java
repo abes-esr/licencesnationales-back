@@ -41,9 +41,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 	}
 	@Transactional
 	public UserDetails loadUser(EtablissementEntity user) throws UsernameNotFoundException, DonneeIncoherenteBddException {
-		log.info("UserDetailsServiceImpl début loadUser");
-		log.info("user = " + user);
-		log.info("UserDetailsServiceImpl fin");
+		log.debug("UserDetailsServiceImpl début loadUser");
+		log.debug("user = " + user);
+		log.debug("UserDetailsServiceImpl fin");
 		return UserDetailsImpl.build(user);
 	}
 

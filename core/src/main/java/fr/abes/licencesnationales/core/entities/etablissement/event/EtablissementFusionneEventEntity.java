@@ -1,14 +1,7 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -18,23 +11,29 @@ import java.util.List;
 
 @Entity
 @DiscriminatorValue("fusionne")
-@NoArgsConstructor
 @Getter
 @Setter
 public class EtablissementFusionneEventEntity  extends EtablissementEventEntity {
+    private transient List<String> sirenAnciensEtablissements;
 
-    //TODO: Définir la différence avec etablissementsFusionne
     @Lob
-    @Column(name = "ETABLISSEMENTDTOFUSION")
-    private String etablissementsFusionnes;
+    @Column(name = "ANCIENS_ETABLISSEMENTS")
+    private String anciensEtablissementsInBdd = null;
 
-    //TODO: Définir la différence avec etablissementsFusionnes
-    @Lob
-    @Column(name = "ETABLISSEMENTS_FUSIONNE")
-    private String etablissementsFusionne;
+    @Deprecated
+    public EtablissementFusionneEventEntity() {
+        super();
+    }
 
-    public EtablissementFusionneEventEntity(Object source) {
+    public EtablissementFusionneEventEntity(Object source, String siren) {
         super(source);
+        this.siren = siren;
+    }
+
+    public EtablissementFusionneEventEntity(Object source, String siren, List<String> sirenAnciensEtablissements) {
+        super(source);
+        this.siren = siren;
+        this.sirenAnciensEtablissements = sirenAnciensEtablissements;
     }
 
     @Override

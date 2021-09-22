@@ -1,51 +1,61 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import lombok.SneakyThrows;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Component
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEventEntity> {
 
     private final EtablissementService service;
-    private final UtilsMapper utilsMapper;
+    private final TypeEtablissementRepository typeEtabrepository;
 
-    public EtablissementFusionneListener(EtablissementService service, UtilsMapper utilsMapper) {
+    public EtablissementFusionneListener(EtablissementService service, TypeEtablissementRepository typeEtablissementRepository) {
         this.service = service;
-        this.utilsMapper = utilsMapper;
+        this.typeEtabrepository = typeEtablissementRepository;
     }
 
+    @SneakyThrows
     @Override
     @Transactional
-    public void onApplicationEvent(EtablissementFusionneEventEntity etablissementFusionneEvent) {
+    public void onApplicationEvent(EtablissementFusionneEventEntity event) {
+        Optional<TypeEtablissementEntity> type = typeEtabrepository.findFirstByLibelle(event.getTypeEtablissement());
+        if (!type.isPresent()) {
+            throw new UnknownTypeEtablissementException("type d'établissement inconnu");
+        }
 
-       /* Set<IpEntity> ipEntities = new HashSet<>();
-        Set<EditeurEntity> editeurEntities = new HashSet<>();
+        // Attention à bien respecter l'ordre des arguments
+        ContactEntity contactEntity = new ContactEntity(event.getNomContact(),
+                event.getPrenomContact(),
+                event.getAdresseContact(),
+                event.getBoitePostaleContact(),
+                event.getCodePostalContact(),
+                event.getVilleContact(),
+                event.getCedexContact(),
+                event.getTelephoneContact(),
+                event.getMailContact(),
+                event.getMotDePasse());
 
-        for (String siren :
-                etablissementFusionneEvent.getSirenFusionne()) {
-                EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
-            if (etablissementEntity.getIps() != null) {
-                ipEntities.addAll(etablissementEntity.getIps()
-                        .stream().map(e -> new IpEntity(null, e.getIp(), e.getTypeAcces(), e.getTypeIp(), e.getCommentaires()))
-                        .collect(Collectors.toSet()));
-            }
+        EtablissementEntity etab = new EtablissementEntity(event.getNomEtab(), event.getSiren(), type.get(), event.getIdAbes(), contactEntity);
 
-            if (etablissementEntity.getEditeurs() != null) {
-                editeurEntities.addAll(etablissementEntity.getEditeurs());
-            }
+        for (String siren : event.getSirenAnciensEtablissements()) {
+            EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
+            etab.ajouterIps(etablissementEntity.getIps());
+            etab.ajouterEditeurs(etablissementEntity.getEditeurs());
 
             service.deleteBySiren(siren);
         }
-        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementFusionneEvent, EtablissementEntity.class);
-        etablissementEntity.setEditeurs(editeurEntities);
-        etablissementEntity.setIps(ipEntities);
-
-        service.save(etablissementEntity);*/
-
+        service.save(etab);
     }
 }

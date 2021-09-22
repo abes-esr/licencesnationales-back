@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
@@ -42,6 +44,9 @@ public class EtablissementController {
 
     @Autowired
     private UtilsMapper mapper;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Autowired
     private EventService eventService;
@@ -121,8 +126,9 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) {
+    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEventEntity etablissementFusionneEvent = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
+        etablissementFusionneEvent.setAnciensEtablissementsInBdd(objectMapper.writeValueAsString(etablissementFusionneEvent.getSirenAnciensEtablissements()));
         applicationEventPublisher.publishEvent(etablissementFusionneEvent);
         eventService.save(etablissementFusionneEvent);
     }
@@ -138,17 +144,15 @@ public class EtablissementController {
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public void suppression(@PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
-        //envoi du mail de suppression
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
-        UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
-        String emailUser = ((UserDetailsImpl) user).getEmail();
-        String nomEtab = ((UserDetailsImpl) user).getNameEtab();
-        emailService.constructSuppressionMail(motif.get("motif"), nomEtab, emailUser);
 
         EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
         applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
         eventService.save(etablissementSupprimeEvent);
 
+        //envoi du mail de suppression
+        UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
+        emailService.constructSuppressionMail(motif.get("motif"), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
     }
 
     @GetMapping(value = "/{siren}")
@@ -196,7 +200,7 @@ public class EtablissementController {
         return mapper.map(etablissementService.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()), EtablissementWebDto.class);
     }
 
-    @GetMapping(value = "/getListEtab")
+    @GetMapping(value = "")
     @PreAuthorize("hasAuthority('admin')")
     public List<EtablissementWebDto> getListEtab() {
         return mapper.mapList(etablissementService.findAll(), EtablissementWebDto.class);
