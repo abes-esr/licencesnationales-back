@@ -38,7 +38,6 @@ public class EditeurEntityConverter {
                 entity.setNomEditeur(source.getNomEditeur());
                 entity.setIdentifiantEditeur(source.getIdentifiantEditeur());
                 entity.setAdresseEditeur(source.getAdresseEditeur());
-                entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
                 entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
                 entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
@@ -63,7 +62,6 @@ public class EditeurEntityConverter {
                 entity.setNomEditeur(source.getNomEditeur());
                 entity.setIdentifiantEditeur(source.getIdentifiantEditeur());
                 entity.setAdresseEditeur(source.getAdresseEditeur());
-                entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
                 entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
                 entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
                 return entity;
@@ -86,7 +84,6 @@ public class EditeurEntityConverter {
                 entity.setNomEditeur(source.getNomEditeur());
                 entity.setIdentifiantEditeur(source.getIdentifiantEditeur());
                 entity.setAdresseEditeur(source.getAdresseEditeur());
-                entity.setGroupesEtabRelies(source.getGroupesEtabRelies());
 
                 entity.setContactCommercialEditeurEntities(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactCommercialEditeurEntity.class));
                 entity.setContactTechniqueEditeurEntities(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactTechniqueEditeurEntity.class));
