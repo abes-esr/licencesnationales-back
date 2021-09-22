@@ -47,7 +47,6 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
         for (String siren : event.getSirenAnciensEtablissements()) {
             EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
             etab.ajouterIps(etablissementEntity.getIps());
-            etab.ajouterEditeurs(etablissementEntity.getEditeurs());
 
             service.deleteBySiren(siren);
         }

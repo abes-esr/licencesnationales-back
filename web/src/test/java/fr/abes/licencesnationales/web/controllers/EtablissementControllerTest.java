@@ -236,15 +236,11 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         EtablissementEntity entity1 = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity1);
         entity1.ajouterIp(new IpV4(1, "1.1.1.1", "commentaireIP1"));
         entity1.ajouterIp(new IpV6(2, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFD", "commentaireIP2"));
-        entity1.ajouterEditeur(new EditeurEntity(1, "editeur1", "id1", "adresseEd1", new Date(), null, null));
-        entity1.ajouterEditeur(new EditeurEntity(2, "editeur2", "id2", "adresseEd2", new Date(), null, null));
 
         ContactEntity contactEntity2 = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
         EtablissementEntity entity2 = new EtablissementEntity(1, "nomEtab2", "987654321", new TypeEtablissementEntity(3, "Validé"), "654321", contactEntity2);
         entity2.ajouterIp(new IpV4(3, "2.2.2.2", "commentaireIP3"));
         entity2.ajouterIp(new IpV6(4, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF", "commentaireIP4"));
-        entity2.ajouterEditeur(new EditeurEntity(3, "editeur3", "id3", "adresseEd3", new Date(), null, null));
-        entity2.ajouterEditeur(new EditeurEntity(4, "editeur4", "id4", "adresse4", new Date(), null, null));
 
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
