@@ -22,7 +22,6 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         this.etablissementService = etablissementService;
     }
 
-    @SneakyThrows
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -34,8 +33,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     }
 
     @Transactional
-    public UserDetails loadUser(EtablissementEntity user) throws UsernameNotFoundException {
-        return new UserDetailsImpl(user);
+    public UserDetails loadUser(EtablissementEntity etab) {
+        if (etab == null) {
+            throw new IllegalArgumentException("L'établissement ne peut pas être nul");
+        }
+        return new UserDetailsImpl(etab);
     }
 
 }
