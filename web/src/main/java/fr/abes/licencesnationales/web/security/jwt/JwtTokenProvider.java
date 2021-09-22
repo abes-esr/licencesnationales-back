@@ -9,10 +9,10 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
@@ -41,8 +41,8 @@ public class JwtTokenProvider {
         log.info("u.getUsername() = " + u.getUsername());//le siren
         log.info("u.getId() = " + u.getId());
         log.info("u.getAuthorities() = " + u.getAuthorities());
-        log.info("role = " +  u.getRole());
-        log.info("u.getPassword() = " +  u.getPassword());
+        log.info("role = " + u.getRole());
+        log.info("u.getPassword() = " + u.getPassword());
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationInMs);
 
@@ -53,9 +53,9 @@ public class JwtTokenProvider {
                 .setExpiration(expiryDate)
                 .claim("id", u.getId())
                 .claim("siren", u.getUsername()) //le siren
-                .claim("nameEtab",u.getNameEtab())//nom de l'étab
+                .claim("nameEtab", u.getNameEtab())//nom de l'étab
                 .claim("role", u.getRole())
-                .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin")? "true":"false")
+                .claim("isAdminViaAuthorite", u.getAuthorities().iterator().next().toString().equals("admin") ? "true" : "false")
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
