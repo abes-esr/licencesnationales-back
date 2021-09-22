@@ -73,7 +73,6 @@ public class EditeurController {
         editeurWebDto.setNomEditeur(editeurEntity.getNomEditeur());
         editeurWebDto.setAdresseEditeur(editeurEntity.getAdresseEditeur());
         editeurWebDto.setIdentifiantEditeur(editeurEntity.getIdentifiantEditeur());
-        editeurWebDto.setGroupesEtabRelies(editeurEntity.getGroupesEtabRelies());
         editeurWebDto.setListeContactCommercialEditeurWebDto(CC);
         editeurWebDto.setListeContactTechniqueEditeurWebDto(CT);
         return editeurWebDto;

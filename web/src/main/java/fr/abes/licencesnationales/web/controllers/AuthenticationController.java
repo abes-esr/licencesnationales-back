@@ -1,10 +1,19 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.web.dto.authentification.MotDePasseOublieRequestDto;
+import fr.abes.licencesnationales.web.dto.authentification.MotDePasseOublieResponsetDto;
+import fr.abes.licencesnationales.web.exception.CaptchaException;
+import fr.abes.licencesnationales.web.exception.JsonIncorrectException;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.dto.authentification.ConnexionRequestDto;
 import fr.abes.licencesnationales.web.dto.authentification.ConnexionResponseDto;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
+import fr.abes.licencesnationales.web.service.ReCaptchaAction;
+import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +22,10 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
+import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 
 import javax.validation.Valid;
 
@@ -28,9 +40,26 @@ public class AuthenticationController {
 
     private final JwtTokenProvider tokenProvider;
 
-    public AuthenticationController(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+    private final ReCaptchaService reCaptchaService;
+
+    private final EtablissementService etablissementService;
+
+    private final EmailService emailService;
+
+    private final UserDetailsServiceImpl userService;
+
+    public AuthenticationController(AuthenticationManager authenticationManager,
+                                    JwtTokenProvider jwtTokenProvider,
+                                    ReCaptchaService reCaptchaService,
+                                    EtablissementService etablissementService,
+                                    EmailService emailService,
+                                    UserDetailsServiceImpl userService) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = jwtTokenProvider;
+        this.reCaptchaService = reCaptchaService;
+        this.etablissementService = etablissementService;
+        this.emailService = emailService;
+        this.userService = userService;
     }
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
@@ -59,6 +88,51 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(response);
 
+    }
+
+    @ApiOperation(value = "permet de ",
+            notes = "le ")
+    @PostMapping("/motDePasseOublie")
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto request) throws RestClientException, CaptchaException, JsonIncorrectException {
+
+        String captcha = request.getRecaptcha();
+
+        if (captcha == null) {
+            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+        }
+
+        //verifier la réponse fr.abes.licencesnationales.web.recaptcha
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+        if (!reCaptchaResponse.isSuccess()) {
+            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+        }
+
+        UserDetailsImpl user;
+
+        if (request.getEmail() != null) {
+            try {
+                user = (UserDetailsImpl)userService.loadUser(etablissementService.getUserByMail(request.getEmail()));
+            } catch (IllegalArgumentException ex) {
+                throw new UsernameNotFoundException("L'utilisateur avec l'email '" + request.getEmail() + "' n'existe pas");
+            }
+        }
+        else if (request.getSiren() != null) {
+            try {
+                user = (UserDetailsImpl)userService.loadUser(etablissementService.getFirstBySiren(request.getSiren()));
+            } catch (IllegalArgumentException ex) {
+                throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + request.getSiren() + "' n'existe pas");
+            }
+        } else {
+            throw new JsonIncorrectException("Au moins un des champs 'siren' ou 'email' est obligatoire");
+        }
+
+        String jwt = tokenProvider.generateToken(user);
+        emailService.constructResetTokenEmail(jwt, user.getEmail(), user.getNameEtab());
+
+        MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
+        response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");
+
+        return ResponseEntity.ok(response);
     }
 }
 
