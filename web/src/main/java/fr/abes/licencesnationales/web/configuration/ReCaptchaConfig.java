@@ -1,7 +1,8 @@
-package fr.abes.licencesnationales.web.recaptcha;
+package fr.abes.licencesnationales.web.configuration;
 
 
 
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaKeys;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,10 +15,7 @@ public class ReCaptchaConfig {
     RestTemplate restTemplate() {
         return new RestTemplate();
     }
-    @Bean
-    ReCaptchaService ReCaptchaService(){
-        return new ReCaptchaService();
-    }
+
     @Bean
     ReCaptchaKeys recaptchaKeys () {
         return new ReCaptchaKeys();

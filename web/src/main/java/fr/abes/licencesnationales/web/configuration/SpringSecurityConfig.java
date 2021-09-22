@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.security;
+package fr.abes.licencesnationales.web.configuration;
 
 import fr.abes.licencesnationales.web.security.jwt.JwtAuthenticationEntryPoint;
 import fr.abes.licencesnationales.web.security.jwt.JwtAuthenticationFilter;

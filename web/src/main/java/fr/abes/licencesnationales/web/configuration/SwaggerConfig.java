@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.documentation;
+package fr.abes.licencesnationales.web.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
