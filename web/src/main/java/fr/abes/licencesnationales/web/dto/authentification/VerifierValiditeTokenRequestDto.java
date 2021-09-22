@@ -6,7 +6,8 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class TokenDto {
-    @JsonProperty("jwtToken")
+public class VerifierValiditeTokenRequestDto {
+
+    @JsonProperty("token")
     private String token;
 }
