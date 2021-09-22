@@ -187,7 +187,6 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         groupesEtabReliesA.add("EPCI");
         groupesEtabReliesA.add("Ecole de Management");
 
-        editeurEntityA.setGroupesEtabRelies(groupesEtabReliesA);
 
         Set<ContactCommercialEditeurEntity> setccEA = new HashSet<>();
         Set<ContactTechniqueEditeurEntity> setctEA = new HashSet<>();
@@ -234,7 +233,6 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         groupesEtabReliesB.add("EPCI");
         groupesEtabReliesB.add("Ecole de Management");
 
-        editeurEntityB.setGroupesEtabRelies(groupesEtabReliesB);
 
         Set<ContactCommercialEditeurEntity> setccEB = new HashSet<>();
         Set<ContactTechniqueEditeurEntity> setctEB = new HashSet<>();
