@@ -58,13 +58,6 @@ public class EtablissementEntity implements Serializable {
     @JsonIgnore
     private Set<IpEntity> ips = new HashSet<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "etablissement_editeur",
-            joinColumns = @JoinColumn(name = "etablissement_id"),
-            inverseJoinColumns = @JoinColumn(name = "editeur_id"))
-    private Set<EditeurEntity> editeurs = new HashSet<>();
-
     @Deprecated
     public EtablissementEntity() {
 
@@ -112,10 +105,6 @@ public class EtablissementEntity implements Serializable {
             throw new IllegalArgumentException("Le contact est obligatoire");
         }
         this.contact = contact;
-    }
-
-    public void ajouterEditeur(EditeurEntity editeur) {
-        this.editeurs.add(editeur);
     }
 
     public void ajouterIp(IpEntity ip) {
