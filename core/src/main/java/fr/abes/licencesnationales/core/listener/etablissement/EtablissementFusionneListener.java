@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -8,6 +7,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.event.Etablissemen
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
 import lombok.SneakyThrows;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
@@ -19,22 +19,17 @@ import java.util.Optional;
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEventEntity> {
 
     private final EtablissementService service;
-    private final TypeEtablissementRepository typeEtabrepository;
+    private final ReferenceService referenceService;
 
-    public EtablissementFusionneListener(EtablissementService service, TypeEtablissementRepository typeEtablissementRepository) {
+    public EtablissementFusionneListener(EtablissementService service, ReferenceService referenceService) {
         this.service = service;
-        this.typeEtabrepository = typeEtablissementRepository;
+        this.referenceService = referenceService;
     }
 
     @SneakyThrows
     @Override
     @Transactional
     public void onApplicationEvent(EtablissementFusionneEventEntity event) {
-        Optional<TypeEtablissementEntity> type = typeEtabrepository.findFirstByLibelle(event.getTypeEtablissement());
-        if (!type.isPresent()) {
-            throw new UnknownTypeEtablissementException("type d'établissement inconnu");
-        }
-
         // Attention à bien respecter l'ordre des arguments
         ContactEntity contactEntity = new ContactEntity(event.getNomContact(),
                 event.getPrenomContact(),
@@ -47,7 +42,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
                 event.getMailContact(),
                 event.getMotDePasse());
 
-        EtablissementEntity etab = new EtablissementEntity(event.getNomEtab(), event.getSiren(), type.get(), event.getIdAbes(), contactEntity);
+        EtablissementEntity etab = new EtablissementEntity(event.getNomEtab(), event.getSiren(), referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()), event.getIdAbes(), contactEntity);
 
         for (String siren : event.getSirenAnciensEtablissements()) {
             EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);

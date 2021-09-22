@@ -1,6 +1,6 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,6 +9,7 @@ import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("divise")
@@ -18,12 +19,12 @@ public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
 
     @Column(name = "ANCIEN_SIREN")
     private String ancienSiren;
-    @Column(name = "ANCIEN_NOM_ETAB")
-    private String ancienNomEtab;
+
+    private transient List<EtablissementEntity> etablissementDivises;
 
     @Lob
-    @Column(name = "ETABLISEMENTS_DIVISE")
-    private String etablisementsDivises;
+    @Column(name = "ETABLISSEMENTS_DIVISE")
+    private String etablisementsDivisesInBdd;
 
     public EtablissementDiviseEventEntity(Object source, String ancienSiren) {
         super(source);

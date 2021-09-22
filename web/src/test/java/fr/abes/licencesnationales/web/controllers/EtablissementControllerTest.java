@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -10,22 +9,18 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.IpException;
-import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
-import lombok.With;
 import org.assertj.core.util.Lists;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +29,6 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -78,7 +72,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     private EtablissementModifieListener listenerModification;
 
     @MockBean
-    private TypeEtablissementRepository typeEtablissementRepository;
+    private ReferenceService referenceService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -151,7 +145,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         EtablissementEntity entity = new EtablissementEntity(1, "testNomEtab", "123456789", type, "12345", contactEntity);
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
-        Mockito.when(typeEtablissementRepository.findFirstByLibelle(Mockito.anyString())).thenReturn(Optional.of(type));
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/etablissements")
@@ -190,7 +184,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         etab.setContact(contact);
 
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.when(typeEtablissementRepository.findFirstByLibelle(Mockito.anyString())).thenReturn(Optional.of(type));
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
         ContactEntity contactEntity = new ContactEntity("testNom", "testPrenom", "testAdresse", "testBP", "testCP", "testVille", "testCedex", "0000000000", "test@test.com", "12345*:KKk");
@@ -217,9 +211,10 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @DisplayName("test fusion établissement")
     @WithMockUser(authorities = {"admin"})
     void testFusionEtab() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
         EtablissementFusionneWebDto dto = new EtablissementFusionneWebDto();
         dto.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
-        EtablissementFusionneNouveauEtabWebDto dtoNouvelEtab = new EtablissementFusionneNouveauEtabWebDto();
+        EtablissementCreeSansCaptchaWebDto dtoNouvelEtab = new EtablissementCreeSansCaptchaWebDto();
         dtoNouvelEtab.setNom("nomEtab");
         dtoNouvelEtab.setTypeEtablissement("Nouveau");
         dtoNouvelEtab.setSiren("654987321");
@@ -251,7 +246,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         entity2.ajouterEditeur(new EditeurEntity(3, "editeur3", "id3", "adresseEd3", new Date(), null, null));
         entity2.ajouterEditeur(new EditeurEntity(4, "editeur4", "id4", "adresse4", new Date(), null, null));
 
-        Mockito.when(typeEtablissementRepository.findFirstByLibelle("Nouveau")).thenReturn(Optional.of(new TypeEtablissementEntity(1, "Nouveau")));
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity1);
@@ -264,6 +259,24 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/fusion")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test suppression Etablissement")
+    @WithMockUser(authorities = {"admin"})
+    void testSuppressionEtablissement() {
+        MotifSuppressionWebDto motif = new MotifSuppressionWebDto();
+        motif.setMotif("Motif suppression");
+
+        String siren = "123456789";
+        String nomEtab = "nomEtab";
+        String mail = "mail2@test.com";
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", mail, "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, nomEtab, "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
+        Mockito.doNothing().when(emailService).constructSuppressionMail(motif.getMotif(), etab.getName(), etab.getContact().getMail());
     }
 
     @Test

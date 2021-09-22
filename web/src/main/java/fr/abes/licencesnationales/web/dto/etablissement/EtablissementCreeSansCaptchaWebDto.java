@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class EtablissementFusionneNouveauEtabWebDto {
+public class EtablissementCreeSansCaptchaWebDto {
     @JsonProperty(value = "nom")
     private String nom;
     @JsonProperty(value = "siren")
