@@ -8,7 +8,9 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.authentification.ConnexionRequestDto;
 import fr.abes.licencesnationales.web.dto.authentification.MotDePasseOublieRequestDto;
+import fr.abes.licencesnationales.web.dto.authentification.ReinitialiserMotDePasseRequestDto;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
+import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.service.ReCaptchaAction;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.junit.jupiter.api.DisplayName;
@@ -33,6 +35,9 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
 
     @MockBean
     private EmailService emailService;
+
+    @MockBean
+    private JwtTokenProvider tokenProvider;
 
     @Test
     @DisplayName("Authentification - route inexistante")
@@ -215,7 +220,6 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         // Début
         MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
 
-
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
@@ -241,6 +245,108 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
+    }
+
+    @Test
+    @DisplayName("Réinitialiser mot de passe - Token valide")
+    public void testEnregistrerPasswordSuccess() throws Exception {
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+
+        // Mock user
+        String motDePasse = "password";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        // Mock token
+        Mockito.when(tokenProvider.validateToken(Mockito.anyString())).thenReturn(true);
+        Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.anyString())).thenReturn(etabIn.getSiren());
+
+        // Mock Etablissement service
+        Mockito.doNothing().when(etablissementService).changePasswordFromSiren(Mockito.anyString(), Mockito.anyString());
+
+        // Début
+        ReinitialiserMotDePasseRequestDto dto = new ReinitialiserMotDePasseRequestDto();
+        dto.setMotDePasse("PassWord1!");
+        dto.setRecaptcha("testCaptcha");
+        dto.setTokenFromMail("testToken");
+
+        this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Votre mot de passe a bien été réinitialiser"));
+
+    }
+
+    @Test
+    @DisplayName("Réinitialiser mot de passe - Token non valide")
+    public void testReinitialiserMotDePasseTokenNonValide() throws Exception {
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+
+        // Début
+        ReinitialiserMotDePasseRequestDto dto = new ReinitialiserMotDePasseRequestDto();
+        dto.setMotDePasse("PassWord1!");
+        dto.setRecaptcha("testCaptcha");
+        dto.setTokenFromMail("testToken");
+
+        this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Le token n'est pas valide"));
+
+    }
+
+    @Test
+    @DisplayName("Réinitialiser mot de passe - Mot de passe on valide")
+    public void testEnregistrerPasswordWrong() throws Exception {
+
+        // Début
+        ReinitialiserMotDePasseRequestDto dto = new ReinitialiserMotDePasseRequestDto();
+        dto.setMotDePasse("pp");
+        dto.setRecaptcha("testCaptcha");
+        dto.setTokenFromMail("testToken");
+
+        this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(content().string(containsString("Votre mot de passe doit contenir au minimum 8 caractères")));
+
+    }
+
+    @Test
+    @DisplayName("Réinitialiser mot de passe - json non valide")
+    public void testEnregistrerPasswordJsonVide() throws Exception {
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+
+        // Début
+        ReinitialiserMotDePasseRequestDto dto = new ReinitialiserMotDePasseRequestDto();
+        dto.setRecaptcha("12345");
+
+        this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Le champs 'token' est obligatoire"));
     }
 //
 //    @Test
@@ -274,28 +380,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
 //                .andExpect(jsonPath("$.debugMessage").value("Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales"));
 //    }
 //
-//    @Test
-//    @DisplayName("test enregistrement password success")
-//    public void testEnregistrerPasswordSuccess() throws Exception {
-//        PasswordEnregistrerWebDto dto = new PasswordEnregistrerWebDto();
 //
-//        ReCaptchaResponse response = new ReCaptchaResponse();
-//        /*Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).then(invocationOnMock -> {
-//            response.setSuccess(true);
-//            return response;
-//        });*/
-//        Mockito.when(tokenProvider.validateToken(Mockito.anyString())).thenReturn(true);
-//        Mockito.doNothing().when(etablissementService).changePasswordFromSiren(Mockito.anyString(), Mockito.anyString());
-//
-//        //test success
-//        dto.setPassword("PassWord1!");
-//        dto.setRecaptcha("testCaptcha");
-//        dto.setToken("testToken");
-//        this.mockMvc.perform(post("/v1/ln/reinitialisationMotDePasse/enregistrerPassword")
-//                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
-//                .andExpect(status().isOk());
-//
-//    }
 //
 //    @Test
 //    @DisplayName("test update password success")
