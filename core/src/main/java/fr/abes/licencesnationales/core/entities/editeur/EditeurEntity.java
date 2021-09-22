@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities.editeur;
 
 
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import lombok.AllArgsConstructor;
@@ -41,8 +42,9 @@ public class EditeurEntity implements Serializable {
 
     private Date dateCreation;
 
-    @Lob
-    private List<String> groupesEtabRelies = new ArrayList<>();
+    @JoinTable(name = "editeurs_types_etablissements", joinColumns = @JoinColumn(name = "ref_editeur"), inverseJoinColumns = @JoinColumn(name = "ref_type_etablissement"))
+    @ManyToMany
+    private Set<TypeEtablissementEntity> typeEtablissements;
 
     @OneToMany(targetEntity = ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Where(clause = "DTYPE='commercial'")

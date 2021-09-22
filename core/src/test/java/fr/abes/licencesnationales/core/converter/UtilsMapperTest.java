@@ -77,7 +77,6 @@ public class UtilsMapperTest {
         Assertions.assertEquals("nomEditeur", entity.getNomEditeur());
         Assertions.assertEquals("adressePostale", entity.getAdresseEditeur());
         Assertions.assertEquals("123456", entity.getIdentifiantEditeur());
-        Assertions.assertEquals(2, entity.getGroupesEtabRelies().size());
         ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
         Assertions.assertEquals("nomCCA", commercialEntity.getNomContact());
         Assertions.assertEquals("prenomCCA", commercialEntity.getPrenomContact());
@@ -123,7 +122,6 @@ public class UtilsMapperTest {
         Assertions.assertEquals("nomEditeur", entity.getNomEditeur());
         Assertions.assertEquals("adressePostale", entity.getAdresseEditeur());
         Assertions.assertEquals("123456", entity.getIdentifiantEditeur());
-        Assertions.assertEquals(2, entity.getGroupesEtabRelies().size());
 
         Assertions.assertEquals(2, entity.getContactCommercialEditeurEntities().size());
         ContactCommercialEditeurEntity commercialEntity = entity.getContactCommercialEditeurEntities().iterator().next();
