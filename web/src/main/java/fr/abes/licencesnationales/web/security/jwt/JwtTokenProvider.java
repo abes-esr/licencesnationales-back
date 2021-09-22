@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
@@ -18,8 +19,6 @@ import java.util.Date;
 
 @Component
 @Slf4j
-//@ConfigurationProperties(prefix = "jwt.token") ===> en comm pour les tests
-@ConfigurationProperties(prefix = "jwt.token")
 @Getter
 @Setter
 public class JwtTokenProvider {
@@ -27,17 +26,13 @@ public class JwtTokenProvider {
     @Autowired
     private Environment env;
 
-    /* en test
-    private String secret = "secret";
-    private int expirationInMs = 1234567891;*/
-
+    @Value("${jwt.token.secret}")
     private String secret;
+
+    @Value("${jwt.token.expirationInMs}")
     private int expirationInMs;
 
-
     public String generateToken(UserDetailsImpl u) {
-
-
 
         log.info("JwtTokenProvider");
         log.info("Début generateToken");
@@ -91,22 +86,7 @@ public class JwtTokenProvider {
         return null;
     }
 
-    /*public ContactEntity getUtilisateurFromJwt(String token) {
-        Claims claims = Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody();
-
-        ContactEntity u = new ContactEntity();
-        u.setId((Long)claims.get("userId"));
-        u.setSiren(claims.get("userSiren").toString());
-        u.setRole(claims.get("userRole").toString());
-
-        return u;
-    }*/
-
     public String getSirenFromJwtToken(String token) {
-        log.debug("token = " + token);
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
     }
 }

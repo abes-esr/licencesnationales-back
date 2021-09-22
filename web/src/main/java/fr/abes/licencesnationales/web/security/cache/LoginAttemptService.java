@@ -30,8 +30,6 @@ public class LoginAttemptService {
         });
     }
 
-    //
-
     public void loginSucceeded(final String key) {
         log.debug(Constant.ENTER_LOGIN_SUCCEED + key);
         attemptsCache.invalidate(key);
