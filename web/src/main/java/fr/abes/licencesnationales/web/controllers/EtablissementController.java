@@ -3,20 +3,20 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
-import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.EventService;
-import fr.abes.licencesnationales.core.services.GenererIdAbes;
+import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.web.exception.DonneeIncoherenteBddException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
@@ -55,6 +55,9 @@ public class EtablissementController {
     private EtablissementService etablissementService;
 
     @Autowired
+    private ReferenceService referenceService;
+
+    @Autowired
     private IpRepository ipRepository;
 
     @Autowired
@@ -71,9 +74,6 @@ public class EtablissementController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private GenererIdAbes genererIdAbes;
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
@@ -133,17 +133,27 @@ public class EtablissementController {
         eventService.save(etablissementFusionneEvent);
     }
 
-    @PostMapping(value = "/division")
+    @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) {
+    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
+        TypeEtablissementEntity type = referenceService.findTypeEtabByLibelle(etablissementDiviseEvent.getTypeEtablissement());
+        StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
+        //on initialise le statut des nouveaux établissement et on génère l'Id Abes
+        etablissementDiviseEvent.getEtablissementDivises().forEach(e -> {
+            e.setIdAbes(GenererIdAbes.generateId());
+            e.setTypeEtablissement(type);
+            e.setStatut(statut);
+        });
+        //on formatte les nouveaux établissements en json pour sauvegarde
+        etablissementDiviseEvent.setEtablisementsDivisesInBdd(objectMapper.writeValueAsString(etablissementDiviseEvent.getEtablissementDivises()));
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventService.save(etablissementDiviseEvent);
     }
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, @RequestBody Map<String, String> motif) throws DonneeIncoherenteBddException, RestClientException {
+    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif) throws RestClientException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
@@ -152,7 +162,7 @@ public class EtablissementController {
 
         //envoi du mail de suppression
         UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
-        emailService.constructSuppressionMail(motif.get("motif"), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructSuppressionMail(motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
     }
 
     @GetMapping(value = "/{siren}")

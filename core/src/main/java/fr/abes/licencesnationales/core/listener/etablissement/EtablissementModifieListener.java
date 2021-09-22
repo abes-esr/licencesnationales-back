@@ -5,11 +5,9 @@ import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
-import fr.abes.licencesnationales.core.repository.StatutRepository;
-import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
@@ -24,10 +22,7 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
     private final EtablissementService service;
 
     @Autowired
-    private TypeEtablissementRepository typeEtabrepository;
-
-    @Autowired
-    private StatutRepository statutRepository;
+    private ReferenceService referenceService;
 
     public EtablissementModifieListener(EtablissementService service) {
         this.service = service;
@@ -44,11 +39,7 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         etab.setName(event.getNomEtab());
 
         // Type d'établissement
-        Optional<TypeEtablissementEntity> type = typeEtabrepository.findFirstByLibelle(event.getTypeEtablissement());
-        if (!type.isPresent()) {
-            throw new UnknownTypeEtablissementException("Type d'établissement inconnu");
-        }
-        etab.setTypeEtablissement(type.get());
+        etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
 
         // Contact - nom
         contact.setNom(event.getNomContact());

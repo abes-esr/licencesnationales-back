@@ -25,12 +25,6 @@ public class EtablissementWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
 
-    @InjectMocks
-    private EtablissementWebDtoConverter etablissementWebDtoConverter;
-
-    @MockBean
-    private TypeEtablissementRepository repository;
-
     @Test
     @DisplayName("Test success converter EtablissementCreeWebDto / EtablissementCreeEvent")
     public void testSuccessConverterEtabCreeWebDto() {
@@ -131,7 +125,6 @@ public class EtablissementWebDtoConverterTest {
 
         EtablissementModifieEventEntity event = utilsMapper.map(etablissement, EtablissementModifieEventEntity.class);
 
-        Assertions.assertEquals(1, event.getId().intValue());
         Assertions.assertEquals("testNom", event.getNomEtab());
         Assertions.assertEquals("123456789", event.getSiren());
         Assertions.assertEquals("testType", event.getTypeEtablissement());
@@ -207,7 +200,6 @@ public class EtablissementWebDtoConverterTest {
 
         EtablissementModifieEventEntity event = utilsMapper.map(etablissement, EtablissementModifieEventEntity.class);
 
-        Assertions.assertEquals(1, event.getId().intValue());
         Assertions.assertEquals("testPassword", event.getMotDePasse());
         Assertions.assertEquals("testNomContact", event.getNomContact());
         Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
@@ -258,7 +250,7 @@ public class EtablissementWebDtoConverterTest {
     public void testSuccessConverterEtabFusionneWebDto() {
         EtablissementFusionneWebDto dto = new EtablissementFusionneWebDto();
         dto.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
-        EtablissementFusionneNouveauEtabWebDto dtoNouvelEtab = new EtablissementFusionneNouveauEtabWebDto();
+        EtablissementCreeSansCaptchaWebDto dtoNouvelEtab = new EtablissementCreeSansCaptchaWebDto();
         dtoNouvelEtab.setNom("testNom");
         dtoNouvelEtab.setTypeEtablissement("testType");
         dtoNouvelEtab.setSiren("654987321");
@@ -301,7 +293,7 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("La fusion doit porter sur au moins 2 établissements");
         etablissement.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
 
-        EtablissementFusionneNouveauEtabWebDto nouvelEtab = new EtablissementFusionneNouveauEtabWebDto();
+        EtablissementCreeSansCaptchaWebDto nouvelEtab = new EtablissementCreeSansCaptchaWebDto();
         etablissement.setNouveauEtab(nouvelEtab);
 
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");

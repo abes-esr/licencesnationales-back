@@ -109,13 +109,17 @@ public class EtablissementEntity implements Serializable {
         this.contact = contact;
     }
 
+    public EtablissementEntity(String nom, String siren, ContactEntity contact) {
+        this.name = nom;
+        this.siren = siren;
+        this.contact = contact;
+    }
+
     public void ajouterIp(IpEntity ip) {
         this.ips.add(ip);
     }
 
     public void ajouterIps(Set<IpEntity> ips) { this.ips.addAll(ips); }
-
-    public void ajouterEditeurs(Set<EditeurEntity> editeurs) { this.editeurs.addAll(editeurs); }
 
     @Override
     public boolean equals(Object obj) {
