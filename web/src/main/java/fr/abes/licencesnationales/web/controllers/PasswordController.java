@@ -1,31 +1,26 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
-import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.exception.SirenExistException;
-import fr.abes.licencesnationales.web.dto.authentification.PasswordEnregistrerWebDto;
-import fr.abes.licencesnationales.web.dto.authentification.PasswordResetWebDto;
-import fr.abes.licencesnationales.web.dto.authentification.PasswordUpdateWebDto;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.web.dto.authentification.TokenDto;
-import fr.abes.licencesnationales.web.exception.CaptchaException;
+import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
-import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
-import fr.abes.licencesnationales.web.exception.DonneeIncoherenteBddException;
-import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
-import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
-import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
-import fr.abes.licencesnationales.web.service.ReCaptchaService;
+import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.web.dto.authentification.PasswordEnregistrerWebDto;
+import fr.abes.licencesnationales.web.dto.authentification.PasswordUpdateWebDto;
+import fr.abes.licencesnationales.web.dto.authentification.TokenDto;
+import fr.abes.licencesnationales.web.exception.CaptchaException;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
+import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
+import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -63,36 +58,6 @@ public class PasswordController {
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
 
-
-
-    @ApiOperation(value = "permet de ",
-            notes = "le ")
-    @PostMapping("/resetPassword")
-    public void resetPassword(HttpServletRequest request, @Valid @RequestBody PasswordResetWebDto userEmailOrSiren) throws DonneeIncoherenteBddException, RestClientException {
-        String mail;
-        String siren;
-        EtablissementEntity user;
-        String msgErr = "Identifiant non connu dans la base ; merci de contacter l’assistance https://stp.abes.fr/node/3?origine=LicencesNationales";
-        if (userEmailOrSiren.getEmail() != null) {
-            mail = userEmailOrSiren.getEmail();
-            log.info("mail = " + mail);
-            user = etablissementService.getUserByMail(mail);
-        } else {
-            siren = userEmailOrSiren.getSiren();
-            user = etablissementService.getFirstBySiren(siren);
-        }
-        if (userEmailOrSiren.getEmail() != null && user == null) {
-            throw new AuthenticationCredentialsNotFoundException(msgErr);
-        } else if (userEmailOrSiren.getSiren() != null && user == null) {
-            throw new AuthenticationCredentialsNotFoundException(msgErr);
-        }
-        userDetails = new UserDetailsServiceImpl(etablissementService).loadUser(user);
-
-        String jwt = tokenProvider.generateToken((UserDetailsImpl) userDetails);
-        String nomEtab = ((UserDetailsImpl) userDetails).getNameEtab();
-        String emailUser = ((UserDetailsImpl) userDetails).getEmail();
-        emailService.constructResetTokenEmail(urlSite, jwt, emailUser, nomEtab);
-    }
 
     @PostMapping("/verifTokenValide")
     public boolean verifTokenValide(@Valid @RequestBody TokenDto requestData) {

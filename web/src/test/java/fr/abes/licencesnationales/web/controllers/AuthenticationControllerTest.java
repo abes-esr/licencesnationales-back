@@ -4,8 +4,13 @@ import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.authentification.ConnexionRequestDto;
+import fr.abes.licencesnationales.web.dto.authentification.MotDePasseOublieRequestDto;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
+import fr.abes.licencesnationales.web.service.ReCaptchaAction;
+import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -22,6 +27,12 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
 
     @MockBean
     private EtablissementService etablissementService;
+
+    @MockBean
+    private ReCaptchaService reCaptchaService;
+
+    @MockBean
+    private EmailService emailService;
 
     @Test
     @DisplayName("Authentification - route inexistante")
@@ -122,6 +133,114 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("The credentials are not valid"))
                 .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")));
+    }
+
+    @Test
+    @DisplayName("Mot de passe oublié - SIREN valide")
+    public void testMotDePasseOublieSirenValide() throws Exception {
+
+        // Mock user
+        String motDePasse = "password";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren(etabIn.getSiren())).thenReturn(etabIn);
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+        request.setSiren(etabIn.getSiren());
+        request.setRecaptcha("4566");
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+    }
+
+    @Test
+    @DisplayName("Mot de passe oublié - Email valide")
+    public void testMotDePasseOublieEmailValide() throws Exception {
+
+        // Mock user
+        String motDePasse = "password";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        Mockito.when(etablissementService.getUserByMail(etabIn.getContact().getMail())).thenReturn(etabIn);
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+        request.setEmail(etabIn.getContact().getMail());
+        request.setRecaptcha("4566");
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+    }
+
+    @Test
+    @DisplayName("Mot de passe oublié - Json vide")
+    public void testMotDePasseOublieJsonVide() throws Exception {
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Le champs 'recaptcha' est obligatoire"));
+    }
+
+    @Test
+    @DisplayName("Mot de passe oublié - Sans Email ou SIREN")
+    public void testMotDePasseOublieSansSirenEmail() throws Exception {
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+        request.setRecaptcha("1234");
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
     }
 //
 //    @Test
