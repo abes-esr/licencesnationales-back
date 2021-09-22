@@ -37,7 +37,7 @@ public class EmailService {
     private MessageSource messageSource;
 
     @Value("${mail.ws.url}")
-    protected String url;
+    protected String baseURL;
 
     public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> c, Set<ContactTechniqueEditeurEntity> t) {
         log.info("DEBUT checkDoublonMail ");
@@ -75,8 +75,8 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructResetTokenEmail(String contextPath, String token, String emailUser, String nomEtab) throws RestClientException {
-        final String url = contextPath + "/reinitialisationPass?token=" + token; //test
+    public void constructResetTokenEmail(String token, String emailUser, String nomEtab) throws RestClientException {
+        final String url = this.baseURL + "/reinitialisationPass?token=" + token; //test
         String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, Locale.FRANCE);
         String message = messageSource.getMessage("message.resetTokenEmailDebut",null, Locale.FRANCE);
         message +=nomEtab + " ";
@@ -131,7 +131,7 @@ public class EmailService {
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-        restTemplate.postForObject(url + "htmlMail/", entity, String.class); //appel du ws avec
+        restTemplate.postForObject(baseURL + "htmlMail/", entity, String.class); //appel du ws avec
     }
 
 
