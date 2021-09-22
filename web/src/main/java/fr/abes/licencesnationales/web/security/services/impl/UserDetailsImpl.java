@@ -56,7 +56,6 @@ public class UserDetailsImpl implements UserDetails {
 
 		List<GrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority(role));
-		log.debug("userPwd = " + user.getContact().getMotDePasse());
 		return new UserDetailsImpl(user.getId(), user.getSiren(), user.getName(), user.getContact().getMotDePasse(), user.getContact().getMail(),authorities, role);
 	}
 
