@@ -116,7 +116,6 @@ public class EtablissementWebDtoConverterTest {
         etablissement.setTypeEtablissement("testType");
 
         ContactModifieWebDto contact = new ContactModifieWebDto();
-        contact.setMotDePasse("testPassword");
         contact.setNom("testNomContact");
         contact.setPrenom("testPrenomContact");
         contact.setAdresse("testAdresseContact");
@@ -131,7 +130,6 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("testNom", event.getNomEtab());
         Assertions.assertEquals("123456789", event.getSiren());
         Assertions.assertEquals("testType", event.getTypeEtablissement());
-        Assertions.assertEquals("testPassword", event.getMotDePasse());
         Assertions.assertEquals("testNomContact", event.getNomContact());
         Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
         Assertions.assertEquals("testAdresseContact", event.getAdresseContact());
@@ -174,9 +172,6 @@ public class EtablissementWebDtoConverterTest {
         etablissement.getContact().setMail("test@test.com");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
 
-        etablissement.getContact().setMotDePasse("testPassword");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'adresse' du contact est obligatoire");
-
         etablissement.getContact().setCodePostal("00000");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
 
@@ -191,7 +186,6 @@ public class EtablissementWebDtoConverterTest {
         EtablissementModifieUserWebDto etablissement = new EtablissementModifieUserWebDto();
 
         ContactModifieWebDto contact = new ContactModifieWebDto();
-        contact.setMotDePasse("testPassword");
         contact.setNom("testNomContact");
         contact.setPrenom("testPrenomContact");
         contact.setAdresse("testAdresseContact");
@@ -203,7 +197,6 @@ public class EtablissementWebDtoConverterTest {
 
         EtablissementModifieEventEntity event = utilsMapper.map(etablissement, EtablissementModifieEventEntity.class);
 
-        Assertions.assertEquals("testPassword", event.getMotDePasse());
         Assertions.assertEquals("testNomContact", event.getNomContact());
         Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
         Assertions.assertEquals("testAdresseContact", event.getAdresseContact());
@@ -237,9 +230,6 @@ public class EtablissementWebDtoConverterTest {
         etablissement.getContact().setMail("test@test.com");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
 
-        etablissement.getContact().setMotDePasse("testPassword");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'adresse' du contact est obligatoire");
-
         etablissement.getContact().setCodePostal("00000");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
 
@@ -261,7 +251,6 @@ public class EtablissementWebDtoConverterTest {
         dtoContact.setNom("testNomContact");
         dtoContact.setPrenom("testPrenomContact");
         dtoContact.setMail("test@test.com");
-        dtoContact.setMotDePasse("testPassword");
         dtoContact.setAdresse("testAdresseContact");
         dtoContact.setCodePostal("testCP");
         dtoContact.setVille("testVille");
@@ -276,7 +265,6 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("testNom", event.getNomEtab());
         Assertions.assertEquals("654987321", event.getSiren());
         Assertions.assertEquals("testType", event.getTypeEtablissement());
-        Assertions.assertEquals("testPassword", event.getMotDePasse());
         Assertions.assertEquals("testNomContact", event.getNomContact());
         Assertions.assertEquals("testPrenomContact", event.getPrenomContact());
         Assertions.assertEquals("testAdresseContact", event.getAdresseContact());
@@ -341,7 +329,6 @@ public class EtablissementWebDtoConverterTest {
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
 
         EtablissementUserWebDto dto = utilsMapper.map(etab, EtablissementUserWebDto.class);
-        Assertions.assertEquals(1, dto.getContact().getId().intValue());
         Assertions.assertEquals("nom2", dto.getContact().getNom());
         Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
         Assertions.assertEquals("adresse2", dto.getContact().getAdresse());
@@ -367,7 +354,6 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("nomEtab", dto.getName());
         Assertions.assertEquals("123456", dto.getIdAbes());
         Assertions.assertEquals("validé", dto.getTypeEtablissement());
-        Assertions.assertEquals(1, dto.getContact().getId().intValue());
         Assertions.assertEquals("nom2", dto.getContact().getNom());
         Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
         Assertions.assertEquals("adresse2", dto.getContact().getAdresse());

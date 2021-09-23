@@ -142,7 +142,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setVille("testVille");
         contact.setTelephone("0000000000");
         contact.setMail("test@test.com");
-        contact.setMotDePasse("12345*:KKk");
         etab.setContact(contact);
 
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
@@ -187,7 +186,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setVille("testVille");
         contact.setTelephone("0000000000");
         contact.setMail("test@test.com");
-        contact.setMotDePasse("12345*:KKk");
         etab.setContact(contact);
 
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
