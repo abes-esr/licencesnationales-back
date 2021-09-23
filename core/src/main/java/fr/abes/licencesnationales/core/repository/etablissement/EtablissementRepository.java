@@ -25,10 +25,6 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     @Query("select e from EtablissementEntity e where e.contact.mail like :x")
     Optional<EtablissementEntity> getUserByMail(@Param("x") String email);
 
-    @Query(nativeQuery = true, value = "select case when exists(select * from Etablissement "
-            + "where contact.mail = :mail) then 'true' else 'false' end from dual")
-    Boolean existeMail(@Param("mail") String mail);
-
     EtablissementEntity findEtablissementEntityByIpsContains(IpEntity ip);
 
 
