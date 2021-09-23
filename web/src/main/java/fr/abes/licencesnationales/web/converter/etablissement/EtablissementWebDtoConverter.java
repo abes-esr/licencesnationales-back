@@ -276,6 +276,7 @@ public class EtablissementWebDtoConverter {
                 EtablissementEntity source = context.getSource();
 
                 EtablissementAdminWebDto dto = new EtablissementAdminWebDto();
+                dto.setId(source.getId());
                 dto.setName(source.getName());
                 dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
                 dto.setSiren(source.getSiren());

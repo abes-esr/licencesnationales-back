@@ -9,9 +9,9 @@ import lombok.Setter;
 @Setter
 public class EtablissementAdminWebDto extends EtablissementWebDto {
     @JsonProperty("id")
-    private Long id;
+    private Integer id;
 
-    @JsonProperty("nomEtab")
+    @JsonProperty("nom")
     private String name;
 
     @JsonProperty("siren")
