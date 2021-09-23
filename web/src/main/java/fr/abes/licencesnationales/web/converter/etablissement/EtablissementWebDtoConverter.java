@@ -60,6 +60,11 @@ public class EtablissementWebDtoConverter {
 
                     setContact(source.getContact(), event);
 
+                    // Contact - mot de passe
+                    if (source.getContact().getMotDePasse() == null) {
+                        throw new IllegalArgumentException("Le champs 'motDePasse' du contact est obligatoire");
+                    }
+                    event.setMotDePasse(source.getContact().getMotDePasse());
                     return event;
                 } catch (IllegalArgumentException ex) {
                     throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
@@ -136,7 +141,7 @@ public class EtablissementWebDtoConverter {
         utilsMapper.addConverter(myConverter);
     }
 
-    private void setContact(ContactCreeWebDto source, EtablissementEventEntity event) {
+    private void setContact(ContactWebDto source, EtablissementEventEntity event) {
 
         // Contact - nom
         if (source.getNom() == null) {
@@ -161,12 +166,6 @@ public class EtablissementWebDtoConverter {
             throw new IllegalArgumentException("Le champs 'mail' du contact est obligatoire");
         }
         event.setMailContact(source.getMail());
-
-        // Contact - mot de passe
-        if (source.getMotDePasse() == null) {
-            throw new IllegalArgumentException("Le champs 'motDePasse' du contact est obligatoire");
-        }
-        event.setMotDePasse(source.getMotDePasse());
 
         // Contact - adresse
         if (source.getAdresse() == null) {
@@ -292,7 +291,6 @@ public class EtablissementWebDtoConverter {
 
     private ContactWebDto getContactWebDto(EtablissementEntity source) {
         ContactWebDto contact = new ContactWebDto();
-        contact.setId(source.getId().intValue());
         contact.setNom(source.getContact().getNom());
         contact.setPrenom(source.getContact().getPrenom());
         contact.setAdresse(source.getContact().getAdresse());

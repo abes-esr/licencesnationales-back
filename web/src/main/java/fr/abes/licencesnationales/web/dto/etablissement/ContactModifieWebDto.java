@@ -5,6 +5,6 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ContactModifieWebDto extends ContactCreeWebDto {
+public class ContactModifieWebDto extends ContactWebDto {
 
 }
