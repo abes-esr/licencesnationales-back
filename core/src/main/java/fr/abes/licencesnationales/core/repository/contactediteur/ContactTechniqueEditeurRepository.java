@@ -7,14 +7,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public interface ContactTechniqueEditeurRepository extends JpaRepository<ContactTechniqueEditeurEntity, Long> {
-
-    @Query(nativeQuery = true, value = "select case when exists(select * from ContactTechniqueEditeur "
-            + "where mailContactTechnique = :mail) then 'true' else 'false' end from dual")
-    Boolean existeMail(@Param("mail") String mail);
-
-    ContactTechniqueEditeurEntity findByMailContact(String mail);
-
-
+public interface ContactTechniqueEditeurRepository extends JpaRepository<ContactTechniqueEditeurEntity, Integer> {
+    Optional<ContactTechniqueEditeurEntity> findByMailContact(String mail);
 }

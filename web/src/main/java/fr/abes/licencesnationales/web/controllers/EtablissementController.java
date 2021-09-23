@@ -30,6 +30,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -74,11 +75,13 @@ public class EtablissementController {
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
+
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
-        if(captcha==null){
+        if (captcha == null) {
             throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
         }
 
@@ -101,8 +104,8 @@ public class EtablissementController {
         eventService.save(event);
 
         /*******************************************/
-        emailService.constructCreationCompteEmailUser(etablissementCreeWebDto.getContact().getMail());
-        emailService.constructCreationCompteEmailAdmin(admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
+        emailService.constructCreationCompteEmailUser(locale, etablissementCreeWebDto.getContact().getMail());
+        emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
     }
 
 
@@ -129,7 +132,7 @@ public class EtablissementController {
         eventService.save(etablissementFusionneEvent);
     }
 
-    @PostMapping(value = "/division")
+    @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
     public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
