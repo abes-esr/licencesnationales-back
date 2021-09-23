@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import fr.abes.licencesnationales.core.exception.*;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
 import org.modelmapper.MappingException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +24,6 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -158,6 +155,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     /**
      * Gestion des erreurs d'authentification
+     *
      * @param ex
      * @return
      */
@@ -181,6 +179,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
                 .findFirst();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, rootCause.get()));
     }
+
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP
@@ -189,7 +188,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class})
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
     }
