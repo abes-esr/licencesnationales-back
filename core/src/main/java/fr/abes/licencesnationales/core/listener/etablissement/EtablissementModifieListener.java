@@ -36,10 +36,12 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         ContactEntity contact = etab.getContact();
 
         // Nom
-        etab.setName(event.getNomEtab());
+        if(event.getNomEtab() != null)
+            etab.setName(event.getNomEtab());
 
         // Type d'établissement
-        etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
+        if(event.getTypeEtablissement() != null)
+            etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
 
         // Contact - nom
         contact.setNom(event.getNomContact());
@@ -52,9 +54,6 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
 
         // Contact - mail
         contact.setMail(event.getMailContact());
-
-        // Contact - mot de passe
-        contact.setMotDePasse(event.getMotDePasse());
 
         // Contact - adresse
         contact.setAdresse(event.getAdresseContact());
