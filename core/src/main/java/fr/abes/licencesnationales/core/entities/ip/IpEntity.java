@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -32,7 +33,7 @@ public abstract class IpEntity implements Serializable {
      * L'IP est stockée sous forme de chaîne de caractère pour les bessoins
      * de retro-compatibilité avec l'ancienne version de l'application
      */
-    @NotBlank(message = "L'IP est obligatoire")
+    @NotNull(message = "L'IP est obligatoire")
     private String ip;
 
     /**
