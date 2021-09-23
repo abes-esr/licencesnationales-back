@@ -8,23 +8,17 @@ import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.web.dto.authentification.PasswordEnregistrerWebDto;
 import fr.abes.licencesnationales.web.dto.authentification.PasswordUpdateWebDto;
-import fr.abes.licencesnationales.web.dto.authentification.TokenDto;
-import fr.abes.licencesnationales.web.exception.CaptchaException;
-import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -57,40 +51,6 @@ public class PasswordController {
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
-
-
-    @PostMapping("/verifTokenValide")
-    public boolean verifTokenValide(@Valid @RequestBody TokenDto requestData) {
-        log.info("requestDataVerifTokenValid = " + requestData);
-        String jwtToken = requestData.getToken();
-        log.info("token = " + jwtToken);
-        if (!tokenProvider.validateToken(jwtToken)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
-
-    @ApiOperation(value = "permet de ",
-            notes = "le ")
-    @PostMapping("/enregistrerPassword")
-    public void enregistrerPassword(@Valid @RequestBody PasswordEnregistrerWebDto requestData) throws RestClientException, CaptchaException {
-        String recaptcha = requestData.getRecaptcha();
-        String mdp = requestData.getPassword();
-        String token = requestData.getToken();
-        String action = "reinitialisationPass";
-
-        //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(recaptcha, action);
-        if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException(StringUtils.joinWith("\n", reCaptchaResponse.getErrors()));
-        }
-        if (tokenProvider.validateToken(token)) {
-            String siren = tokenProvider.getSirenFromJwtToken(token);
-            etablissementService.changePasswordFromSiren(siren, mdp);
-        }
-    }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping("/updatePassword")
