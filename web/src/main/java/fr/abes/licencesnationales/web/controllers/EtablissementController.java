@@ -16,6 +16,7 @@ import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
+import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
@@ -75,6 +76,9 @@ public class EtablissementController {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private UserDetailsServiceImpl userDetailsService;
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
@@ -164,14 +168,23 @@ public class EtablissementController {
         eventService.save(etablissementSupprimeEvent);
 
         //envoi du mail de suppression
-        UserDetails user = new UserDetailsServiceImpl(etablissementService).loadUser(etab);
+        UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructSuppressionMail(motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
     }
 
     @GetMapping(value = "/{siren}")
-    @PreAuthorize("hasAuthority('admin')")
-    public EtablissementWebDto get(@PathVariable String siren) {
-        return mapper.map(etablissementService.getFirstBySiren(siren), EtablissementWebDto.class);
+    public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
+        EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
+        UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
+        if ("admin".equals(user.getRole())) {
+            return mapper.map(entity, EtablissementAdminWebDto.class);
+        }
+        if (user.getSiren().equals(siren)) {
+            return mapper.map(entity, EtablissementUserWebDto.class);
+        }
+        else {
+            throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+        }
     }
 
     @PostMapping(value = "/getDerniereDateModificationIp/{siren}")
@@ -205,12 +218,6 @@ public class EtablissementController {
         } catch (Exception e) {
             throw new DateException("Erreur lors de la recupération de la dernière date de modification : " + e);
         }
-    }
-
-    @GetMapping(value = "/getInfoEtab")
-    @PreAuthorize("hasAnyAuthority('etab', 'admin')")
-    public EtablissementWebDto getInfoEtab() throws SirenIntrouvableException, AccesInterditException {
-        return mapper.map(etablissementService.getFirstBySiren(filtrerAccesServices.getSirenFromSecurityContextUser()), EtablissementWebDto.class);
     }
 
     @GetMapping(value = "")
