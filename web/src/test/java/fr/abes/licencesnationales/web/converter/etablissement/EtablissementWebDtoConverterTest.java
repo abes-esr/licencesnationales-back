@@ -2,6 +2,9 @@ package fr.abes.licencesnationales.web.converter.etablissement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
@@ -329,5 +332,51 @@ public class EtablissementWebDtoConverterTest {
         etablissement.getNouveauEtab().getContact().setVille("villeTest");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
 
+    }
+
+    @Test
+    @DisplayName("test conversion EtablissementEntity / EtablissementUserWebDto")
+    void testEtabUserWebDto() {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        EtablissementUserWebDto dto = utilsMapper.map(etab, EtablissementUserWebDto.class);
+        Assertions.assertEquals(1, dto.getContact().getId().intValue());
+        Assertions.assertEquals("nom2", dto.getContact().getNom());
+        Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
+        Assertions.assertEquals("adresse2", dto.getContact().getAdresse());
+        Assertions.assertEquals("BP2", dto.getContact().getBoitePostale());
+        Assertions.assertEquals("11111", dto.getContact().getCodePostal());
+        Assertions.assertEquals("ville2", dto.getContact().getVille());
+        Assertions.assertEquals("cedex2", dto.getContact().getCedex());
+        Assertions.assertEquals("1111111111", dto.getContact().getTelephone());
+        Assertions.assertEquals("mail@mail.com", dto.getContact().getMail());
+        Assertions.assertEquals("etab", dto.getContact().getRole());
+    }
+
+    @Test
+    @DisplayName("test conversion EtablissementEntity / EtablissementAdminWebDto")
+    void testEtabAdminWebDto() {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        EtablissementAdminWebDto dto = utilsMapper.map(etab, EtablissementAdminWebDto.class);
+
+        Assertions.assertEquals(1, dto.getId().intValue());
+        Assertions.assertEquals("123456789", dto.getSiren());
+        Assertions.assertEquals("nomEtab", dto.getName());
+        Assertions.assertEquals("123456", dto.getIdAbes());
+        Assertions.assertEquals("validé", dto.getTypeEtablissement());
+        Assertions.assertEquals(1, dto.getContact().getId().intValue());
+        Assertions.assertEquals("nom2", dto.getContact().getNom());
+        Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
+        Assertions.assertEquals("adresse2", dto.getContact().getAdresse());
+        Assertions.assertEquals("BP2", dto.getContact().getBoitePostale());
+        Assertions.assertEquals("11111", dto.getContact().getCodePostal());
+        Assertions.assertEquals("ville2", dto.getContact().getVille());
+        Assertions.assertEquals("cedex2", dto.getContact().getCedex());
+        Assertions.assertEquals("1111111111", dto.getContact().getTelephone());
+        Assertions.assertEquals("mail@mail.com", dto.getContact().getMail());
+        Assertions.assertEquals("etab", dto.getContact().getRole());
     }
 }

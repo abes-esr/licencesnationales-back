@@ -19,17 +19,21 @@ import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
+import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
+import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
@@ -73,6 +77,9 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
     @MockBean
     private ReferenceService referenceService;
+
+    @MockBean
+    private UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -273,6 +280,60 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.doNothing().when(emailService).constructSuppressionMail(motif.getMotif(), etab.getName(), etab.getContact().getMail());
+    }
+
+    @Test
+    @DisplayName("test récupération info établissement User")
+    @WithMockUser(authorities = {"etab"})
+    void testGetEtab() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+
+        mockMvc.perform(get("/v1/etablissements/123456789")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.contact.id").value(1))
+                .andExpect(jsonPath("$.contact.nom").value("nom2"))
+                .andExpect(jsonPath("$.contact.prenom").value("prenom2"))
+                .andExpect(jsonPath("$.contact.mail").value("mail@mail.com"))
+                .andExpect(jsonPath("$.contact.telephone").value("1111111111"))
+                .andExpect(jsonPath("$.contact.adresse").value("adresse2"))
+                .andExpect(jsonPath("$.contact.boitePostale").value("BP2"))
+                .andExpect(jsonPath("$.contact.codePostal").value("11111"))
+                .andExpect(jsonPath("$.contact.cedex").value("cedex2"))
+                .andExpect(jsonPath("$.contact.ville").value("ville2"))
+                .andExpect(jsonPath("$.contact.role").value("etab"));
+    }
+
+    @Test
+    @DisplayName("test récupération info établissement Admin")
+    @WithMockUser(authorities = {"admin"})
+    void testGetEtabAdmin() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        contact.setRole("admin");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+
+        mockMvc.perform(get("/v1/etablissements/123456789")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.nom").value("nomEtab"))
+                .andExpect(jsonPath("$.siren").value("123456789"))
+                .andExpect(jsonPath("$.idAbes").value("123456"))
+                .andExpect(jsonPath("$.typeEtablissement").value("validé"))
+                .andExpect(jsonPath("$.contact.id").value(1))
+                .andExpect(jsonPath("$.contact.nom").value("nom2"))
+                .andExpect(jsonPath("$.contact.prenom").value("prenom2"))
+                .andExpect(jsonPath("$.contact.mail").value("mail@mail.com"))
+                .andExpect(jsonPath("$.contact.telephone").value("1111111111"))
+                .andExpect(jsonPath("$.contact.adresse").value("adresse2"))
+                .andExpect(jsonPath("$.contact.boitePostale").value("BP2"))
+                .andExpect(jsonPath("$.contact.codePostal").value("11111"))
+                .andExpect(jsonPath("$.contact.cedex").value("cedex2"))
+                .andExpect(jsonPath("$.contact.ville").value("ville2"))
+                .andExpect(jsonPath("$.contact.role").value("etab"));
     }
 
     @Test
