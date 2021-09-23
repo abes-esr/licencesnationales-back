@@ -12,6 +12,8 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
@@ -30,18 +32,18 @@ public class EtablissementEntity implements Serializable {
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom d'établissement fourni n'est pas valide")
     private String name;
 
-    @NotBlank
+    @NotNull
     @Column(name = "siren", unique = true)
     @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
     private String siren;
 
     private Date dateCreation = new Date();
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ref_typeEtablissement")
     private TypeEtablissementEntity typeEtablissement;
