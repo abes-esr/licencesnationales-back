@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.net.httpserver.HttpsServer;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.MailDto;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
@@ -10,6 +11,7 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueE
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
 import java.util.Set;
@@ -29,80 +32,55 @@ import java.util.Set;
 @Slf4j
 public class EmailService {
     @Autowired
-    private ContactCommercialEditeurRepository contactCommercialEditeurRepository;
-    @Autowired
-    private ContactTechniqueEditeurRepository contactTechniqueEditeurRepository;
+    private MessageSource messageSource;
 
     @Autowired
-    private MessageSource messageSource;
+    private RestTemplate restTemplate;
 
     @Value("${mail.ws.url}")
     protected String baseURL;
 
-    public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> c, Set<ContactTechniqueEditeurEntity> t) {
-        log.info("DEBUT checkDoublonMail ");
-        boolean existeMailCommercial = false;
-        boolean existeMailTechnique = false;
-        String mail;
-        ContactEditeurEntity e;
-        for (ContactCommercialEditeurEntity contact : c){
-            mail = contact.getMailContact();
-            log.info("mail = "+ mail);
-            e = contactCommercialEditeurRepository.findByMailContact(mail);
-            if(e!=null) existeMailCommercial=true;
-        }
-        for (ContactTechniqueEditeurEntity contact : t){
-            mail = contact.getMailContact();
-            log.info("mail = "+ mail);
-            e = contactTechniqueEditeurRepository.findByMailContact(mail);
-            if(e!=null) existeMailTechnique = true;
-        }
-        log.info("existeMailCommercial = "+ existeMailCommercial);
-        log.info("existeMailTechnique = "+ existeMailTechnique);
-        return existeMailCommercial || existeMailTechnique;
-    }
-
-    public void constructCreationCompteEmailAdmin(String emailUser, String siren, String nomEtab) throws RestClientException {
-        String message = messageSource.getMessage("message.CreationCompteAdmin", null, Locale.FRANCE);
+    public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab) throws RestClientException {
+        String message = messageSource.getMessage("message.CreationCompteAdmin", null, locale);
         message +=nomEtab + " avec le siren " + siren;
-        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,Locale.FRANCE), message);
+        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructCreationCompteEmailUser(String emailUser) throws RestClientException {
-        String message = messageSource.getMessage("message.CreationCompteUser", null, Locale.FRANCE);
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.NouveauCompteCree",null,Locale.FRANCE), message);
+    public void constructCreationCompteEmailUser(Locale locale,  String emailUser) throws RestClientException {
+        String message = messageSource.getMessage("message.CreationCompteUser", null, locale);
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructResetTokenEmail(String token, String emailUser, String nomEtab) throws RestClientException {
-        final String url = this.baseURL + "/reinitialisationPass?token=" + token; //test
-        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, Locale.FRANCE);
-        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, Locale.FRANCE);
+    public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
+        final String url = this.baseURL + "/reinitialisationPass?token=" + token;
+        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
+        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
         message +=nomEtab + " ";
-        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, Locale.FRANCE);
+        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, locale);
         message += " \r\n" + url;
-        message += " \r\n" + messageSource.getMessage("message.resetTokenEmailFin", null, Locale.FRANCE);
+        message += " \r\n" + messageSource.getMessage("message.resetTokenEmailFin", null, locale);
         String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message);
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructValidationNewPassEmail(String emailUser) throws RestClientException {
-        final String message = messageSource.getMessage("message.validationNewPass", null, Locale.FRANCE);
+    public void constructValidationNewPassEmail(Locale locale, String emailUser) throws RestClientException {
+        final String message = messageSource.getMessage("message.validationNewPass", null, locale);
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message);
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructAccesModifieEmail(String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
-        String message = messageSource.getMessage("message.modificationAcces", null, Locale.FRANCE);
+    public void constructAccesModifieEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
+        String message = messageSource.getMessage("message.modificationAcces", null, locale);
         message += "\r\n" + descriptionAcces;
         message += "\r\n Commentaires liés à la modification de l'accès : " + commentaires;
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Modification Acces", message);
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructAccesCreeEmail(String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
-        String message = messageSource.getMessage("message.creationAcces", null, Locale.FRANCE);
+    public void constructAccesCreeEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
+        String message = messageSource.getMessage("message.creationAcces", null, locale);
         message += "\r\n" + descriptionAcces;
         message += "\r\n Commentaires liés à la création de l'accès : " + commentaires;
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Creation Acces", message);
@@ -122,7 +100,6 @@ public class EmailService {
 
 
     public void sendMail(String requestJson) throws RestClientException {
-        RestTemplate restTemplate = new RestTemplate(); //appel ws qui envoie le mail
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
@@ -131,7 +108,7 @@ public class EmailService {
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-        restTemplate.postForObject(baseURL + "htmlMail/", entity, String.class); //appel du ws avec
+        restTemplate.postForObject(baseURL + "htmlMail/", entity, String.class);
     }
 
 
