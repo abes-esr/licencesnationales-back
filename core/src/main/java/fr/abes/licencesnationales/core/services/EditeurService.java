@@ -22,7 +22,7 @@ public class EditeurService {
     private EditeurRepository editeurRepository;
 
     @Autowired
-    private EmailService emailService;
+    private EtablissementService etablissementService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -30,13 +30,11 @@ public class EditeurService {
     @Autowired
     private EditeurEventRepository eventRepository;
 
-    @Autowired
-    private UtilsMapper mapper;
 
     public void save(@Valid EditeurEntity editeur) throws MailDoublonException {
 
         log.debug("debut addEditeur");
-        boolean existeMail = emailService.checkDoublonMail(editeur.getContactCommercialEditeurEntities(), editeur.getContactTechniqueEditeurEntities());
+        boolean existeMail = etablissementService.checkDoublonMail(editeur.getContactCommercialEditeurEntities(), editeur.getContactTechniqueEditeurEntities());
         if (existeMail) {
             log.debug("existeMail");
             throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");

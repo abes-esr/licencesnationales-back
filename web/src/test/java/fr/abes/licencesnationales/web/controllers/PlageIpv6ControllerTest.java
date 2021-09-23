@@ -77,7 +77,7 @@ public class PlageIpv6ControllerTest extends LicencesNationalesAPIApplicationTes
         EtablissementEntity etablissementEntity = new EtablissementEntity();
         etablissementEntity.setName("testEtab");
         Mockito.when(etablissementService.getFirstBySiren(Mockito.anyString())).thenReturn(etablissementEntity);
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
     }
 
 
