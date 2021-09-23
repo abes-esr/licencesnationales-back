@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ContactEditeurRepository extends JpaRepository<ContactEditeurEntity, Long> {
+public interface ContactEditeurRepository extends JpaRepository<ContactEditeurEntity, Integer> {
 }

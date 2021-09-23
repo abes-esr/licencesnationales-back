@@ -34,6 +34,7 @@ import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.Locale;
 
 
 @Slf4j
@@ -103,9 +104,9 @@ public class AuthenticationController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping("/motDePasseOublie")
-    public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto request) throws RestClientException, CaptchaException, JsonIncorrectException {
-
-        String captcha = request.getRecaptcha();
+    public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto dto, HttpServletRequest request) throws RestClientException, CaptchaException, JsonIncorrectException {
+        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
+        String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
             throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
@@ -119,24 +120,26 @@ public class AuthenticationController {
 
         UserDetailsImpl user;
 
-        if (request.getEmail() != null) {
+        if (dto.getEmail() != null) {
             try {
-                user = (UserDetailsImpl) userService.loadUser(etablissementService.getUserByMail(request.getEmail()));
+                user = (UserDetailsImpl)userService.loadUser(etablissementService.getUserByMail(dto.getEmail()));
+
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec l'email '" + request.getEmail() + "' n'existe pas");
+                throw new UsernameNotFoundException("L'utilisateur avec l'email '" + dto.getEmail() + "' n'existe pas");
             }
-        } else if (request.getSiren() != null) {
+        }
+        else if (dto.getSiren() != null) {
             try {
-                user = (UserDetailsImpl) userService.loadUser(etablissementService.getFirstBySiren(request.getSiren()));
+                user = (UserDetailsImpl)userService.loadUser(etablissementService.getFirstBySiren(dto.getSiren()));
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + request.getSiren() + "' n'existe pas");
+                throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + dto.getSiren() + "' n'existe pas");
             }
         } else {
             throw new JsonIncorrectException("Au moins un des champs 'siren' ou 'email' est obligatoire");
         }
 
         String jwt = tokenProvider.generateToken(user);
-        emailService.constructResetTokenEmail(jwt, user.getEmail(), user.getNameEtab());
+        emailService.constructResetTokenEmail(locale, jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
         response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");
