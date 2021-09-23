@@ -105,8 +105,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
