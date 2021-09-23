@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class ContactWebDto {
     @JsonProperty("id")
-    private Long id;
+    private Integer id;
     @JsonProperty("nom")
     private String nom;
     @JsonProperty("prenom")

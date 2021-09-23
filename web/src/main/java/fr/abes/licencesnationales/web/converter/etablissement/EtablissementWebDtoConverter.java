@@ -251,4 +251,58 @@ public class EtablissementWebDtoConverter {
         utilsMapper.addConverter(myConverter);
     }
 
+    @Bean
+    public void converterEtablissementUserWebDto() {
+        Converter<EtablissementEntity, EtablissementUserWebDto> myConverter = new Converter<EtablissementEntity, EtablissementUserWebDto>() {
+            @SneakyThrows
+            public EtablissementUserWebDto convert(MappingContext<EtablissementEntity, EtablissementUserWebDto> context) {
+                EtablissementEntity source = context.getSource();
+
+                EtablissementUserWebDto dto = new EtablissementUserWebDto();
+                ContactWebDto contact = getContactWebDto(source);
+
+                dto.setContact(contact);
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterEtablissementAdminWebDto() {
+        Converter<EtablissementEntity, EtablissementAdminWebDto> myConverter = new Converter<EtablissementEntity, EtablissementAdminWebDto>() {
+            @SneakyThrows
+            public EtablissementAdminWebDto convert(MappingContext<EtablissementEntity, EtablissementAdminWebDto> context) {
+                EtablissementEntity source = context.getSource();
+
+                EtablissementAdminWebDto dto = new EtablissementAdminWebDto();
+                dto.setName(source.getName());
+                dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
+                dto.setSiren(source.getSiren());
+                dto.setIdAbes(source.getIdAbes());
+                ContactWebDto contact = getContactWebDto(source);
+
+                dto.setContact(contact);
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    private ContactWebDto getContactWebDto(EtablissementEntity source) {
+        ContactWebDto contact = new ContactWebDto();
+        contact.setId(source.getId().intValue());
+        contact.setNom(source.getContact().getNom());
+        contact.setPrenom(source.getContact().getPrenom());
+        contact.setAdresse(source.getContact().getAdresse());
+        contact.setBoitePostale(source.getContact().getBoitePostale());
+        contact.setCedex(source.getContact().getCedex());
+        contact.setCodePostal(source.getContact().getCodePostal());
+        contact.setVille(source.getContact().getVille());
+        contact.setTelephone(source.getContact().getTelephone());
+        contact.setMail(source.getContact().getMail());
+        contact.setRole("etab");
+        return contact;
+    }
+
 }
