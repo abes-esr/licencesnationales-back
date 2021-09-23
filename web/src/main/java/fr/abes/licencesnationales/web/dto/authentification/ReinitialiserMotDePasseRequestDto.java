@@ -9,13 +9,16 @@ import javax.validation.constraints.Size;
 
 @Getter
 @Setter
-public class PasswordEnregistrerWebDto {
-    @JsonProperty("fr/abes/licencesnationales/web/recaptcha")
+public class ReinitialiserMotDePasseRequestDto {
+
+    @JsonProperty("recaptcha")
     private String recaptcha;
-    @JsonProperty("motDePasse")
+
+    @JsonProperty("nouveauMotDePasse")
     @Size(min = 8, message = "Votre mot de passe doit contenir au minimum 8 caractères dont une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial parmis @ $ ! % * ? &")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$", message = "Votre mot de passe doit contenir au minimum 8 caractères dont une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial parmis @ $ ! % * ? &")
-    private String password;
-    @JsonProperty("jwtToken")
-    private String token;
+    private String motDePasse;
+
+    @JsonProperty("token")
+    private String tokenFromMail;
 }
