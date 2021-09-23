@@ -8,6 +8,7 @@ import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.ContactTechniqueEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
@@ -36,7 +37,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     private EditeurService editeurService;
 
     @MockBean
-    private EmailService emailService;
+    private EtablissementService etablissementService;
 
     @Autowired
     private ObjectMapper mapper;
@@ -104,7 +105,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setListeContactTechniqueEditeur(ct);
 
 
-        Mockito.when(emailService.checkDoublonMail(Mockito.any(),Mockito.any())).thenReturn(false);
+        Mockito.when(etablissementService.checkDoublonMail(Mockito.any(),Mockito.any())).thenReturn(false);
 
         this.mockMvc.perform(put("/v1/ln/editeur/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))

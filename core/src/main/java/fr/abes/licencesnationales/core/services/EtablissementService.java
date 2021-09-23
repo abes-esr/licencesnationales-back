@@ -1,6 +1,9 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
@@ -8,6 +11,8 @@ import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import lombok.extern.slf4j.Slf4j;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
@@ -18,6 +23,8 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 @Slf4j
@@ -27,6 +34,12 @@ public class EtablissementService {
 
     @Autowired
     private ContactRepository contactEtablissementDao;
+
+    @Autowired
+    private ContactCommercialEditeurRepository contactCommercialEditeurDao;
+
+    @Autowired
+    private ContactTechniqueEditeurRepository contactTechniqueEditeurDao;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -103,5 +116,19 @@ public class EtablissementService {
         ContactEntity c = e.getContact();
         c.setMotDePasse(mdphash);
         etablissementDao.save(e);
+    }
+
+    public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> commercialSet, Set<ContactTechniqueEditeurEntity> techniqueSet) {
+        for (ContactCommercialEditeurEntity contact : commercialSet){
+            if(contactCommercialEditeurDao.findByMailContact(contact.getMailContact()).isPresent()) {
+                return true;
+            }
+        }
+        for (ContactTechniqueEditeurEntity contact : techniqueSet){
+            if(contactTechniqueEditeurDao.findByMailContact(contact.getMailContact()).isPresent()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

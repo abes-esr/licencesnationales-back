@@ -155,7 +155,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
 
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
-        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         // Début
         MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
@@ -188,7 +188,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
 
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
-        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructResetTokenEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
         // Début
         MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
