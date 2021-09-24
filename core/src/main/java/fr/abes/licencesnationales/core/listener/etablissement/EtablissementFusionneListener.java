@@ -4,6 +4,8 @@ import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
+import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -50,6 +52,14 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
             service.deleteBySiren(siren);
         }
+
+        if (service.existeMail(etab.getContact().getMail())) {
+            throw new MailDoublonException("L'adresse mail " + etab.getContact().getMail() + " renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+        }
+        if (service.existeSiren(etab.getSiren())) {
+            throw new SirenExistException("L'établissement " + etab.getSiren() + " existe déjà");
+        }
+
         service.save(etab);
     }
 }
