@@ -1,51 +1,65 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
+import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.exception.SirenExistException;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
+import lombok.SneakyThrows;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
+import java.util.Optional;
 
 @Component
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEventEntity> {
 
     private final EtablissementService service;
-    private final UtilsMapper utilsMapper;
+    private final ReferenceService referenceService;
 
-    public EtablissementFusionneListener(EtablissementService service, UtilsMapper utilsMapper) {
+    public EtablissementFusionneListener(EtablissementService service, ReferenceService referenceService) {
         this.service = service;
-        this.utilsMapper = utilsMapper;
+        this.referenceService = referenceService;
     }
 
+    @SneakyThrows
     @Override
     @Transactional
-    public void onApplicationEvent(EtablissementFusionneEventEntity etablissementFusionneEvent) {
+    public void onApplicationEvent(EtablissementFusionneEventEntity event) {
+        // Attention à bien respecter l'ordre des arguments
+        ContactEntity contactEntity = new ContactEntity(event.getNomContact(),
+                event.getPrenomContact(),
+                event.getAdresseContact(),
+                event.getBoitePostaleContact(),
+                event.getCodePostalContact(),
+                event.getVilleContact(),
+                event.getCedexContact(),
+                event.getTelephoneContact(),
+                event.getMailContact(),
+                event.getMotDePasse());
 
-       /* Set<IpEntity> ipEntities = new HashSet<>();
-        Set<EditeurEntity> editeurEntities = new HashSet<>();
+        EtablissementEntity etab = new EtablissementEntity(event.getNomEtab(), event.getSiren(), referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()), event.getIdAbes(), contactEntity);
 
-        for (String siren :
-                etablissementFusionneEvent.getSirenFusionne()) {
-                EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
-            if (etablissementEntity.getIps() != null) {
-                ipEntities.addAll(etablissementEntity.getIps()
-                        .stream().map(e -> new IpEntity(null, e.getIp(), e.getTypeAcces(), e.getTypeIp(), e.getCommentaires()))
-                        .collect(Collectors.toSet()));
-            }
-
-            if (etablissementEntity.getEditeurs() != null) {
-                editeurEntities.addAll(etablissementEntity.getEditeurs());
-            }
+        for (String siren : event.getSirenAnciensEtablissements()) {
+            EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
+            etab.ajouterIps(etablissementEntity.getIps());
 
             service.deleteBySiren(siren);
         }
-        EtablissementEntity etablissementEntity = utilsMapper.map(etablissementFusionneEvent, EtablissementEntity.class);
-        etablissementEntity.setEditeurs(editeurEntities);
-        etablissementEntity.setIps(ipEntities);
 
-        service.save(etablissementEntity);*/
+        if (service.existeMail(etab.getContact().getMail())) {
+            throw new MailDoublonException("L'adresse mail " + etab.getContact().getMail() + " renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+        }
+        if (service.existeSiren(etab.getSiren())) {
+            throw new SirenExistException("L'établissement " + etab.getSiren() + " existe déjà");
+        }
 
+        service.save(etab);
     }
 }

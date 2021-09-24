@@ -1,27 +1,19 @@
 package fr.abes.licencesnationales.web.dto.etablissement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
-public class EtablissementModifieWebDto {
-
-    @JsonProperty("id")
-    private Integer id;
-
-    @JsonProperty("nom")
-    private String name;
-
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "role", defaultImpl = java.lang.Void.class)
+@JsonSubTypes({@JsonSubTypes.Type(value = EtablissementModifieAdminWebDto.class, name = "admin"),
+                @JsonSubTypes.Type(value = EtablissementModifieUserWebDto.class, name = "etab")})
+public abstract class EtablissementModifieWebDto {
     @JsonProperty("siren")
-    private String siren;
-
-    @JsonProperty("typeEtablissement")
-    private String typeEtablissement;
-
+    protected String siren;
     @JsonProperty("contact")
-    private ContactCreeWebDto contact;
+    protected ContactModifieWebDto contact;
 }

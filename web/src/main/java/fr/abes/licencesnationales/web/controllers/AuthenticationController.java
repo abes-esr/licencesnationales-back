@@ -21,6 +21,7 @@ import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
@@ -40,7 +41,7 @@ import java.util.Locale;
 @Slf4j
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/v1/authentification")
+@RequestMapping(value = "/v1/authentification", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController {
 
     private final AuthenticationManager authenticationManager;
@@ -149,7 +150,7 @@ public class AuthenticationController {
 
     @ApiOperation(value = "permet de ",
             notes = "le ")
-    @PostMapping("/reinitialiserMotDePasse")
+    @PostMapping(value = "/reinitialiserMotDePasse")
     public ResponseEntity<?> enregistrerPassword(@Valid @RequestBody ReinitialiserMotDePasseRequestDto request) throws CaptchaException, InvalidTokenException, JsonIncorrectException {
         String captcha = request.getRecaptcha();
 
@@ -203,7 +204,7 @@ public class AuthenticationController {
     }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
-    @PostMapping("/modifierMotDePasse")
+    @PostMapping(value = "/modifierMotDePasse")
     public ResponseEntity<?> modifierMotDePasse(HttpServletRequest requestHtttp, @Valid @RequestBody ModifierMotDePasseRequestDto request) throws PasswordMismatchException, MailDoublonException, SirenExistException, JsonIncorrectException {
 
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(requestHtttp));

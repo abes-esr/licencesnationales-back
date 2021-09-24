@@ -11,5 +11,6 @@ import javax.persistence.Entity;
 public class EtablissementSupprimeEventEntity extends EtablissementEventEntity {
     public EtablissementSupprimeEventEntity(Object source, String siren) {
         super(source);
+        this.siren = siren;
     }
 }

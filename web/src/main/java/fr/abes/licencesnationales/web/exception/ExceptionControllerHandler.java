@@ -9,6 +9,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
@@ -24,6 +25,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.validation.ConstraintViolationException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -38,7 +40,9 @@ import java.util.stream.Stream;
 public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> buildResponseEntity(ApiReturnError apiReturnError) {
-        return new ResponseEntity<>(apiReturnError, apiReturnError.getStatus());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new ResponseEntity<>(apiReturnError, headers, apiReturnError.getStatus());
     }
 
     /**
@@ -153,6 +157,11 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleValidationException(ConstraintViolationException ex){
+        String error = "Erreur de validation des données";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
+    }
     /**
      * Gestion des erreurs d'authentification
      *
@@ -168,6 +177,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UnknownEtablissementException.class)
     protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
         String error = "Etablissement inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
+    @ExceptionHandler(UnknownTypeEtablissementException.class)
+    protected ResponseEntity<Object> handleUnknowTypeEtablissementException(UnknownTypeEtablissementException ex) {
+        String error = "Type d'établissement inconnu";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 

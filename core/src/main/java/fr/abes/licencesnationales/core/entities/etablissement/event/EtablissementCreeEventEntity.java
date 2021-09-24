@@ -23,6 +23,6 @@ public class EtablissementCreeEventEntity  extends EtablissementEventEntity {
 
     @Override
     public String toString() {
-        return "EditeurCreeEventEntity {" + "id=" + id + ", événement=cree, nom de l'établissement=" + nomEtab + " }";
+        return "EditeurCreeEventEntity {" + "id=" + id + ", événement=cree, siren de l'établissement=" + siren + " }";
     }
 }
