@@ -12,10 +12,13 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,17 +32,18 @@ public class EtablissementEntity implements Serializable {
     @SequenceGenerator(name = "etablissement_Sequence", sequenceName = "ETABLISSEMENT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom d'établissement fourni n'est pas valide")
     private String name;
 
-    @NotBlank
+    @NotNull
+    @Column(name = "siren", unique = true)
     @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
     private String siren;
 
     private Date dateCreation = new Date();
 
-    @NotBlank
+    @NotNull
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ref_typeEtablissement")
     private TypeEtablissementEntity typeEtablissement;
@@ -50,7 +54,7 @@ public class EtablissementEntity implements Serializable {
 
     private String idAbes;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private ContactEntity contact;
 
     @OneToMany(mappedBy = "etablissement", cascade = CascadeType.ALL,
@@ -107,9 +111,17 @@ public class EtablissementEntity implements Serializable {
         this.contact = contact;
     }
 
+    public EtablissementEntity(String nom, String siren, ContactEntity contact) {
+        this.name = nom;
+        this.siren = siren;
+        this.contact = contact;
+    }
+
     public void ajouterIp(IpEntity ip) {
         this.ips.add(ip);
     }
+
+    public void ajouterIps(Set<IpEntity> ips) { this.ips.addAll(ips); }
 
     @Override
     public boolean equals(Object obj) {

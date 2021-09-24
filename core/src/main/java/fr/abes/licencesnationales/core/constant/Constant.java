@@ -39,6 +39,9 @@ public class Constant implements Serializable {
     public static final String JWT_TOKEN_INVALID = "Invalid JWT token : {}";
     public static final String JWT_SIGNATURE_INVALID = "Invalid JWT signature : {}";
 
+    public static final String MESSAGE_REGEXP_PASSWORD = "Votre mot de passe doit contenir au minimum 8 caractères dont une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial parmis @ $ ! % * ? &";
+
+
     /** Statuts établissement */
     public static final int STATUT_ETAB_NOUVEAU = 1;
     public static final int STATUT_ETAB_AUCUNEIP = 2;

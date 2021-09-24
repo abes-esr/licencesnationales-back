@@ -25,19 +25,19 @@ public class FiltrerAccesServices {
         //Services EtablissementController
 
         public void autoriserServicesParSiren(String sirenFromController) throws SirenIntrouvableException, AccesInterditException {
-            log.info("Début autoriserServicesParSiren");
-            log.info("sirenFromController = " + sirenFromController);
+            log.debug("Début autoriserServicesParSiren");
+            log.debug("sirenFromController = " + sirenFromController);
             ServletRequestAttributes attr = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-            log.info("jwt = " + tokenProvider.getJwtFromRequest(attr.getRequest()));
+            log.debug("jwt = " + tokenProvider.getJwtFromRequest(attr.getRequest()));
             String jwtContenuDansLaRequest = tokenProvider.getJwtFromRequest(attr.getRequest());
             String sirenFromJwt = tokenProvider.getSirenFromJwtToken(jwtContenuDansLaRequest);
-            log.info("siren = " + sirenFromJwt);
-            log.info("userDetails = " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+            log.debug("siren = " + sirenFromJwt);
+            log.debug("userDetails = " + SecurityContextHolder.getContext().getAuthentication().getPrincipal());
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             String sirenFromSecurityContextUser = userDetails.getUsername();
-            log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
-            log.info("type 1 = " + sirenFromSecurityContextUser.getClass().getSimpleName());
-            log.info("type 2 = " + sirenFromController.getClass().getSimpleName());
+            log.debug("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+            log.debug("type 1 = " + sirenFromSecurityContextUser.getClass().getSimpleName());
+            log.debug("type 2 = " + sirenFromController.getClass().getSimpleName());
 
             //le test d'acceptance :
             //soit on compare sirenFromController avec sirenFromJwtContenuDansLaRequest
@@ -49,7 +49,7 @@ public class FiltrerAccesServices {
                 throw new AccesInterditException("Acces interdit");
             }
             boolean existeSiren = service.existeSiren(sirenFromJwt); // ou existeSiren(sirenFromSecurityContextUser)
-            log.info("existeSiren = "+ existeSiren);
+            log.debug("existeSiren = "+ existeSiren);
             if (!existeSiren) {
                 log.error("Siren absent de la base");
                 throw new SirenIntrouvableException("Siren absent de la base");
@@ -59,18 +59,22 @@ public class FiltrerAccesServices {
     public String getSirenFromSecurityContextUser() throws SirenIntrouvableException, AccesInterditException{
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String sirenFromSecurityContextUser = userDetails.getUsername();
-        log.info("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
+        log.debug("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
         if(sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser==null){
             log.error("Acces interdit");
             throw new AccesInterditException("Acces interdit");
         }
         boolean existeSiren = service.existeSiren(sirenFromSecurityContextUser);
-        log.info("existeSiren = "+ existeSiren);
+        log.debug("existeSiren = "+ existeSiren);
         if (!existeSiren) {
             log.error("Siren absent de la base");
             throw new SirenIntrouvableException("Siren absent de la base");
         }
         return sirenFromSecurityContextUser;
+    }
+
+    public String getRoleFromSecurityContextUser() {
+            return ((UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getRole();
     }
 
 }

@@ -1,13 +1,12 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 
@@ -22,38 +21,38 @@ public class ContactEntity implements Serializable {
     @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le nom fourni n'est pas valide")
     private String nom;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le prénom fourni n'est pas valide")
     private String prenom;
 
-    @NotBlank
+    @NotNull
     @Email
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "L'adresse mail fournie n'est pas valide")
     private String mail;
 
     private String motDePasse;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^\\d{10}$", message = "Veuillez entrer 10 chiffres sans espace")
     private String telephone;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "L'adresse postale fournie n'est pas valide")
     private String adresse;
 
     private String boitePostale;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^\\d{5}$", message = "Le code postal fourni n'est pas valide")
     private String codePostal;
 
     private String cedex;
 
-    @NotBlank
+    @NotNull
     @Pattern(regexp = "^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$", message = "La ville fournie n'est pas valide")
     private String ville;
 
