@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import com.github.jgonian.ipmath.AbstractIpRange;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
@@ -17,7 +18,6 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
         columnDefinition = "SMALLINT")
-@DiscriminatorValue("1")
 @Table(name = "Ip")
 @NoArgsConstructor
 @Getter
@@ -58,6 +58,7 @@ public abstract class IpEntity implements Serializable {
     @ManyToOne(optional = false)
     @JoinColumn(name = "ref_statut")
     private StatutIpEntity statut;
+
 
     /**
      * CTOR d'une IP générique sans identifiant connu

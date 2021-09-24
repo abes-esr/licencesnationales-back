@@ -26,10 +26,12 @@ import java.util.List;
 public class IpV4 extends IpEntity implements Serializable {
 
     public static final List<Ipv4Range> reservedRange = Arrays.asList(
-            Ipv4Range.from("10.0.0.0").to("10.255.255.254"),
-            Ipv4Range.from("192.168.0.0").to("192.168.254.254"),
-            Ipv4Range.from("172.0.0.0").to("172.31.254.254"),
-            Ipv4Range.from("127.0.0.1").to("127.0.0.1"));
+            Ipv4Range.from("10.0.0.0").to("10.255.255.255"),
+            Ipv4Range.from("192.168.0.0").to("192.168.255.255"),
+            Ipv4Range.from("172.16.0.0").to("172.31.255.255"),
+            Ipv4Range.from("127.0.0.1").to("127.0.0.1"),
+            Ipv4Range.from("0.0.0.0").to("0.0.0.0"),
+            Ipv4Range.from("255.255.255.255").to("255.255.255.255"));
 
 
     @Convert(converter = Ipv4RangeConverter.class)

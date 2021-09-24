@@ -30,7 +30,7 @@ import java.util.Set;
 
 @Log
 @RestController
-@RequestMapping("/v1/ln/ip")
+@RequestMapping("/v1/ip")
 public class IpController {
     @Autowired
     private IpEventRepository eventRepository;
@@ -197,11 +197,10 @@ public class IpController {
     }
 
     @GetMapping(value = "/{siren}")
-    public List<IpWebDto> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
+    public Set<IpWebDto> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
         Set<IpEntity> setIps = etablissementService.getFirstBySiren(siren).getIps();
-        List<IpEntity> listIps = List.copyOf(setIps);
-        return mapper.mapList(listIps, IpWebDto.class);
+        return mapper.mapSet(setIps, IpWebDto.class);
     }
 
     @GetMapping(value = "/ipsEtab/{siren}")
