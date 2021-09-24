@@ -8,7 +8,7 @@ import lombok.Setter;
 @Setter
 public class EtablissementModifieAdminWebDto extends EtablissementModifieWebDto {
     @JsonProperty("nom")
-    private String name;
+    private String nom;
     @JsonProperty("typeEtablissement")
     private String typeEtablissement;
 }

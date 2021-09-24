@@ -11,6 +11,7 @@ public class EtablissementModifieEventEntity  extends EtablissementEventEntity {
     public EtablissementModifieEventEntity() {
         super();
     }
+
     public EtablissementModifieEventEntity(Object source, String siren) {
         super(source);
         this.siren = siren;
@@ -18,6 +19,6 @@ public class EtablissementModifieEventEntity  extends EtablissementEventEntity {
 
     @Override
     public String toString() {
-        return "EditeurModifieEventEntity {" + "id=" + id + ", événement=modifie, nom de l'établissement=" + nomEtab + " }";
+        return "EditeurModifieEventEntity {" + "id=" + id + ", événement=modifie, siren de l'établissement=" + siren + " }";
     }
 }

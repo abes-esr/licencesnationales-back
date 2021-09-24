@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -14,8 +13,8 @@ import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
-import lombok.extern.slf4j.Slf4j;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,6 @@ import org.springframework.web.client.RestClientException;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -48,7 +46,7 @@ public class EtablissementService {
     private StatutRepository statutRepository;
 
     public EtablissementEntity getFirstBySiren(String siren) {
-        return etablissementDao.getFirstBySiren(siren).orElseThrow(UnknownEtablissementException::new);
+        return etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
     }
 
     /**
@@ -59,12 +57,11 @@ public class EtablissementService {
      * @throws MailDoublonException
      */
     public void save(EtablissementEntity entity) throws SirenExistException, MailDoublonException {
-        //verifier que le mail du contact n'est pas déjà en base
-        if (existeMail(entity.getContact().getMail())) {
-            throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
-        }
-
         if (entity.getId() == null) {
+            //verifier que le mail du contact n'est pas déjà en base
+            if (existeMail(entity.getContact().getMail())) {
+                throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+            }
             //Création d'un nouvel établissement
             //verifier que le siren n'est pas déjà en base
             boolean existeSiren = existeSiren(entity.getSiren());
@@ -106,7 +103,7 @@ public class EtablissementService {
     }
 
     public EtablissementEntity getUserByMail(String mail) {
-        return etablissementDao.getUserByMail(mail).orElseThrow(UnknownEtablissementException::new);
+        return etablissementDao.getUserByMail(mail).orElseThrow(() -> new UnknownEtablissementException("Mail : " + mail));
     }
 
     public void changePasswordFromSiren(String siren, String password) throws RestClientException {

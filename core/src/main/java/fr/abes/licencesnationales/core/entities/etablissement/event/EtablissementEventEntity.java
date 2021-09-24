@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.entities.etablissement.event;
 
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;

@@ -8,18 +8,15 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
-import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.modelmapper.MappingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
@@ -111,7 +108,7 @@ public class EtablissementWebDtoConverterTest {
     @DisplayName("Test success converter EtablissementModifieAdminWebDto / EtablissementModifieEvent")
     public void testSuccessConverterEtabModifieAdminWebDto() {
         EtablissementModifieAdminWebDto etablissement = new EtablissementModifieAdminWebDto();
-        etablissement.setName("testNom");
+        etablissement.setNom("testNom");
         etablissement.setSiren("123456789");
         etablissement.setTypeEtablissement("testType");
 
@@ -146,7 +143,7 @@ public class EtablissementWebDtoConverterTest {
 
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
 
-        etablissement.setName("testNom");
+        etablissement.setNom("testNom");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");
 
         etablissement.setSiren("123456789");
