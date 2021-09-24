@@ -85,10 +85,10 @@ public class EtablissementWebDtoConverter {
                     EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
 
                     // Nom
-                    if (source.getName() == null) {
+                    if (source.getNom() == null) {
                         throw new IllegalArgumentException("Le champs 'nom' est obligatoire");
                     }
-                    event.setNomEtab(source.getName());
+                    event.setNomEtab(source.getNom());
 
                     // Siren
                     if (source.getSiren() == null) {

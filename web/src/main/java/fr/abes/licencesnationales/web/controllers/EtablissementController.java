@@ -37,6 +37,7 @@ import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -134,24 +135,35 @@ public class EtablissementController {
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
     public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
-        EtablissementFusionneEventEntity etablissementFusionneEvent = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
-        etablissementFusionneEvent.setAnciensEtablissementsInBdd(objectMapper.writeValueAsString(etablissementFusionneEvent.getSirenAnciensEtablissements()));
-        applicationEventPublisher.publishEvent(etablissementFusionneEvent);
-        eventService.save(etablissementFusionneEvent);
+        EtablissementFusionneEventEntity event = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
+        event.setAnciensEtablissementsInBdd(objectMapper.writeValueAsString(event.getSirenAnciensEtablissements()));
+        event.setSource(this);
+        // On genère un identifiant Abes
+        event.setIdAbes(GenererIdAbes.generateId());
+        // On crypte le mot de passe
+        event.setMotDePasse(passwordEncoder.encode(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
     }
 
     @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void division(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
+    public void scission(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
-        TypeEtablissementEntity type = referenceService.findTypeEtabByLibelle(etablissementDiviseEvent.getTypeEtablissement());
         StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
-        //on initialise le statut des nouveaux établissement et on génère l'Id Abes
-        etablissementDiviseEvent.getEtablissementDivises().forEach(e -> {
+        //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
+        for (EtablissementEntity e : etablissementDiviseEvent.getEtablissementDivises()) {
+            //on génère un identifiant Abes
             e.setIdAbes(GenererIdAbes.generateId());
-            e.setTypeEtablissement(type);
+            //on crypte le mode de passe
+            e.getContact().setMotDePasse(passwordEncoder.encode(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
+                etab.getSiren().equals(e.getSiren()))
+                    .collect(Collectors.toList()).get(0).getContact().getMotDePasse()));
+                e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
+                        etab.getSiren().equals(e.getSiren()))
+                .collect(Collectors.toList()).get(0).getTypeEtablissement()));
             e.setStatut(statut);
-        });
+        }
         //on formatte les nouveaux établissements en json pour sauvegarde
         etablissementDiviseEvent.setEtablisementsDivisesInBdd(objectMapper.writeValueAsString(etablissementDiviseEvent.getEtablissementDivises()));
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);

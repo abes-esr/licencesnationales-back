@@ -3,7 +3,6 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
-import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
@@ -11,7 +10,6 @@ import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
-import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -27,20 +25,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -129,7 +123,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
 
         EtablissementModifieAdminWebDto etab = new EtablissementModifieAdminWebDto();
-        etab.setName("testNomEtab");
+        etab.setNom("testNomEtab");
         etab.setTypeEtablissement("Nouveau");
         etab.setSiren("123456789");
         ContactModifieWebDto contact = new ContactModifieWebDto();
@@ -291,7 +285,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
 
         mockMvc.perform(get("/v1/etablissements/123456789")).andExpect(status().isOk())
-                .andExpect(jsonPath("$.contact.id").value(1))
                 .andExpect(jsonPath("$.contact.nom").value("nom2"))
                 .andExpect(jsonPath("$.contact.prenom").value("prenom2"))
                 .andExpect(jsonPath("$.contact.mail").value("mail@mail.com"))
@@ -321,7 +314,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(jsonPath("$.siren").value("123456789"))
                 .andExpect(jsonPath("$.idAbes").value("123456"))
                 .andExpect(jsonPath("$.typeEtablissement").value("validé"))
-                .andExpect(jsonPath("$.contact.id").value(1))
                 .andExpect(jsonPath("$.contact.nom").value("nom2"))
                 .andExpect(jsonPath("$.contact.prenom").value("prenom2"))
                 .andExpect(jsonPath("$.contact.mail").value("mail@mail.com"))

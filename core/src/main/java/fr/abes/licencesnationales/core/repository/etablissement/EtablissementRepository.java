@@ -25,7 +25,5 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     @Query("select e from EtablissementEntity e where e.contact.mail like :x")
     Optional<EtablissementEntity> getUserByMail(@Param("x") String email);
 
-    EtablissementEntity findEtablissementEntityByIpsContains(IpEntity ip);
-
 
 }

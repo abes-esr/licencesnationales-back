@@ -23,7 +23,6 @@ public class EventService {
     private IpEventRepository ipDao;
 
     public void save(EventEntity event) {
-
         if (event instanceof EtablissementEventEntity) {
             etablissementDao.save((EtablissementEventEntity)event);
         } else  if (event instanceof EditeurEventEntity) {

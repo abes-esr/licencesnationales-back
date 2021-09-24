@@ -88,7 +88,7 @@ class EtablissementServiceTest {
     @DisplayName("test getFirstBySiren avec Exception")
     @Test
     void testGetFirstBySirenThrows() {
-        Mockito.when(etablissementDao.getFirstBySiren("000000000")).thenThrow(new UnknownEtablissementException());
+        Mockito.when(etablissementDao.getFirstBySiren("000000000")).thenThrow(new UnknownEtablissementException("Siren : 000000000"));
         Assertions.assertThrows(UnknownEtablissementException.class, ()->service.getFirstBySiren("000000000"));
     }
 
