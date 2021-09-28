@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.ip.cree;
+package fr.abes.licencesnationales.web.dto.ip.creation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
