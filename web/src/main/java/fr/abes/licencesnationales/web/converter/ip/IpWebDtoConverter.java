@@ -2,14 +2,25 @@ package fr.abes.licencesnationales.web.converter.ip;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
+import fr.abes.licencesnationales.web.dto.ip.cree.Ipv4AjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.cree.Ipv6AjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeAdminWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeUserWebDto;
 import org.modelmapper.Converter;
+import org.modelmapper.MappingException;
+import org.modelmapper.spi.ErrorMessage;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.util.Arrays;
 
 @Component
 public class IpWebDtoConverter {
@@ -45,7 +56,107 @@ public class IpWebDtoConverter {
     private IpWebDto getDto(IpEntity source) {
         IpWebDto dto = new IpWebDto(source.getId(), source.getIp(), source.getStatut().getLibelleStatut(), source.getDateCreation(), source.getDateModification(), source.getCommentaires());
         dto.setTypeIp(source.getClass().getSimpleName());
-        dto.setTypeAcces((source.getIp().contains("-"))?"range":"ip");
+        dto.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
         return dto;
+    }
+
+    @Bean
+    public void converterIpv4AjouteeWebDtoIpCreeEvent() {
+
+        Converter<Ipv4AjouteeWebDto, IpCreeEventEntity> myConverter = new Converter<Ipv4AjouteeWebDto, IpCreeEventEntity>() {
+
+            public IpCreeEventEntity convert(MappingContext<Ipv4AjouteeWebDto, IpCreeEventEntity> context) {
+                try {
+                    Ipv4AjouteeWebDto source = context.getSource();
+                    if (source.getIp() == null) {
+                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                    }
+                    IpCreeEventEntity eventEntity = new IpCreeEventEntity(this, source.getIp(), source.getCommentaires());
+                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
+                    eventEntity.setTypeIp(IpType.IPV4);
+                    return eventEntity;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterIpv6AjouteeWebDtoIpCreeEvent() {
+
+        Converter<Ipv6AjouteeWebDto, IpCreeEventEntity> myConverter = new Converter<Ipv6AjouteeWebDto, IpCreeEventEntity>() {
+
+            public IpCreeEventEntity convert(MappingContext<Ipv6AjouteeWebDto, IpCreeEventEntity> context) {
+                try {
+                    Ipv6AjouteeWebDto source = context.getSource();
+                    if (source.getIp() == null) {
+                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                    }
+                    IpCreeEventEntity eventEntity = new IpCreeEventEntity(this, source.getIp(), source.getCommentaires());
+                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
+                    eventEntity.setTypeIp(IpType.IPV6);
+                    return eventEntity;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterIpv4ModifieeUserWebDtoIpModidieEvent() {
+        Converter<IpModifieeUserWebDto, IpModifieeEventEntity> myConverter = new Converter<IpModifieeUserWebDto, IpModifieeEventEntity>() {
+
+            public IpModifieeEventEntity convert(MappingContext<IpModifieeUserWebDto, IpModifieeEventEntity> context) {
+                try {
+                    IpModifieeUserWebDto source = context.getSource();
+                    if (source.getIp() == null) {
+                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                    }
+                    IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
+                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
+                    if (source.getTypeIp() == null) {
+                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
+                    }
+                    eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
+                    return eventEntity;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterIpModifieeAdminWebDtoIpModidieEvent() {
+        Converter<IpModifieeAdminWebDto, IpModifieeEventEntity> myConverter = new Converter<IpModifieeAdminWebDto, IpModifieeEventEntity>() {
+
+            public IpModifieeEventEntity convert(MappingContext<IpModifieeAdminWebDto, IpModifieeEventEntity> context) {
+                try {
+                    IpModifieeAdminWebDto source = context.getSource();
+                    if (source.getIp() == null) {
+                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                    }
+                    IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
+                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
+                    if (source.getTypeIp() == null) {
+                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
+                    }
+                    eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
+                    if (source.getStatut() == null) {
+                        throw new IllegalArgumentException("Le champ 'statut' est obligatoire");
+                    }
+                    eventEntity.setStatut(source.getStatut());
+                    return eventEntity;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
+            }
+        };
+        utilsMapper.addConverter(myConverter);
     }
 }

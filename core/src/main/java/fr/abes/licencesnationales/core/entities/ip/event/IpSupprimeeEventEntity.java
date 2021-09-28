@@ -17,4 +17,8 @@ public class IpSupprimeeEventEntity extends IpEventEntity {
         super(source);
     }
 
+    public IpSupprimeeEventEntity(Object source, Integer id) {
+        super(source, id);
+    }
+
 }
