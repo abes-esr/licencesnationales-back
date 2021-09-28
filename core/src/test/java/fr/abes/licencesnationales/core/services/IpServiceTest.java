@@ -1,11 +1,13 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
@@ -45,45 +47,48 @@ public class IpServiceTest {
     @Test
     @DisplayName("test IP V4 existante")
     void isIpV4AlreadyExists() throws IpException {
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
         List<IpV4> ipV4List = new ArrayList<>();
-        ipV4List.add(new IpV4("1-10.1.1.1", "test"));
-        ipV4List.add(new IpV4("2.1-253.1.1", "test2"));
+        ipV4List.add(new IpV4("1-10.1.1.1", "test", statut));
+        ipV4List.add(new IpV4("2.1-253.1.1", "test2", statut));
 
         Mockito.when(ipV4Repository.findAll()).thenReturn(ipV4List);
 
-        IpV4 candidate = new IpV4("253.1.1.1", "test");
+        IpV4 candidate = new IpV4("253.1.1.1", "test", statut);
         Assertions.assertFalse(ipService.isIpAlreadyExists(candidate));
 
-        candidate = new IpV4("2.3.1.1", "test");
+        candidate = new IpV4("2.3.1.1", "test", statut);
         Assertions.assertTrue(ipService.isIpAlreadyExists(candidate));
 
-        candidate = new IpV4("3-250.1.1.1", "test");
+        candidate = new IpV4("3-250.1.1.1", "test", statut);
         Assertions.assertTrue(ipService.isIpAlreadyExists(candidate));
     }
 
     @Test
     @DisplayName("test IP V6 existante")
     void isIpV6AlreadyExists() throws IpException {
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
         List<IpV6> ipV6List = new ArrayList<>();
-        ipV6List.add(new IpV6("1111:1111:1111:1111:1111:1111:1111-2222:1111-AAAA", "test"));
-        ipV6List.add(new IpV6("2222:1111-AAAA:1111:1111:1111:1111:1111:1111", "test2"));
+        ipV6List.add(new IpV6("1111:1111:1111:1111:1111:1111:1111-2222:1111-AAAA", "test", statut));
+        ipV6List.add(new IpV6("2222:1111-AAAA:1111:1111:1111:1111:1111:1111", "test2", statut));
 
         Mockito.when(ipV6Repository.findAll()).thenReturn(ipV6List);
 
-        IpV6 candidate = new IpV6("3333:1111:1111:1111:1111:1111:1111:1111", "test");
+        IpV6 candidate = new IpV6("3333:1111:1111:1111:1111:1111:1111:1111", "test", statut);
         Assertions.assertFalse(ipService.isIpAlreadyExists(candidate));
 
-        candidate = new IpV6("2222:2222:1111:1111:1111:1111:1111:1111", "test");
+        candidate = new IpV6("2222:2222:1111:1111:1111:1111:1111:1111", "test", statut);
         Assertions.assertTrue(ipService.isIpAlreadyExists(candidate));
 
-        candidate = new IpV6("2222:9999-CCCC:1111:1111:1111:1111:1111:1111", "test");
+        candidate = new IpV6("2222:9999-CCCC:1111:1111:1111:1111:1111:1111", "test", statut);
         Assertions.assertTrue(ipService.isIpAlreadyExists(candidate));
     }
 
     @Test
     @DisplayName("test getEtablissementByIp")
     void testGetEtablissementByIp() throws UnknownIpException, IpException {
-        IpEntity ip = new IpV4(1, "1.1.1.1", "test");
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
@@ -104,7 +109,8 @@ public class IpServiceTest {
     @Test
     @DisplayName("test getFirstById")
     void testGetFirstById() throws IpException, UnknownIpException {
-        IpEntity ip = new IpV4(1, "1.1.1.1", "test");
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);

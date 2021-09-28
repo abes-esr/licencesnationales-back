@@ -21,6 +21,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 @Component
 public class IpWebDtoConverter {
@@ -55,7 +56,7 @@ public class IpWebDtoConverter {
 
     private IpWebDto getDto(IpEntity source) {
         IpWebDto dto = new IpWebDto(source.getId(), source.getIp(), source.getStatut().getLibelleStatut(), source.getDateCreation(), source.getDateModification(), source.getCommentaires());
-        dto.setTypeIp(source.getClass().getSimpleName());
+        dto.setTypeIp(source.getClass().getSimpleName().toUpperCase(Locale.ROOT));
         dto.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
         return dto;
     }

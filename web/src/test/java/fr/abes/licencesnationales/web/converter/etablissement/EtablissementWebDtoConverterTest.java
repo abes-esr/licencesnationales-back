@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.converter.etablissement;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
@@ -8,6 +9,13 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpV4;
+import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
+import fr.abes.licencesnationales.core.exception.IpException;
+import fr.abes.licencesnationales.web.converter.ip.IpWebDtoConverter;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
@@ -20,7 +28,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, EtablissementWebDtoConverter.class, ObjectMapper.class})
+@SpringBootTest(classes = {UtilsMapper.class, EtablissementWebDtoConverter.class, ObjectMapper.class, IpWebDtoConverter.class})
 public class EtablissementWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
@@ -321,10 +329,15 @@ public class EtablissementWebDtoConverterTest {
 
     @Test
     @DisplayName("test conversion EtablissementEntity / EtablissementUserWebDto")
-    void testEtabUserWebDto() {
+    void testEtabUserWebDto() throws IpException {
         ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        StatutEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", (StatutIpEntity) ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", (StatutIpEntity) ipStatut);
 
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
         EtablissementUserWebDto dto = utilsMapper.map(etab, EtablissementUserWebDto.class);
         Assertions.assertEquals("nom2", dto.getContact().getNom());
         Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
@@ -336,6 +349,17 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("1111111111", dto.getContact().getTelephone());
         Assertions.assertEquals("mail@mail.com", dto.getContact().getMail());
         Assertions.assertEquals("etab", dto.getContact().getRole());
+        Assertions.assertEquals("1.1.1.1", dto.getIps().get(0).getIp());
+        Assertions.assertEquals("test", dto.getIps().get(0).getCommentaires());
+        Assertions.assertEquals("IPV4", dto.getIps().get(0).getTypeIp());
+        Assertions.assertEquals("ip", dto.getIps().get(0).getTypeAcces());
+        Assertions.assertEquals(1, dto.getIps().get(0).getId());
+        Assertions.assertEquals("1111:1111:1111:1111:1111:1111:1111:1111", dto.getIps().get(1).getIp());
+        Assertions.assertEquals("test2", dto.getIps().get(1).getCommentaires());
+        Assertions.assertEquals(2, dto.getIps().get(1).getId());
+        Assertions.assertEquals("IPV6", dto.getIps().get(1).getTypeIp());
+        Assertions.assertEquals("ip", dto.getIps().get(1).getTypeAcces());
+
     }
 
     @Test
