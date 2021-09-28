@@ -2,28 +2,37 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.*;
-import fr.abes.licencesnationales.core.entities.ip.IpType;
+import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpValideeEventEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
-import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.web.dto.ip.*;
+import fr.abes.licencesnationales.core.services.IpService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
+import fr.abes.licencesnationales.web.dto.ip.cree.IpAjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeUserWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -39,7 +48,7 @@ public class IpController {
     private EtablissementService etablissementService;
 
     @Autowired
-    private IpRepository ipRepository;
+    private IpService ipService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -51,147 +60,78 @@ public class IpController {
     private EmailService emailService;
 
     @Autowired
+    private ReferenceService referenceService;
+
+    @Autowired
     private UtilsMapper mapper;
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
 
-    @PostMapping(value = "/ajoutIpV4")
-    public void ajoutIpv4(@Valid @RequestBody Ipv4AjouteeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException {
-        traiterAjoutIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/ajoutIpV6")
-    public void ajoutIpv6(@Valid @RequestBody Ipv6AjouteeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException {
-        traiterAjoutIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/ajoutPlageIpV4")
-    public void ajoutPlageIpv4(@Valid @RequestBody PlageIpv4AjouteeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException {
-        traiterAjoutIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/ajoutPlageIpV6")
-    public void ajoutPlageIpv6(@Valid @RequestBody PlageIpv6AjouteeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException {
-        traiterAjoutIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/adminAjoutIpV4")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminAjoutIpv4(@Valid @RequestBody Ipv4AjouteeWebDto event, HttpServletRequest request) {
-        traiterAjoutIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminAjoutIpV6")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminAjoutIpv6(@Valid @RequestBody Ipv6AjouteeWebDto event, HttpServletRequest request) {
-        traiterAjoutIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminAjoutPlageIpV4")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminAjoutPlageIpv4(@Valid @RequestBody PlageIpv4AjouteeWebDto event, HttpServletRequest request) {
-        traiterAjoutIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminAjoutPlageIpV6")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminAjoutPlageIpv6(@Valid @RequestBody PlageIpv6AjouteeWebDto event, HttpServletRequest request) throws IpException {
-        traiterAjoutIp(event, event.getSiren(), request);
-    }
-
-    public void traiterAjoutIp(IpAjouteeWebDto event, String siren, HttpServletRequest request) throws RestClientException {
+    @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public void ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
+        List<String> errors = new ArrayList<>();
+        filtrerAccesServices.autoriserServicesParSiren(siren);
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
-        IpCreeEventEntity ipAjouteeEvent = mapper.map(event, IpCreeEventEntity.class);
-        applicationEventPublisher.publishEvent(ipAjouteeEvent);
-        eventRepository.save(ipAjouteeEvent);
-
         String etab = etablissementService.getFirstBySiren(siren).getName();
-        String descriptionAcces = " ip ou plage d'ips = " + event.getIp() + " en provenance de l'établissement " + etab;
-        log.info("admin = " + admin);
-        //mailSender.send(emailService.constructAccesCreeEmail(new Locale("fr", "FR"), descriptionAcces, fr.abes.licencesnationales.core.event.getCommentaires(), admin));
-        emailService.constructAccesCreeEmail(locale, descriptionAcces, event.getCommentaires(), admin);
+        dto.forEach(e -> {
+            IpCreeEventEntity ipAjouteeEvent = mapper.map(e, IpCreeEventEntity.class);
+            ipAjouteeEvent.setSource(this);
+            ipAjouteeEvent.setSiren(siren);
+            try {
+                applicationEventPublisher.publishEvent(ipAjouteeEvent);
+                eventRepository.save(ipAjouteeEvent);
+            } catch (Exception exception) {
+                errors.add(exception.getLocalizedMessage());
+            }
+            String descriptionAcces = " ip ou plage d'ips = " + e.getIp() + " en provenance de l'établissement " + etab;
+            emailService.constructAccesCreeEmail(locale, descriptionAcces, e.getCommentaires(), admin);
+        });
+
+        if (errors.size() > 0) {
+            throw new IpException(errors.toString());
+        }
 
     }
 
-    @PostMapping(value = "/modifIpV4")
-    public void modifIpv4(@Valid @RequestBody Ipv4ModifieeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
-        traiterModifIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/modifIpV6")
-    public void modifIpv6(@Valid @RequestBody Ipv6ModifieeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
-        traiterModifIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/modifPlageIpV4")
-    public void modifPlageIpv4(@Valid @RequestBody PlageIpv4ModifieeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
-        traiterModifIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/modifPlageIpV6")
-    public void modifPlageIpv6(@Valid @RequestBody PlageIpv6ModifieeWebDto event, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
-        traiterModifIp(event, filtrerAccesServices.getSirenFromSecurityContextUser(), request);
-    }
-
-    @PostMapping(value = "/adminModifIpV4")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminModifIpv4(@Valid @RequestBody Ipv4ModifieeWebDto event, HttpServletRequest request) throws IpException {
-        traiterModifIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminModifIpV6")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminModifIpv6(@Valid @RequestBody Ipv6ModifieeWebDto event, HttpServletRequest request) throws IpException {
-        traiterModifIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminModifPlageIpV4")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminModifPlageIpv4(@Valid @RequestBody PlageIpv4ModifieeWebDto event, HttpServletRequest request) throws IpException {
-        traiterModifIp(event, event.getSiren(), request);
-    }
-
-    @PostMapping(value = "/adminModifPlageIpV6")
-    @PreAuthorize("hasAuthority('admin')")
-    public void adminModifPlageIpv6(@Valid @RequestBody PlageIpv6ModifieeWebDto event, HttpServletRequest request) throws IpException {
-        traiterModifIp(event, event.getSiren(), request);
-    }
-
-    public void traiterModifIp(IpModifieeWebDto ipModifieeDto, String siren, HttpServletRequest request) throws RestClientException {
+    @PostMapping(value = "/{id}")
+    public void modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException {
+        EtablissementEntity etab = ipService.getEtablissementByIp(id);
+        filtrerAccesServices.autoriserServicesParSiren(etab.getSiren());
+        if (dto instanceof IpModifieeUserWebDto) {
+            if (!filtrerAccesServices.getSirenFromSecurityContextUser().equals(etab.getSiren())) {
+                throw new AccesInterditException("Impossible de modifier un autre établissement que celui de l'utilisateur");
+            }
+        } else {
+            if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
+                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
+            }
+        }
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
-        IpModifieeEventEntity ipModifieeEvent = mapper.map(ipModifieeDto, IpModifieeEventEntity.class);
+        IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);
+        ipModifieeEvent.setSource(this);
+        ipModifieeEvent.setSiren(etab.getSiren());
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(ipModifieeEvent);
-        String etab = etablissementService.getFirstBySiren(siren).getName();
-        String descriptionAcces = "id = " + ipModifieeDto.getId() + ", ip ou plage d'ips = " + ipModifieeDto.getIp() + " en provenance de l'établissement " + etab;
-        log.info("admin = " + admin);
-        emailService.constructAccesModifieEmail(locale, descriptionAcces, ipModifieeDto.getCommentaires(), admin);
-
+        String descriptionAcces = "id = " + id + ", ip ou plage d'ips = " + dto.getIp() + " en provenance de l'établissement " + etab.getSiren();
+        emailService.constructAccesModifieEmail(locale, descriptionAcces, dto.getCommentaires(), admin);
     }
 
-
-    @PostMapping(value = "/valide")
-    public void validate(@RequestBody IpValideeWebDto ipValideeDto) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(ipValideeDto.getSiren());
-        IpValideeEventEntity ipValideeEvent = mapper.map(ipValideeDto, IpValideeEventEntity.class);
-        applicationEventPublisher.publishEvent(ipValideeEvent);
-        eventRepository.save(ipValideeEvent);
-    }
-
-    @DeleteMapping(value = "/supprime")
-    public void delete(@Valid @RequestBody IpSupprimeeWebDto ipSupprimeeDto) throws SirenIntrouvableException, AccesInterditException {
-        filtrerAccesServices.autoriserServicesParSiren(ipSupprimeeDto.getSiren());
-        IpSupprimeeEventEntity ipSupprimeeEvent = mapper.map(ipSupprimeeDto, IpSupprimeeEventEntity.class);
-        applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-        eventRepository.save(ipSupprimeeEvent);
-    }
-
-    @DeleteMapping(value = "/supprimeByAdmin")
+    @PostMapping(value = "/valider")
     @PreAuthorize("hasAuthority('admin')")
-    public void deleteByAdmin(@Valid @RequestBody IpSupprimeeWebDto ipSupprimeeDto) {
-        IpSupprimeeEventEntity ipSupprimeeEvent = mapper.map(ipSupprimeeDto, IpSupprimeeEventEntity.class);
+    public void validate(@RequestBody List<Integer> ids) throws SirenIntrouvableException, AccesInterditException {
+        ids.forEach(id -> {
+            IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
+            applicationEventPublisher.publishEvent(ipValideeEvent);
+            eventRepository.save(ipValideeEvent);
+        });
+
+    }
+
+    @DeleteMapping(value = "/{id}")
+    public void delete(@PathVariable Integer id) {
+        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(ipSupprimeeEvent);
     }
@@ -212,8 +152,8 @@ public class IpController {
     }
 
     @PostMapping(value = "/getIpEntity")
-    public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException {
+    public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException, UnknownIpException {
         filtrerAccesServices.autoriserServicesParSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
-        return mapper.map(ipRepository.getFirstById(ipDto.getId()), IpWebDto.class);
+        return mapper.map(ipService.getFirstById(ipDto.getId()), IpWebDto.class);
     }
 }
