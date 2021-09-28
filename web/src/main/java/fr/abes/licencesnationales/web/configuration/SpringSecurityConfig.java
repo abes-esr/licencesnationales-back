@@ -60,6 +60,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/v1/authentification/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/v1/etablissements").permitAll()
+                .antMatchers( "/v1/etablissements/getType").permitAll()
                 .antMatchers("/v1/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/v1/applicationVersion").permitAll()

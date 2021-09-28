@@ -188,7 +188,7 @@ public class EtablissementController {
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
         UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
-        if ("admin".equals(user.getRole())) {
+        if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }
         if (user.getSiren().equals(siren)) {
@@ -234,9 +234,14 @@ public class EtablissementController {
 
     @GetMapping(value = "")
     @PreAuthorize("hasAuthority('admin')")
-    public List<EtablissementWebDto> getListEtab() {
-        return mapper.mapList(etablissementService.findAll(), EtablissementWebDto.class);
+    public List<EtablissementAdminWebDto> getListEtab() {
+        return mapper.mapList(etablissementService.findAll(), EtablissementAdminWebDto.class);
 
+    }
+
+    @GetMapping(value = "/getType")
+    public List<TypeEtablissementDto> getListType() {
+        return mapper.mapList(referenceService.findAllTypeEtab(), TypeEtablissementDto.class);
     }
 
 }
