@@ -1,6 +1,7 @@
-package fr.abes.licencesnationales.web.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement.scission;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
 import lombok.Getter;
 import lombok.Setter;
 

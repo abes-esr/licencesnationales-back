@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.ip.cree;
+package fr.abes.licencesnationales.web.dto.ip.creation;
 
 import lombok.Getter;
 import lombok.Setter;

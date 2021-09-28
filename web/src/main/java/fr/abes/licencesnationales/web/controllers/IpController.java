@@ -18,9 +18,9 @@ import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
-import fr.abes.licencesnationales.web.dto.ip.cree.IpAjouteeWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modifie.IpModifieeUserWebDto;
+import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,11 +82,11 @@ public class IpController {
             try {
                 applicationEventPublisher.publishEvent(ipAjouteeEvent);
                 eventRepository.save(ipAjouteeEvent);
+                String descriptionAcces = " ip ou plage d'ips = " + e.getIp() + " en provenance de l'établissement " + etab;
+                emailService.constructAccesCreeEmail(locale, descriptionAcces, e.getCommentaires(), admin);
             } catch (Exception exception) {
                 errors.add(exception.getLocalizedMessage());
             }
-            String descriptionAcces = " ip ou plage d'ips = " + e.getIp() + " en provenance de l'établissement " + etab;
-            emailService.constructAccesCreeEmail(locale, descriptionAcces, e.getCommentaires(), admin);
         });
 
         if (errors.size() > 0) {

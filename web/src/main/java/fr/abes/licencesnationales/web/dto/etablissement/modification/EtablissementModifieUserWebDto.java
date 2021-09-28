@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement.modification;
 
 import lombok.Getter;
 import lombok.Setter;

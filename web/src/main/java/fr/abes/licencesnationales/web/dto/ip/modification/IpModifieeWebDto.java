@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.ip.modifie;
+package fr.abes.licencesnationales.web.dto.ip.modification;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
