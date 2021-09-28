@@ -278,7 +278,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.anyString())).thenReturn(etabIn.getSiren());
 
         // Mock Etablissement service
-        Mockito.doNothing().when(etablissementService).changePasswordFromSiren(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(etablissementService).save(Mockito.any());
 
         // Début
         ReinitialiserMotDePasseRequestDto dto = new ReinitialiserMotDePasseRequestDto();
