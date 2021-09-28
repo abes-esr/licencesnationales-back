@@ -5,6 +5,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import lombok.SneakyThrows;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
@@ -259,8 +260,10 @@ public class EtablissementWebDtoConverter {
 
                 EtablissementUserWebDto dto = new EtablissementUserWebDto();
                 ContactWebDto contact = getContactWebDto(source);
-
                 dto.setContact(contact);
+                source.getIps().forEach(ip -> {
+                    dto.ajouterIp(utilsMapper.map(ip, IpWebDto.class));
+                });
                 return dto;
             }
         };

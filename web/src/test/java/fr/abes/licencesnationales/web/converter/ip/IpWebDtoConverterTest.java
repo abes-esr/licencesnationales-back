@@ -35,15 +35,14 @@ class IpWebDtoConverterTest {
     @DisplayName("Test convertisseur IpV4 / IpWebDto")
     void testEntityIpV4WebDto() throws IpException {
         IpWebDto dto;
-        StatutEntity statut = new StatutIpEntity(1, "Valide");
-        IpEntity ip = new IpV4(1, "1.1.1.1", "test");
-        ip.setStatut((StatutIpEntity) statut);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
         dto = mapper.map(ip, IpWebDto.class);
         Assertions.assertEquals(1, dto.getId());
         Assertions.assertEquals("1.1.1.1", dto.getIp());
         Assertions.assertEquals("Valide", dto.getStatut());
         Assertions.assertEquals("test", dto.getCommentaires());
-        Assertions.assertEquals("IpV4", dto.getTypeIp());
+        Assertions.assertEquals("IPV4", dto.getTypeIp());
         Assertions.assertEquals("ip", dto.getTypeAcces());
     }
 
@@ -51,15 +50,14 @@ class IpWebDtoConverterTest {
     @DisplayName("test convertisseur range IpV4 / IpWebDto")
     void testEntityIpRangeV4WebDto() throws IpException {
         IpWebDto dto;
-        StatutEntity statut = new StatutIpEntity(1, "Valide");
-        IpEntity ip = new IpV4(1, "1.1-10.1.1", "test");
-        ip.setStatut((StatutIpEntity) statut);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ip = new IpV4(1, "1.1-10.1.1", "test", statut);
         dto = mapper.map(ip, IpWebDto.class);
         Assertions.assertEquals(1, dto.getId());
         Assertions.assertEquals("1.1-10.1.1", dto.getIp());
         Assertions.assertEquals("Valide", dto.getStatut());
         Assertions.assertEquals("test", dto.getCommentaires());
-        Assertions.assertEquals("IpV4", dto.getTypeIp());
+        Assertions.assertEquals("IPV4", dto.getTypeIp());
         Assertions.assertEquals("range", dto.getTypeAcces());
 
     }
@@ -68,15 +66,14 @@ class IpWebDtoConverterTest {
     @DisplayName("Test convertisseur IpV6 / IpWebDto")
     void testEntityIpV6WebDto() throws IpException {
         IpWebDto dto;
-        StatutEntity statut = new StatutIpEntity(1, "Valide");
-        IpEntity ip = new IpV6(1, "1111:1111:1111:1111:1111:1111:1111:1111", "test");
-        ip.setStatut((StatutIpEntity) statut);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ip = new IpV6(1, "1111:1111:1111:1111:1111:1111:1111:1111", "test", statut);
         dto = mapper.map(ip, IpWebDto.class);
         Assertions.assertEquals(1, dto.getId());
         Assertions.assertEquals("1111:1111:1111:1111:1111:1111:1111:1111", dto.getIp());
         Assertions.assertEquals("Valide", dto.getStatut());
         Assertions.assertEquals("test", dto.getCommentaires());
-        Assertions.assertEquals("IpV6", dto.getTypeIp());
+        Assertions.assertEquals("IPV6", dto.getTypeIp());
         Assertions.assertEquals("ip", dto.getTypeAcces());
     }
 
@@ -84,15 +81,14 @@ class IpWebDtoConverterTest {
     @DisplayName("Test convertisseur range IpV6 / IpWebDto")
     void testEntityIpRangeV6WebDto() throws IpException {
         IpWebDto dto;
-        StatutEntity statut = new StatutIpEntity(1, "Valide");
-        IpEntity ip = new IpV6(1, "1111:1111-2222:1111:1111:1111-2222:1111:1111:1111", "test");
-        ip.setStatut((StatutIpEntity) statut);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ip = new IpV6(1, "1111:1111-2222:1111:1111:1111-2222:1111:1111:1111", "test", statut);
         dto = mapper.map(ip, IpWebDto.class);
         Assertions.assertEquals(1, dto.getId());
         Assertions.assertEquals("1111:1111-2222:1111:1111:1111-2222:1111:1111:1111", dto.getIp());
         Assertions.assertEquals("Valide", dto.getStatut());
         Assertions.assertEquals("test", dto.getCommentaires());
-        Assertions.assertEquals("IpV6", dto.getTypeIp());
+        Assertions.assertEquals("IPV6", dto.getTypeIp());
         Assertions.assertEquals("range", dto.getTypeAcces());
     }
 

@@ -186,6 +186,7 @@ public class EtablissementController {
 
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
+
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
         UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(user.getRole())) {

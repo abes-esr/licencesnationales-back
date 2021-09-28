@@ -66,11 +66,11 @@ public abstract class IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpEntity(String ip, String commentaires) throws IpException {
+    public IpEntity(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         if (ip == null || ip.isEmpty()) {
             throw new IpException("Ip ne peut pas être nulle");
         }
-
+        this.statut = statut;
         this.ip = ip;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
@@ -85,14 +85,14 @@ public abstract class IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpEntity(Integer id, String ip, String commentaires) throws IpException {
+    public IpEntity(Integer id, String ip, String commentaires, StatutIpEntity statut) throws IpException {
 
         this.id = id;
 
         if (ip.isEmpty()) {
             throw new IpException("Ip ne peut pas être nulle");
         }
-
+        this.statut = statut;
         this.ip = ip;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
