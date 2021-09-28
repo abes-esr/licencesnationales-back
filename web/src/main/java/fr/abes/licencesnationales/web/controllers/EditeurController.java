@@ -2,41 +2,71 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.services.EditeurService;
+import fr.abes.licencesnationales.core.services.EventService;
+import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.dto.editeur.*;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementCreeWebDto;
+import fr.abes.licencesnationales.web.exception.CaptchaException;
+import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientException;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/ln/editeur")
+@RequestMapping("/v1/editeur")
 public class EditeurController {
+
     @Autowired
     private UtilsMapper mapper;
 
     @Autowired
+    private ObjectMapper objectMapper;
+
+    @Autowired
     private EditeurService editeurService;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private EventService eventService;
 
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
     public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
-        EditeurCreeEventEntity editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
+        // On convertit la DTO web (Json) en objet métier d'événement de création d'éditeur
+        EditeurCreeEventEntity event = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
+        event.setSource(this);
+
+        event.setTypesEtabsInBdd(objectMapper.writeValueAsString(event.getTypesEtabs()));
+
+        // On publie l'événement et on le sauvegarde
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
     }
 
     @PostMapping(value = "/{id}")

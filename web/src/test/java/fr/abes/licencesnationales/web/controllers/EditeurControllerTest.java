@@ -1,3 +1,4 @@
+/*
 package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -218,8 +219,8 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         setctEA.add(actEA);
         setctEA.add(bctEA);
 
-        editeurEntityA.setContactCommercialEditeurEntities(setccEA);
-        editeurEntityA.setContactTechniqueEditeurEntities(setctEA);
+        //editeurEntityA.setContactCommercialEditeurEntities(setccEA);
+        //editeurEntityA.setContactTechniqueEditeurEntities(setctEA);
 
         //editeur B
 
@@ -277,3 +278,4 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     }
 
 }
+*/
