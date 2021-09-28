@@ -1,13 +1,17 @@
 package fr.abes.licencesnationales.core.entities.editeur;
 
 
+import fr.abes.licencesnationales.core.dto.ContactEditeurDto;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
@@ -20,9 +24,8 @@ import java.util.*;
 @Entity
 @Table(name = "Editeur")
 @NoArgsConstructor
-@AllArgsConstructor
 @Getter
-@Setter
+@Slf4j
 public class EditeurEntity implements Serializable {
 
     @Id
@@ -43,7 +46,7 @@ public class EditeurEntity implements Serializable {
 
     private Date dateCreation;
 
-    @JoinTable(name = "editeurs_types_etablissements", joinColumns = @JoinColumn(name = "ref_editeur"), inverseJoinColumns = @JoinColumn(name = "ref_type_etablissement"))
+    @JoinTable(name = "editeurs_types_etablissements", joinColumns = @JoinColumn(name = "ref_editeur", nullable = false), inverseJoinColumns = @JoinColumn(name = "ref_type_etablissement"))
     @ManyToMany
     private Set<TypeEtablissementEntity> typeEtablissements;
 
@@ -63,23 +66,51 @@ public class EditeurEntity implements Serializable {
      * @param identifiantEditeur
      * @param adresseEditeur
      * @param dateCreation
-     * @param contactCommercialEditeurEntities
-     * @param contactTechniqueEditeurEntities
+     * @
      */
     public EditeurEntity(Integer idEditeur,
                          String nomEditeur,
                          String identifiantEditeur,
                          String adresseEditeur,
                          Date dateCreation,
-                         Set<ContactCommercialEditeurEntity> contactCommercialEditeurEntities,
-                         Set<ContactTechniqueEditeurEntity> contactTechniqueEditeurEntities) {
+                         Set<TypeEtablissementEntity> typeEtablissements) {
         this.idEditeur = idEditeur;
         this.nomEditeur = nomEditeur;
         this.identifiantEditeur = identifiantEditeur;
         this.adresseEditeur = adresseEditeur;
         this.dateCreation = dateCreation;
-        this.contactCommercialEditeurEntities = contactCommercialEditeurEntities;
-        this.contactTechniqueEditeurEntities = contactTechniqueEditeurEntities;
+        this.typeEtablissements = typeEtablissements;
+    }
+
+    /**
+     * CTOR d'un éditeur avec sans idEditeur
+     *
+     * @param nomEditeur
+     * @param identifiantEditeur
+     * @param adresseEditeur
+     * @param dateCreation
+     */
+    public EditeurEntity(String nomEditeur,
+                         String identifiantEditeur,
+                         String adresseEditeur,
+                         Date dateCreation,
+                         Set<TypeEtablissementEntity> typeEtablissements) {
+        this.nomEditeur = nomEditeur;
+        this.identifiantEditeur = identifiantEditeur;
+        this.adresseEditeur = adresseEditeur;
+        this.dateCreation = dateCreation;
+        this.typeEtablissements = typeEtablissements;
+    }
+
+    public void ajouterContact(ContactEditeurEntity contact){
+        contact.setEditeurEntity(this);
+        if(contact instanceof ContactCommercialEditeurEntity)
+            this.contactCommercialEditeurEntities.add((ContactCommercialEditeurEntity) contact);
+        else if(contact instanceof ContactTechniqueEditeurEntity)
+            this.contactTechniqueEditeurEntities.add((ContactTechniqueEditeurEntity) contact);
+        else {
+            throw new NotImplementedException("Le contact doit forcément être commercial ou technique");
+        }
     }
 
     @Override
@@ -108,5 +139,29 @@ public class EditeurEntity implements Serializable {
     @Override
     public String toString() {
         return "EditeurEntity {" + "id=" + idEditeur + ", nom=" + nomEditeur + " }";
+    }
+
+    public void setIdEditeur(Integer idEditeur) {
+        this.idEditeur = idEditeur;
+    }
+
+    public void setNomEditeur(String nomEditeur) {
+        this.nomEditeur = nomEditeur;
+    }
+
+    public void setIdentifiantEditeur(String identifiantEditeur) {
+        this.identifiantEditeur = identifiantEditeur;
+    }
+
+    public void setAdresseEditeur(String adresseEditeur) {
+        this.adresseEditeur = adresseEditeur;
+    }
+
+    public void setDateCreation(Date dateCreation) {
+        this.dateCreation = dateCreation;
+    }
+
+    public void setTypeEtablissements(Set<TypeEtablissementEntity> typeEtablissements) {
+        this.typeEtablissements = typeEtablissements;
     }
 }

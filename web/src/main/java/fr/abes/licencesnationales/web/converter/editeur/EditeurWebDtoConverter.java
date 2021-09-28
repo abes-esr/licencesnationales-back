@@ -29,7 +29,7 @@ public class EditeurWebDtoConverter {
                 editeurCreeEvent.setNomEditeur(source.getNomEditeur());
                 editeurCreeEvent.setIdentifiantEditeur(source.getIdentifiantEditeur());
                 editeurCreeEvent.setAdresseEditeur(source.getAdresseEditeur());
-                editeurCreeEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
+                editeurCreeEvent.setTypesEtabs(source.getGroupesEtabRelies());
 
                 editeurCreeEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactEditeurDto.class));
                 editeurCreeEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactEditeurDto.class));
@@ -49,12 +49,12 @@ public class EditeurWebDtoConverter {
             public EditeurModifieEventEntity convert(MappingContext<EditeurModifieWebDto, EditeurModifieEventEntity> context) {
                 EditeurModifieWebDto source = context.getSource();
 
-                EditeurModifieEventEntity editeurModifieEvent = new EditeurModifieEventEntity(this, source.getIdEditeur());
+                EditeurModifieEventEntity editeurModifieEvent = new EditeurModifieEventEntity(this, source.getIdEditeur(), source.getGroupesEtabRelies());
 
                 editeurModifieEvent.setNomEditeur(source.getNomEditeur());
                 editeurModifieEvent.setIdentifiantEditeur(source.getIdentifiantEditeur());
                 editeurModifieEvent.setAdresseEditeur(source.getAdresseEditeur());
-                editeurModifieEvent.setGroupesEtabRelies(source.getGroupesEtabRelies());
+                editeurModifieEvent.setTypesEtabs(source.getGroupesEtabRelies());
 
                 editeurModifieEvent.setListeContactCommercialEditeur(utilsMapper.mapSet(source.getListeContactCommercialEditeur(), ContactEditeurDto.class));
                 editeurModifieEvent.setListeContactTechniqueEditeur(utilsMapper.mapSet(source.getListeContactTechniqueEditeur(), ContactEditeurDto.class));

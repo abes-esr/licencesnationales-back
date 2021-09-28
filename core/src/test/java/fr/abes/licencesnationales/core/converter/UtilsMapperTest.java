@@ -1,7 +1,6 @@
 package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.licencesnationales.core.converter.editeur.EditeurEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.IpEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
@@ -40,7 +39,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class, EditeurEntityConverter.class})
+@SpringBootTest(classes = {UtilsMapper.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class})
 public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;
@@ -60,7 +59,7 @@ public class UtilsMapperTest {
         List<String> groupesEtabRelies = new ArrayList<>();
         groupesEtabRelies.add("EPIC/EPST");
         groupesEtabRelies.add("Ecoles d'ingénieurs");
-        editeurCreeEvent.setGroupesEtabRelies(groupesEtabRelies);
+        editeurCreeEvent.setTypesEtabs(groupesEtabRelies);
 
         ContactCommercialEditeurEntity contactComm = new ContactCommercialEditeurEntity("nomCCA", "prenomCCA", "mail@CCA.com");
         Set<ContactCommercialEditeurEntity> setComm = new HashSet<>();
@@ -98,7 +97,7 @@ public class UtilsMapperTest {
         List<String> groupesEtabRelies = new ArrayList<>();
         groupesEtabRelies.add("EPIC/EPST");
         groupesEtabRelies.add("Ecoles d'ingénieurs");
-        editeurCreeEvent.setGroupesEtabRelies(groupesEtabRelies);
+        editeurCreeEvent.setTypesEtabs(groupesEtabRelies);
 
         ContactCommercialEditeurEntity cc1 = new ContactCommercialEditeurEntity("nomCCA", "prenomCCA", "mail@CCA.com");
         ContactCommercialEditeurEntity cc2 = new ContactCommercialEditeurEntity("nomCCB", "prenomCCB", "mail@CCB.com");

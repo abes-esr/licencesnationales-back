@@ -15,7 +15,6 @@ import java.util.Set;
 
 @Entity
 @Table(name = "EditeurEvent")
-@NoArgsConstructor
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "event", columnDefinition = "varchar(20)", discriminatorType = DiscriminatorType.STRING)
 @Getter @Setter
@@ -35,9 +34,11 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
     @Column(name = "ADRESSE_EDITEUR")
     protected String adresseEditeur;
 
+    private transient List<String> typesEtabs;
+
     @Lob
-    @Column(name = "GROUPES_ETAB_RELIES")
-    protected List<String> groupesEtabRelies = new ArrayList<>();
+    @Column(name = "GROUPES_ETAB_RELIES", columnDefinition = "CLOB")
+    protected String typesEtabsInBdd;
 
     @Lob
     @Convert(converter = ContactEditeurConverter.class)
@@ -49,9 +50,16 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
     @Column(name = "LISTE_CONTACT_TECHNIQUE_EDITEURDTO", columnDefinition = "CLOB")
     protected Set<ContactEditeurDto> listeContactTechniqueEditeur;
 
-    @Lob
-    @Column(name = "ID_EDITEUR_FUSIONNES")
-    protected List<Integer> idEditeurFusionnes;
+
+    public EditeurEventEntity(Object source, List<String> typesEtabs) {
+        super(source);
+        this.typesEtabs = typesEtabs;
+    }
+
+    @Deprecated
+    public EditeurEventEntity() {
+        super();
+    }
 
     public EditeurEventEntity(Object source) {
         super(source);
