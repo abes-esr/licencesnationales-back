@@ -63,6 +63,9 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         if (ex.getCause() instanceof MismatchedInputException) {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
 
+            if (((MismatchedInputException) ex.getCause()).getPath().size() == 0) {
+                return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+            }
             List<JsonMappingException.Reference> errors = ((MismatchedInputException) ex.getCause()).getPath();
             String property = errors.get(errors.size() - 1).getFieldName();
 
