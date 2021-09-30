@@ -112,6 +112,7 @@ public class IpController {
         IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);
         ipModifieeEvent.setSource(this);
         ipModifieeEvent.setSiren(etab.getSiren());
+        ipModifieeEvent.setIpId(id);
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(ipModifieeEvent);
         String descriptionAcces = "id = " + id + ", ip ou plage d'ips = " + dto.getIp() + " en provenance de l'établissement " + etab.getSiren();

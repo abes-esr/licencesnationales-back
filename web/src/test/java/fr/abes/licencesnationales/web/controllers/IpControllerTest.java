@@ -189,7 +189,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+        Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
 
         StringBuilder json = new StringBuilder("{\n");
         json.append("\"typeIp\":\"IPV4\",\n");
@@ -217,7 +217,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+        Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
         Mockito.when(referenceService.findStatutByLibelle(Mockito.anyString())).thenReturn(new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation"));
 
         StringBuilder json = new StringBuilder("{\n");
