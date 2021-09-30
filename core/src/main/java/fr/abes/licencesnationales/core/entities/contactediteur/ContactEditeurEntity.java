@@ -17,7 +17,6 @@ import java.io.Serializable;
         columnDefinition = "VARCHAR(20)")
 @Table(name = "ContactEditeur")
 @DiscriminatorOptions(force = true)
-@NoArgsConstructor
 @Getter
 @Setter
 public abstract class ContactEditeurEntity implements Serializable {
@@ -25,19 +24,27 @@ public abstract class ContactEditeurEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "contact_editeur_Sequence")
     @SequenceGenerator(name = "contact_editeur_Sequence", sequenceName = "CONTACT_EDITEUR_SEQ", allocationSize = 1)
-    protected Integer id;
+    protected Integer id = 000;
 
     @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le nom fourni n'est pas valide")
-    protected String nomContact;
+    protected String nomContact = "nom contact non renseigné";
     @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le prénom fourni n'est pas valide")
-    protected String prenomContact;
+    protected String prenomContact = "prénom contact non renseigné";
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "L'adresse mail fournie n'est pas valide")
-    protected String mailContact;
+    protected String mailContact = "mail contact non renseigné";
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "editeur", nullable = false)
     @JsonIgnore
-    protected EditeurEntity editeurEntity;
+    protected EditeurEntity editeurEntity = new EditeurEntity();
+
+    /**
+     * CTOR vide utilisé par JPA
+     * on évite la null pointer exception en initialisant les attributs
+     *
+     */
+    public ContactEditeurEntity() {
+    }
 
     /**
      * CTOR d'un contact d'éditeur sans identifiant
