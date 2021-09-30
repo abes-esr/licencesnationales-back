@@ -28,6 +28,8 @@ public class IpEventEntity extends EventEntity implements Serializable {
     @Column(name = "IP")
     protected String ip;
 
+    protected transient Integer ipId;
+
     public IpEventEntity(Object source) {
         super(source);
     }
