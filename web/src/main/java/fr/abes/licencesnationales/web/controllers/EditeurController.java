@@ -28,6 +28,7 @@ import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
@@ -57,12 +58,14 @@ public class EditeurController {
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
-    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
+    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, IOException {
         // On convertit la DTO web (Json) en objet métier d'événement de création d'éditeur
         EditeurCreeEventEntity event = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
         event.setSource(this);
 
-        event.setTypesEtabsInBdd(objectMapper.writeValueAsString(event.getTypesEtabs()));
+        event.setTypesEtabsInBdd(event.getTypesEtabs());
+        log.info("types etab = " + event.getTypesEtabsInBdd());
+        log.info("types etab class= " + event.getTypesEtabsInBdd().getClass());
 
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);

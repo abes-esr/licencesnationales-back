@@ -65,7 +65,7 @@ public class EditeurCreeListener implements ApplicationListener<EditeurCreeEvent
             editeur.ajouterContact(ct);
         }
 
-        //service.save(editeur);
+        service.save(editeur);
 
     }
 

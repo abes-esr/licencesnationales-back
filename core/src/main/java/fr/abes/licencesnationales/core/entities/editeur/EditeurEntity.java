@@ -31,24 +31,24 @@ public class EditeurEntity implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "editeur_Sequence")
     @SequenceGenerator(name = "editeur_Sequence", sequenceName = "EDITEUR_SEQ", allocationSize = 1)
-    private Integer idEditeur;
+    private Integer idEditeur = 000;
 
     @NotNull
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
-    private String nomEditeur;
+    private String nomEditeur = "nom editeur non renseigné";
 
     @Pattern(regexp = "^[0-9]*$", message = "L'identifiant éditeur est uniquement composé de chiffres")
-    private String identifiantEditeur;
+    private String identifiantEditeur = "identifiant editeur non renseigné";
 
     @NotNull
     @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "L'adresse postale fournie n'est pas valide")
-    private String adresseEditeur;
+    private String adresseEditeur = "adresse editeur non renseignée";
 
-    private Date dateCreation;
+    private Date dateCreation = new Date();
 
     @JoinTable(name = "editeurs_types_etablissements", joinColumns = @JoinColumn(name = "ref_editeur", nullable = false), inverseJoinColumns = @JoinColumn(name = "ref_type_etablissement"))
     @ManyToMany
-    private Set<TypeEtablissementEntity> typeEtablissements;
+    private Set<TypeEtablissementEntity> typeEtablissements = new HashSet<>();
 
     @OneToMany(targetEntity = ContactCommercialEditeurEntity.class, mappedBy = "editeurEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Where(clause = "DTYPE='commercial'")
