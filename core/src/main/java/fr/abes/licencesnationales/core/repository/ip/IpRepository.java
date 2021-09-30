@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Repository
@@ -17,7 +18,7 @@ public interface IpRepository extends JpaRepository<IpEntity, Integer> {
 
     void deleteById(Integer id);
 
-    IpEntity getFirstById(Integer id);
+    Optional<IpEntity> getFirstById(Integer id);
 
     @Query("select i.ip from IpEntity i")
     List<String> findAllIp();

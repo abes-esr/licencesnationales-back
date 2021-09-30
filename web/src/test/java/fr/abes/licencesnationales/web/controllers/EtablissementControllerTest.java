@@ -2,11 +2,13 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
@@ -15,6 +17,13 @@ import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.modification.ContactModifieWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieAdminWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
@@ -231,15 +240,16 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         dtoNouvelEtab.setContact(dtoContact);
         dto.setNouveauEtab(dtoNouvelEtab);
 
+        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
         ContactEntity contactEntity1 = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
         EtablissementEntity entity1 = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity1);
-        entity1.ajouterIp(new IpV4(1, "1.1.1.1", "commentaireIP1"));
-        entity1.ajouterIp(new IpV6(2, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFD", "commentaireIP2"));
+        entity1.ajouterIp(new IpV4(1, "1.1.1.1", "commentaireIP1", statutIp));
+        entity1.ajouterIp(new IpV6(2, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFD", "commentaireIP2", statutIp));
 
         ContactEntity contactEntity2 = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
         EtablissementEntity entity2 = new EtablissementEntity(1, "nomEtab2", "987654321", new TypeEtablissementEntity(3, "Validé"), "654321", contactEntity2);
-        entity2.ajouterIp(new IpV4(3, "2.2.2.2", "commentaireIP3"));
-        entity2.ajouterIp(new IpV6(4, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF", "commentaireIP4"));
+        entity2.ajouterIp(new IpV4(3, "2.2.2.2", "commentaireIP3", statutIp));
+        entity2.ajouterIp(new IpV6(4, "5800:10C3:E3C3:F1AA:48E3:D923:D494-D497:AAFF-BBFF", "commentaireIP4", statutIp));
 
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());

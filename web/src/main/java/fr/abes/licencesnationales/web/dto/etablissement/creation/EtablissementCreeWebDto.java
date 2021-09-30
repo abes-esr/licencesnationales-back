@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement.creation;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
