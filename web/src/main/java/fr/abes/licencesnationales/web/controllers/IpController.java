@@ -60,9 +60,6 @@ public class IpController {
     private EmailService emailService;
 
     @Autowired
-    private ReferenceService referenceService;
-
-    @Autowired
     private UtilsMapper mapper;
 
     @Value("${ln.dest.notif.admin}")
@@ -121,7 +118,7 @@ public class IpController {
 
     @PostMapping(value = "/valider")
     @PreAuthorize("hasAuthority('admin')")
-    public void validate(@RequestBody List<Integer> ids) throws SirenIntrouvableException, AccesInterditException {
+    public void validate(@RequestBody List<Integer> ids) {
         ids.forEach(id -> {
             IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
             applicationEventPublisher.publishEvent(ipValideeEvent);
@@ -131,8 +128,11 @@ public class IpController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public void delete(@PathVariable Integer id) {
-        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
+    @PreAuthorize("hasAuthority('admin')")
+    public void delete(@PathVariable Integer id) throws UnknownIpException {
+        IpEntity ip = ipService.getFirstById(id);
+        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id, ip.getIp());
+        ipSupprimeeEvent.setSiren(ip.getEtablissement().getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(ipSupprimeeEvent);
     }
