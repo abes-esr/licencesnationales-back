@@ -1,9 +1,12 @@
 package fr.abes.licencesnationales.core.services;
 
 
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
+import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpV4Repository;
@@ -12,8 +15,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 
 @Slf4j
@@ -29,8 +34,6 @@ public class IpService {
     @Autowired
     private IpV6Repository ipV6Repository;
 
-    @Autowired
-    private EtablissementRepository etablissementRepository;
 
     /**
      * Récupère toutes les IP V4 et V6 confondus
@@ -56,6 +59,16 @@ public class IpService {
         return ipV6Repository.findAll();
     }
 
+    public void save(IpEntity ipEntity) {
+        if (ipEntity.getId() != null) {
+            ipEntity.setDateModification(new Date());
+        }
+        ipRepository.save(ipEntity);
+    }
+
+    public void deleteById(Integer id) {
+        ipRepository.deleteById(id);
+    }
     /**
      * Vérifies si une adresse IpV4 existe déjà dans la base de données.
      * L'IP existe si :
@@ -65,14 +78,11 @@ public class IpService {
      * @return Vrai si l'IP existe déjà, Faux sinon
      */
     public boolean isIpAlreadyExists(IpV4 ip) {
-
         List<IpV4> all = getAllIpV4();
-
         Iterator<IpV4> iter = all.iterator();
         while (iter.hasNext()) {
-
             IpV4 candidate = iter.next();
-            if (candidate.getIpRange().contains(ip.getIpRange())) {
+            if (candidate.getIpRange().contains(ip.getIpRange()) || candidate.getIpRange().overlaps(ip.getIpRange())) {
                 return true;
             }
         }
@@ -88,27 +98,35 @@ public class IpService {
      * @return Vrai si l'IP existe déjà, Faux sinon
      */
     public boolean isIpAlreadyExists(IpV6 ip) {
-
         List<IpV6> all = getAllIpV6();
-
         Iterator<IpV6> iter = all.iterator();
         while (iter.hasNext()) {
-
             IpV6 candidate = iter.next();
-            if (candidate.getIpRange().contains(ip.getIpRange())) {
+            if (candidate.getIpRange().contains(ip.getIpRange()) || candidate.getIpRange().overlaps(ip.getIpRange())) {
                 return true;
             }
         }
         return false;
     }
 
-    /**
-     * Ajouter une IP
-     * @param ip transitoire (sans id) à enregistrer
-     * @return ip avec un id
-     */
-    public IpEntity save(IpEntity ip) {
-        return ipRepository.save(ip);
+    public EtablissementEntity getEtablissementByIp(Integer id) throws UnknownIpException, UnknownEtablissementException {
+        Optional<IpEntity> ip = ipRepository.getFirstById(id);
+        if (!ip.isPresent()) {
+            throw new UnknownIpException("L'IP " + id + " n'existe pas");
+        }
+        IpEntity ipEntity = ip.get();
+        EtablissementEntity etab = ipEntity.getEtablissement();
+        if (etab == null) {
+            throw new UnknownEtablissementException("L'IP " + ipEntity.getIp() + " n'est pas rattachée à un établissement");
+        }
+        return etab;
     }
 
+    public IpEntity getFirstById(Integer id) throws UnknownIpException {
+        Optional<IpEntity> ipEntity = ipRepository.getFirstById(id);
+        if (!ipEntity.isPresent()) {
+            throw new UnknownIpException("L'IP " + id + " n'existe pas");
+        }
+        return ipEntity.get();
+    }
 }

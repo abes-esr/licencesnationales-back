@@ -22,6 +22,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -62,6 +63,9 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         if (ex.getCause() instanceof MismatchedInputException) {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
 
+            if (((MismatchedInputException) ex.getCause()).getPath().size() == 0) {
+                return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+            }
             List<JsonMappingException.Reference> errors = ((MismatchedInputException) ex.getCause()).getPath();
             String property = errors.get(errors.size() - 1).getFieldName();
 
@@ -171,6 +175,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AuthenticationException.class, AccesInterditException.class, SirenIntrouvableException.class})
     protected ResponseEntity<Object> handleAuthentificationException(Exception ex) {
         String error = "Credentials not valid";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
+    @ExceptionHandler(UnknownIpException.class)
+    protected ResponseEntity<Object> handleUnknownIpException(UnknownIpException ex) {
+        String error = "IP Inconnue";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
