@@ -2,16 +2,9 @@ package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.net.httpserver.HttpsServer;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.MailDto;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.MessageSource;
@@ -23,10 +16,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import javax.servlet.http.HttpServletRequest;
 import java.nio.charset.StandardCharsets;
 import java.util.Locale;
-import java.util.Set;
 
 @Component
 @Slf4j
@@ -38,7 +29,10 @@ public class EmailService {
     private RestTemplate restTemplate;
 
     @Value("${mail.ws.url}")
-    protected String baseURL;
+    protected String mailServerURL;
+
+    @Value("${site.url}")
+    protected String frontBaseURL;
 
     public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab) throws RestClientException {
         String message = messageSource.getMessage("message.CreationCompteAdmin", null, locale);
@@ -54,7 +48,7 @@ public class EmailService {
     }
 
     public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
-        final String url = this.baseURL + "/reinitialisationPass?token=" + token;
+        final String url = this.frontBaseURL + "/reinitialisationPass?token=" + token;
         String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
         String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
         message +=nomEtab + " ";
@@ -108,7 +102,7 @@ public class EmailService {
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-        restTemplate.postForObject(baseURL + "/htmlMail/", entity, String.class);
+        restTemplate.postForObject(mailServerURL + "/htmlMail/", entity, String.class);
     }
 
 

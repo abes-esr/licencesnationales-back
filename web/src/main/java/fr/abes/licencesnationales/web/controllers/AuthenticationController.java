@@ -56,8 +56,6 @@ public class AuthenticationController {
 
     private final UserDetailsServiceImpl userService;
 
-    private final PasswordEncoder passwordEncoder;
-
     public AuthenticationController(AuthenticationManager authenticationManager,
                                     JwtTokenProvider jwtTokenProvider,
                                     ReCaptchaService reCaptchaService,
@@ -71,7 +69,6 @@ public class AuthenticationController {
         this.etablissementService = etablissementService;
         this.emailService = emailService;
         this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
@@ -151,7 +148,7 @@ public class AuthenticationController {
     @ApiOperation(value = "permet de ",
             notes = "le ")
     @PostMapping(value = "/reinitialiserMotDePasse")
-    public ResponseEntity<?> enregistrerPassword(@Valid @RequestBody ReinitialiserMotDePasseRequestDto request) throws CaptchaException, InvalidTokenException, JsonIncorrectException {
+    public ResponseEntity<?> resetPasswordConfirm(@Valid @RequestBody ReinitialiserMotDePasseRequestDto request) throws CaptchaException, InvalidTokenException, JsonIncorrectException, MailDoublonException, SirenExistException {
         String captcha = request.getRecaptcha();
 
         if (captcha == null) {
@@ -159,7 +156,7 @@ public class AuthenticationController {
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.REINITIALISER_MOT_DE_PASSE);
         if (!reCaptchaResponse.isSuccess()) {
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
@@ -174,7 +171,10 @@ public class AuthenticationController {
 
         if (tokenProvider.validateToken(request.getTokenFromMail())) {
             String siren = tokenProvider.getSirenFromJwtToken(request.getTokenFromMail());
-            etablissementService.changePasswordFromSiren(siren, request.getMotDePasse());
+            EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
+            ContactEntity contact = etab.getContact();
+            contact.setMotDePasse(request.getMotDePasse());
+            etablissementService.save(etab);
         } else {
             throw new InvalidTokenException("Le token n'est pas valide");
         }
@@ -218,14 +218,14 @@ public class AuthenticationController {
         }
 
         String oldPassword = request.getAncienMotDePasse();
-        String newPasswordHash = request.getNouveauMotDePasse();
+        String newPassword = request.getNouveauMotDePasse();
 
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         ContactEntity contact = etab.getContact();
-        //le premier mot de passe ne doit pas être encodé, le second oui
-        if (passwordEncoder.matches(oldPassword, contact.getMotDePasse())) {
-            if (!passwordEncoder.matches(newPasswordHash, contact.getMotDePasse())) {
-                contact.setMotDePasse(newPasswordHash);
+
+        if (contact.estLeMotDePasse(oldPassword)) {
+            if (!contact.estLeMotDePasse(newPassword)) {
+                contact.setMotDePasse(newPassword);
                 etablissementService.save(etab);
             } else {
                 throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");

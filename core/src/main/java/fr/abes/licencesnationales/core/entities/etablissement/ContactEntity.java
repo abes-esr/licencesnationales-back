@@ -2,6 +2,10 @@ package fr.abes.licencesnationales.core.entities.etablissement;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -34,6 +38,9 @@ public class ContactEntity implements Serializable {
     @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "L'adresse mail fournie n'est pas valide")
     private String mail;
 
+    /**
+     * Mot de passe crypté
+     */
     private String motDePasse;
 
     @NotNull
@@ -58,6 +65,9 @@ public class ContactEntity implements Serializable {
 
     private String role = "etab";
 
+    @Transient
+    private transient PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     @Deprecated
     public ContactEntity() {
 
@@ -79,7 +89,7 @@ public class ContactEntity implements Serializable {
     public ContactEntity(String nom, String prenom, String adresse, String boitePostale, String codePostal, String ville, String cedex, String telephone, String mail, String motDePasse) {
         this.nom = nom;
         this.prenom = prenom;
-        this.motDePasse = motDePasse;
+        this.setMotDePasse(motDePasse);
         this.mail = mail;
         this.telephone = telephone;
         this.adresse = adresse;
@@ -107,7 +117,7 @@ public class ContactEntity implements Serializable {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
-        this.motDePasse = motDePasse;
+        this.setMotDePasse(motDePasse);
         this.mail = mail;
         this.telephone = telephone;
         this.adresse = adresse;
@@ -115,6 +125,27 @@ public class ContactEntity implements Serializable {
         this.codePostal = codePostal;
         this.ville = ville;
         this.cedex = cedex;
+    }
+
+    /**
+     * On crypte le mot de passe
+     * @param motDePasse
+     */
+    public void setMotDePasse(String motDePasse) {
+
+        if (motDePasse == null || motDePasse.isEmpty() || motDePasse.isBlank()) {
+            throw new IllegalArgumentException("Le mot de passe ne doit pas être nulle ou vide");
+        }
+            this.motDePasse = passwordEncoder.encode(motDePasse);
+    }
+
+    /**
+     * Vérifie si le mot de passe passé en paramètre correspond au mot de passe
+     * @param motDePasse Mot de passe en clair
+     * @return Vrai si le mot de passe passé en paramètre correspond au mot de passe, Faux sinon
+     */
+    public boolean estLeMotDePasse(String motDePasse) {
+        return passwordEncoder.matches(motDePasse,this.motDePasse);
     }
 
     @Override
