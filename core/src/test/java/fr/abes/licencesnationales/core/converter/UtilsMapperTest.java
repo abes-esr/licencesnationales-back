@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.licencesnationales.core.converter.ip.IpEntityConverter;
+import fr.abes.licencesnationales.core.converter.editeur.EditeurEntityConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
 import fr.abes.licencesnationales.core.dto.ContactEditeurDto;
@@ -24,7 +24,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.modelmapper.MappingException;
 import org.modelmapper.spi.ErrorMessage;
@@ -39,7 +38,7 @@ import java.util.List;
 import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest(classes = {UtilsMapper.class, IpEntityConverter.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class})
+@SpringBootTest(classes = {UtilsMapper.class, Ipv4RangeConverter.class, Ipv6RangeConverter.class, EditeurEntityConverter.class})
 public class UtilsMapperTest {
     @Autowired
     private UtilsMapper utilsMapper;
@@ -59,7 +58,7 @@ public class UtilsMapperTest {
         List<String> groupesEtabRelies = new ArrayList<>();
         groupesEtabRelies.add("EPIC/EPST");
         groupesEtabRelies.add("Ecoles d'ingénieurs");
-        editeurCreeEvent.setTypesEtabs(groupesEtabRelies);
+        editeurCreeEvent.setGroupesEtabRelies(groupesEtabRelies);
 
         ContactCommercialEditeurEntity contactComm = new ContactCommercialEditeurEntity("nomCCA", "prenomCCA", "mail@CCA.com");
         Set<ContactCommercialEditeurEntity> setComm = new HashSet<>();
@@ -154,116 +153,5 @@ public class UtilsMapperTest {
         return ("mail@CTA.com".equals(s) || "mail@CTB.com".equals(s));
     }
 
-    @Test
-    @DisplayName("test mapper établissement modifié")
-    void testMapperEtablissementModifieEvent() {
-        EtablissementModifieEventEntity etablissementModifieEvent = new EtablissementModifieEventEntity(this, "123456789");
-        etablissementModifieEvent.setId(1);
-        etablissementModifieEvent.setNomContact("nomContactTest");
-        etablissementModifieEvent.setPrenomContact("prenomContactTest");
-        etablissementModifieEvent.setMailContact("mail@test.com");
-        etablissementModifieEvent.setTelephoneContact("0000000000");
-        etablissementModifieEvent.setAdresseContact("adresseTest");
-        etablissementModifieEvent.setBoitePostaleContact("BPTest");
-        etablissementModifieEvent.setCodePostalContact("00000");
-        etablissementModifieEvent.setVilleContact("villeTest");
-        etablissementModifieEvent.setCedexContact("cedexTest");
-
-        ContactEntity entity = utilsMapper.map(etablissementModifieEvent, ContactEntity.class);
-
-        Assertions.assertEquals(1, entity.getId().intValue());
-        Assertions.assertEquals("nomContactTest",entity.getNom());
-        Assertions.assertEquals("prenomContactTest", entity.getPrenom());
-        Assertions.assertEquals("mail@test.com", entity.getMail());
-        Assertions.assertEquals("0000000000", entity.getTelephone());
-        Assertions.assertEquals("adresseTest", entity.getAdresse());
-        Assertions.assertEquals("BPTest", entity.getBoitePostale());
-        Assertions.assertEquals("00000", entity.getCodePostal());
-        Assertions.assertEquals("cedexTest", entity.getCedex());
-        Assertions.assertEquals("villeTest", entity.getVille());
-    }
-
-    @Test
-    @DisplayName("test mapper etablissement créé")
-    void testMapperEtablissementEventCree() {
-        Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenReturn(java.util.Optional.of(new TypeEtablissementEntity(1, "testType")));
-        EtablissementCreeEventEntity etablissementCreeEvent = new EtablissementCreeEventEntity(this);
-
-        etablissementCreeEvent.setNomEtab("testNom");
-        etablissementCreeEvent.setTypeEtablissement("testType");
-        etablissementCreeEvent.setSiren("123456789");
-        etablissementCreeEvent.setIdAbes("1234");
-        etablissementCreeEvent.setNomContact("nomContactTest");
-        etablissementCreeEvent.setPrenomContact("prenomContactTest");
-        etablissementCreeEvent.setMailContact("mail@test.com");
-        etablissementCreeEvent.setMotDePasse("passwordtest");
-        etablissementCreeEvent.setTelephoneContact("0000000000");
-        etablissementCreeEvent.setAdresseContact("adresseTest");
-        etablissementCreeEvent.setBoitePostaleContact("BPTest");
-        etablissementCreeEvent.setCodePostalContact("00000");
-        etablissementCreeEvent.setCedexContact("cedexTest");
-        etablissementCreeEvent.setVilleContact("villeTest");
-        etablissementCreeEvent.setRoleContact("roleTest");
-
-        EtablissementEntity entity = utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class);
-
-        Assertions.assertEquals("testType", entity.getTypeEtablissement().getLibelle());
-        Assertions.assertEquals("123456789", entity.getSiren());
-        Assertions.assertEquals("1234", entity.getIdAbes());
-        Assertions.assertEquals("nomContactTest",entity.getContact().getNom());
-        Assertions.assertEquals("prenomContactTest", entity.getContact().getPrenom());
-        Assertions.assertEquals("passwordtest", entity.getContact().getMotDePasse());
-        Assertions.assertEquals("mail@test.com", entity.getContact().getMail());
-        Assertions.assertEquals("0000000000", entity.getContact().getTelephone());
-        Assertions.assertEquals("adresseTest", entity.getContact().getAdresse());
-        Assertions.assertEquals("BPTest", entity.getContact().getBoitePostale());
-        Assertions.assertEquals("00000", entity.getContact().getCodePostal());
-        Assertions.assertEquals("cedexTest", entity.getContact().getCedex());
-        Assertions.assertEquals("villeTest", entity.getContact().getVille());
-        Assertions.assertEquals("roleTest", entity.getContact().getRole());
-        Assertions.assertEquals("testNom", entity.getName());
-    }
-
-    @Test
-    @DisplayName("test mapper etablissement créé avec type inconnu")
-    void testMapperEtablissementEventCreeWithUnknownType() {
-        Mockito.when(repository.findFirstByLibelle(Mockito.anyString())).thenThrow(new MappingException(Lists.newArrayList(new ErrorMessage("Type d'établissement inconnu"))));
-        EtablissementCreeEventEntity etablissementCreeEvent = new EtablissementCreeEventEntity(this);
-
-        etablissementCreeEvent.setNomEtab("testNom");
-        etablissementCreeEvent.setTypeEtablissement("testType");
-        etablissementCreeEvent.setSiren("123456789");
-        etablissementCreeEvent.setIdAbes("1234");
-        etablissementCreeEvent.setNomContact("nomContactTest");
-        etablissementCreeEvent.setPrenomContact("prenomContactTest");
-        etablissementCreeEvent.setMailContact("mail@test.com");
-        etablissementCreeEvent.setMotDePasse("passwordtest");
-        etablissementCreeEvent.setTelephoneContact("0000000000");
-        etablissementCreeEvent.setAdresseContact("adresseTest");
-        etablissementCreeEvent.setBoitePostaleContact("BPTest");
-        etablissementCreeEvent.setCodePostalContact("00000");
-        etablissementCreeEvent.setCedexContact("cedexTest");
-        etablissementCreeEvent.setVilleContact("villeTest");
-        etablissementCreeEvent.setRoleContact("roleTest");
-
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissementCreeEvent, EtablissementEntity.class));
-
-    }
-
-    @Test
-    @DisplayName("test mapper IP créée")
-    void testMapperIpEventCree() {
-        IpCreeEventEntity ip = new IpCreeEventEntity(this);
-        ip.setSiren("123456789");
-        ip.setTypeIp(IpType.IPV4);
-        ip.setTypeAcces("ip");
-        ip.setIp("200.200.200.200");
-
-        IpEntity ipEntity = utilsMapper.map(ip, IpEntity.class);
-
-        Assertions.assertEquals(ipEntity.getClass(), IpV4.class);
-        Assertions.assertEquals("123456789", ip.getSiren());
-
-    }
 
 }

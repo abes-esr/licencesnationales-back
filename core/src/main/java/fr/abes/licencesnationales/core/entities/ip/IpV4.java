@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.core.entities.ip;
 import com.github.jgonian.ipmath.Ipv4;
 import com.github.jgonian.ipmath.Ipv4Range;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.utils.IpUtils;
 import lombok.Getter;
@@ -26,10 +27,12 @@ import java.util.List;
 public class IpV4 extends IpEntity implements Serializable {
 
     public static final List<Ipv4Range> reservedRange = Arrays.asList(
-            Ipv4Range.from("10.0.0.0").to("10.255.255.254"),
-            Ipv4Range.from("192.168.0.0").to("192.168.254.254"),
-            Ipv4Range.from("172.0.0.0").to("172.31.254.254"),
-            Ipv4Range.from("127.0.0.1").to("127.0.0.1"));
+            Ipv4Range.from("10.0.0.0").to("10.255.255.255"),
+            Ipv4Range.from("192.168.0.0").to("192.168.255.255"),
+            Ipv4Range.from("172.16.0.0").to("172.31.255.255"),
+            Ipv4Range.from("127.0.0.1").to("127.0.0.1"),
+            Ipv4Range.from("0.0.0.0").to("0.0.0.0"),
+            Ipv4Range.from("255.255.255.255").to("255.255.255.255"));
 
 
     @Convert(converter = Ipv4RangeConverter.class)
@@ -44,8 +47,8 @@ public class IpV4 extends IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpV4(String ip, String commentaires) throws IpException {
-        super(ip, commentaires);
+    public IpV4(String ip, String commentaires, StatutIpEntity statut) throws IpException {
+        super(ip, commentaires, statut);
         // On transforme la chaîne de caractère normée en Objet Java
         this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
         this.checkIfReserved();
@@ -60,8 +63,8 @@ public class IpV4 extends IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpV4(Integer id, String ip, String commentaires) throws IpException {
-        super(id, ip, commentaires);
+    public IpV4(Integer id, String ip, String commentaires, StatutIpEntity statut) throws IpException {
+        super(id, ip, commentaires, statut);
         // On transforme la chaîne de caractère normée en Objet Java
         this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
         this.checkIfReserved();

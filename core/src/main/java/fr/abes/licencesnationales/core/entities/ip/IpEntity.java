@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
@@ -17,7 +16,6 @@ import java.util.Date;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(discriminatorType = DiscriminatorType.INTEGER,
         columnDefinition = "SMALLINT")
-@DiscriminatorValue("1")
 @Table(name = "Ip")
 @NoArgsConstructor
 @Getter
@@ -59,6 +57,7 @@ public abstract class IpEntity implements Serializable {
     @JoinColumn(name = "ref_statut")
     private StatutIpEntity statut;
 
+
     /**
      * CTOR d'une IP générique sans identifiant connu
      *
@@ -67,11 +66,11 @@ public abstract class IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpEntity(String ip, String commentaires) throws IpException {
+    public IpEntity(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         if (ip == null || ip.isEmpty()) {
             throw new IpException("Ip ne peut pas être nulle");
         }
-
+        this.statut = statut;
         this.ip = ip;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
@@ -86,14 +85,14 @@ public abstract class IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpEntity(Integer id, String ip, String commentaires) throws IpException {
+    public IpEntity(Integer id, String ip, String commentaires, StatutIpEntity statut) throws IpException {
 
         this.id = id;
 
         if (ip.isEmpty()) {
             throw new IpException("Ip ne peut pas être nulle");
         }
-
+        this.statut = statut;
         this.ip = ip;
         this.dateCreation = new Date();
         this.commentaires = commentaires;
