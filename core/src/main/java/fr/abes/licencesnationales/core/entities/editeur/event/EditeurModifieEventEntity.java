@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Getter @Setter
 public class EditeurModifieEventEntity extends EditeurEventEntity {
-    public EditeurModifieEventEntity(Object source, Integer id, List<String> typeEtab) {
+    public EditeurModifieEventEntity(Object source, Integer id) {
         super(source);
         this.id = id;
     }

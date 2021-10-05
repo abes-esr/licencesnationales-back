@@ -71,7 +71,7 @@ public class IpController {
         List<String> errors = new ArrayList<>();
         filtrerAccesServices.autoriserServicesParSiren(siren);
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
-        String etab = etablissementService.getFirstBySiren(siren).getName();
+        String etab = etablissementService.getFirstBySiren(siren).getNom();
         dto.forEach(e -> {
             IpCreeEventEntity ipAjouteeEvent = mapper.map(e, IpCreeEventEntity.class);
             ipAjouteeEvent.setSource(this);

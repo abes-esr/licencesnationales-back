@@ -269,7 +269,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @Test
     @DisplayName("test suppression Etablissement")
     @WithMockUser(authorities = {"admin"})
-    void testSuppressionEtablissement() {
+    void testSuppressionEtablissement() throws Exception {
         MotifSuppressionWebDto motif = new MotifSuppressionWebDto();
         motif.setMotif("Motif suppression");
 
@@ -278,10 +278,16 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         String mail = "mail2@test.com";
         ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", mail, "mdp2");
         EtablissementEntity etab = new EtablissementEntity(1, nomEtab, "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
-        Mockito.doNothing().when(emailService).constructSuppressionMail(motif.getMotif(), etab.getName(), etab.getContact().getMail());
+        Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+        Mockito.doNothing().when(emailService).constructSuppressionMail(motif.getMotif(), etab.getNom(), etab.getContact().getMail());
+
+        this.mockMvc.perform(delete("/v1/etablissements/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(motif)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -317,6 +323,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
 
         mockMvc.perform(get("/v1/etablissements/123456789")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))

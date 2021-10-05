@@ -1,24 +1,17 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 
 import java.util.Iterator;
 import java.util.List;
@@ -33,14 +26,7 @@ public class EtablissementService {
     @Autowired
     private ContactRepository contactEtablissementDao;
 
-    @Autowired
-    private ContactCommercialEditeurRepository contactCommercialEditeurDao;
 
-    @Autowired
-    private ContactTechniqueEditeurRepository contactTechniqueEditeurDao;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private StatutRepository statutRepository;
@@ -65,9 +51,9 @@ public class EtablissementService {
         etablissementDao.save(entity);
     }
 
-    public void saveAll(List<EtablissementEntity> entities) throws MailDoublonException, SirenExistException {
+    public void saveAll(Set<EtablissementEntity> entities) throws MailDoublonException, SirenExistException {
 
-        Iterator<EtablissementEntity> iter = entities.listIterator();
+        Iterator<EtablissementEntity> iter = entities.iterator();
         while (iter.hasNext()) {
             this.save(iter.next());
         }
@@ -91,20 +77,6 @@ public class EtablissementService {
     }
 
     public EtablissementEntity getUserByMail(String mail) {
-        return etablissementDao.getUserByMail(mail).orElseThrow(() -> new UnknownEtablissementException("Mail : " + mail));
-    }
-
-    public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> commercialSet, Set<ContactTechniqueEditeurEntity> techniqueSet) {
-        for (ContactCommercialEditeurEntity contact : commercialSet){
-            if(contactCommercialEditeurDao.findByMailContact(contact.getMailContact()).isPresent()) {
-                return true;
-            }
-        }
-        for (ContactTechniqueEditeurEntity contact : techniqueSet){
-            if(contactTechniqueEditeurDao.findByMailContact(contact.getMailContact()).isPresent()) {
-                return true;
-            }
-        }
-        return false;
+        return etablissementDao.getUserByMail(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
     }
 }

@@ -20,7 +20,7 @@ public class MockUserUtilTest {
     public EtablissementEntity getMockUser() {
         EtablissementEntity user = new EtablissementEntity();
         user.setId(1);
-        user.setName("test");
+        user.setNom("test");
         user.setIdAbes("123456789");
         user.setDateCreation(new Date());
         user.setSiren("123456789");

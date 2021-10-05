@@ -1,42 +1,47 @@
 package fr.abes.licencesnationales.web.dto.editeur;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class
-EditeurWebDto {
+public class EditeurWebDto {
 
-    @JsonProperty("idEditeur")
-    private Long idEditeur;
+    @JsonProperty("nom")
+    private String nom;
 
-    @JsonProperty("nomEditeur")
-    private String nomEditeur;
+    @JsonProperty("id")
+    private Integer id;
 
-    @JsonProperty("identifiantEditeur")
-    private String identifiantEditeur;
+    @JsonProperty("identifiantBis")
+    private String identifiant;
 
-    @JsonProperty("groupesEtabRelies")
-    private List<String> groupesEtabRelies;
+    @JsonProperty("typesEtablissements")
+    private List<String> typesEtablissements = new ArrayList<>();
 
-    @JsonProperty("adresseEditeur")
-    private String adresseEditeur;
+    @JsonProperty("adresse")
+    private String adresse;
 
-    @JsonProperty("listeContactCommercialEditeurDTO")
-    public Set<ContactCommercialEditeurWebDto> listeContactCommercialEditeurWebDto;
+    private String dateCreation;
 
-    @JsonProperty("listeContactTechniqueEditeurDTO")
-    public Set<ContactTechniqueEditeurWebDto> listeContactTechniqueEditeurWebDto;
-    
-    public Date dateCreation = new Date();
+    @JsonProperty("contactsCommerciaux")
+    private List<ContactEditeurWebDto> contactsCommerciaux = new ArrayList<>();
 
+    @JsonProperty("contactsTechniques")
+    private List<ContactEditeurWebDto> contactsTechniques = new ArrayList<>();
+
+
+    public void ajouterTypeEtablissement(String type) {
+        this.typesEtablissements.add(type);
+    }
+
+    public void ajouterContactCommercial(ContactEditeurWebDto dto) {
+        this.contactsCommerciaux.add(dto);
+    }
+
+    public void ajouterContactTechnique(ContactEditeurWebDto dto) {
+        this.contactsTechniques.add(dto);
+    }
 }

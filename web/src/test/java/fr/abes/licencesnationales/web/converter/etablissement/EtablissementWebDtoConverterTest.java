@@ -40,6 +40,7 @@ public class EtablissementWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
 
+
     @Test
     @DisplayName("Test success converter EtablissementCreeWebDto / EtablissementCreeEvent")
     public void testSuccessConverterEtabCreeWebDto() {
@@ -285,8 +286,8 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("0000000000", event.getTelephoneContact());
         Assertions.assertEquals("test@test.com", event.getMailContact());
         Assertions.assertEquals(2, event.getSirenAnciensEtablissements().size());
-        Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().get(0));
-        Assertions.assertEquals("987654321", event.getSirenAnciensEtablissements().get(1));
+        Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().stream().findFirst().get());
+        Assertions.assertEquals("987654321", event.getSirenAnciensEtablissements().stream().findFirst().get());
     }
 
     @Test

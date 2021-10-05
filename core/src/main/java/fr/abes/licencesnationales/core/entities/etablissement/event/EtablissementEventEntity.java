@@ -11,8 +11,7 @@ import java.io.Serializable;
 @Table(name = "EtablissementEvent")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "event", columnDefinition = "varchar(20)", discriminatorType = DiscriminatorType.STRING)
-@Getter
-@Setter
+@Getter @Setter
 public abstract class EtablissementEventEntity extends EventEntity implements Serializable {
 
     @Id
