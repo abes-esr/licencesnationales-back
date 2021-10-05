@@ -9,11 +9,14 @@ import javax.persistence.Entity;
 import java.io.Serializable;
 
 @Entity
-@NoArgsConstructor
 @Getter
 @Setter
 @DiscriminatorValue("commercial")
 public class ContactCommercialEditeurEntity extends ContactEditeurEntity implements Serializable {
+    @Deprecated
+    public ContactCommercialEditeurEntity() {
+        super();
+    }
 
     /**
      * CTOR d'un contact commercial sans identifiant
@@ -53,8 +56,8 @@ public class ContactCommercialEditeurEntity extends ContactEditeurEntity impleme
         }
 
         return (id != null && id.equals(((ContactCommercialEditeurEntity) obj).id)) ||
-                (id == null && nomContact.equals(((ContactCommercialEditeurEntity) obj).nomContact)
-                        && prenomContact.equals(((ContactCommercialEditeurEntity) obj).prenomContact));
+                (id == null && nom.equals(((ContactCommercialEditeurEntity) obj).nom)
+                        && prenom.equals(((ContactCommercialEditeurEntity) obj).prenom));
     }
 
     @Override
@@ -64,6 +67,6 @@ public class ContactCommercialEditeurEntity extends ContactEditeurEntity impleme
 
     @Override
     public String toString() {
-        return "ContactCommercialEditeurEntity {" + "id=" + id + ", nom=" + nomContact + ", prénom=" + prenomContact + " }";
+        return "ContactCommercialEditeurEntity {" + "id=" + id + ", nom=" + nom + ", prénom=" + prenom + " }";
     }
 }

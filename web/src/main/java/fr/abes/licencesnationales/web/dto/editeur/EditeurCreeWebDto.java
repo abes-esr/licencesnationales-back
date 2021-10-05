@@ -13,22 +13,21 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EditeurCreeWebDto  {
+    @JsonProperty("nom")
+    private String nom;
 
-    @JsonProperty("nomEditeur")
-    private String nomEditeur;
+    @JsonProperty("identifiantBis")
+    private String identifiantBis;
 
-    @JsonProperty("identifiantEditeur")
-    private String identifiantEditeur;
+    @JsonProperty("typesEtablissements")
+    private List<String> typesEtablissements;
 
-    @JsonProperty("groupesEtabRelies")
-    private List<String> groupesEtabRelies;
+    @JsonProperty("adresse")
+    private String adresse;
 
-    @JsonProperty("adresseEditeur")
-    private String adresseEditeur;
+    @JsonProperty("contactsCommerciaux")
+    public Set<ContactEditeurWebDto> contactsCommerciaux;
 
-    @JsonProperty("listeContactCommercialEditeurDTO")
-    public Set<ContactCommercialEditeurWebDto> listeContactCommercialEditeur;
-
-    @JsonProperty("listeContactTechniqueEditeurDTO")
-    public Set<ContactTechniqueEditeurWebDto> listeContactTechniqueEditeur;
+    @JsonProperty("contactsTechniques")
+    public Set<ContactEditeurWebDto> contactsTechniques;
 }

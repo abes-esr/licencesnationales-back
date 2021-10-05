@@ -29,7 +29,7 @@ public class UserDetailsImpl implements UserDetails {
     public UserDetailsImpl(EtablissementEntity user) {
         this.id = user.getId();
         this.siren = user.getSiren();
-        this.nameEtab = user.getName();
+        this.nameEtab = user.getNom();
         this.password = user.getContact().getMotDePasse();
         this.email = user.getContact().getMail();
         this.authorities.add(new SimpleGrantedAuthority(user.getContact().getRole()));

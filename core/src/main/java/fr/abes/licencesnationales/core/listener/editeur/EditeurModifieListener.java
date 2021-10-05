@@ -13,16 +13,15 @@ public class EditeurModifieListener implements ApplicationListener<EditeurModifi
 
     private final EditeurRepository editeurRepository;
 
-    private final UtilsMapper utilsMapper;
-
     public EditeurModifieListener(EditeurRepository editeurRepository, UtilsMapper utilsMapper) {
         this.editeurRepository = editeurRepository;
-        this.utilsMapper = utilsMapper;
     }
 
     @Override
-    public void onApplicationEvent(EditeurModifieEventEntity editeurModifieEvent) {
-        EditeurEntity editeurEntity = utilsMapper.map(editeurModifieEvent, EditeurEntity.class);
-        editeurRepository.save(editeurEntity);
+    public void onApplicationEvent(EditeurModifieEventEntity event) {
+        EditeurEntity editeur = new EditeurEntity(event.getId(), event.getNom(), event.getIdentifiant(), event.getAdresse(), event.getTypesEtabs());
+        editeur.ajouterContactsTechniques(event.getContactsTechniques());
+        editeur.ajouterContactsCommerciaux(event.getContactsCommerciaux());
+        editeurRepository.save(editeur);
     }
 }

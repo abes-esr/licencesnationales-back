@@ -10,12 +10,14 @@ import java.io.Serializable;
 
 
 @Entity
-@NoArgsConstructor
 @Getter
 @Setter
 @DiscriminatorValue("technique")
 public class ContactTechniqueEditeurEntity extends ContactEditeurEntity implements Serializable {
-
+    @Deprecated
+    public ContactTechniqueEditeurEntity() {
+        super();
+    }
     /**
      * CTOR d'un contact technique sans identifiant
      *
@@ -54,8 +56,8 @@ public class ContactTechniqueEditeurEntity extends ContactEditeurEntity implemen
         }
 
         return (id != null && id.equals(((ContactTechniqueEditeurEntity) obj).id)) ||
-                (id == null && nomContact.equals(((ContactTechniqueEditeurEntity) obj).nomContact)
-                        && prenomContact.equals(((ContactTechniqueEditeurEntity) obj).prenomContact));
+                (id == null && nom.equals(((ContactTechniqueEditeurEntity) obj).nom)
+                        && prenom.equals(((ContactTechniqueEditeurEntity) obj).prenom));
     }
 
     @Override
@@ -65,6 +67,6 @@ public class ContactTechniqueEditeurEntity extends ContactEditeurEntity implemen
 
     @Override
     public String toString() {
-        return "ContactTechniqueEditeurEntity {" + "id=" + id + ", nom=" + nomContact + ", prénom=" + prenomContact + " }";
+        return "ContactTechniqueEditeurEntity {" + "id=" + id + ", nom=" + nom + ", prénom=" + prenom + " }";
     }
 }

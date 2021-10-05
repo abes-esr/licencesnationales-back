@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.converter.etablissement;
 
+import com.google.common.collect.Sets;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -15,6 +16,7 @@ import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import lombok.SneakyThrows;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
+import org.modelmapper.internal.util.Lists;
 import org.modelmapper.spi.ErrorMessage;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,7 +91,7 @@ public class EtablissementWebDtoConverter {
 
                 try {
                     EtablissementModifieAdminWebDto source = context.getSource();
-                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
+                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this, source.getSiren());
 
                     // Nom
                     if (source.getNom() == null) {
@@ -130,7 +132,7 @@ public class EtablissementWebDtoConverter {
                 try {
                     EtablissementModifieUserWebDto source = context.getSource();
 
-                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this,source.getSiren());
+                    EtablissementModifieEventEntity event = new EtablissementModifieEventEntity(this, source.getSiren());
 
                     // Pour le contact
                     if (source.getContact() == null) {
@@ -204,27 +206,31 @@ public class EtablissementWebDtoConverter {
         Converter<EtablissementFusionneWebDto, EtablissementFusionneEventEntity> myConverter = new Converter<EtablissementFusionneWebDto, EtablissementFusionneEventEntity>() {
             @SneakyThrows
             public EtablissementFusionneEventEntity convert(MappingContext<EtablissementFusionneWebDto, EtablissementFusionneEventEntity> context) {
-                EtablissementFusionneWebDto source = context.getSource();
-                if (source.getSirenFusionnes().size() < 2) {
-                    throw new IllegalArgumentException("La fusion doit porter sur au moins 2 établissements");
-                }
-                if (source.getNouveauEtab().getSiren() == null) {
-                    throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
-                }
-                EtablissementFusionneEventEntity event = new EtablissementFusionneEventEntity(this, source.getNouveauEtab().getSiren(), source.getSirenFusionnes());
-                if (source.getNouveauEtab().getNom() == null) {
-                    throw new IllegalArgumentException("Le champ 'nom' est obligatoire");
-                }
-                event.setNomEtab(source.getNouveauEtab().getNom());
-                event.setTypeEtablissement(source.getNouveauEtab().getTypeEtablissement());
+                try {
+                    EtablissementFusionneWebDto source = context.getSource();
+                    if (source.getSirenFusionnes().size() < 2) {
+                        throw new IllegalArgumentException("La fusion doit porter sur au moins 2 établissements");
+                    }
+                    if (source.getNouveauEtab().getSiren() == null) {
+                        throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                    }
+                    EtablissementFusionneEventEntity event = new EtablissementFusionneEventEntity(this, source.getNouveauEtab().getSiren(), Sets.newHashSet(source.getSirenFusionnes()));
+                    if (source.getNouveauEtab().getNom() == null) {
+                        throw new IllegalArgumentException("Le champ 'nom' est obligatoire");
+                    }
+                    event.setNomEtab(source.getNouveauEtab().getNom());
+                    event.setTypeEtablissement(source.getNouveauEtab().getTypeEtablissement());
 
-                // Pour le contact
-                if (source.getNouveauEtab().getContact() == null) {
-                    throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
-                }
+                    // Pour le contact
+                    if (source.getNouveauEtab().getContact() == null) {
+                        throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                    }
 
-                setContact(source.getNouveauEtab().getContact(), event);
-                return event;
+                    setContact(source.getNouveauEtab().getContact(), event);
+                    return event;
+                } catch (IllegalArgumentException ex) {
+                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+                }
             }
         };
         utilsMapper.addConverter(myConverter);
@@ -250,7 +256,7 @@ public class EtablissementWebDtoConverter {
                     EtablissementEntity etablissement = new EtablissementEntity(e.getNom(), e.getSiren(), contact);
                     listeEtab.add(etablissement);
                 });
-                etablissementDiviseEvent.setEtablissementDivises(listeEtab);
+                etablissementDiviseEvent.setEtablissementDivises(Sets.newHashSet(listeEtab));
                 return etablissementDiviseEvent;
             }
         };
@@ -285,7 +291,7 @@ public class EtablissementWebDtoConverter {
 
                 EtablissementAdminWebDto dto = new EtablissementAdminWebDto();
                 dto.setId(source.getId());
-                dto.setName(source.getName());
+                dto.setName(source.getNom());
                 dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
                 dto.setSiren(source.getSiren());
                 dto.setIdAbes(source.getIdAbes());

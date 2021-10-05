@@ -97,7 +97,7 @@ public class IpServiceTest {
 
         Assertions.assertEquals(etabIn.getSiren(), ipService.getEtablissementByIp(1).getSiren());
         Assertions.assertEquals(etabIn.getTypeEtablissement().getLibelle(), ipService.getEtablissementByIp(1).getTypeEtablissement().getLibelle());
-        Assertions.assertEquals(etabIn.getName(), ipService.getEtablissementByIp(1).getName());
+        Assertions.assertEquals(etabIn.getNom(), ipService.getEtablissementByIp(1).getNom());
 
         ip.setEtablissement(null);
         Assertions.assertThrows(UnknownEtablissementException.class, () -> ipService.getEtablissementByIp(1));

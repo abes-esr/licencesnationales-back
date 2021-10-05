@@ -8,9 +8,6 @@ import fr.abes.licencesnationales.web.dto.etablissement.modification.Etablisseme
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Représente un exemplaire de Notice au format JSON de l'API
- */
 @Getter @Setter
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "role", defaultImpl = java.lang.Void.class)
 @JsonSubTypes({@JsonSubTypes.Type(value = EtablissementAdminWebDto.class, name = "admin"),

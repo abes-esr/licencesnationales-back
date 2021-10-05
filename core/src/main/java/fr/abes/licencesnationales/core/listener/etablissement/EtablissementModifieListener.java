@@ -34,7 +34,7 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
 
         // Nom
         if(event.getNomEtab() != null)
-            etab.setName(event.getNomEtab());
+            etab.setNom(event.getNomEtab());
 
         // Type d'établissement
         if(event.getTypeEtablissement() != null)
