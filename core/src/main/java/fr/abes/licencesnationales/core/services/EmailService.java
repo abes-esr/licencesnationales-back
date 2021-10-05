@@ -108,7 +108,7 @@ public class EmailService {
         restTemplate.getMessageConverters()
                 .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
 
-        restTemplate.postForObject(baseURL + "htmlMail/", entity, String.class);
+        restTemplate.postForObject(baseURL + "/htmlMail/", entity, String.class);
     }
 
 
