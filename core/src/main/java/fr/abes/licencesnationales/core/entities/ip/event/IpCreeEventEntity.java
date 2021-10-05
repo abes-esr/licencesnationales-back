@@ -14,13 +14,17 @@ import java.util.Date;
 @DiscriminatorValue("cree")
 @Getter @Setter
 public class IpCreeEventEntity extends IpEventEntity {
-    private Date dateModification;
     private String typeAcces;
     private IpType typeIp;
     private String commentaires;
 
     public IpCreeEventEntity(Object source) {
         super(source);
+    }
+
+    public IpCreeEventEntity(Object source, String ip, String commentaires) {
+        super(source, ip);
+        this.commentaires = commentaires;
     }
 
 }

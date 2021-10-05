@@ -118,10 +118,14 @@ public class EtablissementEntity implements Serializable {
     }
 
     public void ajouterIp(IpEntity ip) {
+        ip.setEtablissement(this);
         this.ips.add(ip);
     }
 
-    public void ajouterIps(Set<IpEntity> ips) { this.ips.addAll(ips); }
+    public void ajouterIps(Set<IpEntity> ips) {
+        ips.forEach(ip -> ip.setEtablissement(this));
+        this.ips.addAll(ips);
+    }
 
     @Override
     public boolean equals(Object obj) {
@@ -147,6 +151,6 @@ public class EtablissementEntity implements Serializable {
 
     @Override
     public String toString() {
-        return "EtablissementEntity {" + "id=" + id + ", nom=" + name + ", SIRENE=" + siren + ", type=" + typeEtablissement + " }";
+        return "EtablissementEntity {" + "id=" + id + ", nom=" + name + ", SIREN=" + siren + ", type=" + typeEtablissement + " }";
     }
 }

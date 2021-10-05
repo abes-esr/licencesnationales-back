@@ -5,16 +5,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.scission.EtablissementDiviseWebDto;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.recaptcha.ReCaptchaResponse;
@@ -186,6 +189,7 @@ public class EtablissementController {
 
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
+
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
         UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {

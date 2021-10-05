@@ -94,14 +94,6 @@ public class EtablissementService {
         return etablissementDao.getUserByMail(mail).orElseThrow(() -> new UnknownEtablissementException("Mail : " + mail));
     }
 
-    public void changePasswordFromSiren(String siren, String password) throws RestClientException {
-        String mdphash = passwordEncoder.encode(password);
-        EtablissementEntity e = getFirstBySiren(siren);
-        ContactEntity c = e.getContact();
-        c.setMotDePasse(mdphash);
-        etablissementDao.save(e);
-    }
-
     public boolean checkDoublonMail(Set<ContactCommercialEditeurEntity> commercialSet, Set<ContactTechniqueEditeurEntity> techniqueSet) {
         for (ContactCommercialEditeurEntity contact : commercialSet){
             if(contactCommercialEditeurDao.findByMailContact(contact.getMailContact()).isPresent()) {

@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.core.entities.ip;
 import com.github.jgonian.ipmath.Ipv6;
 import com.github.jgonian.ipmath.Ipv6Range;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.utils.IpUtils;
 import lombok.Getter;
@@ -39,8 +40,8 @@ public class IpV6 extends IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpV6(String ip, String commentaires) throws IpException {
-        super(ip, commentaires);
+    public IpV6(String ip, String commentaires, StatutIpEntity statut) throws IpException {
+        super(ip, commentaires, statut);
         // On transforme la chaîne de caractère normée en Objet Java
         this.ipRange = Ipv6Range.from(IpUtils.getIP(ip, IpType.IPV6, 1)).to(IpUtils.getIP(ip, IpType.IPV6, 2));
         this.checkIfReserved();
@@ -55,8 +56,8 @@ public class IpV6 extends IpEntity implements Serializable {
      * @param commentaires Commentaire libre
      * @throws IpException Si l'IP ne peut pas être décodée ou si elle ne respecte pas les contraintes réseaux
      */
-    public IpV6(Integer id, String ip, String commentaires) throws IpException {
-        super(id, ip, commentaires);
+    public IpV6(Integer id, String ip, String commentaires, StatutIpEntity statut) throws IpException {
+        super(id, ip, commentaires, statut);
         // On transforme la chaîne de caractère normée en Objet Java
         this.ipRange = Ipv6Range.from(IpUtils.getIP(ip, IpType.IPV6, 1)).to(IpUtils.getIP(ip, IpType.IPV6, 2));
         this.checkIfReserved();

@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.web.dto.etablissement;
+package fr.abes.licencesnationales.web.dto.etablissement.modification;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
