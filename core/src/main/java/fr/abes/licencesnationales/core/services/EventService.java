@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
@@ -33,6 +34,8 @@ public class EventService {
         if (event instanceof EtablissementEventEntity) {
             if (event instanceof EtablissementFusionneEventEntity) {
                 ((EtablissementFusionneEventEntity) event).setAnciensEtablissementsInBdd(mapper.writeValueAsString(((EtablissementFusionneEventEntity) event).getSirenAnciensEtablissements()));
+            } else if (event instanceof EtablissementDiviseEventEntity) {
+                ((EtablissementDiviseEventEntity) event).setEtablisementsDivisesInBdd(mapper.writeValueAsString(((EtablissementDiviseEventEntity) event).getEtablissementDivises()));
             }
             etablissementDao.save((EtablissementEventEntity)event);
         } else  if (event instanceof EditeurEventEntity) {

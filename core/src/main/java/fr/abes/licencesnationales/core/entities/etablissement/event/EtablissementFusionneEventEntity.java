@@ -1,16 +1,12 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,10 +25,6 @@ public class EtablissementFusionneEventEntity  extends EtablissementEventEntity 
         super();
     }
 
-    public EtablissementFusionneEventEntity(Object source, String siren) {
-        super(source);
-        this.siren = siren;
-    }
 
     public EtablissementFusionneEventEntity(Object source, String siren, Set<String> sirenAnciensEtablissements) {
         super(source);

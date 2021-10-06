@@ -52,9 +52,6 @@ public class EtablissementController {
     private UtilsMapper mapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private EventService eventService;
 
     @Autowired
@@ -109,7 +106,7 @@ public class EtablissementController {
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
-        event.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
+        //event.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
 
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);
@@ -137,7 +134,7 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
+    public void fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEventEntity event = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
         event.setSource(this);
         // On genère un identifiant Abes
@@ -150,7 +147,7 @@ public class EtablissementController {
 
     @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void scission(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
+    public void scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
         StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
         //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe

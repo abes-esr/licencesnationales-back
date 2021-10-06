@@ -8,32 +8,26 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.Column;
-import javax.persistence.DiscriminatorValue;
-import javax.persistence.Entity;
-import javax.persistence.Lob;
+import javax.persistence.*;
 import java.util.List;
 import java.util.Set;
 
 @Entity
 @DiscriminatorValue("divise")
 @NoArgsConstructor
+@Getter @Setter
 public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
 
     @Column(name = "ANCIEN_SIREN")
-    @Getter @Setter
     private String ancienSiren;
 
-    @Getter
+    @Transient
     private transient Set<EtablissementEntity> etablissementDivises;
 
     //on empêche l'accès à cet attribut qui sera automatiquement mis à jour lors d'une mise à jour du set en transcient
     @Lob
     @Column(name = "ETABLISSEMENTS_DIVISE")
     private String etablisementsDivisesInBdd;
-
-    @Autowired
-    private ObjectMapper mapper;
 
     public EtablissementDiviseEventEntity(Object source, String ancienSiren) {
         super(source);
@@ -45,9 +39,8 @@ public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
      * @param entities
      * @throws JsonProcessingException
      */
-    public void setEtablissementDivises(Set<EtablissementEntity> entities) throws JsonProcessingException {
+    public void setEtablissementDivises(Set<EtablissementEntity> entities) {
         this.etablissementDivises = entities;
-        this.etablisementsDivisesInBdd = mapper.writeValueAsString(entities);
     }
 
     @Override

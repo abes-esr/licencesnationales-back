@@ -1,16 +1,11 @@
 package fr.abes.licencesnationales.core.entities.editeur.event;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.core.converter.contactediteur.ContactEditeurConverter;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -49,7 +44,6 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
 
     //on empêche l'accès à cet attribut qui sera automatiquement mis à jour lors d'une mise à jour du set en transcient
     @Lob
-    @Convert(converter = ContactEditeurConverter.class)
     @Column(name = "CONTACTS_COMMERCIAUX")
     private String contactsCommerciauxInBdd;
 
@@ -57,7 +51,6 @@ public class EditeurEventEntity extends EventEntity implements Serializable {
 
     //on empêche l'accès à cet attribut qui sera automatiquement mis à jour lors d'une mise à jour du set en transcient
     @Lob
-    @Convert(converter = ContactEditeurConverter.class)
     @Column(name = "CONTACTS_TECHNIQUES")
     private String contactsTechniquesInBdd;
 
