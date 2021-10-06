@@ -99,6 +99,16 @@ public class ContactEntity implements Serializable {
         this.cedex = cedex;
     }
 
+    public ContactEntity(String nom, String prenom, String adresse, String codePostal, String ville, String telephone, String mail, String motDePasse) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.adresse = adresse;
+        this.codePostal = codePostal;
+        this.ville = ville;
+        this.telephone = telephone;
+        this.mail = mail;
+        this.setMotDePasse(motDePasse);
+    }
     /**
      * CTOR d'un contact avec un identifiant et le rôle par défaut à 'etab'.
      *
