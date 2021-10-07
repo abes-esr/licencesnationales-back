@@ -1,8 +1,13 @@
 package fr.abes.licencesnationales.core.services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
@@ -22,11 +27,16 @@ public class EventService {
     @Autowired
     private IpEventRepository ipDao;
 
-    public void save(EventEntity event) {
+    @Autowired
+    private ObjectMapper mapper;
+
+    public void save(EventEntity event) throws JsonProcessingException {
         if (event instanceof EtablissementEventEntity) {
             etablissementDao.save((EtablissementEventEntity)event);
         } else  if (event instanceof EditeurEventEntity) {
             editeurDao.save((EditeurEventEntity)event);
+        } else if (event instanceof IpEventEntity) {
+            ipDao.save((IpEventEntity) event);
         }
     }
 }

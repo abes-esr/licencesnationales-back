@@ -1,61 +1,33 @@
 package fr.abes.licencesnationales.core.listener.editeur;
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactCommercialEditeurRepository;
-import fr.abes.licencesnationales.core.repository.contactediteur.ContactTechniqueEditeurRepository;
-import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
+import fr.abes.licencesnationales.core.services.EditeurService;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
-
-import java.util.Set;
 
 @Component
 @Slf4j
 public class EditeurCreeListener implements ApplicationListener<EditeurCreeEventEntity> {
 
-    private final EditeurRepository editeurRepository;
+    private final EditeurService service;
 
-    @Autowired
-    ContactCommercialEditeurRepository ccRepository;
-
-    @Autowired
-    ContactTechniqueEditeurRepository ctRepository;
-
-    private final UtilsMapper utilsMapper;
-
-    public EditeurCreeListener(EditeurRepository editeurRepository, UtilsMapper utilsMapper) {
-        this.editeurRepository = editeurRepository;
-        this.utilsMapper = utilsMapper;
+    public EditeurCreeListener(EditeurService service) {
+        this.service = service;
     }
 
+
+    @SneakyThrows
     @Override
-    public void onApplicationEvent(EditeurCreeEventEntity editeurCreeEvent) {
+    public void onApplicationEvent(EditeurCreeEventEntity event) {
+        EditeurEntity entity = new EditeurEntity(event.getNom(), event.getIdentifiant(), event.getAdresse(), event.getTypesEtabs());
 
-        log.debug("editeurCreeEvent.getCC" + editeurCreeEvent.getListeContactCommercialEditeur());
-        log.debug("editeurCreeEvent.getCT" + editeurCreeEvent.getListeContactTechniqueEditeur());
-        log.debug("editeurCreeEvent.getEditeur().getDateCreation()" + editeurCreeEvent.getDateCreationEvent());
+        entity.ajouterContactsCommerciaux(event.getContactsCommerciaux());
+        entity.ajouterContactsTechniques(event.getContactsTechniques());
 
-        EditeurEntity editeurEntity = utilsMapper.map(editeurCreeEvent, EditeurEntity.class);
-
-        Set<ContactCommercialEditeurEntity> CC = editeurEntity.getContactCommercialEditeurEntities();
-        Set<ContactTechniqueEditeurEntity> CT = editeurEntity.getContactTechniqueEditeurEntities();
-
-        for (ContactCommercialEditeurEntity C:CC) {
-            log.debug(" editeurEntity.getContactCommercialEditeurEntities() =  " + C.getMailContact() + C.getNomContact() + C.getPrenomContact());
-
-        }
-        for (ContactTechniqueEditeurEntity T:CT) {
-            log.debug(" editeurEntity.getContactTechniqueEditeurEntities() =  " + T.getMailContact() + T.getNomContact() + T.getPrenomContact());
-
-        }
-
-        editeurRepository.save(editeurEntity);
+        service.save(entity);
 
     }
 

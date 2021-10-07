@@ -18,11 +18,8 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
 
     Optional<EtablissementEntity> getFirstBySiren(String siren);
 
-    @Query(nativeQuery = true, value = "select case when exists(select * from Etablissement "
-            + "where siren = :siren) then 'true' else 'false' end from dual")
-    Boolean existeSiren(@Param("siren") String siren);
+    boolean existsBySiren(@Param("siren") String siren);
 
-    @Query("select e from EtablissementEntity e where e.contact.mail like :x")
-    Optional<EtablissementEntity> getUserByMail(@Param("x") String email);
+    Optional<EtablissementEntity> getEtablissementEntityByContact_MailContains(@Param("x") String email);
 
 }

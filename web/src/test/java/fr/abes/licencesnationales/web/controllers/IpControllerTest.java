@@ -1,8 +1,5 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -12,33 +9,26 @@ import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.IpException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
-import oracle.jdbc.driver.Const;
-import org.hamcrest.core.AnyOf;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.hamcrest.Matchers.oneOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(SpringExtension.class)
 public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
@@ -248,16 +238,69 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(ipService.getFirstById(3)).thenReturn(entity3);
 
         this.mockMvc.perform(post("/v1/ip/valider/")
-        .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    @DisplayName("test validation IP Utilisateur Etab")
+    @WithMockUser(authorities = {"etab"})
+    void testValiderIpWrongUser() throws Exception {
+        List<Integer> listIps = Arrays.asList(1, 2, 3);
+
+        this.mockMvc.perform(post("/v1/ip/valider/")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("test suppression IP sans auth")
+    void testValiderIpNoUser() throws Exception {
+        List<Integer> listIps = Arrays.asList(1, 2, 3);
+        this.mockMvc.perform(post("/v1/ip/valider/").content(mapper.writeValueAsString(listIps)))
+                .andExpect(status().isUnauthorized());
+    }
+
 
     @Test
     @DisplayName("test suppression IP")
     @WithMockUser(authorities = {"admin"})
     void testSupprimerIp() throws Exception {
+        StatutIpEntity statut = new StatutIpEntity(1, "Nouvelle IP");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+        ip.setEtablissement(etab);
+        Mockito.when(ipService.getFirstById(1)).thenReturn(ip);
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test suppression IP Inconnue")
+    @WithMockUser(authorities = {"admin"})
+    void testSupprimerIpInconnue() throws Exception {
+        Mockito.when(ipService.getFirstById(1)).thenThrow(new UnknownIpException("L'IP 1 n'existe pas"));
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        this.mockMvc.perform(delete("/v1/ip/1"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("IP inconnue"))
+                .andExpect(jsonPath("$.debugMessage").value("L'IP 1 n'existe pas"));
+    }
+
+    @Test
+    @DisplayName("test suppression IP Utilisateur Etab")
+    @WithMockUser(authorities = {"etab"})
+    void testSupprimerIpWrongUser() throws Exception {
+        this.mockMvc.perform(delete("/v1/ip/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("test suppression IP sans auth")
+    void testSupprimerIpNoUser() throws Exception {
+        this.mockMvc.perform(delete("/v1/ip/1"))
+                .andExpect(status().isUnauthorized());
     }
 }

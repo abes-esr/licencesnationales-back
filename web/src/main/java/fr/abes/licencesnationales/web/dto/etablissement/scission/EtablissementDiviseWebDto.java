@@ -12,6 +12,10 @@ import java.util.ArrayList;
 public class EtablissementDiviseWebDto {
     @JsonProperty("sirenScinde")
     private String sirenScinde;
-    @JsonProperty(value = "nouveauxEtab")
-    private ArrayList<EtablissementCreeSansCaptchaWebDto> nouveauxEtabs;
+    @JsonProperty(value = "nouveauxEtabs")
+    private ArrayList<EtablissementCreeSansCaptchaWebDto> nouveauxEtabs = new ArrayList<>();
+
+    public void ajouterNouvelEtab(EtablissementCreeSansCaptchaWebDto etab) {
+        this.nouveauxEtabs.add(etab);
+    }
 }

@@ -178,9 +178,15 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(UnknownEditeurException.class)
+    protected ResponseEntity<Object> handleUnknownIpException(UnknownEditeurException ex) {
+        String error = "Editeur inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     @ExceptionHandler(UnknownIpException.class)
     protected ResponseEntity<Object> handleUnknownIpException(UnknownIpException ex) {
-        String error = "IP Inconnue";
+        String error = "IP inconnue";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
@@ -215,7 +221,11 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
+        String message = "Erreur non répertoriée";
+        Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
+                .filter(element -> element.getCause() == null)
+                .findFirst();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, rootCause.get()));
     }
 
 

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import java.util.List;
 
 @Entity
 @DiscriminatorValue("modifie")

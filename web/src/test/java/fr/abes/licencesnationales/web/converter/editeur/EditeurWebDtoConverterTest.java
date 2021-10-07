@@ -1,12 +1,15 @@
 package fr.abes.licencesnationales.web.converter.editeur;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
-import fr.abes.licencesnationales.web.dto.editeur.ContactCommercialEditeurWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.ContactTechniqueEditeurWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
-import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
+import fr.abes.licencesnationales.web.dto.editeur.*;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,50 +23,91 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
+@SpringBootTest(classes = {UtilsMapper.class, ObjectMapper.class, EditeurWebDtoConverter.class})
 public class EditeurWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
 
     @Test
+    @DisplayName("test converter EditeurEntity / WebDtoList")
+    void testConverterEntityWebDtoList() {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        Set<TypeEtablissementEntity> setType = new HashSet<>();
+        setType.add(type);
+
+        EditeurEntity entity = new EditeurEntity(1, "nom", "123456", "adresse", setType);
+
+        EditeurWebDtoList dto = utilsMapper.map(entity, EditeurWebDtoList.class);
+
+        Assertions.assertEquals(1, dto.getId());
+        Assertions.assertEquals("nom", dto.getNom());
+
+    }
+
+    @Test
+    @DisplayName("test converter EditeurEntity / Webdto")
+    void testConverterEntityWebDto() {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        Set<TypeEtablissementEntity> setType = new HashSet<>();
+        setType.add(type);
+
+        EditeurEntity entity = new EditeurEntity(1, "nom", "123456", "adresse", setType);
+        ContactEditeurEntity contactCommercial = new ContactCommercialEditeurEntity(1, "nomComm", "prenomComm", "mail@mail.com");
+        ContactEditeurEntity contactTechnique = new ContactTechniqueEditeurEntity(2, "nomTech", "prenomTech", "mail@mail.tech");
+        entity.ajouterContact(contactCommercial);
+        entity.ajouterContact(contactTechnique);
+
+        EditeurWebDto dto = utilsMapper.map(entity, EditeurWebDto.class);
+
+        Assertions.assertEquals("nom", dto.getNom());
+        Assertions.assertEquals(1, dto.getId());
+        Assertions.assertEquals("123456", dto.getIdentifiant());
+        Assertions.assertEquals("adresse", dto.getAdresse());
+        Assertions.assertEquals("Nouveau", dto.getTypesEtablissements().get(0));
+
+        Assertions.assertEquals(1, dto.getContactsCommerciaux().get(0).getId());
+        Assertions.assertEquals("nomComm", dto.getContactsCommerciaux().get(0).getNomContact());
+        Assertions.assertEquals("prenomComm", dto.getContactsCommerciaux().get(0).getPrenomContact());
+        Assertions.assertEquals("mail@mail.com", dto.getContactsCommerciaux().get(0).getMailContact());
+
+        Assertions.assertEquals(2, dto.getContactsTechniques().get(0).getId());
+        Assertions.assertEquals("nomTech", dto.getContactsTechniques().get(0).getNomContact());
+        Assertions.assertEquals("prenomTech", dto.getContactsTechniques().get(0).getPrenomContact());
+        Assertions.assertEquals("mail@mail.tech", dto.getContactsTechniques().get(0).getMailContact());
+    }
+
+    @Test
     @DisplayName("test converter EditeurCreeWebDto / EditeurCreeEvent")
-    public void testConverterEditeurCreeWebDto() {
+    void testConverterEditeurCreeWebDto() {
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         EditeurCreeWebDto editeur = new EditeurCreeWebDto();
-        editeur.setNomEditeur("testNom");
-        editeur.setAdresseEditeur("testAdresse");
-        editeur.setIdentifiantEditeur("testId");
+        editeur.setNom("testNom");
+        editeur.setAdresse("testAdresse");
+        editeur.setIdentifiantBis("testId");
 
-        List<String> listEtabRelie = new ArrayList<>();
-        listEtabRelie.add("etabRelie1");
-        listEtabRelie.add("etabRelie2");
-        editeur.setGroupesEtabRelies(listEtabRelie);
+        ContactEditeurWebDto contactCommercial = new ContactEditeurWebDto("testNomComm", "testPrenomComm", "test@test.comm");
+        ContactEditeurWebDto contactTechnique = new ContactEditeurWebDto("testNomTech", "testPrenomTech", "test@test.tech");
 
-        ContactCommercialEditeurWebDto contactCommercial = new ContactCommercialEditeurWebDto("testNomComm", "testPrenomComm", "test@test.comm");
-        ContactTechniqueEditeurWebDto contactTechnique = new ContactTechniqueEditeurWebDto("testNomTech", "testPrenomTech", "test@test.tech");
-
-        Set<ContactCommercialEditeurWebDto> setContactComm = new HashSet<>();
+        Set<ContactEditeurWebDto> setContactComm = new HashSet<>();
         setContactComm.add(contactCommercial);
-        editeur.setListeContactCommercialEditeur(setContactComm);
+        editeur.setContactsCommerciaux(setContactComm);
 
-        Set<ContactTechniqueEditeurWebDto> setContactTech = new HashSet<>();
+        Set<ContactEditeurWebDto> setContactTech = new HashSet<>();
         setContactTech.add(contactTechnique);
-        editeur.setListeContactTechniqueEditeur(setContactTech);
+        editeur.setContactsTechniques(setContactTech);
 
         EditeurCreeEventEntity editeurCreeEvent = utilsMapper.map(editeur, EditeurCreeEventEntity.class);
 
-        Assertions.assertEquals("testNom", editeurCreeEvent.getNomEditeur());
-        Assertions.assertEquals("testAdresse", editeurCreeEvent.getAdresseEditeur());
-        Assertions.assertEquals("testId", editeurCreeEvent.getIdentifiantEditeur());
+        Assertions.assertEquals("testNom", editeurCreeEvent.getNom());
+        Assertions.assertEquals("testAdresse", editeurCreeEvent.getAdresse());
+        Assertions.assertEquals("testId", editeurCreeEvent.getIdentifiant());
         Assertions.assertEquals(format.format(new Date()), format.format(editeurCreeEvent.getDateCreationEvent()));
-        Assertions.assertEquals("etabRelie1", editeurCreeEvent.getGroupesEtabRelies().get(0));
-        Assertions.assertEquals("etabRelie2", editeurCreeEvent.getGroupesEtabRelies().get(1));
-        Assertions.assertEquals("testNomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContact());
-        Assertions.assertEquals("testPrenomComm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContact());
-        Assertions.assertEquals("test@test.comm", editeurCreeEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContact());
-        Assertions.assertEquals("testNomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContact());
-        Assertions.assertEquals("testPrenomTech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContact());
-        Assertions.assertEquals("test@test.tech", editeurCreeEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContact());
+        Assertions.assertEquals("testNomComm", editeurCreeEvent.getContactsCommerciaux().stream().findFirst().get().getNom());
+        Assertions.assertEquals("testPrenomComm", editeurCreeEvent.getContactsCommerciaux().stream().findFirst().get().getPrenom());
+        Assertions.assertEquals("test@test.comm", editeurCreeEvent.getContactsCommerciaux().stream().findFirst().get().getMail());
+        Assertions.assertEquals("testNomTech", editeurCreeEvent.getContactsTechniques().stream().findFirst().get().getNom());
+        Assertions.assertEquals("testPrenomTech", editeurCreeEvent.getContactsTechniques().stream().findFirst().get().getPrenom());
+        Assertions.assertEquals("test@test.tech", editeurCreeEvent.getContactsTechniques().stream().findFirst().get().getMail());
 
     }
 
@@ -71,41 +115,35 @@ public class EditeurWebDtoConverterTest {
     @DisplayName("test converter EditeurModifieWebDto / EditeurModifieEvent")
     public void testConverterEditeurModifieWebDto() {
         EditeurModifieWebDto editeur = new EditeurModifieWebDto();
-        editeur.setIdEditeur(1);
-        editeur.setNomEditeur("testNom");
-        editeur.setAdresseEditeur("testAdresse");
-        editeur.setIdentifiantEditeur("testId");
+        editeur.setId(1);
+        editeur.setNom("testNom");
+        editeur.setAdresse("testAdresse");
+        editeur.setIdentifiantBis("testId");
 
-        List<String> listEtabRelie = new ArrayList<>();
-        listEtabRelie.add("etabRelie1");
-        listEtabRelie.add("etabRelie2");
-        editeur.setGroupesEtabRelies(listEtabRelie);
+        ContactEditeurWebDto contactCommercial = new ContactEditeurWebDto("testNomComm", "testPrenomComm", "test@test.comm");
+        ContactEditeurWebDto contactTechnique = new ContactEditeurWebDto("testNomTech", "testPrenomTech", "test@test.tech");
 
-        ContactCommercialEditeurWebDto contactCommercial = new ContactCommercialEditeurWebDto("testNomComm", "testPrenomComm", "test@test.comm");
-        ContactTechniqueEditeurWebDto contactTechnique = new ContactTechniqueEditeurWebDto("testNomTech", "testPrenomTech", "test@test.tech");
-
-        Set<ContactCommercialEditeurWebDto> setContactComm = new HashSet<>();
+        Set<ContactEditeurWebDto> setContactComm = new HashSet<>();
         setContactComm.add(contactCommercial);
-        editeur.setListeContactCommercialEditeur(setContactComm);
+        editeur.setContactsCommerciaux(setContactComm);
 
-        Set<ContactTechniqueEditeurWebDto> setContactTech = new HashSet<>();
+        Set<ContactEditeurWebDto> setContactTech = new HashSet<>();
         setContactTech.add(contactTechnique);
-        editeur.setListeContactTechniqueEditeur(setContactTech);
+        editeur.setContactsTechniques(setContactTech);
 
         EditeurModifieEventEntity editeurModifieEvent = utilsMapper.map(editeur, EditeurModifieEventEntity.class);
 
         Assertions.assertEquals(Long.toString(1L), editeurModifieEvent.getId().toString());
-        Assertions.assertEquals("testNom", editeurModifieEvent.getNomEditeur());
-        Assertions.assertEquals("testAdresse", editeurModifieEvent.getAdresseEditeur());
-        Assertions.assertEquals("testId", editeurModifieEvent.getIdentifiantEditeur());
-        Assertions.assertEquals("etabRelie1", editeurModifieEvent.getGroupesEtabRelies().get(0));
-        Assertions.assertEquals("etabRelie2", editeurModifieEvent.getGroupesEtabRelies().get(1));
-        Assertions.assertEquals("testNomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getNomContact());
-        Assertions.assertEquals("testPrenomComm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getPrenomContact());
-        Assertions.assertEquals("test@test.comm", editeurModifieEvent.getListeContactCommercialEditeur().stream().findFirst().get().getMailContact());
-        Assertions.assertEquals("testNomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getNomContact());
-        Assertions.assertEquals("testPrenomTech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getPrenomContact());
-        Assertions.assertEquals("test@test.tech", editeurModifieEvent.getListeContactTechniqueEditeur().stream().findFirst().get().getMailContact());
+        Assertions.assertEquals(1, editeurModifieEvent.getId());
+        Assertions.assertEquals("testNom", editeurModifieEvent.getNom());
+        Assertions.assertEquals("testAdresse", editeurModifieEvent.getAdresse());
+        Assertions.assertEquals("testId", editeurModifieEvent.getIdentifiant());
+        Assertions.assertEquals("testNomComm", editeurModifieEvent.getContactsCommerciaux().stream().findFirst().get().getNom());
+        Assertions.assertEquals("testPrenomComm", editeurModifieEvent.getContactsCommerciaux().stream().findFirst().get().getPrenom());
+        Assertions.assertEquals("test@test.comm", editeurModifieEvent.getContactsCommerciaux().stream().findFirst().get().getMail());
+        Assertions.assertEquals("testNomTech", editeurModifieEvent.getContactsTechniques().stream().findFirst().get().getNom());
+        Assertions.assertEquals("testPrenomTech", editeurModifieEvent.getContactsTechniques().stream().findFirst().get().getPrenom());
+        Assertions.assertEquals("test@test.tech", editeurModifieEvent.getContactsTechniques().stream().findFirst().get().getMail());
 
     }
 }
