@@ -43,12 +43,12 @@ public class EditeurService {
 
     public void checkDoublonMail(EditeurEntity editeur) throws MailDoublonException {
         for (ContactEditeurEntity ct : editeur.getContactsTechniques()) {
-            if (contactEditeurRepository.findByMail(ct.getMail()).isPresent()) {
+            if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
                 throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
             }
         }
         for (ContactEditeurEntity ct : editeur.getContactsCommerciaux()) {
-            if (contactEditeurRepository.findByMail(ct.getMail()).isPresent()) {
+            if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
                 throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
             }
         }

@@ -1,7 +1,10 @@
 package fr.abes.licencesnationales.core.entities.etablissement.event;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
@@ -11,13 +14,15 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("fusionne")
-@Getter @Setter
 public class EtablissementFusionneEventEntity  extends EtablissementEventEntity {
+    @Getter
     private transient Set<String> sirenAnciensEtablissements;
 
     @Lob
     @Column(name = "ANCIENS_ETABLISSEMENTS")
-    private String anciensEtablissementsInBdd = null;
+    private String anciensEtablissementsInBdd;
+
+    private transient ObjectMapper mapper = new ObjectMapper();
 
 
     @Deprecated
@@ -26,15 +31,20 @@ public class EtablissementFusionneEventEntity  extends EtablissementEventEntity 
     }
 
 
-    public EtablissementFusionneEventEntity(Object source, String siren, Set<String> sirenAnciensEtablissements) {
+    public EtablissementFusionneEventEntity(Object source, String siren, Set<String> sirenAnciensEtablissements) throws JsonProcessingException {
         super(source);
         this.siren = siren;
-        this.sirenAnciensEtablissements = sirenAnciensEtablissements;
+        setSirenAnciensEtablissements(sirenAnciensEtablissements);
     }
 
+    public void setSirenAnciensEtablissements(Set<String> sirenAnciensEtablissements) throws JsonProcessingException {
+        this.sirenAnciensEtablissements = sirenAnciensEtablissements;
+        this.anciensEtablissementsInBdd = mapper.writeValueAsString(this.sirenAnciensEtablissements);
+    }
 
-    public void addSirenAnciensEtablissements(String siren) {
+    public void addSirenAnciensEtablissements(String siren) throws JsonProcessingException {
         this.sirenAnciensEtablissements.add(siren);
+        this.anciensEtablissementsInBdd = mapper.writeValueAsString(this.sirenAnciensEtablissements);
     }
 
     @Override

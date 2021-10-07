@@ -65,7 +65,7 @@ public class EtablissementService {
     }
 
     public boolean existeSiren(String siren) {
-        return etablissementDao.existeSiren(siren);
+        return etablissementDao.existsBySiren(siren);
     }
 
     public boolean existeMail(String email) {
@@ -77,6 +77,6 @@ public class EtablissementService {
     }
 
     public EtablissementEntity getUserByMail(String mail) {
-        return etablissementDao.getUserByMail(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
+        return etablissementDao.getEtablissementEntityByContact_MailContains(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
     }
 }

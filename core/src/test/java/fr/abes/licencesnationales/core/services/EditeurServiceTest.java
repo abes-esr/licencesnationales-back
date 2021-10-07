@@ -56,18 +56,18 @@ public class EditeurServiceTest {
         editeur.setContactsCommerciaux(ccSet);
         editeur.setContactsTechniques(ctSet);
 
-        Mockito.when(contactEditeurRepository.findByMail("mail1@mail.com")).thenReturn(Optional.empty());
-        Mockito.when(contactEditeurRepository.findByMail("mail2@mail.com")).thenReturn(Optional.empty());
-        Mockito.when(contactEditeurRepository.findByMail("mail3@mail.com")).thenReturn(Optional.empty());
-        Mockito.when(contactEditeurRepository.findByMail("mail4@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(contactEditeurRepository.findByMailContains("mail1@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(contactEditeurRepository.findByMailContains("mail2@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(contactEditeurRepository.findByMailContains("mail3@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(contactEditeurRepository.findByMailContains("mail4@mail.com")).thenReturn(Optional.empty());
 
+        service.checkDoublonMail(editeur);
+
+        Mockito.when(contactEditeurRepository.findByMailContains("mail1@mail.com")).thenReturn(Optional.of(new ContactTechniqueEditeurEntity("nomTest", "prenomTest", "mail1@mail.com")));
         Assertions.assertThrows(MailDoublonException.class, () -> service.checkDoublonMail(editeur), "L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
 
-        Mockito.when(contactEditeurRepository.findByMail("mail1@mail.com")).thenReturn(Optional.of(new ContactTechniqueEditeurEntity("nomTest", "prenomTest", "mail1@mail.com")));
-        Assertions.assertThrows(MailDoublonException.class, () -> service.checkDoublonMail(editeur), "L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
-
-        Mockito.when(contactEditeurRepository.findByMail("mail1@mail.com")).thenReturn(Optional.empty());
-        Mockito.when(contactEditeurRepository.findByMail("mail3@mail.com")).thenReturn(Optional.of(new ContactCommercialEditeurEntity("nomTest", "prenomTest", "mail3@mail.com")));
+        Mockito.when(contactEditeurRepository.findByMailContains("mail1@mail.com")).thenReturn(Optional.empty());
+        Mockito.when(contactEditeurRepository.findByMailContains("mail3@mail.com")).thenReturn(Optional.of(new ContactCommercialEditeurEntity("nomTest", "prenomTest", "mail3@mail.com")));
         Assertions.assertThrows(MailDoublonException.class, () -> service.checkDoublonMail(editeur), "L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
     }
 }

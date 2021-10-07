@@ -289,7 +289,6 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("test@test.com", event.getMailContact());
         Assertions.assertEquals(2, event.getSirenAnciensEtablissements().size());
         Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().stream().findFirst().get());
-        Assertions.assertEquals("987654321", event.getSirenAnciensEtablissements().stream().findFirst().get());
     }
 
     @Test
