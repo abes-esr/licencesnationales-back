@@ -8,6 +8,7 @@ import fr.abes.licencesnationales.core.exception.PasswordMismatchException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.PasswordService;
 import fr.abes.licencesnationales.web.dto.authentification.*;
 import fr.abes.licencesnationales.web.exception.CaptchaException;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
@@ -56,19 +57,22 @@ public class AuthenticationController {
 
     private final UserDetailsServiceImpl userService;
 
+    private final PasswordService passwordService;
+
     public AuthenticationController(AuthenticationManager authenticationManager,
                                     JwtTokenProvider jwtTokenProvider,
                                     ReCaptchaService reCaptchaService,
                                     EtablissementService etablissementService,
                                     EmailService emailService,
                                     UserDetailsServiceImpl userService,
-                                    PasswordEncoder passwordEncoder) {
+                                    PasswordService passwordService) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = jwtTokenProvider;
         this.reCaptchaService = reCaptchaService;
         this.etablissementService = etablissementService;
         this.emailService = emailService;
         this.userService = userService;
+        this.passwordService = passwordService;
     }
 
     @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
@@ -223,8 +227,8 @@ public class AuthenticationController {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         ContactEntity contact = etab.getContact();
 
-        if (contact.estLeMotDePasse(oldPassword)) {
-            if (!contact.estLeMotDePasse(newPassword)) {
+        if (passwordService.estLeMotDePasse(oldPassword, contact.getMotDePasse())) {
+            if (!passwordService.estLeMotDePasse(newPassword, contact.getMotDePasse())) {
                 contact.setMotDePasse(newPassword);
                 etablissementService.save(etab);
             } else {

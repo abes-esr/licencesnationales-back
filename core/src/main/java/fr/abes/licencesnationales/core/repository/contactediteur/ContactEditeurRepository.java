@@ -8,5 +8,5 @@ import java.util.Optional;
 
 @Repository
 public interface ContactEditeurRepository extends JpaRepository<ContactEditeurEntity, Integer> {
-    Optional<ContactEditeurEntity> findByMail(String mail);
+    Optional<ContactEditeurEntity> findByMailContains(String mail);
 }

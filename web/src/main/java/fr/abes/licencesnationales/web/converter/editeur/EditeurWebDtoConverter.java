@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.converter.editeur;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -85,16 +86,22 @@ public class EditeurWebDtoConverter {
             throw new IllegalArgumentException("Le champ 'adresse' de l'éditeur est obligatoire");
         }
         eventEntity.setAdresse(adresse);
+
         if ((contactsCommerciaux == null && contactsTechniques == null)
-            && (contactsCommerciaux != null && contactsTechniques == null && contactsCommerciaux.size() == 0)
-            && (contactsTechniques != null && contactsCommerciaux == null && contactsTechniques.size() == 0))
+                && (contactsCommerciaux != null && contactsTechniques == null && contactsCommerciaux.size() == 0)
+                && (contactsTechniques != null && contactsCommerciaux == null && contactsTechniques.size() == 0)) {
             throw new IllegalArgumentException("Au moins un 'contact commercial' ou un 'contact technique' est obligatoire");
-
-        if (contactsCommerciaux != null)
-            contactsCommerciaux.forEach(cc -> eventEntity.addContactCommercial(new ContactCommercialEditeurEntity(cc.getNomContact(), cc.getPrenomContact(), cc.getMailContact())));
-
-        if (contactsTechniques != null)
-            contactsTechniques.forEach(ct -> eventEntity.addContactTechnique(new ContactTechniqueEditeurEntity(ct.getNomContact(), ct.getPrenomContact(), ct.getMailContact())));
+        }
+        try {
+            for (ContactEditeurWebDto cc : contactsCommerciaux) {
+                eventEntity.addContactCommercial(new ContactCommercialEditeurEntity(cc.getNomContact(), cc.getPrenomContact(), cc.getMailContact()));
+            }
+            for (ContactEditeurWebDto ct : contactsTechniques) {
+                eventEntity.addContactTechnique(new ContactTechniqueEditeurEntity(ct.getNomContact(), ct.getPrenomContact(), ct.getMailContact()));
+            }
+        } catch (JsonProcessingException ex) {
+            throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
+        }
     }
 
     @Bean

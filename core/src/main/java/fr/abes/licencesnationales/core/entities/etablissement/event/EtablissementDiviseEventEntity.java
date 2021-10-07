@@ -14,20 +14,26 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("divise")
-@NoArgsConstructor
-@Getter @Setter
 public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
 
+    @Getter @Setter
     @Column(name = "ANCIEN_SIREN")
     private String ancienSiren;
 
-    @Transient
+    @Getter
     private transient Set<EtablissementEntity> etablissementDivises;
 
     //on empêche l'accès à cet attribut qui sera automatiquement mis à jour lors d'une mise à jour du set en transcient
     @Lob
     @Column(name = "ETABLISSEMENTS_DIVISE")
     private String etablisementsDivisesInBdd;
+
+    private transient ObjectMapper mapper = new ObjectMapper();
+
+    @Deprecated
+    public EtablissementDiviseEventEntity() {
+        super();
+    }
 
     public EtablissementDiviseEventEntity(Object source, String ancienSiren) {
         super(source);
@@ -39,8 +45,9 @@ public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
      * @param entities
      * @throws JsonProcessingException
      */
-    public void setEtablissementDivises(Set<EtablissementEntity> entities) {
+    public void setEtablissementDivises(Set<EtablissementEntity> entities) throws JsonProcessingException {
         this.etablissementDivises = entities;
+        this.etablisementsDivisesInBdd = mapper.writeValueAsString(this.etablissementDivises);
     }
 
     @Override

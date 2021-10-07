@@ -3,6 +3,8 @@ package fr.abes.licencesnationales.core.entities.etablissement.event;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -75,6 +77,7 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
     public EtablissementEventEntity(Object source) {
         super(source);
     }
+
 
     @Override
     public boolean equals(Object obj) {

@@ -76,7 +76,7 @@ public class EtablissementController {
     EmailService emailService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordService passwordService;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -86,7 +86,7 @@ public class EtablissementController {
 
 
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException, JsonProcessingException {
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
@@ -140,7 +140,7 @@ public class EtablissementController {
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
-        event.setMotDePasse(passwordEncoder.encode(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
+        event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
     }
@@ -155,7 +155,7 @@ public class EtablissementController {
             //on génère un identifiant Abes
             e.setIdAbes(GenererIdAbes.generateId());
             //on crypte le mode de passe
-            e.getContact().setMotDePasse(passwordEncoder.encode(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
+            e.getContact().setMotDePasse(passwordService.getEncodedMotDePasse(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
                 etab.getSiren().equals(e.getSiren()))
                     .collect(Collectors.toList()).get(0).getContact().getMotDePasse()));
                 e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->

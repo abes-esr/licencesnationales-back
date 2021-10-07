@@ -230,7 +230,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Le champs 'recaptcha' est obligatoire"));
+                .andExpect(jsonPath("$.debugMessage").value("Le champs 'recaptcha' est obligatoire"));
     }
 
     @Test
@@ -251,7 +251,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
+                .andExpect(jsonPath("$.debugMessage").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
     }
 
     @Test
@@ -314,7 +314,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Le token n'est pas valide"));
+                .andExpect(jsonPath("$.debugMessage").value("Le token n'est pas valide"));
 
     }
 
@@ -354,7 +354,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Le champs 'token' est obligatoire"));
+                .andExpect(jsonPath("$.debugMessage").value("Le champs 'token' est obligatoire"));
     }
 
     @Test
@@ -406,7 +406,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel."));
+                .andExpect(jsonPath("$.debugMessage").value("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel."));
     }
 
     @Test
