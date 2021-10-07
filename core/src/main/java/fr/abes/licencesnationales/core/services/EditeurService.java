@@ -1,15 +1,13 @@
 package fr.abes.licencesnationales.core.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
+import fr.abes.licencesnationales.core.exception.UnknownEditeurException;
+import fr.abes.licencesnationales.core.repository.contactediteur.ContactEditeurRepository;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import javax.validation.Valid;
@@ -22,48 +20,37 @@ public class EditeurService {
     private EditeurRepository editeurRepository;
 
     @Autowired
-    private EtablissementService etablissementService;
-
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
-
-    @Autowired
-    private EditeurEventRepository eventRepository;
+    private ContactEditeurRepository contactEditeurRepository;
 
 
     public void save(@Valid EditeurEntity editeur) throws MailDoublonException {
-
-        log.debug("debut addEditeur");
-        boolean existeMail = etablissementService.checkDoublonMail(editeur.getContactCommercialEditeurEntities(), editeur.getContactTechniqueEditeurEntities());
-        if (existeMail) {
-            log.debug("existeMail");
-            throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
-        } else {
-            editeurRepository.save(editeur);
-        }
-
-        if (editeur.getIdEditeur() == null) {
-            // Création
-        } else {
-            // Modification
-        }
+        checkDoublonMail(editeur);
+        editeurRepository.save(editeur);
     }
 
-    public EditeurEntity getFirstEditeurById(Long id) {
-        return editeurRepository.getFirstByIdEditeur(id);
+    public EditeurEntity getFirstEditeurById(Integer id) {
+        return editeurRepository.getFirstById(id).orElseThrow(() -> new UnknownEditeurException("id : " + id));
     }
 
     public List<EditeurEntity> findAllEditeur() {
         return editeurRepository.findAll();
     }
 
-    public void deleteEditeur(String id) throws JsonProcessingException {
-        EditeurSupprimeEventEntity editeurSupprimeEvent = new EditeurSupprimeEventEntity(this, Integer.parseInt(id));
-        applicationEventPublisher.publishEvent(editeurSupprimeEvent);
-        eventRepository.save(editeurSupprimeEvent);
-    }
 
     public void deleteById(Integer id) {
         editeurRepository.deleteById(id);
+    }
+
+    public void checkDoublonMail(EditeurEntity editeur) throws MailDoublonException {
+        for (ContactEditeurEntity ct : editeur.getContactsTechniques()) {
+            if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
+                throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+            }
+        }
+        for (ContactEditeurEntity ct : editeur.getContactsCommerciaux()) {
+            if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
+                throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+            }
+        }
     }
 }

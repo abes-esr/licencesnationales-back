@@ -7,6 +7,7 @@ import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
@@ -24,6 +25,7 @@ import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusi
 import fr.abes.licencesnationales.web.dto.etablissement.modification.ContactModifieWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieAdminWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.scission.EtablissementDiviseWebDto;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -39,6 +41,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 public class EtablissementWebDtoConverterTest {
     @Autowired
     private UtilsMapper utilsMapper;
+
 
     @Test
     @DisplayName("Test success converter EtablissementCreeWebDto / EtablissementCreeEvent")
@@ -285,8 +288,7 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("0000000000", event.getTelephoneContact());
         Assertions.assertEquals("test@test.com", event.getMailContact());
         Assertions.assertEquals(2, event.getSirenAnciensEtablissements().size());
-        Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().get(0));
-        Assertions.assertEquals("987654321", event.getSirenAnciensEtablissements().get(1));
+        Assertions.assertEquals("123456789", event.getSirenAnciensEtablissements().stream().findFirst().get());
     }
 
     @Test
@@ -332,6 +334,44 @@ public class EtablissementWebDtoConverterTest {
         etablissement.getNouveauEtab().getContact().setVille("villeTest");
         Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
 
+    }
+
+    @Test
+    @DisplayName("test conversion EtablissementDiviseWebDto / EtablissementDiviseEventEntity")
+    void testSuccessConverterEtabDiviseWebDto() {
+        ContactCreeWebDto contact = new ContactCreeWebDto();
+        contact.setNom("testScission");
+        contact.setPrenom("testScission");
+        contact.setAdresse("testScission");
+        contact.setBoitePostale("34000");
+        contact.setCodePostal("34444");
+        contact.setVille("Motopp");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@abes.fr");
+        contact.setMotDePasse("!EtabTest3");
+
+        EtablissementDiviseWebDto dto = new EtablissementDiviseWebDto();
+        dto.setSirenScinde("000000000");
+        EtablissementCreeSansCaptchaWebDto etab1 = new EtablissementCreeSansCaptchaWebDto();
+        etab1.setNom("testScission 2");
+        etab1.setTypeEtablissement("CHR-CHU");
+        etab1.setSiren("000000001");
+        etab1.setContact(contact);
+
+        EtablissementCreeSansCaptchaWebDto etab2 = new EtablissementCreeSansCaptchaWebDto();
+        etab2.setNom("testScission 3");
+        etab2.setTypeEtablissement("CHR-CHU");
+        etab2.setSiren("000000003");
+        etab2.setContact(contact);
+
+        dto.ajouterNouvelEtab(etab1);
+        dto.ajouterNouvelEtab(etab2);
+
+        EtablissementDiviseEventEntity event = utilsMapper.map(dto, EtablissementDiviseEventEntity.class);
+
+        Assertions.assertEquals("000000000", event.getAncienSiren());
+        Assertions.assertEquals("testScission 2", event.getEtablissementDivises().stream().findFirst().get().getNom());
+        Assertions.assertEquals("000000001", event.getEtablissementDivises().stream().findFirst().get().getSiren());
     }
 
     @Test

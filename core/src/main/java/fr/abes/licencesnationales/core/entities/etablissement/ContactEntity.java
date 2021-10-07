@@ -65,9 +65,6 @@ public class ContactEntity implements Serializable {
 
     private String role = "etab";
 
-    @Transient
-    private transient PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
     @Deprecated
     public ContactEntity() {
 
@@ -99,6 +96,16 @@ public class ContactEntity implements Serializable {
         this.cedex = cedex;
     }
 
+    public ContactEntity(String nom, String prenom, String adresse, String codePostal, String ville, String telephone, String mail, String motDePasse) {
+        this.nom = nom;
+        this.prenom = prenom;
+        this.adresse = adresse;
+        this.codePostal = codePostal;
+        this.ville = ville;
+        this.telephone = telephone;
+        this.mail = mail;
+        this.motDePasse = motDePasse;
+    }
     /**
      * CTOR d'un contact avec un identifiant et le rôle par défaut à 'etab'.
      *
@@ -117,7 +124,7 @@ public class ContactEntity implements Serializable {
         this.id = id;
         this.nom = nom;
         this.prenom = prenom;
-        this.setMotDePasse(motDePasse);
+        this.motDePasse = motDePasse;
         this.mail = mail;
         this.telephone = telephone;
         this.adresse = adresse;
@@ -127,26 +134,7 @@ public class ContactEntity implements Serializable {
         this.cedex = cedex;
     }
 
-    /**
-     * On crypte le mot de passe
-     * @param motDePasse
-     */
-    public void setMotDePasse(String motDePasse) {
 
-        if (motDePasse == null || motDePasse.isEmpty() || motDePasse.isBlank()) {
-            throw new IllegalArgumentException("Le mot de passe ne doit pas être nulle ou vide");
-        }
-            this.motDePasse = passwordEncoder.encode(motDePasse);
-    }
-
-    /**
-     * Vérifie si le mot de passe passé en paramètre correspond au mot de passe
-     * @param motDePasse Mot de passe en clair
-     * @return Vrai si le mot de passe passé en paramètre correspond au mot de passe, Faux sinon
-     */
-    public boolean estLeMotDePasse(String motDePasse) {
-        return passwordEncoder.matches(motDePasse,this.motDePasse);
-    }
 
     @Override
     public boolean equals(Object obj) {

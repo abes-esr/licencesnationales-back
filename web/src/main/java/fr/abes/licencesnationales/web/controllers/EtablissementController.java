@@ -52,9 +52,6 @@ public class EtablissementController {
     private UtilsMapper mapper;
 
     @Autowired
-    private ObjectMapper objectMapper;
-
-    @Autowired
     private EventService eventService;
 
     @Autowired
@@ -79,7 +76,7 @@ public class EtablissementController {
     EmailService emailService;
 
     @Autowired
-    private PasswordEncoder passwordEncoder;
+    private PasswordService passwordService;
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
@@ -89,7 +86,7 @@ public class EtablissementController {
 
 
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, SirenExistException, MailDoublonException, RestClientException {
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
@@ -108,7 +105,7 @@ public class EtablissementController {
         event.setSource(this);
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
-
+        event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementCreeWebDto.getContact().getMotDePasse()));
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
@@ -119,7 +116,7 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "")
-    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException {
+    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException {
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
         } else {
@@ -135,21 +132,20 @@ public class EtablissementController {
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
+    public void fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEventEntity event = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
-        event.setAnciensEtablissementsInBdd(objectMapper.writeValueAsString(event.getSirenAnciensEtablissements()));
         event.setSource(this);
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
-        event.setMotDePasse(passwordEncoder.encode(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
+        event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
     }
 
     @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void scission(@RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
+    public void scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
         StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
         //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
@@ -157,7 +153,7 @@ public class EtablissementController {
             //on génère un identifiant Abes
             e.setIdAbes(GenererIdAbes.generateId());
             //on crypte le mode de passe
-            e.getContact().setMotDePasse(passwordEncoder.encode(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
+            e.getContact().setMotDePasse(passwordService.getEncodedMotDePasse(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
                 etab.getSiren().equals(e.getSiren()))
                     .collect(Collectors.toList()).get(0).getContact().getMotDePasse()));
                 e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
@@ -166,14 +162,13 @@ public class EtablissementController {
             e.setStatut(statut);
         }
         //on formatte les nouveaux établissements en json pour sauvegarde
-        etablissementDiviseEvent.setEtablisementsDivisesInBdd(objectMapper.writeValueAsString(etablissementDiviseEvent.getEtablissementDivises()));
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventService.save(etablissementDiviseEvent);
     }
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif) throws RestClientException {
+    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif) throws RestClientException, JsonProcessingException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
@@ -187,7 +182,6 @@ public class EtablissementController {
 
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
-
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
         UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {

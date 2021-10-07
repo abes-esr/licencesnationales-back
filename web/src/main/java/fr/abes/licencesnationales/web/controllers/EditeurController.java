@@ -3,95 +3,103 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
-import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
+import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.services.EditeurService;
-import fr.abes.licencesnationales.web.dto.editeur.*;
+import fr.abes.licencesnationales.core.services.EventService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
+import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
+import fr.abes.licencesnationales.web.dto.editeur.EditeurWebDto;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
+import java.io.IOException;
 import java.util.List;
-import java.util.Set;
 
 
 @Slf4j
 @RestController
-@RequestMapping("/v1/ln/editeur")
+@RequestMapping("/v1/editeurs")
 public class EditeurController {
+
     @Autowired
     private UtilsMapper mapper;
 
     @Autowired
     private EditeurService editeurService;
 
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Autowired
+    private EventService eventService;
+
+    @Autowired
+    private ReferenceService referenceService;
+
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
-    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDTO) throws MailDoublonException, JsonProcessingException {
-        EditeurCreeEventEntity editeurCreeEvent = mapper.map(editeurCreeWebDTO, EditeurCreeEventEntity.class);
+    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDto) throws IOException, UnknownTypeEtablissementException {
+        // On convertit la DTO web (Json) en objet métier d'événement de création d'éditeur
+        EditeurCreeEventEntity event = mapper.map(editeurCreeWebDto, EditeurCreeEventEntity.class);
+        event.setSource(this);
+        //initialisation de la liste des types d'établissements par récupération dans la BDD
+        for (String t : editeurCreeWebDto.getTypesEtablissements()) {
+                event.addTypeEtab(referenceService.findTypeEtabByLibelle(t));
+        }
+
+        // On publie l'événement et on le sauvegarde
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
     }
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void modificationEditeur (@PathVariable Long id, @RequestBody EditeurModifieWebDto editeurModifieDTO) throws MailDoublonException, JsonProcessingException {
-        EditeurModifieEventEntity editeurModifieEvent = mapper.map(editeurModifieDTO, EditeurModifieEventEntity.class);
-    }
-
-    @GetMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('admin')")
-    public EditeurWebDto get(@PathVariable Long id) {
-        EditeurEntity editeurEntity   = editeurService.getFirstEditeurById(id);
-        Set<ContactCommercialEditeurEntity> cc = editeurEntity.getContactCommercialEditeurEntities();
-        Set<ContactTechniqueEditeurEntity> ct = editeurEntity.getContactTechniqueEditeurEntities();
-        Set<ContactCommercialEditeurWebDto> CC = new HashSet<>();
-        Set<ContactTechniqueEditeurWebDto> CT = new HashSet<>();
-        for (ContactCommercialEditeurEntity c:cc) {
-            ContactCommercialEditeurWebDto cce = new ContactCommercialEditeurWebDto();
-            cce.nomContactCommercial = c.getNomContact();
-            cce.prenomContactCommercial = c.getPrenomContact();
-            cce.mailContactCommercial = c.getMailContact();
-            CC.add(cce);
+    public void edit (@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
+        editeurModifieWebDto.setId(id);
+        EditeurModifieEventEntity event = mapper.map(editeurModifieWebDto, EditeurModifieEventEntity.class);
+        event.setSource(this);
+        //initialisation de la liste des types d'établissements par récupération dans la BDD
+        for (String t : editeurModifieWebDto.getTypesEtablissements()) {
+            event.addTypeEtab(referenceService.findTypeEtabByLibelle(t));
         }
-        for (ContactTechniqueEditeurEntity t:ct) {
-            ContactTechniqueEditeurWebDto cte = new ContactTechniqueEditeurWebDto();
-            cte.nomContactTechnique = t.getNomContact();
-            cte.prenomContactTechnique = t.getPrenomContact();
-            cte.mailContactTechnique = t.getMailContact();
-            CT.add(cte);
-        }
-        //editeurEntity.setContactCommercialEditeurEntities(editeurService.getAllCCByIdEditeur(id));
-        //editeurEntity.setContactTechniqueEditeurEntities(editeurService.getAllCTByIdEditeur(editeurEntity));
-        EditeurWebDto editeurWebDto = new EditeurWebDto();
-        editeurWebDto.setNomEditeur(editeurEntity.getNomEditeur());
-        editeurWebDto.setAdresseEditeur(editeurEntity.getAdresseEditeur());
-        editeurWebDto.setIdentifiantEditeur(editeurEntity.getIdentifiantEditeur());
-        editeurWebDto.setListeContactCommercialEditeurWebDto(CC);
-        editeurWebDto.setListeContactTechniqueEditeurWebDto(CT);
-        return editeurWebDto;
-        //return mapper.map(editeurEntity, EditeurWebDto.class);
-    }
-
-
-    @GetMapping(value = "/getListEditeurs")
-    @PreAuthorize("hasAuthority('admin')")
-    public List<EditeurWebDto> getListEditeurs() {
-        return mapper.mapList(editeurService.findAllEditeur(), EditeurWebDto.class);
+        // On publie l'événement et on le sauvegarde
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
     }
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String id) throws JsonProcessingException {
-        log.info("id suppression = " + id);
-        editeurService.deleteEditeur(id);
+    public void suppression(@PathVariable Integer id) throws JsonProcessingException {
+        //on cherche l'editeur uniquement pour gérer le cas où il n'existe pas
+        editeurService.getFirstEditeurById(id);
+
+        EditeurSupprimeEventEntity event = new EditeurSupprimeEventEntity(this, id);
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
+    }
+
+    @GetMapping(value = "/{id}")
+    @PreAuthorize("hasAuthority('admin')")
+    public EditeurWebDto get(@PathVariable Integer id) {
+        EditeurEntity editeurEntity = editeurService.getFirstEditeurById(id);
+        return mapper.map(editeurEntity, EditeurWebDto.class);
     }
 
 
+    @GetMapping(value = "")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<EditeurWebDto> getListEditeurs() {
+        return mapper.mapList(editeurService.findAllEditeur(), EditeurWebDto.class);
+    }
 }
