@@ -106,7 +106,7 @@ public class EtablissementController {
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
-        //event.setMotDePasse(passwordEncoder.encode(etablissementCreeWebDto.getContact().getMotDePasse()));
+        event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementCreeWebDto.getContact().getMotDePasse()));
 
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);

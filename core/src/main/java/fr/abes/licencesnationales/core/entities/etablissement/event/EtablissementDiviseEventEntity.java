@@ -26,6 +26,7 @@ public class EtablissementDiviseEventEntity  extends EtablissementEventEntity {
     //on empêche l'accès à cet attribut qui sera automatiquement mis à jour lors d'une mise à jour du set en transcient
     @Lob
     @Column(name = "ETABLISSEMENTS_DIVISE")
+    @Getter
     private String etablisementsDivisesInBdd;
 
     private transient ObjectMapper mapper = new ObjectMapper();
