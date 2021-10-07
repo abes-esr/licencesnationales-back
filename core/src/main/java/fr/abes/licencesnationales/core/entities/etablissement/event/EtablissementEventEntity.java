@@ -36,7 +36,7 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
     @Column(name = "ID_ABES")
     protected String idAbes;
 
-    @Column(name = "IDL_CONTACT")
+    @Column(name = "ID_CONTACT")
     protected Integer idContact;
 
     @Column(name = "MAIL_CONTACT")
