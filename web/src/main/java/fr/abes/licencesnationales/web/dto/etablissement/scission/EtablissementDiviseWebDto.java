@@ -5,14 +5,17 @@ import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCr
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 
 @Getter
 @Setter
 public class EtablissementDiviseWebDto {
     @JsonProperty("sirenScinde")
+    @NotNull
     private String sirenScinde;
     @JsonProperty(value = "nouveauxEtabs")
+    @NotNull
     private ArrayList<EtablissementCreeSansCaptchaWebDto> nouveauxEtabs = new ArrayList<>();
 
     public void ajouterNouvelEtab(EtablissementCreeSansCaptchaWebDto etab) {
