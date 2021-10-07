@@ -80,7 +80,6 @@ public class EditeurEntity implements Serializable {
         this.nom = nom;
         this.identifiant = identifiant;
         this.adresse = adresse;
-        this.dateCreation = new Date();
         this.typeEtablissements = typeEtablissements;
     }
 

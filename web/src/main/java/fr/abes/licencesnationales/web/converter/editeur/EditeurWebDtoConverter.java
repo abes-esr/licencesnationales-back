@@ -1,8 +1,6 @@
 package fr.abes.licencesnationales.web.converter.editeur;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.ContactEditeurDto;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
@@ -87,14 +85,16 @@ public class EditeurWebDtoConverter {
             throw new IllegalArgumentException("Le champ 'adresse' de l'éditeur est obligatoire");
         }
         eventEntity.setAdresse(adresse);
-
-        if (contactsCommerciaux.size() == 0 && contactsTechniques.size() == 0) {
+        if ((contactsCommerciaux == null && contactsTechniques == null)
+            && (contactsCommerciaux != null && contactsTechniques == null && contactsCommerciaux.size() == 0)
+            && (contactsTechniques != null && contactsCommerciaux == null && contactsTechniques.size() == 0))
             throw new IllegalArgumentException("Au moins un 'contact commercial' ou un 'contact technique' est obligatoire");
-        }
 
-        contactsCommerciaux.forEach(cc -> eventEntity.addContactCommercial(new ContactCommercialEditeurEntity(cc.getNomContact(), cc.getPrenomContact(), cc.getMailContact())));
+        if (contactsCommerciaux != null)
+            contactsCommerciaux.forEach(cc -> eventEntity.addContactCommercial(new ContactCommercialEditeurEntity(cc.getNomContact(), cc.getPrenomContact(), cc.getMailContact())));
 
-        contactsTechniques.forEach(ct -> eventEntity.addContactTechnique(new ContactTechniqueEditeurEntity(ct.getNomContact(), ct.getPrenomContact(), ct.getMailContact())));
+        if (contactsTechniques != null)
+            contactsTechniques.forEach(ct -> eventEntity.addContactTechnique(new ContactTechniqueEditeurEntity(ct.getNomContact(), ct.getPrenomContact(), ct.getMailContact())));
     }
 
     @Bean
