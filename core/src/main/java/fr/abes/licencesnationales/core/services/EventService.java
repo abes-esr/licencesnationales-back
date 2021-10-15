@@ -32,6 +32,12 @@ public class EventService {
 
     public void save(EventEntity event) throws JsonProcessingException {
         if (event instanceof EtablissementEventEntity) {
+            if (event instanceof EtablissementDiviseEventEntity) {
+                ((EtablissementDiviseEventEntity) event).setEtablisementsDivisesInBdd(mapper.writeValueAsString(((EtablissementDiviseEventEntity) event).getEtablissementDivises()));
+            }
+            if (event instanceof EtablissementFusionneEventEntity) {
+                ((EtablissementFusionneEventEntity) event).setAnciensEtablissementsInBdd(mapper.writeValueAsString(((EtablissementFusionneEventEntity) event).getSirenAnciensEtablissements()));
+            }
             etablissementDao.save((EtablissementEventEntity)event);
         } else  if (event instanceof EditeurEventEntity) {
             editeurDao.save((EditeurEventEntity)event);

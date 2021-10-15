@@ -147,6 +147,22 @@ public class EtablissementController {
     @PreAuthorize("hasAuthority('admin')")
     public void scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
+        EtablissementEntity etablissement = etablissementService.getFirstBySiren(etablissementDiviseEvent.getAncienSiren());
+        etablissementDiviseEvent.setTypeEtablissement(etablissement.getTypeEtablissement().getLibelle());
+        etablissementDiviseEvent.setIdAbes(etablissement.getIdAbes());
+        etablissementDiviseEvent.setAdresseContact(etablissement.getContact().getAdresse());
+        etablissementDiviseEvent.setBoitePostaleContact(etablissement.getContact().getBoitePostale());
+        etablissementDiviseEvent.setCedexContact(etablissement.getContact().getCedex());
+        etablissementDiviseEvent.setCodePostalContact(etablissement.getContact().getCodePostal());
+        etablissementDiviseEvent.setVilleContact(etablissement.getContact().getVille());
+        etablissementDiviseEvent.setIdContact(etablissement.getContact().getId());
+        etablissementDiviseEvent.setMailContact(etablissement.getContact().getMail());
+        etablissementDiviseEvent.setTelephoneContact(etablissement.getContact().getTelephone());
+        etablissementDiviseEvent.setPrenomContact(etablissement.getContact().getPrenom());
+        etablissementDiviseEvent.setNomContact(etablissement.getContact().getNom());
+        etablissementDiviseEvent.setMotDePasse(etablissement.getContact().getMotDePasse());
+        etablissementDiviseEvent.setNomEtab(etablissement.getNom());
+        etablissementDiviseEvent.setRoleContact(etablissement.getContact().getRole());
         StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
         //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
         for (EtablissementEntity e : etablissementDiviseEvent.getEtablissementDivises()) {
@@ -154,11 +170,11 @@ public class EtablissementController {
             e.setIdAbes(GenererIdAbes.generateId());
             //on crypte le mode de passe
             e.getContact().setMotDePasse(passwordService.getEncodedMotDePasse(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
-                etab.getSiren().equals(e.getSiren()))
+                    etab.getSiren().equals(e.getSiren()))
                     .collect(Collectors.toList()).get(0).getContact().getMotDePasse()));
-                e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
-                        etab.getSiren().equals(e.getSiren()))
-                .collect(Collectors.toList()).get(0).getTypeEtablissement()));
+            e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
+                    etab.getSiren().equals(e.getSiren()))
+                    .collect(Collectors.toList()).get(0).getTypeEtablissement()));
             e.setStatut(statut);
         }
         //on formatte les nouveaux établissements en json pour sauvegarde
@@ -189,8 +205,7 @@ public class EtablissementController {
         }
         if (user.getSiren().equals(siren)) {
             return mapper.map(entity, EtablissementUserWebDto.class);
-        }
-        else {
+        } else {
             throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
         }
     }
