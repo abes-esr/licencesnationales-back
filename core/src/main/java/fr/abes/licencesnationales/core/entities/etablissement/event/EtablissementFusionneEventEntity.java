@@ -14,8 +14,8 @@ import java.util.Set;
 
 @Entity
 @DiscriminatorValue("fusionne")
+@Getter @Setter
 public class EtablissementFusionneEventEntity  extends EtablissementEventEntity {
-    @Getter
     private transient Set<String> sirenAnciensEtablissements;
 
     @Lob
@@ -36,16 +36,7 @@ public class EtablissementFusionneEventEntity  extends EtablissementEventEntity 
         this.siren = siren;
         setSirenAnciensEtablissements(sirenAnciensEtablissements);
     }
-
-    public void setSirenAnciensEtablissements(Set<String> sirenAnciensEtablissements) throws JsonProcessingException {
-        this.sirenAnciensEtablissements = sirenAnciensEtablissements;
-        this.anciensEtablissementsInBdd = mapper.writeValueAsString(this.sirenAnciensEtablissements);
-    }
-
-    public void addSirenAnciensEtablissements(String siren) throws JsonProcessingException {
-        this.sirenAnciensEtablissements.add(siren);
-        this.anciensEtablissementsInBdd = mapper.writeValueAsString(this.sirenAnciensEtablissements);
-    }
+    
 
     @Override
     public String toString() {
