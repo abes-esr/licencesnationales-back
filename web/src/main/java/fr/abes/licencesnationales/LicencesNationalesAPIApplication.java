@@ -1,5 +1,8 @@
 package fr.abes.licencesnationales;
 
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,6 +19,9 @@ import java.util.Collections;
 
 @SpringBootApplication
 public class LicencesNationalesAPIApplication extends SpringBootServletInitializer implements CommandLineRunner {
+
+    @Autowired
+    private EtablissementEventRepository etablissementEventRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(LicencesNationalesAPIApplication.class, args);

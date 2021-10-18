@@ -1,32 +1,72 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 
-import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.entities.ContactEntity;
-import fr.abes.licencesnationales.core.entities.EtablissementEntity;
-import fr.abes.licencesnationales.core.event.etablissement.EtablissementModifieEvent;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
 
 @Component
-public class EtablissementModifieListener implements ApplicationListener<EtablissementModifieEvent> {
+public class EtablissementModifieListener implements ApplicationListener<EtablissementModifieEventEntity> {
 
     private final EtablissementService service;
-    private final UtilsMapper utilsMapper;
 
-    public EtablissementModifieListener(EtablissementService service, UtilsMapper utilsMapper) {
+    @Autowired
+    private ReferenceService referenceService;
+
+    public EtablissementModifieListener(EtablissementService service) {
         this.service = service;
-        this.utilsMapper = utilsMapper;
     }
 
     @Override
     @Transactional
-    public void onApplicationEvent(EtablissementModifieEvent etablissementModifieEvent) {
-        EtablissementEntity etablissementEntity = service.getFirstBySiren(etablissementModifieEvent.getSiren());
-        etablissementEntity.setContact(utilsMapper.map(etablissementModifieEvent, ContactEntity.class));
-        service.save(etablissementEntity);
+    @SneakyThrows
+    public void onApplicationEvent(EtablissementModifieEventEntity event) {
+        EtablissementEntity etab = service.getFirstBySiren(event.getSiren());
+        ContactEntity contact = etab.getContact();
+
+        // Nom
+        if(event.getNomEtab() != null)
+            etab.setNom(event.getNomEtab());
+
+        // Type d'établissement
+        if(event.getTypeEtablissement() != null)
+            etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
+
+        // Contact - nom
+        contact.setNom(event.getNomContact());
+
+        // Contact - prénom
+        contact.setPrenom(event.getPrenomContact());
+
+        // Contact - téléphone
+        contact.setTelephone(event.getTelephoneContact());
+
+        // Contact - mail
+        contact.setMail(event.getMailContact());
+
+        // Contact - adresse
+        contact.setAdresse(event.getAdresseContact());
+
+        // Contact - boîte postale
+        contact.setBoitePostale(event.getBoitePostaleContact());
+
+        // Contact - code postal
+        contact.setCodePostal(event.getCodePostalContact());
+
+        // Contact - cedex
+        contact.setCedex(event.getCedexContact());
+
+        // Contact - ville
+        contact.setVille(event.getVilleContact());
+
+        service.save(etab);
     }
 }
