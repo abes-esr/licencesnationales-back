@@ -11,6 +11,8 @@ import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
+import fr.abes.licencesnationales.core.repository.StatutRepository;
+import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpV4Repository;
 import fr.abes.licencesnationales.core.repository.ip.IpV6Repository;
@@ -43,6 +45,9 @@ public class IpServiceTest {
 
     @MockBean
     private IpV6Repository ipV6Repository;
+
+    @MockBean
+    private ReferenceService referenceService;
 
     @Test
     @DisplayName("test IP V4 existante")
