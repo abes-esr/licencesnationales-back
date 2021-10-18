@@ -27,7 +27,7 @@ public class EmailServiceTest {
     void init() {
         jsonResult = new StringBuilder("{");
         jsonResult.append("\"to\":[\"test@test.com\",\"test2@test.com\"],");
-        jsonResult.append("\"cc\":[],");
+        jsonResult.append("\"cc\":[\"test2@test2.com\"],");
         jsonResult.append("\"cci\":[],");
         jsonResult.append("\"subject\":\"Test subject\",");
         jsonResult.append("\"text\":\"Test body\"");
@@ -38,9 +38,10 @@ public class EmailServiceTest {
     @Test
     void testmailToJSON() {
         String to = "test@test.com;test2@test.com";
+        String cc = "test2@test2.com";
         String subject = "Test subject";
         String body = "Test body";
 
-        Assertions.assertEquals(jsonResult.toString(), service.mailToJSON(to, subject, body));
+        Assertions.assertEquals(jsonResult.toString(), service.mailToJSON(to, cc, subject, body));
     }
 }

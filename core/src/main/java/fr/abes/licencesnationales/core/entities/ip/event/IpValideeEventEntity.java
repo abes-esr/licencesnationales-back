@@ -17,7 +17,7 @@ public class IpValideeEventEntity extends IpEventEntity {
         super(source);
     }
 
-    public IpValideeEventEntity(Object source, Integer id) {
-        super(source, id);
+    public IpValideeEventEntity(Object source, Integer ipId) {
+        super(source, ipId);
     }
 }

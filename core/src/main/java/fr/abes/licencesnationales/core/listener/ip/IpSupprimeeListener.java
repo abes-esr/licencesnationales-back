@@ -15,17 +15,14 @@ public class IpSupprimeeListener implements ApplicationListener<IpSupprimeeEvent
 
     private final IpService service;
 
-    private final ReferenceService referenceService;
 
-
-    public IpSupprimeeListener(IpService service, ReferenceService referenceService) {
+    public IpSupprimeeListener(IpService service) {
         this.service = service;
-        this.referenceService = referenceService;
     }
 
     @Override
     @SneakyThrows
     public void onApplicationEvent(IpSupprimeeEventEntity ipSupprimeeEvent) {
-        service.deleteById(ipSupprimeeEvent.getId());
+        service.deleteById(ipSupprimeeEvent.getIpId());
     }
 }
