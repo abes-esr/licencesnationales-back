@@ -34,9 +34,9 @@ public class IpEventEntity extends EventEntity implements Serializable {
         super(source);
     }
 
-    public IpEventEntity(Object source, Integer id) {
+    public IpEventEntity(Object source, Integer ipId) {
         super(source);
-        this.id = id;
+        this.ipId = ipId;
     }
 
     public IpEventEntity(Object source, String ip) {
@@ -44,10 +44,10 @@ public class IpEventEntity extends EventEntity implements Serializable {
         this.ip = ip;
     }
 
-    public IpEventEntity(Object source, Integer id, String ip) {
+    public IpEventEntity(Object source, Integer ipId, String ip) {
         super(source);
         this.ip = ip;
-        this.id = id;
+        this.ipId = ipId;
     }
 
 }
