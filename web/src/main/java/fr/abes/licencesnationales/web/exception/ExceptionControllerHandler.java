@@ -9,6 +9,7 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.core.AuthenticationException;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -38,7 +40,9 @@ import java.util.stream.Stream;
 public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     private ResponseEntity<Object> buildResponseEntity(ApiReturnError apiReturnError) {
-        return new ResponseEntity<>(apiReturnError, apiReturnError.getStatus());
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new ResponseEntity<>(apiReturnError, headers, apiReturnError.getStatus());
     }
 
     /**
@@ -58,6 +62,9 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         if (ex.getCause() instanceof MismatchedInputException) {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
 
+            if (((MismatchedInputException) ex.getCause()).getPath().size() == 0) {
+                return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+            }
             List<JsonMappingException.Reference> errors = ((MismatchedInputException) ex.getCause()).getPath();
             String property = errors.get(errors.size() - 1).getFieldName();
 
@@ -153,8 +160,14 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
 
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleValidationException(ConstraintViolationException ex){
+        String error = "Erreur de validation des données";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
+    }
     /**
      * Gestion des erreurs d'authentification
+     *
      * @param ex
      * @return
      */
@@ -164,9 +177,27 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(UnknownEditeurException.class)
+    protected ResponseEntity<Object> handleUnknownIpException(UnknownEditeurException ex) {
+        String error = "Editeur inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
+    @ExceptionHandler(UnknownIpException.class)
+    protected ResponseEntity<Object> handleUnknownIpException(UnknownIpException ex) {
+        String error = "IP inconnue";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     @ExceptionHandler(UnknownEtablissementException.class)
     protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
         String error = "Etablissement inconnu";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
+    @ExceptionHandler(UnknownTypeEtablissementException.class)
+    protected ResponseEntity<Object> handleUnknowTypeEtablissementException(UnknownTypeEtablissementException ex) {
+        String error = "Type d'établissement inconnu";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
@@ -178,6 +209,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
                 .findFirst();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, rootCause.get()));
     }
+
     /**
      * Erreur dans la validation du captcha / Etablissement déjà existant
      * / mail déjà existant / récupération dernière date de modification / IP
@@ -186,9 +218,13 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class})
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, ex.getMessage(), ex));
+        String message = "Erreur non répertoriée";
+        Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
+                .filter(element -> element.getCause() == null)
+                .findFirst();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, rootCause.get()));
     }
 
 
