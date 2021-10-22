@@ -127,7 +127,7 @@ public class EditeurWebDtoConverter {
         Converter<EditeurEntity, EditeurWebDto> myConverter = new Converter<EditeurEntity, EditeurWebDto>() {
 
             public EditeurWebDto convert(MappingContext<EditeurEntity, EditeurWebDto> context) {
-                DateFormat dateFormat = new SimpleDateFormat("dd/mm/yyyy");
+                DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 EditeurEntity source = context.getSource();
 
                 EditeurWebDto dto = new EditeurWebDto();
