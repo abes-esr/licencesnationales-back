@@ -68,8 +68,6 @@ public class JwtTokenProvider {
             log.error(Constant.JWT_SIGNATURE_INVALID, ex.getMessage());
         } catch (MalformedJwtException ex) {
             log.error(Constant.JWT_TOKEN_INVALID, ex.getMessage());
-        } catch (ExpiredJwtException ex) {
-            log.error(Constant.JWT_TOKEN_EXPIRED, ex.getMessage());
         } catch (UnsupportedJwtException ex) {
             log.error(Constant.JWT_TOKEN_UNSUPPORTED, ex.getMessage());
         } catch (IllegalArgumentException ex) {

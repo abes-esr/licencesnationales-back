@@ -35,7 +35,7 @@ public class Constant implements Serializable {
     public static final String ENTER_LOGIN_SUCCEED = "entree dans loginSucceeded pour IP = ";
     public static final String JWT_CLAIMS_STRING_EMPTY = "JWT claims string is empty : {}";
     public static final String JWT_TOKEN_UNSUPPORTED = "Unsupported JWT token : {}";
-    public static final String JWT_TOKEN_EXPIRED = "Expired JWT token : {}";
+    public static final String JWT_TOKEN_EXPIRED = "Expired JWT token";
     public static final String JWT_TOKEN_INVALID = "Invalid JWT token : {}";
     public static final String JWT_SIGNATURE_INVALID = "Invalid JWT signature : {}";
 
