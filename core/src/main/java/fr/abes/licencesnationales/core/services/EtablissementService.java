@@ -73,7 +73,11 @@ public class EtablissementService {
     }
 
     public List<EtablissementEntity> findAll() {
-        return etablissementDao.findAll();
+        List<EtablissementEntity> list = etablissementDao.findAll();
+        list.forEach(etab -> {
+            etab.setIdAbes(GenererIdAbes.genererIdAbes(etab.getIdAbes()));
+        });
+        return list;
     }
 
     public EtablissementEntity getUserByMail(String mail) {
