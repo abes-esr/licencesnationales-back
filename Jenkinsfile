@@ -274,9 +274,9 @@ node {
                             newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
                             newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${BDpassword}")
                             newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
-                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.site=*", "google.fr.abes.licencesnationales.web.recaptcha.key.site=${googleRecaptchaKey}")
-                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.secret=*", "google.fr.abes.licencesnationales.web.recaptcha.key.secret=${googleRecaptchaSecret}")
-                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.web.recaptcha.key.threshold=*", "google.fr.abes.licencesnationales.web.recaptcha.key.threshold=${googleRecaptchaThreshold}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.site=*", "google.fr.abes.licencesnationales.recaptcha.key.site=${googleRecaptchaKey}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.secret=*", "google.fr.abes.licencesnationales.recaptcha.key.secret=${googleRecaptchaSecret}")
+                            newconfig = newconfig.replaceAll("google.fr.abes.licencesnationales.recaptcha.key.threshold=*", "google.fr.abes.licencesnationales.recaptcha.key.threshold=${googleRecaptchaThreshold}")
                             newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
                             newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
                         }
