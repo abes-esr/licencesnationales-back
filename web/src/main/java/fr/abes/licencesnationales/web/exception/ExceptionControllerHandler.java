@@ -202,6 +202,12 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    @ExceptionHandler(BadStatutException.class)
+    protected ResponseEntity<Object> handleBadStatutEcception(BadStatutException ex) {
+        String error = "Erreur dans le statut de l'établissement";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     @ExceptionHandler(TransactionSystemException.class)
     protected ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
         String error = "Erreur de mise à jour de la base de données";
