@@ -16,7 +16,7 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.MotifSuppressionWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
@@ -264,6 +264,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/fusion")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+
     }
 
     @Test
@@ -288,6 +289,39 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(motif)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test validation établissement")
+    @WithMockUser(authorities = {"admin"})
+    void testValidationEtablissement() throws Exception {
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test validation établissement avec mauvais statut")
+    @WithMockUser(authorities = {"admin"})
+    void testValidationEtablissementWithWrongStatut() throws Exception {
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        etab.setValide(true);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("Erreur dans le statut de l'établissement"))
+                .andExpect(jsonPath("$.debugMessage").value("L'établissement ne doit pas déjà être validé"));
     }
 
     @Test

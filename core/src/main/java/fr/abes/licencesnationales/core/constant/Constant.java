@@ -43,17 +43,15 @@ public class Constant implements Serializable {
 
 
     /** Statuts établissement */
-    public static final int STATUT_ETAB_NOUVEAU = 1;
-    public static final int STATUT_ETAB_AUCUNEIP = 2;
-    public static final int STATUT_ETAB_ENVALIDATION = 3;
-    public static final int STATUT_ETAB_ATTESTATION = 4;
-    public static final int STATUT_ETAB_VALIDE = 5;
+    public static final String STATUT_ETAB_SANSIP = "Sans IP";
+    public static final String STATUT_ETAB_EXAMINERIP = "Examiner IP";
+    public static final String STATUT_ETAB_ATTENTEATTESTATION = "Attestation à envoyer";
+    public static final String STATUT_ETAB_IPOK = "IP Ok";
 
     /** Statuts IP */
     public static final int STATUT_IP_NOUVELLE = 6;
     public static final int STATUT_IP_ATTESTATION = 7;
     public static final int STATUT_IP_VALIDEE = 8;
-    public static final int STATUT_IP_AUCUNEIP = 9;
 
 
     /**Email service */

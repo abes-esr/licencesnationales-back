@@ -18,11 +18,11 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
 
     private final EtablissementService service;
 
-    @Autowired
-    private ReferenceService referenceService;
+    private final ReferenceService referenceService;
 
-    public EtablissementModifieListener(EtablissementService service) {
+    public EtablissementModifieListener(EtablissementService service, ReferenceService referenceService) {
         this.service = service;
+        this.referenceService = referenceService;
     }
 
     @Override

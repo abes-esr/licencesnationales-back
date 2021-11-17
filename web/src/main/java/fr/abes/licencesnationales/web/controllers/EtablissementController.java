@@ -2,13 +2,10 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
@@ -31,7 +28,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
@@ -163,7 +159,6 @@ public class EtablissementController {
         etablissementDiviseEvent.setMotDePasse(etablissement.getContact().getMotDePasse());
         etablissementDiviseEvent.setNomEtab(etablissement.getNom());
         etablissementDiviseEvent.setRoleContact(etablissement.getContact().getRole());
-        StatutEtablissementEntity statut = (StatutEtablissementEntity) referenceService.findStatutById(Constant.STATUT_ETAB_NOUVEAU);
         //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
         for (EtablissementEntity e : etablissementDiviseEvent.getEtablissementDivises()) {
             //on génère un identifiant Abes
@@ -175,7 +170,7 @@ public class EtablissementController {
             e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
                     etab.getSiren().equals(e.getSiren()))
                     .collect(Collectors.toList()).get(0).getTypeEtablissement()));
-            e.setStatut(statut);
+            e.setValide(false);
         }
         //on formatte les nouveaux établissements en json pour sauvegarde
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
@@ -194,6 +189,18 @@ public class EtablissementController {
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructSuppressionMail(motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+    }
+
+    @PostMapping(value = "/validation/{siren}")
+    @PreAuthorize("hasAuthority('admin')")
+    public void validation(@Valid @PathVariable String siren) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+        EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
+        if (etab.isValide()) {
+            throw new BadStatutException("L'établissement ne doit pas déjà être validé");
+        }
+        EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        applicationEventPublisher.publishEvent(etablissementValideEvent);
+        eventService.save(etablissementValideEvent);
     }
 
     @GetMapping(value = "/{siren}")
