@@ -43,6 +43,7 @@ class EtablissementServiceTest {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+        etabIn.setValide(false);
         Optional<EtablissementEntity> optionEtab = Optional.of(etabIn);
         Mockito.when(etablissementDao.getFirstBySiren("000000000")).thenReturn(optionEtab);
         EtablissementEntity etabOut = service.getFirstBySiren("000000000");
@@ -60,6 +61,7 @@ class EtablissementServiceTest {
         Assertions.assertEquals("cedex", etabOut.getContact().getCedex());
         Assertions.assertEquals("telephone", etabOut.getContact().getTelephone());
         Assertions.assertEquals("mail@mail.com", etabOut.getContact().getMail());
+        Assertions.assertEquals(false, etabOut.isValide());
         Assertions.assertNotNull(etabOut.getContact().getMotDePasse());
     }
 

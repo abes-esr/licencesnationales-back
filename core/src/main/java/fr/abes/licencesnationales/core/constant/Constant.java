@@ -49,9 +49,9 @@ public class Constant implements Serializable {
     public static final String STATUT_ETAB_IPOK = "IP Ok";
 
     /** Statuts IP */
-    public static final int STATUT_IP_NOUVELLE = 6;
-    public static final int STATUT_IP_ATTESTATION = 7;
-    public static final int STATUT_IP_VALIDEE = 8;
+    public static final int STATUT_IP_NOUVELLE = 1;
+    public static final int STATUT_IP_ATTESTATION = 2;
+    public static final int STATUT_IP_VALIDEE = 3;
 
 
     /**Email service */
