@@ -40,6 +40,9 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         if(event.getTypeEtablissement() != null)
             etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
 
+        //statut de validation  de l'établissement
+        etab.setValide(event.isValide());
+
         // Contact - nom
         contact.setNom(event.getNomContact());
 

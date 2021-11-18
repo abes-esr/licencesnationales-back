@@ -101,6 +101,7 @@ public class EtablissementController {
         event.setSource(this);
         // On genère un identifiant Abes
         event.setIdAbes(GenererIdAbes.generateId());
+        event.setValide(false);
         event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementCreeWebDto.getContact().getMotDePasse()));
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);
@@ -135,6 +136,7 @@ public class EtablissementController {
         event.setIdAbes(GenererIdAbes.generateId());
         // On crypte le mot de passe
         event.setMotDePasse(passwordService.getEncodedMotDePasse(etablissementFusionneWebDto.getNouveauEtab().getContact().getMotDePasse()));
+        event.setValide(true);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
     }
@@ -159,6 +161,7 @@ public class EtablissementController {
         etablissementDiviseEvent.setMotDePasse(etablissement.getContact().getMotDePasse());
         etablissementDiviseEvent.setNomEtab(etablissement.getNom());
         etablissementDiviseEvent.setRoleContact(etablissement.getContact().getRole());
+        etablissementDiviseEvent.setValide(etablissement.isValide());
         //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
         for (EtablissementEntity e : etablissementDiviseEvent.getEtablissementDivises()) {
             //on génère un identifiant Abes
@@ -170,7 +173,7 @@ public class EtablissementController {
             e.setTypeEtablissement(referenceService.findTypeEtabByLibelle(etablissementDiviseWebDto.getNouveauxEtabs().stream().filter(etab ->
                     etab.getSiren().equals(e.getSiren()))
                     .collect(Collectors.toList()).get(0).getTypeEtablissement()));
-            e.setValide(false);
+            e.setValide(true);
         }
         //on formatte les nouveaux établissements en json pour sauvegarde
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
@@ -199,6 +202,7 @@ public class EtablissementController {
             throw new BadStatutException("L'établissement ne doit pas déjà être validé");
         }
         EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
         eventService.save(etablissementValideEvent);
     }
