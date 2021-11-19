@@ -87,7 +87,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
 
         Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
@@ -130,7 +129,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         entity.ajouterIp(ipEntity);
 
         Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
         Mockito.when(ipService.isIpAlreadyExists(Mockito.any(IpV4.class))).thenReturn(true);
 
@@ -177,7 +175,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
 
@@ -205,7 +202,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
         Mockito.when(referenceService.findStatutByLibelle(Mockito.anyString())).thenReturn(new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation"));

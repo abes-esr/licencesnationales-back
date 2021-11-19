@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.exception;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.exc.MismatchedInputException;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.MappingException;
@@ -227,7 +228,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
-        String message = "Erreur non répertoriée";
+        String message = Constant.ERROR_SAISIE;
         Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
                 .filter(element -> element.getCause() == null)
                 .findFirst();

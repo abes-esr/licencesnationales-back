@@ -35,9 +35,12 @@ public class EmailService {
     protected String frontBaseURL;
 
     public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab) throws RestClientException {
-        String message = messageSource.getMessage("message.CreationCompteAdmin", null, locale);
-        message +=nomEtab + " avec le siren " + siren;
-        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
+        StringBuilder message = new StringBuilder();
+        message.append(messageSource.getMessage("message.CreationCompteAdmin", null, locale));
+        message.append(nomEtab);
+        message.append(" avec le siren ");
+        message.append(siren);
+        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -49,49 +52,79 @@ public class EmailService {
 
     public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
         final String url = this.frontBaseURL + "/reinitialisationPass?token=" + token;
-        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
-        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
-        message +=nomEtab + " ";
-        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, locale);
-        message += " \r\n" + url;
-        message += " \r\n" + messageSource.getMessage("message.resetTokenEmailFin", null, locale);
-        String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message);
+        StringBuilder message = new StringBuilder();
+        message.append(messageSource.getMessage("message.resetTokenEmailDebut",null, locale));
+        message.append(nomEtab);
+        message.append(" ");
+        message.append(messageSource.getMessage("message.resetTokenEmailMilieu", null, locale));
+        message.append(" \r\n");
+        message.append(url);
+        message.append(" \r\n");
+        message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.resetTokenEmailObjet",null, locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
     public void constructValidationNewPassEmail(Locale locale, String emailUser) throws RestClientException {
-        final String message = messageSource.getMessage("message.validationNewPass", null, locale);
-        String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message);
+        StringBuilder message = new StringBuilder();
+        message.append(messageSource.getMessage("message.validationNewPass", null, locale));
+        String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message.toString());
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructAccesModifieEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
-        String message = messageSource.getMessage("message.modificationAcces", null, locale);
-        message += "\r\n" + descriptionAcces;
-        message += "\r\n Commentaires liés à la modification de l'accès : " + commentaires;
-        String jsonRequestConstruct = mailToJSON(emailUser, "LN Modification Acces", message);
+    public void constructSuppressionCompteMailUser(Locale locale, String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
+        StringBuilder message = new StringBuilder();
+        message.append("Bonjour,\n");
+        message.append("Le compte que vous avez créé pour ");
+        message.append(nomEtab);
+        message.append(" sur le site Licencesnationales.fr vient d'être supprimé.\n");
+        message.append("Raison de la suppression : \n");
+        message.append(motifSuppression);
+        message.append("\n");
+        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
+        message.append("Bien cordialement,\n");
+        message.append("L’équipe Licences nationales\n");
+        message.append("https://acces.licencesnationales.fr/");
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteSupprimeUser",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructAccesCreeEmail(Locale locale, String descriptionAcces, String commentaires, String emailUser) throws RestClientException {
-        String message = messageSource.getMessage("message.creationAcces", null, locale);
-        message += "\r\n" + descriptionAcces;
-        message += "\r\n Commentaires liés à la création de l'accès : " + commentaires;
-        String jsonRequestConstruct = mailToJSON(emailUser, "LN Creation Acces", message);
+    public void constructSuppressionCompteMailAdmin(Locale locale, String motifSuppression, String emailUser, String nomEtab, String siren) {
+        StringBuilder message = new StringBuilder();
+        message.append(messageSource.getMessage("message.suppressionCompteAdmin", null, locale));
+        message.append(nomEtab);
+        message.append(" avec le siren ");
+        message.append(siren);
+        message.append(" pour le motif : ");
+        message.append(motifSuppression);
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteSupprimeAdmin",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructSuppressionMail(String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
-        String message = "Bonjour,\n" +
-                "Le compte que vous avez créé pour " + nomEtab + " sur le site Licencesnationales.fr vient d'être supprimé.\n" +
-                "Raison de la suppression : \n" + motifSuppression + "\n" + "Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n" +
-                "Bien cordialement,\n" +
-                "L’équipe Licences nationales\n" +
-                "https://acces.licencesnationales.fr/";
-        String jsonRequestConstruct = mailToJSON(emailUser, "Suppression de votre compte Licences Nationales", message);
+    public void constructValidationCompteMailAdmin(Locale locale, String emailUser, String nomEtab, String siren) {
+        StringBuilder message = new StringBuilder();
+        message.append(messageSource.getMessage("message.validationCompteAdmin", null, locale));
+        message.append(nomEtab);
+        message.append(" avec le siren ");
+        message.append(siren);
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteValideAdmin",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructValidationCompteMailUser(Locale locale, String nomEtab, String emailUser) {
+        StringBuilder message = new StringBuilder();
+        message.append("Bonjour,\n");
+        message.append("Le compte que vous avez créé pour ");
+        message.append(nomEtab);
+        message.append(" sur le site Licencesnationales.fr vient d'être validé par l'administrateur.\n");
+        message.append("\n");
+        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
+        message.append("Bien cordialement,\n");
+        message.append("L’équipe Licences nationales\n");
+        message.append("https://acces.licencesnationales.fr/");
+        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteValideUser",null,locale), message.toString());
+        sendMail(jsonRequestConstruct);
+    }
 
     public void sendMail(String requestJson) throws RestClientException {
         HttpHeaders headers = new HttpHeaders();
@@ -122,5 +155,7 @@ public class EmailService {
         }
         return json;
     }
+
+
 
 }
