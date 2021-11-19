@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
@@ -82,7 +83,7 @@ public class EtablissementController {
 
 
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException {
+    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
@@ -95,7 +96,12 @@ public class EtablissementController {
         if (!reCaptchaResponse.isSuccess()) {
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
-
+        if (etablissementService.existeSiren(etablissementCreeWebDto.getSiren())) {
+            throw new SirenExistException("Le siren saisi est déjà utilisé");
+        }
+        if (etablissementService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
+            throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
+        }
         // On convertit la DTO web (Json) en objet métier d'événement de création d'établissement
         EtablissementCreeEventEntity event = mapper.map(etablissementCreeWebDto, EtablissementCreeEventEntity.class);
         event.setSource(this);
@@ -113,13 +119,17 @@ public class EtablissementController {
     }
 
     @PostMapping(value = "")
-    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException {
+    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException {
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
                 throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
             }
+        }
+        EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
+        if (!(etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail())) && (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail()))) {
+            throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
         }
         EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
@@ -182,7 +192,8 @@ public class EtablissementController {
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif) throws RestClientException, JsonProcessingException {
+    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif, HttpServletRequest request) throws RestClientException, JsonProcessingException {
+        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
@@ -191,12 +202,14 @@ public class EtablissementController {
 
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructSuppressionMail(motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructSuppressionCompteMailUser(locale, motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructSuppressionCompteMailAdmin(locale, motif.getMotif(), admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
     }
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void validation(@Valid @PathVariable String siren) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+    public void validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
             throw new BadStatutException("L'établissement ne doit pas déjà être validé");
@@ -205,6 +218,12 @@ public class EtablissementController {
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
         eventService.save(etablissementValideEvent);
+
+        //envoi du mail de validation
+        UserDetails user = userDetailsService.loadUser(etab);
+        emailService.constructValidationCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructValidationCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+
     }
 
     @GetMapping(value = "/{siren}")

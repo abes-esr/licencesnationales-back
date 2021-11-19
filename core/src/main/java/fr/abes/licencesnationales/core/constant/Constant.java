@@ -57,5 +57,9 @@ public class Constant implements Serializable {
     /**Email service */
     public static final String ERROR_CONVERSION_MAIL_TO_JSON = "Erreur lors de la conversion Mail-Json";
     public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
+
+    /** Gestion des erreurs */
+    public static final String ERROR_SAISIE = "Erreur dans la saisie des paramètres";
+    public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 }
 
