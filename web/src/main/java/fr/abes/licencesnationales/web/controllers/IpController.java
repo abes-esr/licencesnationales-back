@@ -79,8 +79,6 @@ public class IpController {
             try {
                 applicationEventPublisher.publishEvent(ipAjouteeEvent);
                 eventRepository.save(ipAjouteeEvent);
-                String descriptionAcces = " ip ou plage d'ips = " + e.getIp() + " en provenance de l'établissement " + etab;
-                emailService.constructAccesCreeEmail(locale, descriptionAcces, e.getCommentaires(), admin);
             } catch (Exception exception) {
                 errors.add(exception.getLocalizedMessage());
             }
@@ -112,8 +110,6 @@ public class IpController {
         ipModifieeEvent.setIpId(id);
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(ipModifieeEvent);
-        String descriptionAcces = "id = " + id + ", ip ou plage d'ips = " + dto.getIp() + " en provenance de l'établissement " + etab.getSiren();
-        emailService.constructAccesModifieEmail(locale, descriptionAcces, dto.getCommentaires(), admin);
     }
 
     @PostMapping(value = "/valider")

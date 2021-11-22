@@ -36,6 +36,9 @@ public abstract class EtablissementEventEntity extends EventEntity implements Se
     @Column(name = "ID_ABES")
     protected String idAbes;
 
+    @Column(name = "VALIDE")
+    protected boolean valide;
+
     @Column(name = "ID_CONTACT")
     protected Integer idContact;
 
