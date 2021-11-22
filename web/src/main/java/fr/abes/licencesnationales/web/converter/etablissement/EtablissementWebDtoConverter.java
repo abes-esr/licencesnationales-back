@@ -67,6 +67,8 @@ public class EtablissementWebDtoConverter {
                         throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
                     }
 
+                    event.setValide(false);
+
                     setContact(source.getContact(), event);
 
                     // Contact - mot de passe
