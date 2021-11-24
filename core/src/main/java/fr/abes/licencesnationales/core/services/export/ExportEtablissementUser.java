@@ -54,6 +54,7 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
 
     private void writeEtabInfo(ExportEtablissementUserDto item, List<String> output) {
         output.add(item.getIdAbes());
+        output.add(item.getSiren());
         output.add(item.getNom());
         output.add(item.getTypeEtablissement());
         output.add(item.getAdresse());
