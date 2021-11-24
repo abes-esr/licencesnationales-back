@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.google.common.collect.Lists;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -10,6 +11,8 @@ import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
+import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
+import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
@@ -24,16 +27,22 @@ import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -77,6 +86,12 @@ public class EtablissementController {
 
     @Autowired
     private UserDetailsServiceImpl userDetailsService;
+
+    @Autowired
+    private ExportEtablissementUser exportEtablissementUser;
+
+    @Autowired
+    private ExportEtablissementAdmin exportEtablissementAdmin;
 
     @Value("${ln.dest.notif.admin}")
     private String admin;
@@ -283,6 +298,22 @@ public class EtablissementController {
     @GetMapping(value = "/getType")
     public List<TypeEtablissementDto> getListType() {
         return mapper.mapList(referenceService.findAllTypeEtab(), TypeEtablissementDto.class);
+    }
+
+    @GetMapping(value = "/export")
+    public void exportEtab(@RequestBody List<String> sirens, HttpServletResponse response) throws IOException, SirenIntrouvableException, AccesInterditException {
+        response.setContentType("text/csv;charset=UTF-8");
+        response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
+        InputStream stream;
+        if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
+            stream = exportEtablissementAdmin.generateCsv(sirens);
+        } else {
+            List liste = new ArrayList();
+            liste.add(filtrerAccesServices.getSirenFromSecurityContextUser());
+            stream = exportEtablissementUser.generateCsv(liste);
+        }
+        IOUtils.copy(stream , response.getOutputStream());
+        response.flushBuffer();
     }
 
 }
