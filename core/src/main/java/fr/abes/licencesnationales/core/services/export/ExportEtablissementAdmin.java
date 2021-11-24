@@ -43,9 +43,11 @@ public class ExportEtablissementAdmin extends ExportService<ExportEtablissementA
     protected void writeLine(CSVPrinter printer, ExportEtablissementAdminDto item) throws IOException {
         List<String> output = new ArrayList<>();
         output.add(item.getIdAbes());
+        output.add(item.getSiren());
         output.add(item.getNom());
         output.add(item.getTypeEtablissement());
         output.add(item.getAdresse());
+        output.add(item.getVille());
         output.add(item.getTelephone());
         output.add(item.getNomPrenomContact());
         output.add(item.getMailContact());

@@ -19,7 +19,7 @@ public abstract class ExportService<T, E> {
 
     public ByteArrayInputStream generateCsv(List<E> ids) {
         try (final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-             final CSVPrinter printer = new CSVPrinter(new PrintWriter(stream), CSVFormat.newFormat(';'))) {
+             final CSVPrinter printer = new CSVPrinter(new PrintWriter(stream), CSVFormat.EXCEL.withDelimiter(';').withRecordSeparator("\r\n"))) {
             List<T> query = this.getItems(ids);
             if (!query.isEmpty()) {
                 this.writeHeader(printer);
