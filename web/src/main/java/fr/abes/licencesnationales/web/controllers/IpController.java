@@ -21,6 +21,7 @@ import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
+import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,7 +68,7 @@ public class IpController {
 
 
     @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException {
+    public void ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
         List<String> errors = new ArrayList<>();
         filtrerAccesServices.autoriserServicesParSiren(siren);
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
@@ -93,7 +94,7 @@ public class IpController {
     }
 
     @PostMapping(value = "/{id}")
-    public void modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException {
+    public void modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
         EtablissementEntity etab = ipService.getEtablissementByIp(id);
         filtrerAccesServices.autoriserServicesParSiren(etab.getSiren());
         if (dto instanceof IpModifieeUserWebDto) {
@@ -138,7 +139,7 @@ public class IpController {
     }
 
     @GetMapping(value = "/{siren}")
-    public Set<IpWebDto> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException {
+    public Set<IpWebDto> get(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException, InvalidTokenException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
         Set<IpEntity> setIps = etablissementService.getFirstBySiren(siren).getIps();
         return mapper.mapSet(setIps, IpWebDto.class);
@@ -153,7 +154,7 @@ public class IpController {
     }
 
     @PostMapping(value = "/getIpEntity")
-    public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException, UnknownIpException {
+    public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
         filtrerAccesServices.autoriserServicesParSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
         return mapper.map(ipService.getFirstById(ipDto.getId()), IpWebDto.class);
     }
