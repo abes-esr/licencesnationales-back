@@ -59,13 +59,33 @@ public class BatchConfiguration {
     }
 
     @Bean
-    public Job jobSupprimerIpEnValidation(ItemReader itemReader, ItemProcessor itemProcessor, ItemWriter itemWriter) {
-        return this.jobs.get("supprimerIpEnValidation").incrementer(incrementer())
+    public Job jobGestionCompte() {
+        return this.jobs.get("gestionCompte").incrementer(incrementer())
+                .start(stepCalculDateSuppression()).on("SUPTODAY").to(stepSuppressionCompte())
+                .on("INFTODAY").end()
+                .build().build();
+    }
+    @Bean
+    public Job jobRelances(ItemReader itemReader, ItemProcessor itemProcessor, ItemWriter itemWriter) {
+        return this.jobs.get("jobRelances").incrementer(incrementer())
                 .start(stepGetIpATraiter()).on("FAILED").end()
                 .from(stepGetIpATraiter()).on("COMPLETED").to(stepTraiterSuppressionIp(itemReader, itemProcessor, itemWriter))
-                .from(stepTraiterSuppressionIp(itemReader, itemProcessor, itemWriter)).on("FAILED").end()
-                .from(stepTraiterSuppressionIp(itemReader, itemProcessor, itemWriter))
+                .next(stepSelectIpAttestationAEnvoyer())
                 .build().build();
+    }
+
+    @Bean
+    public Step stepCalculDateSuppression() {
+        return stepBuilderFactory.get("stepCalculDateSUppression").allowStartIfComplete(true)
+        .tasklet(new CalculDateSuppressionTasklet())
+        .build();
+    }
+
+    @Bean
+    public Step stepSuppressionCompte() {
+        return stepBuilderFactory.get("stepSuppressionCompte").allowStartIfComplete(true)
+                .tasklet(new SuppressionCompteTasklet())
+                .build();
     }
 
     @Bean
