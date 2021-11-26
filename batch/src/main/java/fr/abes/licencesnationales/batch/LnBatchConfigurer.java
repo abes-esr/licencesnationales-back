@@ -8,6 +8,7 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -15,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
 @Slf4j
+@Configuration
 public class LnBatchConfigurer implements BatchConfigurer {
     private final EntityManagerFactory entityManagerFactory;
 

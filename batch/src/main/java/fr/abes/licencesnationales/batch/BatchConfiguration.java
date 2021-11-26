@@ -1,18 +1,18 @@
-package fr.abes.licencesnationales.batch.SuppressionIpValidation;
+package fr.abes.licencesnationales.batch;
 
-import fr.abes.licencesnationales.batch.LnBatchConfigurer;
+import fr.abes.licencesnationales.batch.SuppressionIpValidation.IpDto;
 import fr.abes.licencesnationales.batch.SuppressionIpValidation.tasklets.GetIpATraiterTasklet;
-import fr.abes.licencesnationales.batch.TimeIncrementer;
+import fr.abes.licencesnationales.batch.gestionCompte.EnvoiMailEtablissementTasklet;
+import fr.abes.licencesnationales.batch.gestionCompte.SelectEtablissementTasklet;
+import fr.abes.licencesnationales.batch.gestionCompte.SuppressionCompteTasklet;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import fr.abes.licencesnationales.core.services.IpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
-import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
-import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.configuration.annotation.*;
+import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.ItemWriter;
@@ -61,11 +61,12 @@ public class BatchConfiguration {
     @Bean
     public Job jobGestionCompte() {
         return this.jobs.get("gestionCompte").incrementer(incrementer())
-                .start(stepCalculDateSuppression()).on("SUPTODAY").to(stepSuppressionCompte())
-                .on("INFTODAY").end()
-                .build().build();
+                .start(stepSelectEtablissement()).next(stepSuppressionCompte())
+                .next(stepEnvoiMail())
+                .build();
     }
-    @Bean
+
+ /**   @Bean
     public Job jobRelances(ItemReader itemReader, ItemProcessor itemProcessor, ItemWriter itemWriter) {
         return this.jobs.get("jobRelances").incrementer(incrementer())
                 .start(stepGetIpATraiter()).on("FAILED").end()
@@ -73,11 +74,11 @@ public class BatchConfiguration {
                 .next(stepSelectIpAttestationAEnvoyer())
                 .build().build();
     }
-
+*/
     @Bean
-    public Step stepCalculDateSuppression() {
+    public Step stepSelectEtablissement() {
         return stepBuilderFactory.get("stepCalculDateSUppression").allowStartIfComplete(true)
-        .tasklet(new CalculDateSuppressionTasklet())
+        .tasklet((Tasklet) new SelectEtablissementTasklet())
         .build();
     }
 
@@ -88,6 +89,12 @@ public class BatchConfiguration {
                 .build();
     }
 
+    @Bean
+    public Step stepEnvoiMail() {
+        return stepBuilderFactory.get("stepEnvoiMail").allowStartIfComplete(true)
+                .tasklet(new EnvoiMailEtablissementTasklet())
+                .build();
+    }
     @Bean
     public Step stepGetIpATraiter() {
         return stepBuilderFactory.get("stepGetIpATraiter").allowStartIfComplete(true)

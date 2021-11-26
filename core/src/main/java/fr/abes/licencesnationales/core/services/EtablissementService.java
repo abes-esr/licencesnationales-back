@@ -9,13 +9,12 @@ import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -24,12 +23,21 @@ public class EtablissementService {
     private EtablissementRepository etablissementDao;
 
     @Autowired
+    private EventService eventService;
+
+    @Autowired
     private ContactRepository contactEtablissementDao;
-
-
 
     @Autowired
     private StatutRepository statutRepository;
+
+    @Setter
+    private Calendar oneYearAgo;
+
+    public EtablissementService() {
+        this.oneYearAgo = Calendar.getInstance();
+        oneYearAgo.add(Calendar.YEAR, -1);
+    }
 
     public EtablissementEntity getFirstBySiren(String siren) {
         return etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
@@ -78,5 +86,27 @@ public class EtablissementService {
 
     public EtablissementEntity getUserByMail(String mail) {
         return etablissementDao.getEtablissementEntityByContact_MailContains(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
+    }
+
+    public List<EtablissementEntity> getEtabASupprimer() {
+        List<EtablissementEntity> emptyEtab = etablissementDao.getEtablissementEntityByIps_Empty();
+        List<EtablissementEntity> listeOut = new ArrayList<>();
+        for (EtablissementEntity etab : emptyEtab) {
+            Date dateSuppressionDerniereIp = eventService.getLastDateSuppressionIpEtab(etab);
+            if (dateSuppressionDerniereIp != null) {
+                //si on a la date de dernière suppression d'une IP de l'etab, on regarde si elle est plus vieille d'un an
+                if (dateSuppressionDerniereIp.before(oneYearAgo.getTime())) {
+                    listeOut.add(etab);
+                }
+            }
+            else {
+                //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
+                Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                if (dateCreationEtab.before(oneYearAgo.getTime())) {
+                    listeOut.add(etab);
+                }
+            }
+        }
+        return listeOut;
     }
 }
