@@ -166,6 +166,13 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         String error = "Erreur de validation des données";
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    protected ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException ex) {
+        String error = "Erreur de token d'authentification";
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     /**
      * Gestion des erreurs d'authentification
      *
@@ -219,7 +226,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      * @param ex
      * @return
      */
-    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
+    @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
         String message = "Erreur non répertoriée";
         Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)

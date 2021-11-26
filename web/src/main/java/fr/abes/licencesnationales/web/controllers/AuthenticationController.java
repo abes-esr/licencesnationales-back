@@ -209,7 +209,7 @@ public class AuthenticationController {
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping(value = "/modifierMotDePasse")
-    public ResponseEntity<?> modifierMotDePasse(HttpServletRequest requestHtttp, @Valid @RequestBody ModifierMotDePasseRequestDto request) throws PasswordMismatchException, MailDoublonException, SirenExistException, JsonIncorrectException {
+    public ResponseEntity<?> modifierMotDePasse(HttpServletRequest requestHtttp, @Valid @RequestBody ModifierMotDePasseRequestDto request) throws PasswordMismatchException, MailDoublonException, SirenExistException, JsonIncorrectException, InvalidTokenException {
 
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(requestHtttp));
 
