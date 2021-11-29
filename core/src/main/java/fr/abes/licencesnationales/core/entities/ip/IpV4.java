@@ -122,4 +122,10 @@ public class IpV4 extends IpEntity implements Serializable {
         return this.ipRange.end();
     }
 
+    //194.57.116-116.1-255
+    @Override
+    public String formatRange(){
+
+        return "ranged";
+    }
 }
