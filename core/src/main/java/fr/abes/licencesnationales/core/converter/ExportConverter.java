@@ -1,9 +1,8 @@
 package fr.abes.licencesnationales.core.converter;
 
-import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementAdminDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
-import fr.abes.licencesnationales.core.dto.export.ExportIpDto;
+import fr.abes.licencesnationales.core.dto.export.*;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
@@ -97,11 +96,28 @@ public class ExportConverter {
 
     @Bean
     public void converterEditeurExportAdmin() {
-        Converter<EtablissementEntity, ExportEditeurDto> myConverter = new Converter<EtablissementEntity, ExportEditeurDto>() {
+        Converter<EditeurEntity, ExportEditeurDto> myConverter = new Converter<EditeurEntity, ExportEditeurDto>() {
 
-            public ExportEditeurDto convert(MappingContext<EtablissementEntity, ExportEditeurDto> context) {
-                EtablissementEntity entity = context.getSource();
+            public ExportEditeurDto convert(MappingContext<EditeurEntity, ExportEditeurDto> context) {
+                EditeurEntity entity = context.getSource();
                 ExportEditeurDto dto = new ExportEditeurDto();
+                dto.setId(entity.getIdentifiant());
+                dto.setAdresse(entity.getAdresse());
+                dto.setNom(entity.getNom());
+                for (ContactEditeurEntity contactEditeurEntity : entity.getContactsCommerciaux()) {
+                    ContactEditeurDto contactEditeurDto = new ContactEditeurDto();
+                    contactEditeurDto.setMail(contactEditeurEntity.getMail());
+                    contactEditeurDto.setNomPrenom(contactEditeurEntity.getNom() + " " + contactEditeurEntity.getPrenom());
+                    contactEditeurDto.setType("Commercial");
+                    dto.addContact(contactEditeurDto);
+                }
+                for (ContactEditeurEntity contactEditeurEntity : entity.getContactsTechniques()) {
+                    ContactEditeurDto contactEditeurDto = new ContactEditeurDto();
+                    contactEditeurDto.setMail(contactEditeurEntity.getMail());
+                    contactEditeurDto.setNomPrenom(contactEditeurEntity.getNom() + " " + contactEditeurEntity.getPrenom());
+                    contactEditeurDto.setType("Technique");
+                    dto.addContact(contactEditeurDto);
+                }
                 return dto;
             }
         };
