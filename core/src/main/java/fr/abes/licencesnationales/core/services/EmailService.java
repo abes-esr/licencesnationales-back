@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -141,11 +142,10 @@ public class EmailService {
         return json;
     }
 
-    public void constructSuppresionIpMail(String ip, String nomEtab, String to, String cc) {
+    public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String nomEtab, String to, String cc) {
         StringBuilder message = new StringBuilder("Bonjour,");
         message.append(System.lineSeparator());
         message.append("en l'absence de document certifiant l'appartenance de l'IP ");
-        message.append(ip);
         message.append(", déclarée il y a un an sous le compte '");
         message.append(nomEtab);
         message.append("', à l'établissement, nous procédons à sa suppression automatique.");
