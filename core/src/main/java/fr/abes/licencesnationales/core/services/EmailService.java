@@ -95,6 +95,17 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructRelanceEtabMail(String nomEtab, String emailUser, String dateSuppression) throws RestClientException {
+        String message = "Bonjour,<br>" +
+                "Le compte que vous avez créé pour " + nomEtab + " sur le site Licencesnationales.fr ne contient pas d'adresse IP déclarée.<br>" +
+                "Merci de renseigner au moins une adresse IP avant le " + dateSuppression + ", date à laquelle votre compte sera automatiquement supprimé.<br>" +
+                "Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>" +
+                "Bien cordialement,<br>" +
+                "L’équipe Licences nationales<br>" +
+                urlSite;
+        String jsonRequestContruct = mailToJSON(emailUser, null, "Relance pour création d'IP sur votre compte Licences Nationales", message);
+        sendMail(jsonRequestContruct);
+    }
 
     public void sendMail(String requestJson) throws RestClientException {
         HttpHeaders headers = new HttpHeaders();

@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.batch.gestionCompte;
+package fr.abes.licencesnationales.batch.relance.tasklets;
 
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
@@ -8,7 +8,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-public class SuppressionCompteTasklet implements Tasklet, StepExecutionListener {
+public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
     @Override
     public void beforeStep(StepExecution stepExecution) {
 

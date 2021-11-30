@@ -1,7 +1,6 @@
-package fr.abes.licencesnationales.batch.SuppressionIpValidation.traiterSuppressionIpChunk;
+package fr.abes.licencesnationales.batch.relance.traiterSuppressionIpChunk;
 
-import fr.abes.licencesnationales.batch.SuppressionIpValidation.IpDto;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.batch.relance.IpDto;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;

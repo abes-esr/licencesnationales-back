@@ -2,6 +2,8 @@ package fr.abes.licencesnationales.batch.gestionCompte;
 
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EtablissementService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -13,12 +15,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-public class EnvoiMailEtablissementTasklet implements Tasklet, StepExecutionListener {
+@Slf4j
+public class SuppressionEtEnvoiMailTasklet implements Tasklet, StepExecutionListener {
     @Autowired
-    private EmailService service;
+    private EtablissementService etablissementService;
+    @Autowired
+    private EmailService emailService;
 
     private List<EtablissementEntity> listeEtab;
-
     @Override
     public void beforeStep(StepExecution stepExecution) {
         this.listeEtab = (List<EtablissementEntity>) stepExecution.getJobExecution().getExecutionContext().get("listeEtab");
@@ -26,11 +30,20 @@ public class EnvoiMailEtablissementTasklet implements Tasklet, StepExecutionList
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        return null;
+        return stepExecution.getExitStatus();
     }
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        return null;
+        for (EtablissementEntity etab : this.listeEtab) {
+            try {
+                etablissementService.deleteBySiren(etab.getSiren());
+                String motif = "Suppression automatique après un an d'inactivité";
+                emailService.constructSuppressionMail(motif, etab.getNom(), etab.getContact().getMail());
+            } catch (Exception ex) {
+                log.error("Erreur dans la suppression de l'établissement. Siren : " + etab.getSiren() + " / cause : " + ex.getMessage());
+            }
+        }
+        return RepeatStatus.FINISHED;
     }
 }
