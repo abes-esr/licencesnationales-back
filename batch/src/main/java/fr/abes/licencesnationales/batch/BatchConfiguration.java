@@ -1,15 +1,10 @@
 package fr.abes.licencesnationales.batch;
 
-import fr.abes.licencesnationales.batch.relance.IpDto;
-import fr.abes.licencesnationales.batch.relance.tasklets.EnvoiMailRelanceTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.ConstructionListeEtabTasklet;
+import fr.abes.licencesnationales.batch.relance.tasklets.*;
 import fr.abes.licencesnationales.batch.gestionCompte.SelectEtablissementTasklet;
 import fr.abes.licencesnationales.batch.gestionCompte.SuppressionEtEnvoiMailTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.SelectionEtabARelanceTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.TraiterEtabSansIpTasklet;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import fr.abes.licencesnationales.core.services.IpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobParametersIncrementer;
@@ -71,8 +66,7 @@ public class BatchConfiguration {
     public Job jobRelances(ItemReader itemReader, ItemProcessor itemProcessor, ItemWriter itemWriter) {
         return this.jobs.get("jobRelances").incrementer(incrementer())
                 .start(stepContructionListeEtab()).next(stepTraiterEtabSansIp())
-                .next(stepTraiterSuppressionIp(itemReader, itemProcessor, itemWriter))
-                .next(stepSelectionEtabARelancer())
+                .next(stepTraiterSuppressionIp())
                 .next(stepEnvoiMailRelance())
                 .build();
     }
@@ -108,18 +102,12 @@ public class BatchConfiguration {
     }
     
     @Bean
-    public Step stepTraiterSuppressionIp(ItemReader reader, ItemProcessor processor, ItemWriter writer) {
-        return stepBuilderFactory.get("stepTraiterSuppressionIp").<IpDto, IpSupprimeeEventEntity> chunk(chunkSize)
-                .reader(reader).processor(processor).writer(writer).build();
-    }
-    
-    @Bean
-    public Step stepSelectionEtabARelancer() {
-        return stepBuilderFactory.get("stepSelectionEtabARelancer").allowStartIfComplete(true)
-                .tasklet(new SelectionEtabARelanceTasklet())
+    public Step stepTraiterSuppressionIp() {
+        return stepBuilderFactory.get("stepTraiterSuppressionIp").allowStartIfComplete(true)
+                .tasklet(new traiterSuppressionIpTasklet())
                 .build();
     }
-    
+
     @Bean
     public Step stepEnvoiMailRelance() {
         return stepBuilderFactory.get("stepEnvoiMailRelance").allowStartIfComplete(true)
