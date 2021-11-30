@@ -264,7 +264,7 @@ public class EtablissementController {
 
         try {
             ArrayList<String> listDateModifIp = new ArrayList<>();
-            Set<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
+            List<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
             for (IpEntity i : listeIpsEtab) {
                 Date dateModif;
                 if (i.getDateModification() != null) {

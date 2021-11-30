@@ -116,4 +116,8 @@ public class IpV6 extends IpEntity implements Serializable {
         return this.ipRange.end();
     }
 
+    @Override
+    public String formatRange() {
+        return null;
+    }
 }

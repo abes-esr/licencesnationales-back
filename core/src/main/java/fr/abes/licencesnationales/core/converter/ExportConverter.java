@@ -1,16 +1,20 @@
 package fr.abes.licencesnationales.core.converter;
 
-import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementAdminDto;
-import fr.abes.licencesnationales.core.dto.export.ExportIpDto;
+import fr.abes.licencesnationales.core.dto.export.*;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpV4;
+import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import org.modelmapper.Converter;
 import org.modelmapper.spi.MappingContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 @Component
 public class ExportConverter {
@@ -45,7 +49,7 @@ public class ExportConverter {
                 dto.setTelephone(entity.getContact().getTelephone());
                 dto.setNomPrenomContact(entity.getContact().getNom() + " " + entity.getContact().getPrenom());
                 dto.setMailContact(entity.getContact().getMail());
-                for(IpEntity ip : entity.getIps()) {
+                for (IpEntity ip : entity.getIps()) {
                     dto.ajouterIp(ip.getIp());
                 }
                 return dto;
@@ -81,7 +85,7 @@ public class ExportConverter {
                 dto.setTelephone(entity.getContact().getTelephone());
                 dto.setNomPrenomContact(entity.getContact().getNom() + " " + entity.getContact().getPrenom());
                 dto.setMailContact(entity.getContact().getMail());
-                for(IpEntity ip : entity.getIps()) {
+                for (IpEntity ip : entity.getIps()) {
                     dto.ajouterIp(ip.getIp());
                 }
                 return dto;
@@ -92,11 +96,28 @@ public class ExportConverter {
 
     @Bean
     public void converterEditeurExportAdmin() {
-        Converter<EtablissementEntity, ExportEditeurDto> myConverter = new Converter<EtablissementEntity, ExportEditeurDto>() {
+        Converter<EditeurEntity, ExportEditeurDto> myConverter = new Converter<EditeurEntity, ExportEditeurDto>() {
 
-            public ExportEditeurDto convert(MappingContext<EtablissementEntity, ExportEditeurDto> context) {
-                EtablissementEntity entity = context.getSource();
+            public ExportEditeurDto convert(MappingContext<EditeurEntity, ExportEditeurDto> context) {
+                EditeurEntity entity = context.getSource();
                 ExportEditeurDto dto = new ExportEditeurDto();
+                dto.setId(entity.getIdentifiant());
+                dto.setAdresse(entity.getAdresse());
+                dto.setNom(entity.getNom());
+                for (ContactEditeurEntity contactEditeurEntity : entity.getContactsCommerciaux()) {
+                    ContactEditeurDto contactEditeurDto = new ContactEditeurDto();
+                    contactEditeurDto.setMail(contactEditeurEntity.getMail());
+                    contactEditeurDto.setNomPrenom(contactEditeurEntity.getNom() + " " + contactEditeurEntity.getPrenom());
+                    contactEditeurDto.setType("Commercial");
+                    dto.addContact(contactEditeurDto);
+                }
+                for (ContactEditeurEntity contactEditeurEntity : entity.getContactsTechniques()) {
+                    ContactEditeurDto contactEditeurDto = new ContactEditeurDto();
+                    contactEditeurDto.setMail(contactEditeurEntity.getMail());
+                    contactEditeurDto.setNomPrenom(contactEditeurEntity.getNom() + " " + contactEditeurEntity.getPrenom());
+                    contactEditeurDto.setType("Technique");
+                    dto.addContact(contactEditeurDto);
+                }
                 return dto;
             }
         };
@@ -104,12 +125,37 @@ public class ExportConverter {
     }
 
     @Bean
-    public void converterIpExportAdmin() {
-        Converter<EtablissementEntity, ExportIpDto> myConverter = new Converter<EtablissementEntity, ExportIpDto>() {
+    public void converterIpExportUser() {
+        Converter<IpEntity, ExportIpDto> myConverter = new Converter<IpEntity, ExportIpDto>() {
 
-            public ExportIpDto convert(MappingContext<EtablissementEntity, ExportIpDto> context) {
-                EtablissementEntity entity = context.getSource();
+            public ExportIpDto convert(MappingContext<IpEntity, ExportIpDto> context) {
+                IpEntity entity = context.getSource();
                 ExportIpDto dto = new ExportIpDto();
+                dto.setIp(entity.getIp());
+                if(entity instanceof IpV4) {
+                    IpV4 ipV4 = (IpV4) entity;
+                    if(ipV4.isRange()) {
+                        dto.setType("Plage d'IP V4");
+                        dto.setIp(ipV4.formatRange());
+                    } else {
+                        dto.setType("IP V4");
+                        dto.setIp(ipV4.getIp());
+                    }
+                }else if(entity instanceof IpV6) {
+                    IpV6 ipV6 = (IpV6) entity;
+                    if(ipV6.isRange()) {
+                        dto.setType("Plage d'IP V6");
+                        dto.setIp(ipV6.formatRange());
+                    } else {
+                        dto.setType("IP V6");
+                        dto.setIp(ipV6.getIp());
+                    }
+                }
+                DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+                dto.setDateCreation(format.format(entity.getDateCreation()));
+                dto.setDateModificationStatut(format.format(entity.getDateModification()));
+                dto.setStatut(entity.getStatut().getLibelleStatut());
+                dto.setCommentaire(entity.getCommentaires());
                 return dto;
             }
         };

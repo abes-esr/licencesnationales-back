@@ -7,22 +7,29 @@ import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
+import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurWebDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -46,6 +53,8 @@ public class EditeurController {
     @Autowired
     private ReferenceService referenceService;
 
+    @Autowired
+    private ExportEditeur exportEditeur;
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
@@ -101,5 +110,15 @@ public class EditeurController {
     @PreAuthorize("hasAuthority('admin')")
     public List<EditeurWebDto> getListEditeurs() {
         return mapper.mapList(editeurService.findAllEditeur(), EditeurWebDto.class);
+    }
+
+    @GetMapping(value = "/export")
+    @PreAuthorize("hasAuthority('admin')")
+    public void exportEditeur(@RequestBody List<Integer> ids, HttpServletResponse response) throws IOException{
+        response.setContentType("text/csv;charset=UTF-8");
+        response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
+        InputStream stream = exportEditeur.generateCsv(ids);
+        IOUtils.copy(stream , response.getOutputStream());
+        response.flushBuffer();
     }
 }

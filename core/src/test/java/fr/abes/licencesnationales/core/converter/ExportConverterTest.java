@@ -1,7 +1,12 @@
 package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
+import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
+import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
@@ -9,6 +14,7 @@ import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
+import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +22,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {UtilsMapper.class, ObjectMapper.class, ExportConverter.class})
@@ -87,5 +96,45 @@ class ExportConverterTest {
         Assertions.assertEquals("nom2 prenom2", dto.getNomPrenomContact());
         Assertions.assertEquals("mail2@test.com", dto.getMailContact());
         Assertions.assertEquals(0, dto.getIps().size());
+    }
+
+    @Test
+    @DisplayName("Test convertisseur export éditeur sans contact")
+    void testMapperExportEditeurSansContact() {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1,"validé");
+        Set<TypeEtablissementEntity> types = new HashSet<>();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nom","abes321654","ades@trc",types);
+
+        ExportEditeurDto dto = mapper.map(editeur,ExportEditeurDto.class);
+        Assertions.assertEquals("abes321654",dto.getId());
+        Assertions.assertEquals("nom",dto.getNom());
+        Assertions.assertEquals(0,dto.getContact().size());
+        Assertions.assertEquals("ades@trc",dto.getAdresse());
+    }
+    @Test
+    @DisplayName("Test convertisseur export éditeur Avec contact")
+    void testMapperExportEditeurAvecContact() {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1,"validé");
+        Set<TypeEtablissementEntity> types = new HashSet<>();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nom","abes321654","ades@trc",types);
+        ContactEditeurEntity contactCommercial = new ContactCommercialEditeurEntity(2,"nom2","prenom2","sqn@abes.fr");
+        ContactEditeurEntity contactTechnique = new ContactTechniqueEditeurEntity(3,"nom3","prenom3","sqn@abes.fr");
+        editeur.ajouterContact(contactTechnique);
+        editeur.ajouterContact(contactCommercial);
+
+
+        ExportEditeurDto dto = mapper.map(editeur,ExportEditeurDto.class);
+        Assertions.assertEquals("abes321654",dto.getId());
+        Assertions.assertEquals("nom",dto.getNom());
+        Assertions.assertEquals(2,dto.getContact().size());
+        Assertions.assertEquals("ades@trc",dto.getAdresse());
+        Assertions.assertEquals("nom2 prenom2",dto.getContact().get(0).getNomPrenom());
+        Assertions.assertEquals("sqn@abes.fr",dto.getContact().get(0).getMail());
+        Assertions.assertEquals("Commercial",dto.getContact().get(0).getType());
+        Assertions.assertEquals("nom3 prenom3",dto.getContact().get(1).getNomPrenom());
+        Assertions.assertEquals("sqn@abes.fr",dto.getContact().get(1).getMail());
+        Assertions.assertEquals("Technique",dto.getContact().get(1).getType());
     }
 }
