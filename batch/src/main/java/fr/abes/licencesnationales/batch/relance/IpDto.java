@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.batch.SuppressionIpValidation;
+package fr.abes.licencesnationales.batch.relance;
 
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import lombok.Getter;

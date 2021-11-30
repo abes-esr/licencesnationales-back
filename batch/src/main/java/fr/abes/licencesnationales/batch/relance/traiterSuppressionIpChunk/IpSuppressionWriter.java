@@ -1,25 +1,21 @@
-package fr.abes.licencesnationales.batch.SuppressionIpValidation.traiterSuppressionIpChunk;
+package fr.abes.licencesnationales.batch.relance.traiterSuppressionIpChunk;
 
-import fr.abes.licencesnationales.batch.SuppressionIpValidation.IpDto;
+import fr.abes.licencesnationales.batch.relance.IpDto;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.IpService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.item.ItemWriter;
-import org.springframework.batch.item.support.AbstractItemStreamItemWriter;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 
