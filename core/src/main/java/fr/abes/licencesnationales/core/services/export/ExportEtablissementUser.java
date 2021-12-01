@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.services.export;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.ExportService;
 import org.apache.commons.csv.CSVPrinter;
@@ -48,6 +47,7 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
                 writeEtabInfo(item, output);
                 output.add(ip);
                 printer.printRecord(output);
+                output.clear();
             }
         }
     }
