@@ -4,7 +4,6 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ContactEditeurDto;
 import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
-import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.ExportService;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Service;
@@ -50,6 +49,7 @@ public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
                 output.add(contact.getMail());
                 output.add(contact.getType());
                 printer.printRecord(output);
+                output.clear();
             }
         }
     }

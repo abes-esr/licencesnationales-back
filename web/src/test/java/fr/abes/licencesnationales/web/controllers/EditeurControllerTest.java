@@ -7,8 +7,6 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercial
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.UnknownEditeurException;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
@@ -328,17 +326,17 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     }
 
     @Test
-    @DisplayName("test export editeur Admin")
+    @DisplayName("test export editeur Admin 2 editeurs avec 1 seul contact")
     @WithMockUser(authorities = {"admin"})
-    void testExportEditeurAdmin() throws Exception {
-        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nom", "prenom", "mail2@mail.com");
+    void testExportEditeurAdminDeuxEditeursUnSeulContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
         TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
         Set types = new HashSet();
         types.add(type);
-        EditeurEntity editeur = new EditeurEntity(2,"nom1","identifian","adresse",types);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
         editeur.ajouterContact(contact);
-        ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nom2", "prenom2", "mail22@mail.com");
-        EditeurEntity editeur2 = new EditeurEntity(3,"nom14","identifian3","adresse3",types);
+        ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nomCom", "prenomCom", "mailCom@mail.com");
+        EditeurEntity editeur2 = new EditeurEntity(2,"nomEditeur2","identifiant2","adresse2",types);
         editeur2.ajouterContact(contact2);
 
         List listEditeur = new ArrayList();
@@ -349,9 +347,68 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
 
         String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
-        fileContent += "identifian;nom1;adresse;nom prenom;mail2@mail.com;Technique\r\n";
-        fileContent += "identifian3;nom14;adresse3;nom2 prenom2;mail22@mail.com;Commercial\r\n";
-        String json = "[2,3]";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        fileContent += "identifiant2;nomEditeur2;adresse2;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
+        String json = "[1,2]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+
+    @Test
+    @DisplayName("test export editeur Admin 1 seul editeurs avec 1 seul contact")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEditeurAdminUnSeulEditeurUnSeulContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1,"test");
+        Set types = new HashSet();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
+        editeur.ajouterContact(contact);
+
+        List listEditeur = new ArrayList();
+        listEditeur.add(editeur);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
+
+        String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        String json = "[1]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+
+    @Test
+    @DisplayName("test export editeur Admin 1 editeurs avec 2 contact")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEditeurAdminUnSeulEditeurDeuxContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
+        TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
+        Set types = new HashSet();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
+        ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nomCom", "prenomCom", "mailCom@mail.com");
+        editeur.ajouterContact(contact);
+        editeur.ajouterContact(contact2);
+
+        List listEditeur = new ArrayList();
+        listEditeur.add(editeur);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
+
+        String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        String json = "[1]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
