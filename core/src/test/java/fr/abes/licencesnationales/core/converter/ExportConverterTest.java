@@ -2,6 +2,8 @@ package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
+import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
+import fr.abes.licencesnationales.core.dto.export.ExportIpDto;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -9,12 +11,10 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueE
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
-import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -136,5 +136,19 @@ class ExportConverterTest {
         Assertions.assertEquals("nom3 prenom3",dto.getContact().get(1).getNomPrenom());
         Assertions.assertEquals("sqn@abes.fr",dto.getContact().get(1).getMail());
         Assertions.assertEquals("Technique",dto.getContact().get(1).getType());
+    }
+    @Test
+    @DisplayName("Test convertisseur export IpV4")
+    void testMapperExportIpv4() throws IpException {
+        IpEntity ip = new IpV4(1,"192.162.0.1","test",new StatutIpEntity(1,"testType"));
+
+
+        ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
+        Assertions.assertEquals("192.162.0.1",dto.getIp());
+        Assertions.assertEquals("IpV4",dto.getType());
+        Assertions.assertEquals("test",dto.getCommentaire());
+        Assertions.assertEquals("testType",dto.getStatut());
+        Assertions.assertEquals("test de date todo",dto.getDateCreation());
+        Assertions.assertEquals("test de date todo",dto.getDateModificationStatut());
     }
 }
