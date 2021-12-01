@@ -19,6 +19,7 @@ import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.licencesnationales.web.service.ReCaptchaAction;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -198,9 +199,14 @@ public class AuthenticationController {
 
         VerifierValiditeTokenResponseDto response = new VerifierValiditeTokenResponseDto();
 
-        if (tokenProvider.validateToken(request.getToken())) {
-            response.setValid(true);
-        } else {
+        try {
+
+            if (tokenProvider.validateToken(request.getToken())) {
+                response.setValid(true);
+            } else {
+                response.setValid(false);
+            }
+        } catch (ExpiredJwtException ex) {
             response.setValid(false);
         }
 
