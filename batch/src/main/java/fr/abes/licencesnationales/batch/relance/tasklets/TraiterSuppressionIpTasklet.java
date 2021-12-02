@@ -21,17 +21,21 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class traiterSuppressionIpTasklet implements Tasklet, StepExecutionListener {
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+public class TraiterSuppressionIpTasklet implements Tasklet, StepExecutionListener {
 
-    @Autowired
-    private IpEventRepository eventRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    private final IpEventRepository eventRepository;
 
     private List<EtablissementEntity> etabAvecAuMoinsUneIpAttestation;
     private List<EtablissementDto> etablissementDtos;
 
-    Calendar oneYearAgo;
+    private Calendar oneYearAgo;
+
+    public TraiterSuppressionIpTasklet(IpEventRepository eventRepository, ApplicationEventPublisher applicationEventPublisher) {
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.eventRepository = eventRepository;
+    }
 
     @Override
     public void beforeStep(StepExecution stepExecution) {

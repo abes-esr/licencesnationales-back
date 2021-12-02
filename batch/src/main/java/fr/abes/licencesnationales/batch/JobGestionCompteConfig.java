@@ -8,7 +8,6 @@ import org.springframework.batch.core.Step;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@Slf4j
 public class JobGestionCompteConfig extends JobConfiguration {
     @Bean(name = "jobGestionCompte")
     public Job jobGestionCompte() {

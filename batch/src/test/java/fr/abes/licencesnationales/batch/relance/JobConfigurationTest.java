@@ -1,26 +1,51 @@
 package fr.abes.licencesnationales.batch.relance;
 
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
-import org.mockito.Mockito;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
+import org.mockito.InjectMocks;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.launch.JobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.test.JobLauncherTestUtils;
+import org.springframework.batch.test.JobRepositoryTestUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
-import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Primary;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.context.annotation.Configuration;
 
-@TestConfiguration
+
+@Configuration
 @EnableAutoConfiguration
-@EnableBatchProcessing
-@ComponentScan(basePackages = {"fr.abes.licencesnationales.core"})
-@EnableJpaRepositories(basePackages = "fr.abes.licencesnationales.core.repository")
-@EntityScan("fr.abes.licencesnationales.core.entities")
 public class JobConfigurationTest {
-    @Bean(name = "mockEtabService")
-    @Primary
-    public EtablissementService mockEtabService(){
-        return Mockito.mock(EtablissementService.class);
+    @Autowired
+    private JobLauncher jobLauncher;
+    @Autowired
+    private JobRepository jobRepository;
+
+    @Autowired
+    @InjectMocks
+    private Job jobRelances;
+
+    @MockBean
+    public EtablissementService service;
+
+    @MockBean
+    public EtablissementRepository etablissementRepository;
+
+    @Bean
+    public JobLauncherTestUtils jobLauncherTestUtils(){
+        final JobLauncherTestUtils utils = new JobLauncherTestUtils();
+        utils.setJobLauncher(jobLauncher);
+        utils.setJobRepository(jobRepository);
+        utils.setJob(jobRelances);
+        return utils;
+    }
+
+    @Bean
+    public JobRepositoryTestUtils jobRepositoryTestUtils() throws Exception {
+        final JobRepositoryTestUtils utils = new JobRepositoryTestUtils();
+        utils.setJobRepository(jobRepository);
+        return utils;
     }
 }
