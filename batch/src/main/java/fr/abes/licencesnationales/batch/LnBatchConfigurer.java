@@ -16,7 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
 @Slf4j
-@Configuration
 public class LnBatchConfigurer implements BatchConfigurer {
     private final EntityManagerFactory entityManagerFactory;
 
