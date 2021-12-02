@@ -18,8 +18,12 @@ import java.text.SimpleDateFormat;
 
 @Component
 public class ExportConverter {
-    @Autowired
     private UtilsMapper utilsMapper;
+
+    @Autowired
+    public ExportConverter(UtilsMapper utilsMapper) {
+        this.utilsMapper = utilsMapper;
+    }
 
     @Bean
     public void converterEtablissementExportUser() {
@@ -125,31 +129,43 @@ public class ExportConverter {
     }
 
     @Bean
-    public void converterIpExportUser() {
-        Converter<IpEntity, ExportIpDto> myConverter = new Converter<IpEntity, ExportIpDto>() {
+    public void converterIpV4ExportUser() {
+        Converter<IpV4, ExportIpDto> myConverter = new Converter<IpV4, ExportIpDto>() {
 
-            public ExportIpDto convert(MappingContext<IpEntity, ExportIpDto> context) {
-                IpEntity entity = context.getSource();
+            public ExportIpDto convert(MappingContext<IpV4, ExportIpDto> context) {
+                IpV4 entity = context.getSource();
                 ExportIpDto dto = new ExportIpDto();
                 dto.setIp(entity.getIp());
-                if(entity instanceof IpV4) {
-                    IpV4 ipV4 = (IpV4) entity;
-                    if(ipV4.isRange()) {
-                        dto.setType("Plage d'IP V4");
-                        dto.setIp(ipV4.formatRange());
-                    } else {
-                        dto.setType("IP V4");
-                        dto.setIp(ipV4.getIp());
-                    }
-                }else if(entity instanceof IpV6) {
-                    IpV6 ipV6 = (IpV6) entity;
-                    if(ipV6.isRange()) {
-                        dto.setType("Plage d'IP V6");
-                        dto.setIp(ipV6.formatRange());
-                    } else {
-                        dto.setType("IP V6");
-                        dto.setIp(ipV6.getIp());
-                    }
+                if (entity.isRange()) {
+                    dto.setType("Plage d'IP V4");
+                    dto.setIp(entity.formatRange());
+                } else {
+                    dto.setType("IP V4");
+                }
+                DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+                dto.setDateCreation(format.format(entity.getDateCreation()));
+                dto.setDateModificationStatut(format.format(entity.getDateModification()));
+                dto.setStatut(entity.getStatut().getLibelleStatut());
+                dto.setCommentaire(entity.getCommentaires());
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterIpV6ExportUser() {
+        Converter<IpV6, ExportIpDto> myConverter = new Converter<IpV6, ExportIpDto>() {
+
+            public ExportIpDto convert(MappingContext<IpV6, ExportIpDto> context) {
+                IpV6 entity = context.getSource();
+                ExportIpDto dto = new ExportIpDto();
+                dto.setIp(entity.getIp());
+                if (entity.isRange()) {
+                    dto.setType("Plage d'IP V6");
+                    dto.setIp(entity.formatRange());
+                } else {
+                    dto.setType("IP V6");
                 }
                 DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 dto.setDateCreation(format.format(entity.getDateCreation()));

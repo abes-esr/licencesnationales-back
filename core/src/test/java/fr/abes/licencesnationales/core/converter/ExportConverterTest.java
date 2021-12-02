@@ -23,6 +23,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -140,15 +144,18 @@ class ExportConverterTest {
     @Test
     @DisplayName("Test convertisseur export IpV4")
     void testMapperExportIpv4() throws IpException {
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         IpEntity ip = new IpV4(1,"192.162.0.1","test",new StatutIpEntity(1,"testType"));
-
+        Date today = Calendar.getInstance().getTime();
+        ip.setDateModification(today);
+        ip.setDateCreation(today);
 
         ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
         Assertions.assertEquals("192.162.0.1",dto.getIp());
-        Assertions.assertEquals("IpV4",dto.getType());
+        Assertions.assertEquals("IP V4",dto.getType());
         Assertions.assertEquals("test",dto.getCommentaire());
         Assertions.assertEquals("testType",dto.getStatut());
-        Assertions.assertEquals("test de date todo",dto.getDateCreation());
-        Assertions.assertEquals("test de date todo",dto.getDateModificationStatut());
+        Assertions.assertEquals(format.format(today),dto.getDateCreation());
+        Assertions.assertEquals(format.format(today),dto.getDateModificationStatut());
     }
 }
