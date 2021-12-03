@@ -1,7 +1,9 @@
 package fr.abes.licencesnationales.batch;
 
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
+import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.EventService;
 import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -27,6 +29,10 @@ public abstract class JobConfiguration {
     protected ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     protected IpEventRepository ipEventRepository;
+    @Autowired
+    protected EmailService emailService;
+    @Autowired
+    protected EventService eventService;
 
     public JobConfiguration() {
         super();

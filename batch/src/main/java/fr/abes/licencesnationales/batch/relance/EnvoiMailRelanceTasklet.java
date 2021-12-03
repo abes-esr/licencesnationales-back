@@ -1,6 +1,6 @@
-package fr.abes.licencesnationales.batch.relance.tasklets;
+package fr.abes.licencesnationales.batch.relance;
 
-import fr.abes.licencesnationales.batch.relance.EtablissementDto;
+import fr.abes.licencesnationales.batch.relance.dto.EtablissementDto;
 import fr.abes.licencesnationales.core.services.EmailService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
