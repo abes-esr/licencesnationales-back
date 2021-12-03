@@ -1,9 +1,9 @@
 package fr.abes.licencesnationales.batch;
 
-import fr.abes.licencesnationales.batch.relance.tasklets.ConstructionListeEtabTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.EnvoiMailRelanceTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.TraiterEtabSansIpTasklet;
-import fr.abes.licencesnationales.batch.relance.tasklets.TraiterSuppressionIpTasklet;
+import fr.abes.licencesnationales.batch.relance.ConstructionListeEtabTasklet;
+import fr.abes.licencesnationales.batch.relance.EnvoiMailRelanceTasklet;
+import fr.abes.licencesnationales.batch.relance.TraiterEtabSansIpTasklet;
+import fr.abes.licencesnationales.batch.relance.TraiterSuppressionIpTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.context.annotation.Bean;
@@ -29,7 +29,7 @@ public class JobRelancesConfig extends JobConfiguration {
     @Bean
     public Step stepTraiterEtabSansIp() {
         return stepBuilderFactory.get("stepTraiterEtabSansIp").allowStartIfComplete(true)
-                .tasklet(new TraiterEtabSansIpTasklet())
+                .tasklet(new TraiterEtabSansIpTasklet(emailService, eventService))
                 .build();
     }
 

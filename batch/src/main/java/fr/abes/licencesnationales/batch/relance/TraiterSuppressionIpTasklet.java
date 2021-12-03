@@ -1,12 +1,10 @@
-package fr.abes.licencesnationales.batch.relance.tasklets;
+package fr.abes.licencesnationales.batch.relance;
 
-import fr.abes.licencesnationales.batch.relance.EtablissementDto;
-import fr.abes.licencesnationales.batch.relance.IpDto;
+import fr.abes.licencesnationales.batch.relance.dto.EtablissementDto;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
-import fr.abes.licencesnationales.core.services.IpService;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -14,7 +12,6 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
 import java.util.ArrayList;

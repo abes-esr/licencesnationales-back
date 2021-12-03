@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.batch.relance.tasklets;
+package fr.abes.licencesnationales.batch.relance;
 
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.services.EmailService;
@@ -11,6 +11,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -19,15 +20,19 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+@Component
 public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener {
     private List<EtablissementEntity> etabSansIp;
 
-    @Autowired
-    private EmailService emailService;
+    private final EmailService emailService;
+
+    private final EventService eventService;
 
     @Autowired
-    private EventService eventService;
-
+    public TraiterEtabSansIpTasklet(EmailService emailService, EventService eventService) {
+        this.emailService = emailService;
+        this.eventService = eventService;
+    }
     @Override
     public void beforeStep(StepExecution stepExecution) {
         this.etabSansIp = (List<EtablissementEntity>) stepExecution.getExecutionContext().get("etabSansIp");
@@ -54,7 +59,7 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
                 dateSuppressionEtab.setTime(dateCreationEtab);
             }
             dateSuppressionEtab.add(Calendar.YEAR, 1);
-            emailService.constructRelanceEtabMail(etab.getNom(), etab.getContact().getMail(), format.format(dateSuppressionEtab));
+            emailService.constructRelanceEtabMail(etab.getNom(), etab.getContact().getMail(), format.format(dateSuppressionEtab.getTime()));
         }
         return RepeatStatus.FINISHED;
     }

@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.batch.relance.tasklets;
+package fr.abes.licencesnationales.batch.relance;
 
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;

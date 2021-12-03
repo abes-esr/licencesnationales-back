@@ -1,4 +1,4 @@
-package fr.abes.licencesnationales.batch.relance;
+package fr.abes.licencesnationales.batch.relance.dto;
 
 import lombok.Getter;
 
