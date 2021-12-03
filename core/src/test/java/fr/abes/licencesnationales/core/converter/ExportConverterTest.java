@@ -13,6 +13,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
+import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import org.junit.jupiter.api.Assertions;
@@ -141,6 +142,7 @@ class ExportConverterTest {
         Assertions.assertEquals("sqn@abes.fr",dto.getContact().get(1).getMail());
         Assertions.assertEquals("Technique",dto.getContact().get(1).getType());
     }
+
     @Test
     @DisplayName("Test convertisseur export IpV4")
     void testMapperExportIpv4() throws IpException {
@@ -153,6 +155,62 @@ class ExportConverterTest {
         ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
         Assertions.assertEquals("192.162.0.1",dto.getIp());
         Assertions.assertEquals("IP V4",dto.getType());
+        Assertions.assertEquals("test",dto.getCommentaire());
+        Assertions.assertEquals("testType",dto.getStatut());
+        Assertions.assertEquals(format.format(today),dto.getDateCreation());
+        Assertions.assertEquals(format.format(today),dto.getDateModificationStatut());
+    }
+
+    @Test
+    @DisplayName("Test convertisseur export range IpV4")
+    void testMapperExportRangeIpv4() throws IpException {
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
+        IpEntity ip = new IpV4(1,"192.162.0-0.1-10","test",new StatutIpEntity(1,"testType"));
+
+        Date today = Calendar.getInstance().getTime();
+        ip.setDateModification(today);
+        ip.setDateCreation(today);
+
+        ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
+        Assertions.assertEquals("192.162.0-0.1-10",dto.getIp());
+        Assertions.assertEquals("Plage d'IP V4",dto.getType());
+        Assertions.assertEquals("test",dto.getCommentaire());
+        Assertions.assertEquals("testType",dto.getStatut());
+        Assertions.assertEquals(format.format(today),dto.getDateCreation());
+        Assertions.assertEquals(format.format(today),dto.getDateModificationStatut());
+    }
+
+    @Test
+    @DisplayName("Test convertisseur export IpV6")
+    void testMapperExportIpv6() throws IpException {
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        IpEntity ip = new IpV6(1,"0000:0000:0000:0000:0000:0000:0000:0001","test",new StatutIpEntity(1,"testType"));
+        Date today = Calendar.getInstance().getTime();
+        ip.setDateModification(today);
+        ip.setDateCreation(today);
+
+        ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
+        Assertions.assertEquals("0000:0000:0000:0000:0000:0000:0000:0001",dto.getIp());
+        Assertions.assertEquals("IP V6",dto.getType());
+        Assertions.assertEquals("test",dto.getCommentaire());
+        Assertions.assertEquals("testType",dto.getStatut());
+        Assertions.assertEquals(format.format(today),dto.getDateCreation());
+        Assertions.assertEquals(format.format(today),dto.getDateModificationStatut());
+    }
+
+    @Test
+    @DisplayName("Test convertisseur export IpV6 range")
+    void testMapperExportIpv6Range() throws IpException {
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+        IpEntity ip = new IpV6(1,"0000:0000:0000:0000:0000:0000:0000-0001:0001-00AA","test",new StatutIpEntity(1,"testType"));
+        Date today = Calendar.getInstance().getTime();
+        ip.setDateModification(today);
+        ip.setDateCreation(today);
+
+        ExportIpDto dto = mapper.map(ip, ExportIpDto.class);
+        Assertions.assertEquals("0000:0000:0000:0000:0000:0000:0000-0001:0001-00AA",dto.getIp());
+        Assertions.assertEquals("Plage d'IP V6",dto.getType());
         Assertions.assertEquals("test",dto.getCommentaire());
         Assertions.assertEquals("testType",dto.getStatut());
         Assertions.assertEquals(format.format(today),dto.getDateCreation());
