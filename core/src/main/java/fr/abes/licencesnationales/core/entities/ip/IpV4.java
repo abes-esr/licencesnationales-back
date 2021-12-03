@@ -127,8 +127,7 @@ public class IpV4 extends IpEntity implements Serializable {
     @Override
     public String formatRange(){
         if(this.isRange()){
-            return this.getStart().toString().split("\\.")[0] + "-" + this.getEnd().toString().split("\\.")[0]+"."+
-            this.getStart().toString().split("\\.")[1] + "-" + this.getEnd().toString().split("\\.")[1]+"."+
+            return  this.getEnd().toString().split("\\.")[0]+"." + this.getEnd().toString().split("\\.")[1]+"."+
             this.getStart().toString().split("\\.")[2] + "-" + this.getEnd().toString().split("\\.")[2]+"."+
             this.getStart().toString().split("\\.")[3] + "-" + this.getEnd().toString().split("\\.")[3];
         }

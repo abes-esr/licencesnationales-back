@@ -135,12 +135,12 @@ public class ExportConverter {
             public ExportIpDto convert(MappingContext<IpV4, ExportIpDto> context) {
                 IpV4 entity = context.getSource();
                 ExportIpDto dto = new ExportIpDto();
-                dto.setIp(entity.getIp());
                 if (entity.isRange()) {
                     dto.setType("Plage d'IP V4");
                     dto.setIp(entity.formatRange());
                 } else {
                     dto.setType("IP V4");
+                    dto.setIp(entity.getIp());
                 }
                 DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 dto.setDateCreation(format.format(entity.getDateCreation()));
@@ -160,12 +160,12 @@ public class ExportConverter {
             public ExportIpDto convert(MappingContext<IpV6, ExportIpDto> context) {
                 IpV6 entity = context.getSource();
                 ExportIpDto dto = new ExportIpDto();
-                dto.setIp(entity.getIp());
                 if (entity.isRange()) {
                     dto.setType("Plage d'IP V6");
                     dto.setIp(entity.formatRange());
                 } else {
                     dto.setType("IP V6");
+                    dto.setIp(entity.getIp());
                 }
                 DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 dto.setDateCreation(format.format(entity.getDateCreation()));
