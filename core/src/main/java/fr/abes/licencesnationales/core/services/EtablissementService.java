@@ -1,8 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
@@ -54,7 +52,7 @@ public class EtablissementService {
         if (entity.getId() == null) {
             // Création d'un nouvel établisssement
             entity.getContact().setRole("etab");
-            entity.setStatut((StatutEtablissementEntity) statutRepository.findById(Constant.STATUT_ETAB_NOUVEAU).get());
+            entity.setValide(false);
         }
         etablissementDao.save(entity);
     }
@@ -81,7 +79,11 @@ public class EtablissementService {
     }
 
     public List<EtablissementEntity> findAll() {
-        return etablissementDao.findAll();
+        List<EtablissementEntity> list = etablissementDao.findAll();
+        list.forEach(etab -> {
+            etab.setIdAbes(GenererIdAbes.genererIdAbes(etab.getIdAbes()));
+        });
+        return list;
     }
 
     public EtablissementEntity getUserByMail(String mail) {

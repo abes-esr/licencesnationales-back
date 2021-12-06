@@ -17,8 +17,24 @@ import java.io.Serializable;
 @NoArgsConstructor
 public abstract class StatutEntity implements Serializable {
     @Id
-    protected int idStatut;
+    protected Integer idStatut;
 
     @Column(name = "libelle")
     protected String libelleStatut;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+
+        if (this == obj) {
+            return true;
+        }
+
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        return (idStatut == (((StatutEntity) obj).idStatut));
+    }
 }

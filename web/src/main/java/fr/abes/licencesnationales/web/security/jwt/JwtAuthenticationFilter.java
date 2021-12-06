@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.web.security.jwt;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.web.security.cache.LoginAttemptService;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -58,7 +59,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-        } catch (Exception ex) {
+        } catch (ExpiredJwtException ex) {
+            request.setAttribute("expired", ex.getMessage());
+        }
+        catch (Exception ex) {
             log.error(Constant.ERROR_AUTHENTICATION_IN_SECURITY_CONTEXT, ex);
         }
 
