@@ -15,7 +15,6 @@ import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 import javax.persistence.Lob;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -120,15 +119,23 @@ public class IpV6 extends IpEntity implements Serializable {
     @Override
     public String formatRange() {
         if(this.isRange()){
+            String[] digits =  this.getIp().split(":");
             StringBuilder output = new StringBuilder();
-            for (int i = 0; i < this.getStart().toString().split(":").length; i++) {
-                if(!this.getStart().toString().split(":")[i].equals(this.getEnd().toString().split(":")[i])) {
-                    output.append(this.getStart().toString().split(":")[i]).append("-").append(this.getEnd().toString().split(":")[i]);
+            for (int i = 0; i <digits.length; i++) {
+                String[] octet =  digits[i].split("-");
+                if(octet.length > 1) {
+                    if(octet[0].equals(octet[1])){
+                        output.append(octet[0]);
+                    }else{
+                        output.append(octet[0]).append("-").append(octet[1]);
+                    }
                 }else{
-                    output.append(this.getStart().toString().split(":")[i]);
+                    output.append(octet[0]);
+                }
+                if(i != digits.length-1){
+                    output.append(":");
                 }
             }
-
             return output.toString();
         }
         return "not range";
