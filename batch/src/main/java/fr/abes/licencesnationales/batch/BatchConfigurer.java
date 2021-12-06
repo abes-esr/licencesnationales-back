@@ -1,14 +1,12 @@
 package fr.abes.licencesnationales.batch;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.explore.JobExplorer;
 import org.springframework.batch.core.explore.support.MapJobExplorerFactoryBean;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.launch.support.SimpleJobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.repository.support.MapJobRepositoryFactoryBean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 
@@ -16,7 +14,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManagerFactory;
 
 @Slf4j
-public class LnBatchConfigurer implements BatchConfigurer {
+public class BatchConfigurer implements org.springframework.batch.core.configuration.annotation.BatchConfigurer {
     private final EntityManagerFactory entityManagerFactory;
 
     private PlatformTransactionManager transactionManager;
@@ -28,10 +26,10 @@ public class LnBatchConfigurer implements BatchConfigurer {
     private JobExplorer jobExplorer;
 
     /**
-     * Create a new {@link LnBatchConfigurer} instance.
+     * Create a new {@link BatchConfigurer} instance.
      * @param entityManagerFactory the entity manager factory
      */
-    public LnBatchConfigurer(EntityManagerFactory entityManagerFactory) {
+    public BatchConfigurer(EntityManagerFactory entityManagerFactory) {
         this.entityManagerFactory = entityManagerFactory;
     }
 

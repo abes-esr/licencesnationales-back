@@ -16,9 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
-@Configuration
-@EnableBatchProcessing
+import javax.persistence.EntityManagerFactory;
+
+
 public abstract class JobConfiguration {
+    @Autowired
+    protected EntityManagerFactory entityManagerFactory;
     @Autowired
     protected JobBuilderFactory jobBuilderFactory;
     @Autowired
@@ -34,10 +37,6 @@ public abstract class JobConfiguration {
     @Autowired
     protected EventService eventService;
 
-    public JobConfiguration() {
-        super();
-    }
-
     @Bean
     public RestTemplate restTemplate() {
         return new RestTemplate();
@@ -48,8 +47,7 @@ public abstract class JobConfiguration {
         return new BCryptPasswordEncoder();
     }
 
-    protected JobParametersIncrementer incrementer() {
-        return new TimeIncrementer();
-    }
+    @Bean
+    public BatchConfigurer configurer() { return new BatchConfigurer(entityManagerFactory);}
 
 }

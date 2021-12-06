@@ -6,12 +6,15 @@ import fr.abes.licencesnationales.batch.relance.TraiterEtabSansIpTasklet;
 import fr.abes.licencesnationales.batch.relance.TraiterSuppressionIpTasklet;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class JobRelancesConfig extends JobConfiguration {
     @Bean(name = "jobRelances")
     public Job jobRelances() {
-        return this.jobBuilderFactory.get("jobRelances").incrementer(incrementer())
+        return this.jobBuilderFactory.get("jobRelances").incrementer(new RunIdIncrementer())
                 .start(stepContructionListeEtab()).next(stepTraiterEtabSansIp())
                 .next(stepTraiterSuppressionIp())
                 .next(stepEnvoiMailRelance())
