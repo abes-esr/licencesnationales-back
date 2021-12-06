@@ -18,13 +18,21 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, AuthenticationException e) throws IOException {
         this.sendErrorGenericAuthorization();
 
+        final String expiredMsg = (String) httpServletRequest.getAttribute("expired");
+
         if (e.getMessage().contains(Constant.ERROR_ACCESS_DATABASE)) {
             this.sendErrorTechnicalProblems(httpServletResponse);
         } else if (e.getMessage().contains(Constant.BLOCKED)) {
             this.sendErrorAccountBlocked(httpServletResponse);
+        } else if(expiredMsg != null) {
+            this.sendErrorTokenExpired(httpServletResponse);
         } else {
             this.sendErrorAccessResourceNotAllowed(httpServletResponse);
         }
+    }
+
+    private void sendErrorTokenExpired(HttpServletResponse httpServletResponse) throws IOException {
+        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED, Constant.JWT_TOKEN_EXPIRED);
     }
 
     private void sendErrorGenericAuthorization(){

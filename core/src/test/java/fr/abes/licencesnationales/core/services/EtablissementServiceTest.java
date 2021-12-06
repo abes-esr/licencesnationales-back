@@ -1,11 +1,8 @@
 package fr.abes.licencesnationales.core.services;
 
-import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
-import fr.abes.licencesnationales.core.entities.statut.StatutEtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
@@ -49,6 +46,7 @@ class EtablissementServiceTest {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+        etabIn.setValide(false);
         Optional<EtablissementEntity> optionEtab = Optional.of(etabIn);
         Mockito.when(etablissementDao.getFirstBySiren("000000000")).thenReturn(optionEtab);
         EtablissementEntity etabOut = service.getFirstBySiren("000000000");
@@ -66,6 +64,7 @@ class EtablissementServiceTest {
         Assertions.assertEquals("cedex", etabOut.getContact().getCedex());
         Assertions.assertEquals("telephone", etabOut.getContact().getTelephone());
         Assertions.assertEquals("mail@mail.com", etabOut.getContact().getMail());
+        Assertions.assertEquals(false, etabOut.isValide());
         Assertions.assertNotNull(etabOut.getContact().getMotDePasse());
     }
 
@@ -80,10 +79,8 @@ class EtablissementServiceTest {
     @Test
     void saveCreation() throws MailDoublonException, SirenExistException {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
-        StatutEntity statut = new StatutEtablissementEntity(Constant.STATUT_ETAB_NOUVEAU, "Nouveau");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity( "testNom", "000000000", type, "12345", contact);
-        Mockito.when(statutRepository.findById(1)).thenReturn(Optional.of(statut));
         Mockito.when(etablissementDao.save(etabIn)).thenReturn(etabIn);
 
         service.save(etabIn);
@@ -93,10 +90,8 @@ class EtablissementServiceTest {
     @Test
     void saveModification() throws MailDoublonException, SirenExistException {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
-        StatutEntity statut = new StatutEtablissementEntity(Constant.STATUT_ETAB_VALIDE, "Validé");
         ContactEntity contact = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn = new EtablissementEntity( 1, "testNom", "000000000", type, "12345", contact);
-        Mockito.when(statutRepository.findById(Constant.STATUT_ETAB_VALIDE)).thenReturn(Optional.of(statut));
         Mockito.when(etablissementDao.save(etabIn)).thenReturn(etabIn);
 
         service.save(etabIn);

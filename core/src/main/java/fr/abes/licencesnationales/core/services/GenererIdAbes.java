@@ -64,7 +64,7 @@ public class GenererIdAbes {
         return   identifiant;
     }
 
-    public String genererIdAbes(String identifiant) {
+    public static String genererIdAbes(String identifiant) {
         return "ABES" + identifiant.substring(0, 9).toUpperCase();
     }
 
