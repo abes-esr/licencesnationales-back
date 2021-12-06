@@ -203,7 +203,7 @@ class ExportConverterTest {
     @DisplayName("Test convertisseur export IpV6 range")
     void testMapperExportIpv6Range() throws IpException {
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
-        IpEntity ip = new IpV6(1,"0000:0000:0000:0000:0000:0000:0000-0001:0001-00AA","test",new StatutIpEntity(1,"testType"));
+        IpEntity ip = new IpV6(1,"0000:0000:0000:0000:0000-0000:0000:0000-0001:0001-00AA","test",new StatutIpEntity(1,"testType"));
         Date today = Calendar.getInstance().getTime();
         ip.setDateModification(today);
         ip.setDateCreation(today);
