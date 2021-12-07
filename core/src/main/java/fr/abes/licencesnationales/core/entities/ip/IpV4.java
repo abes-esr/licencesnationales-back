@@ -126,11 +126,13 @@ public class IpV4 extends IpEntity implements Serializable {
     //    194.57.116-116.1-255
     @Override
     public String formatRange(){
+        String[] octetStart = this.getStart().toString().split("\\.");
+        String[] octetEnd = this.getEnd().toString().split("\\.");
         if(this.isRange()){
-            return  this.getEnd().toString().split("\\.")[0]+"." + this.getEnd().toString().split("\\.")[1]+"."+
-            this.getStart().toString().split("\\.")[2] + "-" + this.getEnd().toString().split("\\.")[2]+"."+
-            this.getStart().toString().split("\\.")[3] + "-" + this.getEnd().toString().split("\\.")[3];
+            return  octetStart[0]+"." + octetStart[1]+"."+
+                    octetStart[2] + "-" + octetEnd[2]+"."+
+                    octetStart[3] + "-" + octetEnd[3];
         }
-        return "ranged";
+        return "not range"; //TODO: lever une exception pour mauvaise utilisation de méthode ?
     }
 }
