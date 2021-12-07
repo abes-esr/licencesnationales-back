@@ -138,6 +138,6 @@ public class IpV6 extends IpEntity implements Serializable {
             }
             return output.toString();
         }
-        return "not range";
+        return "not range"; //TODO: lever une exception pour mauvaise utilisation de méthode ?
     }
 }
