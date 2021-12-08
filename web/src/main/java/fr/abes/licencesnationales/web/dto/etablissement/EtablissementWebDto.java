@@ -15,4 +15,6 @@ import lombok.Setter;
 public class EtablissementWebDto {
     @JsonProperty("contact")
     private ContactWebDto contact;
+    @JsonProperty("dateCreation")
+    private String dateCreation;
 }
