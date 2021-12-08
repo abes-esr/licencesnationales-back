@@ -13,16 +13,22 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
 public class SuppressionEtEnvoiMailTasklet implements Tasklet, StepExecutionListener {
-    @Autowired
     private EtablissementService etablissementService;
-    @Autowired
     private EmailService emailService;
 
     private List<EtablissementEntity> listeEtab;
+
+    public SuppressionEtEnvoiMailTasklet(EtablissementService etablissementService, EmailService emailService) {
+        this.etablissementService = etablissementService;
+        this.emailService = emailService;
+        this.listeEtab = new ArrayList<>();
+    }
+
     @Override
     public void beforeStep(StepExecution stepExecution) {
         this.listeEtab = (List<EtablissementEntity>) stepExecution.getJobExecution().getExecutionContext().get("listeEtab");

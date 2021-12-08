@@ -4,11 +4,11 @@ import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
-import org.springframework.batch.core.JobParametersIncrementer;
 import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,8 +27,6 @@ public abstract class JobConfiguration {
     @Autowired
     protected StepBuilderFactory stepBuilderFactory;
     @Autowired
-    protected EtablissementService service;
-    @Autowired
     protected ApplicationEventPublisher applicationEventPublisher;
     @Autowired
     protected IpEventRepository ipEventRepository;
@@ -36,6 +34,8 @@ public abstract class JobConfiguration {
     protected EmailService emailService;
     @Autowired
     protected EventService eventService;
+    @Autowired
+    protected EtablissementService etablissementService;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -48,6 +48,8 @@ public abstract class JobConfiguration {
     }
 
     @Bean
-    public BatchConfigurer configurer() { return new BatchConfigurer(entityManagerFactory);}
+    public LnBatchConfigurer configurer() {
+        return new LnBatchConfigurer(entityManagerFactory);
+    }
 
 }

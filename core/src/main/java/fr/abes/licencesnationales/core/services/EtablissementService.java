@@ -90,7 +90,7 @@ public class EtablissementService {
         return etablissementDao.getEtablissementEntityByContact_MailContains(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
     }
 
-    public List<EtablissementEntity> getEtabASupprimer() {
+    public List<EtablissementEntity> getEtabASupprimer() throws UnknownEtablissementException {
         List<EtablissementEntity> emptyEtab = etablissementDao.getEtablissementEntityByIps_Empty();
         List<EtablissementEntity> listeOut = new ArrayList<>();
         for (EtablissementEntity etab : emptyEtab) {
