@@ -41,10 +41,21 @@ public class ConstructionListeEtabTasklet implements Tasklet, StepExecutionListe
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
         if (stepExecution.getExitStatus().equals(ExitStatus.COMPLETED)) {
-            stepExecution.getJobExecution().getExecutionContext().put("etabAvecAuMoinsUneIpAttestation", this.etabAvecAuMoinsUneIpAttestation);
-            stepExecution.getJobExecution().getExecutionContext().put("etabSansIp", this.etabSansIp);
+            if (this.etabSansIp.size() != 0 && this.etabAvecAuMoinsUneIpAttestation.size() != 0) {
+                stepExecution.getJobExecution().getExecutionContext().put("etabSansIp", this.etabSansIp);
+                stepExecution.getJobExecution().getExecutionContext().put("etabAvecAuMoinsUneIpAttestation", this.etabAvecAuMoinsUneIpAttestation);
+                return new ExitStatus("ALLTYPEETAB");
+            }
+            if (this.etabSansIp.size() != 0) {
+                stepExecution.getJobExecution().getExecutionContext().put("etabSansIp", this.etabSansIp);
+                return new ExitStatus("ETABSANSIPONLY");
+            }
+            if (this.etabAvecAuMoinsUneIpAttestation.size() != 0) {
+                stepExecution.getJobExecution().getExecutionContext().put("etabAvecAuMoinsUneIpAttestation", this.etabAvecAuMoinsUneIpAttestation);
+                return new ExitStatus("ETABAVECAUMOINSUNEIPATTESTATIONONLY");
+            }
         }
-        return stepExecution.getExitStatus();
+        return new ExitStatus("AUCUNETAB");
     }
 
     @Override

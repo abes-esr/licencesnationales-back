@@ -1,8 +1,10 @@
 package fr.abes.licencesnationales.batch.relance;
 
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EventService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.StepExecution;
@@ -20,7 +22,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
-@Component
+@Slf4j
 public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener {
     private List<EtablissementEntity> etabSansIp;
 
@@ -28,19 +30,19 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
 
     private final EventService eventService;
 
-    @Autowired
     public TraiterEtabSansIpTasklet(EmailService emailService, EventService eventService) {
         this.emailService = emailService;
         this.eventService = eventService;
     }
+
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        this.etabSansIp = (List<EtablissementEntity>) stepExecution.getExecutionContext().get("etabSansIp");
+        this.etabSansIp = (List<EtablissementEntity>) stepExecution.getJobExecution().getExecutionContext().get("etabSansIp");
     }
 
     @Override
     public ExitStatus afterStep(StepExecution stepExecution) {
-        return null;
+        return stepExecution.getExitStatus();
     }
 
     @Override
@@ -54,9 +56,13 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
                 //si on a la date de dernière suppression d'une IP de l'etab, on ajoute un an pour avoir la date de suppression de l'établissement
                 dateSuppressionEtab.setTime(dateSuppressionDerniereIp);
             } else {
-                //on récupère la date de création de l'établissement
-                Date dateCreationEtab = eventService.getDateCreationEtab(etab);
-                dateSuppressionEtab.setTime(dateCreationEtab);
+                try {
+                    //on récupère la date de création de l'établissement
+                    Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                    dateSuppressionEtab.setTime(dateCreationEtab);
+                } catch (UnknownEtablissementException ex) {
+                    log.error("Etablissement inconnu : " + ex.getMessage());
+                }
             }
             dateSuppressionEtab.add(Calendar.YEAR, 1);
             emailService.constructRelanceEtabMail(etab.getNom(), etab.getContact().getMail(), format.format(dateSuppressionEtab.getTime()));

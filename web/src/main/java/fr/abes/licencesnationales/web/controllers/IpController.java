@@ -57,13 +57,7 @@ public class IpController {
     private FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    private EmailService emailService;
-
-    @Autowired
     private UtilsMapper mapper;
-
-    @Value("${ln.dest.notif.admin}")
-    private String admin;
 
 
     @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -103,7 +97,6 @@ public class IpController {
                 throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
             }
         }
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);
         ipModifieeEvent.setSource(this);
         ipModifieeEvent.setSiren(etab.getSiren());

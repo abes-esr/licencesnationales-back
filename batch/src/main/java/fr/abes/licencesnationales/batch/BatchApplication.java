@@ -23,7 +23,7 @@ import org.springframework.util.StringUtils;
 @ComponentScan(basePackages = {"fr.abes.licencesnationales.batch", "fr.abes.licencesnationales.core"})
 @EntityScan("fr.abes.licencesnationales.core.entities")
 @EnableJpaRepositories(basePackages = "fr.abes.licencesnationales.core.repository")
-@EnableBatchProcessing(modular = true)
+@EnableBatchProcessing
 public class BatchApplication {
 
     public static void main(String[] args) throws JobParametersInvalidException, JobExecutionAlreadyRunningException, JobRestartException, JobInstanceAlreadyCompleteException {

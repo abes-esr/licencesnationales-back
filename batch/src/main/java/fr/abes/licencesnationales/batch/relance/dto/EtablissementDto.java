@@ -2,11 +2,12 @@ package fr.abes.licencesnationales.batch.relance.dto;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
-public class EtablissementDto {
+public class EtablissementDto implements Serializable {
     private String nomEtab;
     private String siren;
     private String email;
