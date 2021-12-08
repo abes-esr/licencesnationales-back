@@ -66,7 +66,7 @@ public class IpV6 extends IpEntity implements Serializable {
     /**
      * Vérifie si l'IP passée en paramètre fait partie de la plage d'IP
      *
-     * @param ip Ipv4 à vérifier
+     * @param ip Ipv6 à vérifier
      * @return Vrai si l'IP passée en paramètre fait partie de la plage d'IP, Faux sinon
      */
     public boolean contains(String ip) {
@@ -101,7 +101,7 @@ public class IpV6 extends IpEntity implements Serializable {
     /**
      * Retourne l'IP de début de la plage
      *
-     * @return IpV4 de début de la plage
+     * @return IpV6 de début de la plage
      */
     public Ipv6 getStart() {
         return this.ipRange.start();
@@ -110,10 +110,34 @@ public class IpV6 extends IpEntity implements Serializable {
     /**
      * Retourne l'IP de fin de la plage
      *
-     * @return IpV4 de fin de la plage
+     * @return IpV6 de fin de la plage
      */
     public Ipv6 getEnd() {
         return this.ipRange.end();
     }
 
+    @Override
+    public String formatRange() {
+        if(this.isRange()){
+            String[] digits =  this.getIp().split(":");
+            StringBuilder output = new StringBuilder();
+            for (int i = 0; i <digits.length; i++) {
+                String[] octet =  digits[i].split("-");
+                if(octet.length > 1) {
+                    if(octet[0].equals(octet[1])){
+                        output.append(octet[0]);
+                    }else{
+                        output.append(octet[0]).append("-").append(octet[1]);
+                    }
+                }else{
+                    output.append(octet[0]);
+                }
+                if(i != digits.length-1){
+                    output.append(":");
+                }
+            }
+            return output.toString();
+        }
+        return "not range"; //TODO: lever une exception pour mauvaise utilisation de méthode ?
+    }
 }
