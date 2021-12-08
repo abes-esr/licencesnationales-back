@@ -19,6 +19,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+
 @Entity
 @NoArgsConstructor
 @Getter
@@ -122,4 +123,16 @@ public class IpV4 extends IpEntity implements Serializable {
         return this.ipRange.end();
     }
 
+    //    194.57.116-116.1-255
+    @Override
+    public String formatRange(){
+        String[] octetStart = this.getStart().toString().split("\\.");
+        String[] octetEnd = this.getEnd().toString().split("\\.");
+        if(this.isRange()){
+            return  octetStart[0]+"." + octetStart[1]+"."+
+                    octetStart[2] + "-" + octetEnd[2]+"."+
+                    octetStart[3] + "-" + octetEnd[3];
+        }
+        return "not range"; //TODO: lever une exception pour mauvaise utilisation de méthode ?
+    }
 }

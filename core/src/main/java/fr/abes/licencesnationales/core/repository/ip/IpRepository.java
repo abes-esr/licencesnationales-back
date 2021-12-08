@@ -14,7 +14,7 @@ import java.util.Set;
 public interface IpRepository extends JpaRepository<IpEntity, Integer> {
 
     @Query("select etab.ips from EtablissementEntity etab where etab.siren = :siren")
-    Set<IpEntity> findAllBySiren(@Param("siren") String siren);
+    List<IpEntity> findAllBySiren(@Param("siren") String siren);
 
     void deleteById(Integer id);
 

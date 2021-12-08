@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -21,5 +22,7 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     boolean existsBySiren(@Param("siren") String siren);
 
     Optional<EtablissementEntity> getEtablissementEntityByContact_MailContains(@Param("x") String email);
+
+    List<EtablissementEntity> findAllBySirenIn(List<String> ids);
 
 }

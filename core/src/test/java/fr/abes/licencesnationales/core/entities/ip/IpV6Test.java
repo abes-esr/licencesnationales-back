@@ -65,4 +65,12 @@ class IpV6Test {
         assertEquals("Invalid range [5800:10c3:e3c3:f1aa:48e3:d923:d497:bbff..5800:10c3:e3c3:f1aa:48e3:d923:d494:aaff]", exception.getLocalizedMessage());
     }
 
+    @Test
+    @DisplayName("Format ip csv")
+    void testFormatIpV6CSV() throws IpException {
+        IpV6 ip = new IpV6("0000:0000:0000:0000:0000:0000:0001-0001:0001-FFFF", "test", statut);
+
+        assertEquals("0000:0000:0000:0000:0000:0000:0001:0001-FFFF", ip.formatRange());
+    }
+
 }
