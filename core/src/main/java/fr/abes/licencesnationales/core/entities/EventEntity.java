@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities;
 
 import lombok.Getter;
+import lombok.Setter;
 import org.springframework.context.ApplicationEvent;
 
 import javax.persistence.*;
@@ -8,7 +9,7 @@ import java.util.Date;
 
 
 @MappedSuperclass
-@Getter
+@Getter @Setter
 public abstract class EventEntity extends ApplicationEvent {
 
     @Column(name = "DATE_CREATION_EVENT")

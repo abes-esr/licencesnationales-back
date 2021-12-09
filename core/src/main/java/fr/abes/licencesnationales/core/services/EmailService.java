@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Locale;
 
 @Component
@@ -29,10 +30,13 @@ public class EmailService {
     private RestTemplate restTemplate;
 
     @Value("${mail.ws.url}")
-    protected String mailServerURL;
+    private String mailServerURL;
 
     @Value("${site.url}")
-    protected String frontBaseURL;
+    private String frontBaseURL;
+
+    @Value("${site.url}")
+    private String urlSite;
 
     public void constructCreationCompteEmailAdmin(Locale locale, String emailUser, String siren, String nomEtab) throws RestClientException {
         StringBuilder message = new StringBuilder();
@@ -40,13 +44,13 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" avec le siren ");
         message.append(siren);
-        String jsonRequestConstruct = mailToJSON(emailUser,  messageSource.getMessage("message.NouveauCompteCree",null,locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser,  null, messageSource.getMessage("message.NouveauCompteCree",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
     public void constructCreationCompteEmailUser(Locale locale,  String emailUser) throws RestClientException {
         String message = messageSource.getMessage("message.CreationCompteUser", null, locale);
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
+        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.NouveauCompteCree",null,locale), message);
         sendMail(jsonRequestConstruct);
     }
 
@@ -61,17 +65,16 @@ public class EmailService {
         message.append(url);
         message.append(" <br>");
         message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
-        String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, objetMsg, message.toString());
         sendMail(jsonRequestConstruct);
     }
 
     public void constructValidationNewPassEmail(Locale locale, String emailUser) throws RestClientException {
         StringBuilder message = new StringBuilder();
         message.append(messageSource.getMessage("message.validationNewPass", null, locale));
-        String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, "LN Nouveau mot de passe enregistré", message.toString());
         sendMail(jsonRequestConstruct);
     }
-
 
     public void constructSuppressionCompteMailUser(Locale locale, String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
         StringBuilder message = new StringBuilder();
@@ -82,11 +85,15 @@ public class EmailService {
         message.append("Raison de la suppression : <br>");
         message.append(motifSuppression);
         message.append("<br>");
+        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>");
+        message.append("Bien cordialement,<br>");
+        message.append("L’équipe Licences nationales<br>");
+        message.append("<br>");
         message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
         message.append("Bien cordialement,<br>");
         message.append("L’équipe Licences nationales<br>");
         message.append("https://acces.licencesnationales.fr/");
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteSupprimeUser",null,locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.CompteSupprimeUser",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -98,7 +105,7 @@ public class EmailService {
         message.append(siren);
         message.append(" pour le motif : ");
         message.append(motifSuppression);
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteSupprimeAdmin",null,locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.CompteSupprimeAdmin",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -108,7 +115,7 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" avec le siren ");
         message.append(siren);
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteValideAdmin",null,locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.CompteValideAdmin",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -119,12 +126,24 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" sur le site Licencesnationales.fr vient d'être validé par l'administrateur.<br>");
         message.append("<br>");
-        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
+        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>");
         message.append("Bien cordialement,<br>");
         message.append("L’équipe Licences nationales<br>");
         message.append("https://acces.licencesnationales.fr/");
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteValideUser",null,locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.CompteValideUser",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
+    }
+
+    public void constructRelanceEtabMail(String nomEtab, String emailUser, String dateSuppression) throws RestClientException {
+        String message = "Bonjour,<br>" +
+                "Le compte que vous avez créé pour " + nomEtab + " sur le site Licencesnationales.fr ne contient pas d'adresse IP déclarée.<br>" +
+                "Merci de renseigner au moins une adresse IP avant le " + dateSuppression + ", date à laquelle votre compte sera automatiquement supprimé.<br>" +
+                "Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>" +
+                "Bien cordialement,<br>" +
+                "L’équipe Licences nationales<br>" +
+                urlSite;
+        String jsonRequestContruct = mailToJSON(emailUser, null, "Relance pour création d'IP sur votre compte Licences Nationales", message);
+        sendMail(jsonRequestContruct);
     }
 
     public void sendMail(String requestJson) throws RestClientException {
@@ -139,13 +158,46 @@ public class EmailService {
         restTemplate.postForObject(mailServerURL + "/htmlMail/", entity, String.class);
     }
 
+    public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String nomEtab, String to, String cc) {
+        StringBuilder message = new StringBuilder("Bonjour,");
+        message.append("<br>");
+        message.append("en l'absence de document certifiant l'appartenance de l'IP ");
+        message.append(", déclarée il y a un an sous le compte '");
+        message.append(nomEtab);
+        message.append("', à l'établissement, nous procédons à sa suppression automatique.");
+        message.append("<br>");
+        message.append("Pour toute question, contacter l'équipe d'assistance de l'Abes : ");
+        message.append("<a href='https://stp.abes.fr/node/3?origine=LicencesNationales'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>");
+        message.append("<br>");
+        message.append("Bien cordialement,");
+        message.append("<br>");
+        message.append("L'équipe Licences Nationales");
+        message.append("<br>");
+        message.append("<a href='");
+        message.append(urlSite);
+        message.append("'>");
+        message.append(urlSite);
+        message.append("</a>");
+        String jsonRequestConstruct = mailToJSON(to, cc, "Suppression des IP en validation de votre compte Licences nationales", message.toString());
+        sendMail(jsonRequestConstruct);
+    }
 
-    protected String mailToJSON(String to, String subject, String text) {
+    public void constructSuppressionMail(String motif, String nom, String mail) {
+        StringBuilder message = new StringBuilder(nom);
+        String jsonRequestConstruct = mailToJSON(mail, null, "Suppression des IP en validation de votre compte Licences nationales", message.toString());
+        sendMail(jsonRequestConstruct);
+    }
+
+    protected String mailToJSON(String to, String cc, String subject, String text) {
         String json = "";
         ObjectMapper mapper = new ObjectMapper();
         MailDto mail = new MailDto();
         mail.setTo(to.split(";"));
-        mail.setCc(new String[]{});
+        if (cc != null) {
+            mail.setCc(cc.split(";"));
+        } else {
+            mail.setCc(new String[]{});
+        }
         mail.setCci(new String[]{});
         mail.setSubject(subject);
         mail.setText(text);

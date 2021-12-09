@@ -1,12 +1,16 @@
 package fr.abes.licencesnationales.core.services;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
+import fr.abes.licencesnationales.core.exception.UnknownStatutException;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpV4Repository;
@@ -15,10 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 @Slf4j
@@ -34,7 +35,8 @@ public class IpService {
     @Autowired
     private IpV6Repository ipV6Repository;
 
-
+    @Autowired
+    private ReferenceService referenceService;
     /**
      * Récupère toutes les IP V4 et V6 confondus
      * @return
@@ -128,5 +130,12 @@ public class IpService {
             throw new UnknownIpException("L'IP " + id + " n'existe pas");
         }
         return ipEntity.get();
+    }
+
+    public List<IpEntity> getIpValidationOlderThanOneYear() throws UnknownStatutException {
+        StatutEntity statut = referenceService.findStatutById(Constant.STATUT_IP_NOUVELLE);
+        Calendar dateJour = new GregorianCalendar();
+        dateJour.add(Calendar.YEAR, -1);
+        return ipRepository.getAllByStatutAndDateModificationIsBefore((StatutIpEntity) statut, dateJour.getTime());
     }
 }

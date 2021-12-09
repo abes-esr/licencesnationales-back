@@ -62,9 +62,6 @@ public class IpController {
     private FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    private EmailService emailService;
-
-    @Autowired
     private UtilsMapper mapper;
 
     @Autowired
@@ -111,7 +108,6 @@ public class IpController {
                 throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
             }
         }
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);
         ipModifieeEvent.setSource(this);
         ipModifieeEvent.setSiren(etab.getSiren());
