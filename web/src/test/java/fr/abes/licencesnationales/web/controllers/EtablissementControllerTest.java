@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
@@ -10,6 +11,8 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
+import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
@@ -253,12 +256,12 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isOk());
 
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("etab");
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
@@ -299,17 +302,83 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    @DisplayName("test modification établissement user avec Accès interdit")
+    void testEditEtablissementUserWithAccesInterdit() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+
+        EtablissementModifieUserWebDto etab = new EtablissementModifieUserWebDto();
+        etab.setSiren("123456789");
+        ContactModifieWebDto contact = new ContactModifieWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        etab.setContact(contact);
+
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenThrow(new AccesInterditException("Acces interdit"));
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid : Acces interdit"))
-                .andExpect(jsonPath("$.debugMessage").value("Acces interdit"));
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("test modification établissement user avec mauvais siren")
+    void testEditEtablissementUserWithWrongSiren() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+
+        EtablissementModifieUserWebDto etab = new EtablissementModifieUserWebDto();
+        etab.setSiren("123456789");
+        ContactModifieWebDto contact = new ContactModifieWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        etab.setContact(contact);
+
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("987654321");
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -344,7 +413,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
