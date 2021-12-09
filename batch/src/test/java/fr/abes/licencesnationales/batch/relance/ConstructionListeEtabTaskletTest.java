@@ -66,7 +66,7 @@ public class ConstructionListeEtabTaskletTest {
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepContructionListeEtab");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepConstructionListeEtab");
 
         Assertions.assertEquals(1, jobExecution.getStepExecutions().size());
         Assertions.assertEquals("ETABSANSIPONLY", jobExecution.getExitStatus().getExitCode());
@@ -100,7 +100,7 @@ public class ConstructionListeEtabTaskletTest {
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepContructionListeEtab");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepConstructionListeEtab");
 
         Assertions.assertEquals(1, jobExecution.getStepExecutions().size());
         Assertions.assertEquals("ETABAVECAUMOINSUNEIPATTESTATIONONLY", jobExecution.getExitStatus().getExitCode());
@@ -135,7 +135,7 @@ public class ConstructionListeEtabTaskletTest {
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
 
-        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepContructionListeEtab");
+        JobExecution jobExecution = jobLauncherTestUtils.launchStep("stepConstructionListeEtab");
 
         Assertions.assertEquals(1, jobExecution.getStepExecutions().size());
         Assertions.assertEquals("ALLTYPEETAB", jobExecution.getExitStatus().getExitCode());
