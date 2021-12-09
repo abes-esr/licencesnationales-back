@@ -65,7 +65,7 @@ public class EmailService {
         message.append(url);
         message.append(" <br>");
         message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
-        String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, objetMsg, message.toString());
         sendMail(jsonRequestConstruct);
     }
 
