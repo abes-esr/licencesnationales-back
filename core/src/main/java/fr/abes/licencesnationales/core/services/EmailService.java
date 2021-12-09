@@ -56,16 +56,16 @@ public class EmailService {
 
     public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
         final String url = this.frontBaseURL + "/reinitialisationPass?token=" + token;
-        StringBuilder message = new StringBuilder();
-        message.append(messageSource.getMessage("message.resetTokenEmailDebut",null, locale));
+        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
+        StringBuilder message = new StringBuilder(messageSource.getMessage("message.resetTokenEmailDebut",null, locale));
         message.append(nomEtab);
         message.append(" ");
         message.append(messageSource.getMessage("message.resetTokenEmailMilieu", null, locale));
-        message.append("<br>");
+        message.append(" <br>");
         message.append(url);
-        message.append("<br>");
+        message.append(" <br>");
         message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
-        String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.resetTokenEmailObjet",null, locale), message.toString());
+        String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -86,6 +86,10 @@ public class EmailService {
         message.append(motifSuppression);
         message.append("<br>");
         message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>");
+        message.append("Bien cordialement,<br>");
+        message.append("L’équipe Licences nationales<br>");
+        message.append("<br>");
+        message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
         message.append("Bien cordialement,<br>");
         message.append("L’équipe Licences nationales<br>");
         message.append("https://acces.licencesnationales.fr/");

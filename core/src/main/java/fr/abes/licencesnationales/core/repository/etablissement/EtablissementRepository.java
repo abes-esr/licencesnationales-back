@@ -24,4 +24,7 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     Optional<EtablissementEntity> getEtablissementEntityByContact_MailContains(@Param("x") String email);
 
     List<EtablissementEntity> getEtablissementEntityByIps_Empty();
+
+    List<EtablissementEntity> findAllBySirenIn(List<String> ids);
+
 }
