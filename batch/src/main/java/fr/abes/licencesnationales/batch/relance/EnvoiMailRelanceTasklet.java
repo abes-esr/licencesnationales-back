@@ -20,7 +20,6 @@ import java.util.List;
 public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
     private List<EtablissementDto> etablissementDtos;
 
-    @Autowired
     private EmailService emailService;
 
     @Value("${ln.skipMail}")
@@ -28,6 +27,10 @@ public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
 
     @Value("${ln.dest.notif.admin}")
     private String mailAdmin;
+
+    public EnvoiMailRelanceTasklet(EmailService emailService) {
+        this.emailService = emailService;
+    }
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
