@@ -16,14 +16,15 @@ import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
-import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.core.services.export.ExportIp;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
+import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -32,7 +33,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -63,6 +67,9 @@ public class IpController {
     @Autowired
     private UtilsMapper mapper;
 
+    @Autowired
+    private ExportIp exportIp;
+
     @Value("${ln.dest.notif.admin}")
     private String admin;
 
@@ -80,8 +87,6 @@ public class IpController {
             try {
                 applicationEventPublisher.publishEvent(ipAjouteeEvent);
                 eventRepository.save(ipAjouteeEvent);
-                String descriptionAcces = " ip ou plage d'ips = " + e.getIp() + " en provenance de l'établissement " + etab;
-                emailService.constructAccesCreeEmail(locale, descriptionAcces, e.getCommentaires(), admin);
             } catch (Exception exception) {
                 errors.add(exception.getLocalizedMessage());
             }
@@ -113,8 +118,6 @@ public class IpController {
         ipModifieeEvent.setIpId(id);
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(ipModifieeEvent);
-        String descriptionAcces = "id = " + id + ", ip ou plage d'ips = " + dto.getIp() + " en provenance de l'établissement " + etab.getSiren();
-        emailService.constructAccesModifieEmail(locale, descriptionAcces, dto.getCommentaires(), admin);
     }
 
     @PostMapping(value = "/valider")
@@ -157,5 +160,17 @@ public class IpController {
     public IpWebDto getIpEntity(@RequestBody IpWebDto ipDto) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
         filtrerAccesServices.autoriserServicesParSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
         return mapper.map(ipService.getFirstById(ipDto.getId()), IpWebDto.class);
+    }
+
+    @GetMapping(value = "/export/{siren}")
+    public void exportIp(@PathVariable String siren, HttpServletResponse response) throws IOException, SirenIntrouvableException, AccesInterditException {
+        response.setContentType("text/csv;charset=UTF-8");
+        response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
+        InputStream stream;
+        List<String> sirens = new ArrayList<>();
+        sirens.add(siren);
+        stream = exportIp.generateCsv(sirens);
+        IOUtils.copy(stream , response.getOutputStream());
+        response.flushBuffer();
     }
 }

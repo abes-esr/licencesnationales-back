@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
@@ -10,13 +11,16 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
+import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
+import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.MotifSuppressionWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
@@ -30,6 +34,7 @@ import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceImpl;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import org.assertj.core.util.Lists;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,9 +46,13 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -56,6 +65,9 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
     @MockBean
     private EtablissementService etablissementService;
+
+    @MockBean
+    private EtablissementRepository dao;
 
     @MockBean
     private ReCaptchaService reCaptchaService;
@@ -111,6 +123,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         ReCaptchaResponse response = new ReCaptchaResponse();
         response.setSuccess(true);
         response.setAction("creationCompte");
+        Mockito.when(etablissementService.existeSiren("123456789")).thenReturn(false);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
         Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
@@ -121,8 +135,88 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+    }
 
+    @Test
+    @DisplayName("test création de compte avec doublon Siren")
+    public void testCreationCompteDoublonSiren() throws Exception {
+        EtablissementCreeWebDto dto = new EtablissementCreeWebDto();
+        dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
+        dto.setName("Etab de test 32");
+        dto.setSiren("123456789");
+        dto.setTypeEtablissement("EPIC/EPST");
+        ContactCreeWebDto contact = new ContactCreeWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        contact.setMotDePasse("12345*:KKk");
+        dto.setContact(contact);
 
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction("creationCompte");
+        Mockito.when(etablissementService.existeSiren("123456789")).thenReturn(true);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+
+        this.mockMvc.perform(put("/v1/etablissements")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : Le siren saisi est déjà utilisé"))
+                .andExpect(jsonPath("$.debugMessage").value("Le siren saisi est déjà utilisé"));
+    }
+
+    @Test
+    @DisplayName("test création de compte avec doublon Mail")
+    public void testCreationCompteDoublonMail() throws Exception {
+        EtablissementCreeWebDto dto = new EtablissementCreeWebDto();
+        dto.setRecaptcha("ksdjfklsklfjhskjdfhklf");
+        dto.setName("Etab de test 32");
+        dto.setSiren("123456789");
+        dto.setTypeEtablissement("EPIC/EPST");
+        ContactCreeWebDto contact = new ContactCreeWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        contact.setMotDePasse("12345*:KKk");
+        dto.setContact(contact);
+
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction("creationCompte");
+        Mockito.when(etablissementService.existeSiren("123456789")).thenReturn(false);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(true);
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+
+        this.mockMvc.perform(put("/v1/etablissements")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
+                .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
     }
 
     @Test
@@ -147,6 +241,11 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setMail("test@test.com");
         etab.setContact(contact);
 
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
@@ -157,16 +256,16 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isOk());
 
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("etab");
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid"))
+                .andExpect(jsonPath("$.message").value("Credentials not valid : L'opération ne peut être effectuée que par un administrateur"))
                 .andExpect(jsonPath("$.debugMessage").value("L'opération ne peut être effectuée que par un administrateur"));
 
     }
@@ -191,28 +290,136 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         contact.setMail("test@test.com");
         etab.setContact(contact);
 
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
-        ContactEntity contactEntity = new ContactEntity("testNom", "testPrenom", "testAdresse", "testBP", "testCP", "testVille", "testCedex", "0000000000", "test@test.com", "12345*:KKk");
-        EtablissementEntity entity = new EtablissementEntity(1, "testNomEtab", "123456789", type, "12345", contactEntity);
-        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
-
 
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    @DisplayName("test modification établissement user avec Accès interdit")
+    void testEditEtablissementUserWithAccesInterdit() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+
+        EtablissementModifieUserWebDto etab = new EtablissementModifieUserWebDto();
+        etab.setSiren("123456789");
+        ContactModifieWebDto contact = new ContactModifieWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        etab.setContact(contact);
+
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenThrow(new AccesInterditException("Acces interdit"));
-        this.mockMvc.perform(post("/v1/etablissements")
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("test modification établissement user avec mauvais siren")
+    void testEditEtablissementUserWithWrongSiren() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+
+        EtablissementModifieUserWebDto etab = new EtablissementModifieUserWebDto();
+        etab.setSiren("123456789");
+        ContactModifieWebDto contact = new ContactModifieWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        etab.setContact(contact);
+
+        ContactEntity contactInBdd = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(false);
+
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("987654321");
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("test modification établissement user avec doublon email")
+    @WithMockUser(authorities = {"etab"})
+    void testEditEtablissementUserWithDoublonMail() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+
+        EtablissementModifieUserWebDto etab = new EtablissementModifieUserWebDto();
+        etab.setSiren("123456789");
+        ContactModifieWebDto contact = new ContactModifieWebDto();
+        contact.setNom("testNom");
+        contact.setPrenom("testPrenom");
+        contact.setAdresse("testAdresse");
+        contact.setBoitePostale("testBP");
+        contact.setCedex("testCedex");
+        contact.setCodePostal("testCP");
+        contact.setVille("testVille");
+        contact.setTelephone("0000000000");
+        contact.setMail("test@test.com");
+        etab.setContact(contact);
+
+        ContactEntity contactInBdd = new ContactEntity(1, "nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity etabInBdd = new EtablissementEntity(1, "testNom", "123456789", type, "123456", contactInBdd);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etabInBdd);
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(true);
+
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid"))
-                .andExpect(jsonPath("$.debugMessage").value("Acces interdit"));
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
+                .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
+
     }
 
     @Test
@@ -264,6 +471,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/fusion")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk());
+
     }
 
     @Test
@@ -283,11 +491,47 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructSuppressionMail(motif.getMotif(), etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUser(Locale.FRANCE, motif.getMotif(), etab.getNom(), etab.getContact().getMail());
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(motif)))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test validation établissement")
+    @WithMockUser(authorities = {"admin"})
+    void testValidationEtablissement() throws Exception {
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+        Mockito.doNothing().when(emailService).constructValidationCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(Locale.FRANCE, etab.getNom(), etab.getContact().getMail(), etab.getSiren());
+
+        this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("test validation établissement avec mauvais statut")
+    @WithMockUser(authorities = {"admin"})
+    void testValidationEtablissementWithWrongStatut() throws Exception {
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        etab.setValide(true);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
+                .andExpect(jsonPath("$.message").value("Erreur dans le statut de l'établissement : L'établissement ne doit pas déjà être validé"))
+                .andExpect(jsonPath("$.debugMessage").value("L'établissement ne doit pas déjà être validé"));
     }
 
     @Test
@@ -362,4 +606,117 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(get("/v1/etablissements")).andExpect(status().isOk());
     }
 
+    @Test
+    @DisplayName("test export etablissement User")
+    @WithMockUser(authorities = {"etab"})
+    void testExportEtablissementUser() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("admin");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+
+        List listeEtabOut = new ArrayList();
+        listeEtabOut.add(etab);
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("etab");
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
+
+        String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
+        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com\r\n";
+        String json = "[]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+    @Test
+    @DisplayName("test export etablissement User avec IPs")
+    @WithMockUser(authorities = {"etab"})
+    void testExportEtablissementUserWithIp() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("admin");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+        etab.ajouterIp(new IpV4("192.162.0.1","commentaire",new StatutIpEntity(1,"test")));
+        etab.ajouterIp(new IpV4("192.162.0.2","commentaire",new StatutIpEntity(1,"test")));
+
+
+        List listeEtabOut = new ArrayList();
+        listeEtabOut.add(etab);
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("etab");
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
+
+        String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
+        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.1\r\n";
+        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.2\r\n";
+        String json = "[]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+    @Test
+    @DisplayName("test export etablissement Admin")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEtablissementAdmin() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("admin");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+
+        ContactEntity contact2 = new ContactEntity(2, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        contact2.setRole("etab");
+        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "123456", contact2);
+
+        List listeEtabOut = new ArrayList();
+        listeEtabOut.add(etab);
+        listeEtabOut.add(etab2);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
+
+        String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Ville;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
+        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com\r\n";
+        fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
+        String json = "[\"123456789\",\"111111111\"]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+    @Test
+    @DisplayName("test export etablissement Admin avec IP")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEtablissementAdminWithIp() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("admin");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+        etab.ajouterIp(new IpV4("192.162.0.1","commentaire",new StatutIpEntity(1,"test")));
+        etab.ajouterIp(new IpV4("192.162.0.2","commentaire",new StatutIpEntity(1,"test")));
+
+        ContactEntity contact2 = new ContactEntity(2, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        contact2.setRole("etab");
+        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "123456", contact2);
+
+        List listeEtabOut = new ArrayList();
+        listeEtabOut.add(etab);
+        listeEtabOut.add(etab2);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
+
+        String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Ville;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
+        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com;192.162.0.1;192.162.0.2\r\n";
+        fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
+        String json = "[\"123456789\",\"111111111\"]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
 }

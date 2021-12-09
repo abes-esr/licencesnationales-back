@@ -3,7 +3,6 @@ package fr.abes.licencesnationales.core.entities.ip;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
-import oracle.jdbc.driver.Const;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -115,5 +114,13 @@ class IpV4Test {
             IpV4 ip = new IpV4("154.1399.0.289", "test", statut);
         });
         assertEquals("Invalid IPv4 address: '154.1399.0.289'", exception.getLocalizedMessage());
+    }
+
+    @Test
+    @DisplayName("Format ip csv")
+    void testFormatIpVCSV() throws IpException {
+        IpV4 ip = new IpV4("192.162.0-0.1-168", "test", statut);
+
+        assertEquals("192.162.0-0.1-168", ip.formatRange());
     }
 }

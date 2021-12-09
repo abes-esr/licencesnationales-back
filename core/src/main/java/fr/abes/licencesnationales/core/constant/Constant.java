@@ -43,21 +43,29 @@ public class Constant implements Serializable {
 
 
     /** Statuts établissement */
-    public static final int STATUT_ETAB_NOUVEAU = 1;
-    public static final int STATUT_ETAB_AUCUNEIP = 2;
-    public static final int STATUT_ETAB_ENVALIDATION = 3;
-    public static final int STATUT_ETAB_ATTESTATION = 4;
-    public static final int STATUT_ETAB_VALIDE = 5;
+    public static final String STATUT_ETAB_SANSIP = "Sans IP";
+    public static final String STATUT_ETAB_EXAMINERIP = "Examiner IP";
+    public static final String STATUT_ETAB_ATTENTEATTESTATION = "Attestation à envoyer";
+    public static final String STATUT_ETAB_IPOK = "IP Ok";
 
     /** Statuts IP */
-    public static final int STATUT_IP_NOUVELLE = 6;
-    public static final int STATUT_IP_ATTESTATION = 7;
-    public static final int STATUT_IP_VALIDEE = 8;
-    public static final int STATUT_IP_AUCUNEIP = 9;
+    public static final int STATUT_IP_NOUVELLE = 1;
+    public static final int STATUT_IP_ATTESTATION = 2;
+    public static final int STATUT_IP_VALIDEE = 3;
 
 
     /**Email service */
     public static final String ERROR_CONVERSION_MAIL_TO_JSON = "Erreur lors de la conversion Mail-Json";
     public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
+
+    /** Gestion des erreurs */
+    public static final String ERROR_SAISIE = "Erreur dans la saisie : ";
+    public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
+    public static final String ERROR_ETAB = "Erreur dans le statut de l'établissement : ";
+    public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
+    public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
+    public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
+    public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
+    public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 }
 

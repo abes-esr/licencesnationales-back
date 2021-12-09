@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -14,5 +15,7 @@ public interface EditeurRepository extends JpaRepository<EditeurEntity, Integer>
     void deleteById(Integer id);
 
     Optional<EditeurEntity> getFirstById(Integer id);
+
+    List<EditeurEntity> getAllByIdIn(List<Integer> ids);
 
 }

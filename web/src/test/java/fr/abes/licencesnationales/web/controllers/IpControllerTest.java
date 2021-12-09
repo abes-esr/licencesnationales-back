@@ -10,8 +10,10 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +23,11 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.hamcrest.Matchers.oneOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,6 +41,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @MockBean
     private EtablissementService etablissementService;
+
+    @MockBean
+    private IpRepository dao;
 
     @MockBean
     private FiltrerAccesServices filtrerAccesServices;
@@ -87,7 +94,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
 
         Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
@@ -130,7 +136,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         entity.ajouterIp(ipEntity);
 
         Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
-        Mockito.doNothing().when(emailService).constructAccesCreeEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
         Mockito.when(ipService.isIpAlreadyExists(Mockito.any(IpV4.class))).thenReturn(true);
 
@@ -177,7 +182,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
 
@@ -205,7 +209,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(emailService).constructAccesModifieEmail(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
         Mockito.when(referenceService.findStatutByLibelle(Mockito.anyString())).thenReturn(new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation"));
@@ -285,7 +288,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("IP inconnue"))
+                .andExpect(jsonPath("$.message").value("IP inconnue : L'IP 1 n'existe pas"))
                 .andExpect(jsonPath("$.debugMessage").value("L'IP 1 n'existe pas"));
     }
 
@@ -302,5 +305,35 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     void testSupprimerIpNoUser() throws Exception {
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isUnauthorized());
+    }
+
+
+    @Test
+    @DisplayName("test export IP")
+    @WithMockUser(authorities = {"etab"})
+    void testExportIp() throws Exception {
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("etab");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+        StatutIpEntity statutIp = new StatutIpEntity(1, "validé");
+        IpV4 ip = new IpV4(1,"192.128.0.1","test",statutIp);
+        etab.ajouterIp(ip);
+        List list = new ArrayList();
+        list.add(ip);
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("etab");
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
+        Mockito.when(dao.findAllBySiren(Mockito.any())).thenReturn(list);
+
+        String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
+        fileContent += "09-12-2021;IP V4;192.128.0.1;;validé;test\r\n";
+        String json = "[]";
+
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
     }
 }
