@@ -53,12 +53,15 @@ public class EmailService {
     public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
         final String url = this.frontBaseURL + "/reinitialisationPass?token=" + token;
         String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
-        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
-        message +=nomEtab + " ";
-        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, locale);
-        message += " <br>" + url;
-        message += " <br>" + messageSource.getMessage("message.resetTokenEmailFin", null, locale);
-        String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.resetTokenEmailObjet",null, locale), message.toString());
+        StringBuilder message = new StringBuilder(messageSource.getMessage("message.resetTokenEmailDebut",null, locale));
+        message.append(nomEtab);
+        message.append(" ");
+        message.append(messageSource.getMessage("message.resetTokenEmailMilieu", null, locale));
+        message.append(" <br>");
+        message.append(url);
+        message.append(" <br>");
+        message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
+        String jsonRequestConstruct = mailToJSON(emailUser, objetMsg, message.toString());
         sendMail(jsonRequestConstruct);
     }
 
@@ -72,16 +75,16 @@ public class EmailService {
 
     public void constructSuppressionCompteMailUser(Locale locale, String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
         StringBuilder message = new StringBuilder();
-        message.append("Bonjour,\n");
+        message.append("Bonjour,<br>");
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
-        message.append(" sur le site Licencesnationales.fr vient d'être supprimé.\n");
-        message.append("Raison de la suppression : \n");
+        message.append(" sur le site Licencesnationales.fr vient d'être supprimé.<br>");
+        message.append("Raison de la suppression : <br>");
         message.append(motifSuppression);
-        message.append("\n");
+        message.append("<br>");
         message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
-        message.append("Bien cordialement,\n");
-        message.append("L’équipe Licences nationales\n");
+        message.append("Bien cordialement,<br>");
+        message.append("L’équipe Licences nationales<br>");
         message.append("https://acces.licencesnationales.fr/");
         String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteSupprimeUser",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
@@ -111,14 +114,14 @@ public class EmailService {
 
     public void constructValidationCompteMailUser(Locale locale, String nomEtab, String emailUser) {
         StringBuilder message = new StringBuilder();
-        message.append("Bonjour,\n");
+        message.append("Bonjour,<br>");
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
-        message.append(" sur le site Licencesnationales.fr vient d'être validé par l'administrateur.\n");
-        message.append("\n");
+        message.append(" sur le site Licencesnationales.fr vient d'être validé par l'administrateur.<br>");
+        message.append("<br>");
         message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales\n");
-        message.append("Bien cordialement,\n");
-        message.append("L’équipe Licences nationales\n");
+        message.append("Bien cordialement,<br>");
+        message.append("L’équipe Licences nationales<br>");
         message.append("https://acces.licencesnationales.fr/");
         String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.CompteValideUser",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
