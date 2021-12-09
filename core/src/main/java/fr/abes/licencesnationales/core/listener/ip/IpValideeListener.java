@@ -27,7 +27,7 @@ public class IpValideeListener implements ApplicationListener<IpValideeEventEnti
     @Override
     @SneakyThrows
     public void onApplicationEvent(IpValideeEventEntity ipValideeEvent) {
-        IpEntity ipEntity = service.getFirstById(ipValideeEvent.getId());
+        IpEntity ipEntity = service.getFirstById(ipValideeEvent.getIpId());
         ipEntity.setStatut((StatutIpEntity) referenceService.findStatutById(Constant.STATUT_IP_VALIDEE));
         service.save(ipEntity);
     }

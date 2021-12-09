@@ -17,12 +17,12 @@ public class IpSupprimeeEventEntity extends IpEventEntity {
         super(source);
     }
 
-    public IpSupprimeeEventEntity(Object source, Integer id) {
-        super(source, id);
+    public IpSupprimeeEventEntity(Object source, Integer ipId) {
+        super(source, ipId);
     }
 
-    public IpSupprimeeEventEntity(Object source, Integer id, String ip) {
-        super(source, id, ip);
+    public IpSupprimeeEventEntity(Object source, Integer ipId, String ip) {
+        super(source, ipId, ip);
     }
 
 }

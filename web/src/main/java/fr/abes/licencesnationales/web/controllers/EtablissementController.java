@@ -79,7 +79,7 @@ public class EtablissementController {
     private FiltrerAccesServices filtrerAccesServices;
 
     @Autowired
-    EmailService emailService;
+    private EmailService emailService;
 
     @Autowired
     private PasswordService passwordService;
