@@ -133,10 +133,14 @@ public class EtablissementController {
         emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
     }
 
-    @PostMapping(value = "")
-    public void edit(@Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException {
+    @PostMapping(value = "/{siren}")
+    public void edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
-            etablissementModifieWebDto.setSiren(filtrerAccesServices.getSirenFromSecurityContextUser());
+            if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
+                etablissementModifieWebDto.setSiren(siren);
+            } else {
+                throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+            }
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
                 throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
