@@ -130,4 +130,5 @@ public abstract class IpEntity implements Serializable, Comparable {
         IpEntity ip = (IpEntity) o;
         return this.statut.getIdStatut().compareTo(ip.statut.getIdStatut());
     }
+    public abstract String formatRange();
 }

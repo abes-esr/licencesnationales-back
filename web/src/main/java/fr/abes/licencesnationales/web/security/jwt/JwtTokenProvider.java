@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.security.jwt;
 
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import lombok.Getter;
@@ -84,7 +85,11 @@ public class JwtTokenProvider {
         return null;
     }
 
-    public String getSirenFromJwtToken(String token) {
-        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+    public String getSirenFromJwtToken(String token) throws InvalidTokenException {
+        try {
+            return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
+        } catch (IllegalArgumentException ex) {
+            throw new InvalidTokenException("Token invalide ou absent");
+        }
     }
 }

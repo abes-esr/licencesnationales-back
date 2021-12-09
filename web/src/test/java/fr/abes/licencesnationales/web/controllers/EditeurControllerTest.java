@@ -1,8 +1,8 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -10,7 +10,7 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueE
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.UnknownEditeurException;
-import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
+import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import fr.abes.licencesnationales.core.services.EditeurService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -18,11 +18,12 @@ import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.web.dto.editeur.ContactEditeurWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
+import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -30,10 +31,14 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -61,6 +66,12 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
 
     @Autowired
     private ObjectMapper mapper;
+
+    @MockBean
+    private FiltrerAccesServices filtrerAccesServices;
+
+    @MockBean
+    private EditeurRepository dao;
 
     @Test
     @DisplayName("test nouvel editeur sans être admin")
@@ -154,7 +165,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setContactsCommerciaux(cc);
         editeurCreeWebDto.setContactsTechniques(ct);
 
-        Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).save(Mockito.any());
+        Mockito.doThrow(new MailDoublonException(Constant.ERROR_DOUBLON_MAIL)).when(editeurService).save(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
@@ -162,7 +173,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.debugMessage").value("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail."));
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : " + Constant.ERROR_DOUBLON_MAIL));
     }
 
     @Test
@@ -287,7 +298,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         //cas éditeur inconnu
         Mockito.when(editeurService.getFirstEditeurById(1)).thenThrow(new UnknownEditeurException("id : 1"));
         this.mockMvc.perform(delete("/v1/editeurs/1")).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Editeur inconnu"))
+                .andExpect(jsonPath("$.message").value("Editeur inconnu : id : 1"))
                 .andExpect(jsonPath("$.debugMessage").value("id : 1"));
     }
 
@@ -313,6 +324,97 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     @DisplayName("test suppression editeur sans user")
     void testSuppressionEditeurNoUser() throws Exception {
         this.mockMvc.perform(delete("/v1/editeurs/1")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("test export editeur Admin 2 editeurs avec 1 seul contact")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEditeurAdminDeuxEditeursUnSeulContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
+        TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
+        Set types = new HashSet();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
+        editeur.ajouterContact(contact);
+        ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nomCom", "prenomCom", "mailCom@mail.com");
+        EditeurEntity editeur2 = new EditeurEntity(2,"nomEditeur2","identifiant2","adresse2",types);
+        editeur2.ajouterContact(contact2);
+
+        List listEditeur = new ArrayList();
+        listEditeur.add(editeur);
+        listEditeur.add(editeur2);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
+
+        String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        fileContent += "identifiant2;nomEditeur2;adresse2;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
+        String json = "[1,2]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+
+    @Test
+    @DisplayName("test export editeur Admin 1 seul editeurs avec 1 seul contact")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEditeurAdminUnSeulEditeurUnSeulContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1,"test");
+        Set types = new HashSet();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
+        editeur.ajouterContact(contact);
+
+        List listEditeur = new ArrayList();
+        listEditeur.add(editeur);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
+
+        String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        String json = "[1]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
+    }
+
+
+    @Test
+    @DisplayName("test export editeur Admin 1 editeurs avec 2 contact")
+    @WithMockUser(authorities = {"admin"})
+    void testExportEditeurAdminUnSeulEditeurDeuxContact() throws Exception {
+        ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
+        TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
+        Set types = new HashSet();
+        types.add(type);
+        EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
+        ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nomCom", "prenomCom", "mailCom@mail.com");
+        editeur.ajouterContact(contact);
+        editeur.ajouterContact(contact2);
+
+        List listEditeur = new ArrayList();
+        listEditeur.add(editeur);
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
+
+        String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
+        fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
+        String json = "[1]";
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+        Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
+        Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+
     }
 }
 

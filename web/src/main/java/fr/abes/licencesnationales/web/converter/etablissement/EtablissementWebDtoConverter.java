@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,8 @@ import java.util.List;
 public class EtablissementWebDtoConverter {
     @Autowired
     private UtilsMapper utilsMapper;
+
+    private DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
 
     @Bean
     public void converterEtablissementCreeWebDto() {
@@ -273,6 +277,7 @@ public class EtablissementWebDtoConverter {
                 EtablissementEntity source = context.getSource();
 
                 EtablissementUserWebDto dto = new EtablissementUserWebDto();
+                dto.setDateCreation(format.format(source.getDateCreation()));
                 ContactWebDto contact = getContactWebDto(source);
                 dto.setContact(contact);
                 source.getIps().forEach(ip -> {
@@ -297,6 +302,7 @@ public class EtablissementWebDtoConverter {
                 dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
                 dto.setSiren(source.getSiren());
                 dto.setIdAbes(source.getIdAbes());
+                dto.setDateCreation(format.format(source.getDateCreation()));
                 ContactWebDto contact = getContactWebDto(source);
 
                 dto.setContact(contact);

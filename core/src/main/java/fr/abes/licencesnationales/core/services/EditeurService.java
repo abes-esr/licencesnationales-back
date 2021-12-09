@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
@@ -44,12 +45,12 @@ public class EditeurService {
     public void checkDoublonMail(EditeurEntity editeur) throws MailDoublonException {
         for (ContactEditeurEntity ct : editeur.getContactsTechniques()) {
             if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
-                throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+                throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
             }
         }
         for (ContactEditeurEntity ct : editeur.getContactsCommerciaux()) {
             if (contactEditeurRepository.findByMailContains(ct.getMail()).isPresent()) {
-                throw new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+                throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
             }
         }
     }

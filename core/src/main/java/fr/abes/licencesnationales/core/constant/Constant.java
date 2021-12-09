@@ -59,7 +59,13 @@ public class Constant implements Serializable {
     public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
 
     /** Gestion des erreurs */
-    public static final String ERROR_SAISIE = "Erreur dans la saisie des paramètres";
+    public static final String ERROR_SAISIE = "Erreur dans la saisie : ";
+    public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
+    public static final String ERROR_ETAB = "Erreur dans le statut de l'établissement : ";
+    public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
+    public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
+    public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
+    public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 }
 
