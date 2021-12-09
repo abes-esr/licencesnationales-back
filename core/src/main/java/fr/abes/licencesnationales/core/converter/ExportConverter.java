@@ -144,7 +144,9 @@ public class ExportConverter {
                 }
                 DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
                 dto.setDateCreation(format.format(entity.getDateCreation()));
-                dto.setDateModificationStatut(format.format(entity.getDateModification()));
+                if(entity.getDateModification() != null) {
+                    dto.setDateModificationStatut(format.format(entity.getDateModification()));
+                }
                 dto.setStatut(entity.getStatut().getLibelleStatut());
                 dto.setCommentaire(entity.getCommentaires());
                 return dto;

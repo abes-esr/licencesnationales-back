@@ -10,7 +10,6 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
-import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
@@ -325,11 +324,13 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         Mockito.when(dao.findAllBySiren(Mockito.any())).thenReturn(list);
 
-        String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Ville;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com\r\n";
-        fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
+        String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
+        fileContent += "09-12-2021;IP V4;192.128.0.1;;validé;test\r\n";
         String json = "[]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+
+
+
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
