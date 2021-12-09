@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.web.security.services;
 
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
+import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.jwt.JwtTokenProvider;
 import fr.abes.licencesnationales.web.security.services.impl.UserDetailsImpl;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -23,7 +24,7 @@ public class FiltrerAccesServices {
     private JwtTokenProvider tokenProvider;
 
 
-    public void autoriserServicesParSiren(String sirenFromController) throws SirenIntrouvableException, AccesInterditException {
+    public void autoriserServicesParSiren(String sirenFromController) throws SirenIntrouvableException, AccesInterditException, InvalidTokenException {
         String sirenFromJwt = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest()));
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String sirenFromSecurityContextUser = userDetails.getUsername();

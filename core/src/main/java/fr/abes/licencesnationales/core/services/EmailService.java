@@ -52,15 +52,12 @@ public class EmailService {
 
     public void constructResetTokenEmail(Locale locale, String token, String emailUser, String nomEtab) throws RestClientException {
         final String url = this.frontBaseURL + "/reinitialisationPass?token=" + token;
-        StringBuilder message = new StringBuilder();
-        message.append(messageSource.getMessage("message.resetTokenEmailDebut",null, locale));
-        message.append(nomEtab);
-        message.append(" ");
-        message.append(messageSource.getMessage("message.resetTokenEmailMilieu", null, locale));
-        message.append(" \r\n");
-        message.append(url);
-        message.append(" \r\n");
-        message.append(messageSource.getMessage("message.resetTokenEmailFin", null, locale));
+        String objetMsg = messageSource.getMessage("message.resetTokenEmailObjet",null, locale);
+        String message = messageSource.getMessage("message.resetTokenEmailDebut",null, locale);
+        message +=nomEtab + " ";
+        message += messageSource.getMessage("message.resetTokenEmailMilieu", null, locale);
+        message += " <br>" + url;
+        message += " <br>" + messageSource.getMessage("message.resetTokenEmailFin", null, locale);
         String jsonRequestConstruct = mailToJSON(emailUser, messageSource.getMessage("message.resetTokenEmailObjet",null, locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
@@ -71,6 +68,7 @@ public class EmailService {
         String jsonRequestConstruct = mailToJSON(emailUser, "LN Nouveau mot de passe enregistré", message.toString());
         sendMail(jsonRequestConstruct);
     }
+
 
     public void constructSuppressionCompteMailUser(Locale locale, String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
         StringBuilder message = new StringBuilder();
