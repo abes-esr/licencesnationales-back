@@ -110,7 +110,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Credentials not valid"))
+                .andExpect(jsonPath("$.message").value("Credentials not valid : Bad credentials"))
                 .andExpect(content().string(containsString("Bad credentials")));
     }
 

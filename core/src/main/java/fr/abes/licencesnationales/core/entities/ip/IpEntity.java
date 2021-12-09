@@ -20,7 +20,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class IpEntity implements Serializable {
+public abstract class IpEntity implements Serializable, Comparable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ip_Sequence")
@@ -125,4 +125,10 @@ public abstract class IpEntity implements Serializable {
         return "IpEntity {" + "id=" + id + "}";
     }
 
+    @Override
+    public int compareTo(Object o) {
+        IpEntity ip = (IpEntity) o;
+        return this.statut.getIdStatut().compareTo(ip.statut.getIdStatut());
+    }
+    public abstract String formatRange();
 }

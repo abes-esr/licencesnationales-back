@@ -1,12 +1,9 @@
 package fr.abes.licencesnationales.core.listener.ip;
 
 
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
-import fr.abes.licencesnationales.core.exception.UnknownStatutException;
-import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
 import lombok.SneakyThrows;
