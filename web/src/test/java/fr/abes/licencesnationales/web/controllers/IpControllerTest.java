@@ -289,7 +289,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("IP inconnue"))
+                .andExpect(jsonPath("$.message").value("IP inconnue : L'IP 1 n'existe pas"))
                 .andExpect(jsonPath("$.debugMessage").value("L'IP 1 n'existe pas"));
     }
 
