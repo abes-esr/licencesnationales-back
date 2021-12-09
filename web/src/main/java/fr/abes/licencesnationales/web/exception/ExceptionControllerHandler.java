@@ -157,15 +157,15 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(MappingException.class)
     protected ResponseEntity<Object> handleMappingException(MappingException ex) {
-        String error = "Malformed JSON request";
+        String error = "Malformed JSON request : " + ex.getMessage();
         log.error(ex.getCause().getLocalizedMessage());
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<Object> handleValidationException(ConstraintViolationException ex){
-        String error = "Erreur de validation des données";
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex.getCause()));
+        String error = "Erreur de validation des données" + ex.getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
     /**
      * Gestion des erreurs d'authentification
@@ -175,47 +175,47 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({AuthenticationException.class, AccesInterditException.class, SirenIntrouvableException.class})
     protected ResponseEntity<Object> handleAuthentificationException(Exception ex) {
-        String error = "Credentials not valid";
+        String error = "Credentials not valid : " + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(UnknownEditeurException.class)
     protected ResponseEntity<Object> handleUnknownIpException(UnknownEditeurException ex) {
-        String error = "Editeur inconnu";
+        String error = Constant.ERROR_EDITEUR_INCONNU + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(UnknownIpException.class)
     protected ResponseEntity<Object> handleUnknownIpException(UnknownIpException ex) {
-        String error = "IP inconnue";
+        String error = Constant.ERROR_IP_INCONNUE + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(UnknownEtablissementException.class)
     protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
-        String error = "Etablissement inconnu";
+        String error = Constant.ERROR_ETAB_INCONNU + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(UnknownTypeEtablissementException.class)
     protected ResponseEntity<Object> handleUnknowTypeEtablissementException(UnknownTypeEtablissementException ex) {
-        String error = "Type d'établissement inconnu";
+        String error = Constant.ERROR_TYPEETAB_INCONNU + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(BadStatutException.class)
     protected ResponseEntity<Object> handleBadStatutEcception(BadStatutException ex) {
-        String error = "Erreur dans le statut de l'établissement";
+        String error = Constant.ERROR_ETAB + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(TransactionSystemException.class)
     protected ResponseEntity<Object> handleTransactionException(TransactionSystemException ex) {
-        String error = "Erreur de mise à jour de la base de données";
         Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
                 .filter(element -> element.getCause() == null)
                 .findFirst();
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, rootCause.get()));
+        String error = Constant.ERROR_BDD + rootCause.get();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     /**
@@ -228,11 +228,11 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({CaptchaException.class, SirenExistException.class, MailDoublonException.class, DateException.class, IpException.class, PasswordMismatchException.class, JsonIncorrectException.class, InvalidTokenException.class})
     protected ResponseEntity<Object> handleCaptchaException(Exception ex) {
-        String message = Constant.ERROR_SAISIE;
         Optional<Throwable> rootCause = Stream.iterate(ex, Throwable::getCause)
                 .filter(element -> element.getCause() == null)
                 .findFirst();
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, rootCause.get()));
+        String message = Constant.ERROR_SAISIE + rootCause.get().getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, ex));
     }
 
 

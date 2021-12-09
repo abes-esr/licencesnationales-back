@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -164,7 +165,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setContactsCommerciaux(cc);
         editeurCreeWebDto.setContactsTechniques(ct);
 
-        Mockito.doThrow(new MailDoublonException("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.")).when(editeurService).save(Mockito.any());
+        Mockito.doThrow(new MailDoublonException(Constant.ERROR_DOUBLON_MAIL)).when(editeurService).save(Mockito.any());
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
@@ -172,7 +173,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.debugMessage").value("L'adresse mail renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail."));
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : " + Constant.ERROR_DOUBLON_MAIL));
     }
 
     @Test
@@ -297,7 +298,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         //cas éditeur inconnu
         Mockito.when(editeurService.getFirstEditeurById(1)).thenThrow(new UnknownEditeurException("id : 1"));
         this.mockMvc.perform(delete("/v1/editeurs/1")).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Editeur inconnu"))
+                .andExpect(jsonPath("$.message").value("Editeur inconnu : id : 1"))
                 .andExpect(jsonPath("$.debugMessage").value("id : 1"));
     }
 
