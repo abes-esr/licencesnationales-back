@@ -1,9 +1,26 @@
 package fr.abes.licencesnationales.batch;
 
 import fr.abes.licencesnationales.batch.relance.ConstructionListeEtabTasklet;
+import fr.abes.licencesnationales.batch.relance.DateHelperTest;
 import fr.abes.licencesnationales.batch.relance.TraiterEtabSansIpTasklet;
+import fr.abes.licencesnationales.batch.relance.dto.EtablissementDto;
+import fr.abes.licencesnationales.batch.utils.BatchUtil;
+import fr.abes.licencesnationales.batch.utils.DateHelper;
+import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpV4;
+import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
+import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
+import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.EventService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -20,6 +37,7 @@ import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -27,7 +45,10 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.support.DirtiesContextTestExecutionListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @SpringBootTest(classes = {JobRelancesConfig.class, JobRelanceConfigurationTest.class})
 @EnableAutoConfiguration
@@ -35,6 +56,17 @@ import java.util.List;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {JobRelancesConfig.class})
 public class JobRelancesConfigTest {
+    @Autowired
+    private EtablissementService etablissementService;
+    @Autowired
+    private EmailService emailService;
+    @Autowired
+    private EventService eventService;
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
+    @Autowired
+    private IpEventRepository ipEventRepository;
+
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 
@@ -46,8 +78,9 @@ public class JobRelancesConfigTest {
         jobRepositoryTestUtils.removeJobExecutions();
     }
 
+    @DisplayName("test cas aucun établissement")
     @Test
-    void testJobRelance() throws Exception {
+    void testJobRelanceAucunEtab() throws Exception {
         ConstructionListeEtabTasklet tasklet = Mockito.mock(ConstructionListeEtabTasklet.class);
         Mockito.when(tasklet.execute(Mockito.any(), Mockito.any())).thenReturn(RepeatStatus.FINISHED);
         JobExecution jobExecution =  new JobExecution(new JobInstance(1L, "jobRelances"), new JobParameters());
@@ -59,126 +92,169 @@ public class JobRelancesConfigTest {
         JobInstance actualJobInstance = jobExecution.getJobInstance();
         ExitStatus actualJobExitStatus = jobExecution.getExitStatus();
 
-        // then
+        List<StepExecution> steps = jobExecution.getStepExecutions().stream().collect(Collectors.toList());
+        StepExecution step1 = steps.get(0);
         Assertions.assertEquals("jobRelances", actualJobInstance.getJobName());
-        Assertions.assertEquals(1, jobExecution.getStepExecutions().size());
-        Assertions.assertEquals("STOPPED", actualJobExitStatus);
+        Assertions.assertEquals(1, steps.size());
+        Assertions.assertEquals("AUCUNETAB",step1.getExitStatus().getExitCode());
+        Assertions.assertEquals("COMPLETED", actualJobExitStatus.getExitCode());
     }
 
+    @DisplayName("test établissement sans IP uniquement")
     @Test
-    void testJobRelance2() throws Exception {
-        JobInstanceDao jobInstanceDao = new JdbcJobInstanceDao();
-        JobExecutionDao jobExecutionDao = new JdbcJobExecutionDao();
-        StepExecutionDao stepExecutionDao = new JdbcStepExecutionDao();
-        ExecutionContextDao ec = new JdbcExecutionContextDao();
-        JobRepository jobRepository = new SimpleJobRepository(jobInstanceDao, jobExecutionDao, stepExecutionDao, ec);
-        SimpleJob job = new SimpleJob("jobRelances");
+    void testJobRelanceEtabSansIpUniquement() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact1 = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact1);
 
-        StubStep stepEtab = new StubStep("stepContructionListeEtab", jobRepository);
-        StubStep stepSansIp = new StubStep("stepTraiterEtabSansIp", jobRepository);
-        List<Step> steps = new ArrayList<>();
-        steps.add(stepEtab);
-        steps.add(stepSansIp);
-        job.setSteps(steps);
+        ContactEntity contact2 = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom", "000000000", type, "12345", contact2);
 
-        JobExecution jobExecution = jobRepository.createJobExecution(job.getName(), new JobParameters());
-        JobInstance jobInstance = jobExecution.getJobInstance();
-        jobLauncherTestUtils.setJobRepository(jobRepository);
+        List<EtablissementEntity> listIn = new ArrayList<>();
+        listIn.add(etabIn1);
+        listIn.add(etabIn2);
 
-        jobExecution = jobLauncherTestUtils.launchJob();
+        Mockito.when(etablissementService.findAll()).thenReturn(listIn);
+        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
+        Mockito.when(eventService.getDateCreationEtab(Mockito.any())).thenReturn(Calendar.getInstance().getTime());
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         JobInstance actualJobInstance = jobExecution.getJobInstance();
         ExitStatus actualJobExitStatus = jobExecution.getExitStatus();
 
-        // then
+        StepExecution step1 = jobExecution.getStepExecutions().stream().collect(Collectors.toList()).get(0);
+        StepExecution step2 = jobExecution.getStepExecutions().stream().collect(Collectors.toList()).get(1);
         Assertions.assertEquals("jobRelances", actualJobInstance.getJobName());
         Assertions.assertEquals(2, jobExecution.getStepExecutions().size());
-        Assertions.assertEquals("COMPLETED", actualJobExitStatus);
+        Assertions.assertEquals("stepConstructionListeEtab", step1.getStepName());
+        Assertions.assertEquals("ETABSANSIPONLY", step1.getExitStatus().getExitCode());
+        Assertions.assertEquals("stepTraiterEtabSansIp", step2.getStepName());
+        Assertions.assertEquals("COMPLETED", step2.getExitStatus().getExitCode());
+        Assertions.assertEquals(2, ((List<EtablissementEntity>) jobExecution.getExecutionContext().get("etabSansIp")).size());
+        Assertions.assertEquals("COMPLETED", actualJobExitStatus.getExitCode());
     }
 
-    private static class StubStep extends org.springframework.batch.core.step.AbstractStep {
+    @DisplayName("test établissement IP attestation uniquement")
+    @Test
+    void testJobRelanceEtabIpAttestationUniquement() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact1 = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact1);
 
-        private Runnable runnable;
+        ContactEntity contact2 = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000000", type, "12345", contact2);
 
-        private Throwable exception;
+        StatutIpEntity statutAttestation = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
+        StatutIpEntity statutNouvelleIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "Nouvelle IP");
 
-        private JobRepository jobRepository;
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", statutAttestation);
+        ip1.setDateModification((new GregorianCalendar(2019, 1, 1)).getTime());
+        IpEntity ip2 = new IpV4(2, "2.2.2.2", "test", statutNouvelleIp);
+        IpEntity ip3 = new IpV4(3, "3.3.3.3", "test", statutNouvelleIp);
 
-        private ExecutionContext passedInStepContext;
+        etabIn1.ajouterIp(ip1);
+        etabIn1.ajouterIp(ip2);
+        etabIn2.ajouterIp(ip3);
 
-        private ExecutionContext passedInJobContext;
+        List<EtablissementEntity> listIn = new ArrayList<>();
+        listIn.add(etabIn1);
+        listIn.add(etabIn2);
 
-        /**
-         * @param string
-         */
-        public StubStep(String string, JobRepository jobRepository) {
-            super(string);
-            this.jobRepository = jobRepository;
-        }
+        IpSupprimeeEventEntity event = Mockito.mock(IpSupprimeeEventEntity.class);
+        Mockito.doNothing().when(Mockito.mock(applicationEventPublisher.getClass())).publishEvent(event);
+        Mockito.when(ipEventRepository.save(Mockito.any())).thenReturn(null);
 
-        /**
-         * @param exception
-         */
-        public void setProcessException(Throwable exception) {
-            this.exception = exception;
-        }
+        Mockito.when(etablissementService.findAll()).thenReturn(listIn);
+        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
 
-        /**
-         * @param runnable
-         */
-        public void setCallback(Runnable runnable) {
-            this.runnable = runnable;
-        }
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobInstance actualJobInstance = jobExecution.getJobInstance();
+        ExitStatus actualJobExitStatus = jobExecution.getExitStatus();
 
-        /*
-         * (non-Javadoc)
-         *
-         * @seeorg.springframework.batch.core.step.StepSupport#execute(org.
-         * springframework.batch.core.StepExecution)
-         */
-        @Override
-        public void doExecute(StepExecution stepExecution) throws JobInterruptedException,
-                UnexpectedJobExecutionException {
-
-            passedInJobContext = new ExecutionContext(stepExecution.getJobExecution().getExecutionContext());
-            passedInStepContext = new ExecutionContext(stepExecution.getExecutionContext());
-            stepExecution.getExecutionContext().putString("stepKey", "stepValue");
-            stepExecution.getJobExecution().getExecutionContext().putString("jobKey", "jobValue");
-            jobRepository.update(stepExecution);
-            jobRepository.updateExecutionContext(stepExecution);
-
-            if (exception instanceof JobInterruptedException) {
-                stepExecution.setExitStatus(ExitStatus.FAILED);
-                stepExecution.setStatus(((JobInterruptedException) exception).getStatus());
-                stepExecution.addFailureException(exception);
-                throw (JobInterruptedException) exception;
-            }
-            if (exception instanceof RuntimeException) {
-                stepExecution.setExitStatus(ExitStatus.FAILED);
-                stepExecution.setStatus(BatchStatus.FAILED);
-                stepExecution.addFailureException(exception);
-                return;
-            }
-            if (exception instanceof Error) {
-                stepExecution.setExitStatus(ExitStatus.FAILED);
-                stepExecution.setStatus(BatchStatus.FAILED);
-                stepExecution.addFailureException(exception);
-                return;
-            }
-            if (exception instanceof JobInterruptedException) {
-                stepExecution.setExitStatus(ExitStatus.FAILED);
-                stepExecution.setStatus(BatchStatus.FAILED);
-                stepExecution.addFailureException(exception);
-                return;
-            }
-            if (runnable != null) {
-                runnable.run();
-            }
-            stepExecution.setExitStatus(ExitStatus.COMPLETED);
-            stepExecution.setStatus(BatchStatus.COMPLETED);
-            jobRepository.update(stepExecution);
-            jobRepository.updateExecutionContext(stepExecution);
-
-        }
-
+        List<StepExecution> steps = jobExecution.getStepExecutions().stream().collect(Collectors.toList());
+        StepExecution step1 = steps.get(0);
+        StepExecution step2 = steps.get(1);
+        StepExecution step3 = steps.get(2);
+        Assertions.assertEquals("jobRelances", actualJobInstance.getJobName());
+        Assertions.assertEquals(3, steps.size());
+        Assertions.assertEquals("stepConstructionListeEtab", step1.getStepName());
+        Assertions.assertEquals("ETABAVECAUMOINSUNEIPATTESTATIONONLY", step1.getExitStatus().getExitCode());
+        Assertions.assertEquals("stepTraiterSuppressionIp", step2.getStepName());
+        Assertions.assertEquals("COMPLETED", step2.getExitStatus().getExitCode());
+        Assertions.assertEquals(1, ((List<EtablissementEntity>) jobExecution.getExecutionContext().get("etabAvecAuMoinsUneIpAttestation")).size());
+        Assertions.assertEquals("stepEnvoiMailRelance", step3.getStepName());
+        Assertions.assertEquals(1, ((List<EtablissementDto>) jobExecution.getExecutionContext().get("etablissementDtos")).size());
+        Assertions.assertEquals("COMPLETED", step3.getExitStatus().getExitCode());
+        Assertions.assertEquals("COMPLETED", actualJobExitStatus.getExitCode());
     }
+
+    @DisplayName("test établissement IP attestation + etablissement sans IP")
+    @Test
+    void testJobRelanceEtabIpAttestationAndEtabSansIp() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact1 = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact1);
+
+        ContactEntity contact2 = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000000", type, "12345", contact2);
+
+        ContactEntity contact3 = new ContactEntity(3, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "000000000", type, "12345", contact2);
+
+        StatutIpEntity statutAttestation = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
+        StatutIpEntity statutNouvelleIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "Nouvelle IP");
+
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", statutAttestation);
+        ip1.setDateModification((new GregorianCalendar(2019, 1, 1)).getTime());
+        IpEntity ip2 = new IpV4(2, "2.2.2.2", "test", statutNouvelleIp);
+        IpEntity ip3 = new IpV4(3, "3.3.3.3", "test", statutNouvelleIp);
+
+        etabIn1.ajouterIp(ip1);
+        etabIn1.ajouterIp(ip2);
+        etabIn2.ajouterIp(ip3);
+
+        List<EtablissementEntity> listIn = new ArrayList<>();
+        listIn.add(etabIn1);
+        listIn.add(etabIn2);
+        listIn.add(etabIn3);
+
+        IpSupprimeeEventEntity event = Mockito.mock(IpSupprimeeEventEntity.class);
+        Mockito.doNothing().when(Mockito.mock(applicationEventPublisher.getClass())).publishEvent(event);
+        Mockito.when(ipEventRepository.save(Mockito.any())).thenReturn(null);
+
+        DateHelper mockDate = new DateHelperTest();
+        BatchUtil.load(mockDate);
+
+        Mockito.when(etablissementService.findAll()).thenReturn(listIn);
+        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
+        Mockito.when(eventService.getDateCreationEtab(Mockito.any())).thenReturn(Calendar.getInstance().getTime());
+
+        JobExecution jobExecution = jobLauncherTestUtils.launchJob();
+        JobInstance actualJobInstance = jobExecution.getJobInstance();
+        ExitStatus actualJobExitStatus = jobExecution.getExitStatus();
+
+        List<StepExecution> steps = jobExecution.getStepExecutions().stream().collect(Collectors.toList());
+        StepExecution step1 = steps.get(0);
+        StepExecution step2 = steps.get(1);
+        StepExecution step3 = steps.get(2);
+        StepExecution step4 = steps.get(3);
+        Assertions.assertEquals("jobRelances", actualJobInstance.getJobName());
+        Assertions.assertEquals(4, steps.size());
+        Assertions.assertEquals("stepConstructionListeEtab", step1.getStepName());
+        Assertions.assertEquals("ALLTYPEETAB", step1.getExitStatus().getExitCode());
+        Assertions.assertEquals("stepTraiterEtabSansIp", step2.getStepName());
+        Assertions.assertEquals("COMPLETED", step2.getExitStatus().getExitCode());
+        Assertions.assertEquals("stepTraiterSuppressionIp", step3.getStepName());
+        Assertions.assertEquals("COMPLETED", step3.getExitStatus().getExitCode());
+        Assertions.assertEquals(1, ((List<EtablissementEntity>) jobExecution.getExecutionContext().get("etabAvecAuMoinsUneIpAttestation")).size());
+        Assertions.assertEquals("stepEnvoiMailRelance", step4.getStepName());
+        Assertions.assertEquals(1, ((List<EtablissementDto>) jobExecution.getExecutionContext().get("etablissementDtos")).size());
+        Assertions.assertEquals("COMPLETED", step3.getExitStatus().getExitCode());
+        Assertions.assertEquals("COMPLETED", actualJobExitStatus.getExitCode());
+    }
+
 }
