@@ -171,7 +171,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie des paramètres"))
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : Le siren saisi est déjà utilisé"))
                 .andExpect(jsonPath("$.debugMessage").value("Le siren saisi est déjà utilisé"));
     }
 
@@ -212,7 +212,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie des paramètres"))
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
     }
 
@@ -262,7 +262,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid"))
+                .andExpect(jsonPath("$.message").value("Credentials not valid : L'opération ne peut être effectuée que par un administrateur"))
                 .andExpect(jsonPath("$.debugMessage").value("L'opération ne peut être effectuée que par un administrateur"));
 
     }
@@ -308,7 +308,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid"))
+                .andExpect(jsonPath("$.message").value("Credentials not valid : Acces interdit"))
                 .andExpect(jsonPath("$.debugMessage").value("Acces interdit"));
     }
 
@@ -348,7 +348,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie des paramètres"))
+                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
 
     }
@@ -461,7 +461,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans le statut de l'établissement"))
+                .andExpect(jsonPath("$.message").value("Erreur dans le statut de l'établissement : L'établissement ne doit pas déjà être validé"))
                 .andExpect(jsonPath("$.debugMessage").value("L'établissement ne doit pas déjà être validé"));
     }
 
