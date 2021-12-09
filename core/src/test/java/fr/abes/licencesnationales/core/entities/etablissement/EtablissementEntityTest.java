@@ -11,8 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
 public class EtablissementEntityTest {
@@ -22,6 +30,7 @@ public class EtablissementEntityTest {
     private StatutIpEntity statutIpAttestation;
     private StatutIpEntity statutIpValidee;
 
+    private Validator validator;
 
     @BeforeEach
     void init() {
@@ -32,6 +41,8 @@ public class EtablissementEntityTest {
         statutIpAttestation = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
         statutIpValidee = new StatutIpEntity(Constant.STATUT_IP_VALIDEE, "IP Validée");
 
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator();
     }
     @Test
     @DisplayName("test méthode de mise à jour du statut en fonction des statuts d'Ips : cas liste IP vide")
@@ -103,5 +114,61 @@ public class EtablissementEntityTest {
         etab.ajouterIp(ip5);
 
         Assertions.assertEquals(Constant.STATUT_ETAB_ATTENTEATTESTATION, etab.getStatut());
+    }
+
+    @Test
+    @DisplayName("test validation creation contact sans ville ")
+    void testValidateCreatEtabSansVille() {
+        ContactEntity contact = new ContactEntity();
+        contact.setPrenom("Samuel");
+        contact.setNom("Quetin");
+        contact.setAdresse("13 Rue du testàMontpellier");
+        contact.setMail("sqn@abes.fr");
+        contact.setCodePostal("34090");
+        contact.setRole("etab");
+        contact.setTelephone("0123456789");
+        contact.setVille("");
+        contact.setMotDePasse("aepojfovridehfgvgva65e6f54aze651daze321f45z6a5e54a24sdf321q3f46a45e");
+
+        Set<ConstraintViolation<ContactEntity>> violations = validator.validate(contact);
+        Optional<ConstraintViolation<ContactEntity>> violation = violations.stream().findFirst();
+
+        Assertions.assertTrue(violation.isPresent());
+        Assertions.assertEquals("ville", violation.get().getPropertyPath().toString());
+        Assertions.assertEquals("La ville fournie n'est pas valide", violation.get().getMessage());
+    }
+
+    @Test
+    @DisplayName("test validation creation contact sans prenom ")
+    void testValidateCreatEtabSansPrenom() {
+        ContactEntity contact = new ContactEntity();
+        contact.setPrenom("");
+        contact.setNom("");
+        contact.setAdresse("");
+        contact.setMail("");
+        contact.setCodePostal("");
+        contact.setRole("");
+        contact.setTelephone("");
+        contact.setVille("");
+        contact.setMotDePasse("");
+
+        Set<ConstraintViolation<ContactEntity>> violations = validator.validate(contact);
+        List<ConstraintViolation<ContactEntity>> list = new ArrayList<>(violations);
+        Assertions.assertEquals(7,list.size());
+        Assertions.assertEquals("telephone",list.get(0).getPropertyPath().toString());
+        Assertions.assertEquals("Veuillez entrer 10 chiffres sans espace",list.get(0).getMessage());
+        Assertions.assertEquals("codePostal",list.get(1).getPropertyPath().toString());
+        Assertions.assertEquals("Le code postal fourni n'est pas valide",list.get(1).getMessage());
+        Assertions.assertEquals("adresse",list.get(2).getPropertyPath().toString());
+        Assertions.assertEquals("L'adresse postale fournie n'est pas valide",list.get(2).getMessage());
+        Assertions.assertEquals("ville",list.get(3).getPropertyPath().toString());
+        Assertions.assertEquals("La ville fournie n'est pas valide",list.get(3).getMessage());
+        Assertions.assertEquals("mail",list.get(4).getPropertyPath().toString());
+        Assertions.assertEquals("L'adresse mail fournie n'est pas valide",list.get(4).getMessage());
+        Assertions.assertEquals("nom",list.get(5).getPropertyPath().toString());
+        Assertions.assertEquals("Le nom fourni n'est pas valide",list.get(5).getMessage());
+        Assertions.assertEquals("prenom",list.get(6).getPropertyPath().toString());
+        Assertions.assertEquals("Le prénom fourni n'est pas valide",list.get(6).getMessage());
+
     }
 }
