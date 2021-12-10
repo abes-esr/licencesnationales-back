@@ -17,10 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @ExtendWith(SpringExtension.class)
 public class EtablissementEntityTest {
@@ -139,8 +136,9 @@ public class EtablissementEntityTest {
     }
 
     @Test
-    @DisplayName("test validation creation contact sans prenom ")
-    void testValidateCreatEtabSansPrenom() {
+    @DisplayName("test validation creation etablissement Blank ")
+    void testValidateCreatEtabBlank() {
+        EtablissementEntity etablissement = new EtablissementEntity();
         ContactEntity contact = new ContactEntity();
         contact.setPrenom("");
         contact.setNom("");
@@ -151,24 +149,37 @@ public class EtablissementEntityTest {
         contact.setTelephone("");
         contact.setVille("");
         contact.setMotDePasse("");
+        etablissement.setTypeEtablissement(new TypeEtablissementEntity(1,"test"));
+        etablissement.setContact(contact);
+        etablissement.setNom("");
+        etablissement.setSiren("");
+        etablissement.setIdAbes("");
+        etablissement.setDateCreation(new Date());
 
-        Set<ConstraintViolation<ContactEntity>> violations = validator.validate(contact);
-        List<ConstraintViolation<ContactEntity>> list = new ArrayList<>(violations);
-        Assertions.assertEquals(7,list.size());
-        Assertions.assertEquals("telephone",list.get(0).getPropertyPath().toString());
-        Assertions.assertEquals("Veuillez entrer 10 chiffres sans espace",list.get(0).getMessage());
-        Assertions.assertEquals("codePostal",list.get(1).getPropertyPath().toString());
-        Assertions.assertEquals("Le code postal fourni n'est pas valide",list.get(1).getMessage());
-        Assertions.assertEquals("adresse",list.get(2).getPropertyPath().toString());
-        Assertions.assertEquals("L'adresse postale fournie n'est pas valide",list.get(2).getMessage());
-        Assertions.assertEquals("ville",list.get(3).getPropertyPath().toString());
-        Assertions.assertEquals("La ville fournie n'est pas valide",list.get(3).getMessage());
-        Assertions.assertEquals("mail",list.get(4).getPropertyPath().toString());
-        Assertions.assertEquals("L'adresse mail fournie n'est pas valide",list.get(4).getMessage());
-        Assertions.assertEquals("nom",list.get(5).getPropertyPath().toString());
-        Assertions.assertEquals("Le nom fourni n'est pas valide",list.get(5).getMessage());
-        Assertions.assertEquals("prenom",list.get(6).getPropertyPath().toString());
-        Assertions.assertEquals("Le prénom fourni n'est pas valide",list.get(6).getMessage());
+        Set<ConstraintViolation<ContactEntity>> violationsContact = validator.validate(contact);
+        List<ConstraintViolation<ContactEntity>> contraintsViolationContact = new ArrayList<>(violationsContact);
+        Assertions.assertEquals(7,contraintsViolationContact.size());
+        Assertions.assertEquals("telephone",contraintsViolationContact.get(0).getPropertyPath().toString());
+        Assertions.assertEquals("Veuillez entrer 10 chiffres sans espace",contraintsViolationContact.get(0).getMessage());
+        Assertions.assertEquals("codePostal",contraintsViolationContact.get(1).getPropertyPath().toString());
+        Assertions.assertEquals("Le code postal fourni n'est pas valide",contraintsViolationContact.get(1).getMessage());
+        Assertions.assertEquals("adresse",contraintsViolationContact.get(2).getPropertyPath().toString());
+        Assertions.assertEquals("L'adresse postale fournie n'est pas valide",contraintsViolationContact.get(2).getMessage());
+        Assertions.assertEquals("ville",contraintsViolationContact.get(3).getPropertyPath().toString());
+        Assertions.assertEquals("La ville fournie n'est pas valide",contraintsViolationContact.get(3).getMessage());
+        Assertions.assertEquals("mail",contraintsViolationContact.get(4).getPropertyPath().toString());
+        Assertions.assertEquals("L'adresse mail fournie n'est pas valide",contraintsViolationContact.get(4).getMessage());
+        Assertions.assertEquals("nom",contraintsViolationContact.get(5).getPropertyPath().toString());
+        Assertions.assertEquals("Le nom fourni n'est pas valide",contraintsViolationContact.get(5).getMessage());
+        Assertions.assertEquals("prenom",contraintsViolationContact.get(6).getPropertyPath().toString());
+        Assertions.assertEquals("Le prénom fourni n'est pas valide",contraintsViolationContact.get(6).getMessage());
 
+        Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etablissement);
+        List<ConstraintViolation<EtablissementEntity>> contraintsViolationEtab = new ArrayList<>(violationsEtab);
+        Assertions.assertEquals(2,contraintsViolationEtab.size());
+        Assertions.assertEquals("nom",contraintsViolationEtab.get(0).getPropertyPath().toString());
+        Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide",contraintsViolationEtab.get(0).getMessage());
+        Assertions.assertEquals("siren",contraintsViolationEtab.get(1).getPropertyPath().toString());
+        Assertions.assertEquals("Le SIREN doit contenir 9 chiffres",contraintsViolationEtab.get(1).getMessage());
     }
 }
