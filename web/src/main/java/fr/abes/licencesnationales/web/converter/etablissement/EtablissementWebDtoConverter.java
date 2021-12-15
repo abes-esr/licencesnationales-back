@@ -5,6 +5,7 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
@@ -27,6 +28,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -302,7 +304,12 @@ public class EtablissementWebDtoConverter {
                 dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
                 dto.setSiren(source.getSiren());
                 dto.setIdAbes(source.getIdAbes());
+                dto.setStatut(source.isValide()?"Validé":"Nouveau");
+                dto.setStatutIps(source.getStatut());
                 dto.setDateCreation(format.format(source.getDateCreation()));
+                if (source.getIps().size() != 0) {
+                    dto.setDateModificationDerniereIp(format.format(source.getIps().stream().sorted(Comparator.comparing(IpEntity::getDateModification).reversed()).findFirst().get().getDateModification()));
+                }
                 ContactWebDto contact = getContactWebDto(source);
 
                 dto.setContact(contact);
