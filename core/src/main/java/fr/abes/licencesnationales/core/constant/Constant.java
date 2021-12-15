@@ -65,6 +65,7 @@ public class Constant implements Serializable {
     public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
     public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
+    public static final String ERROR_IP_ACTION_INCONNUE = "Action inconnue sur les IPs : ";
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 }
