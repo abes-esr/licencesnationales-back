@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
@@ -11,8 +10,6 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
-import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementCreeListener;
 import fr.abes.licencesnationales.core.listener.etablissement.EtablissementModifieListener;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
@@ -20,7 +17,6 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
-import fr.abes.licencesnationales.web.dto.etablissement.MotifSuppressionWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
@@ -478,9 +474,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @DisplayName("test suppression Etablissement")
     @WithMockUser(authorities = {"admin"})
     void testSuppressionEtablissement() throws Exception {
-        MotifSuppressionWebDto motif = new MotifSuppressionWebDto();
-        motif.setMotif("Motif suppression");
-
         String siren = "123456789";
         String nomEtab = "nomEtab";
         String mail = "mail2@test.com";
@@ -491,10 +484,10 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUser(Locale.FRANCE, motif.getMotif(), etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
-                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(motif)))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
