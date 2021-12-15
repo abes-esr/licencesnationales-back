@@ -17,7 +17,7 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-import java.util.*;
+import java.util.Set;
 
 @ExtendWith(SpringExtension.class)
 public class EtablissementEntityTest {
@@ -114,30 +114,8 @@ public class EtablissementEntityTest {
     }
 
     @Test
-    @DisplayName("test validation creation contact sans ville ")
-    void testValidateCreatEtabSansVille() {
-        ContactEntity contact = new ContactEntity();
-        contact.setPrenom("Samuel");
-        contact.setNom("Quetin");
-        contact.setAdresse("13 Rue du testàMontpellier");
-        contact.setMail("sqn@abes.fr");
-        contact.setCodePostal("34090");
-        contact.setRole("etab");
-        contact.setTelephone("0123456789");
-        contact.setVille("");
-        contact.setMotDePasse("aepojfovridehfgvgva65e6f54aze651daze321f45z6a5e54a24sdf321q3f46a45e");
-
-        Set<ConstraintViolation<ContactEntity>> violations = validator.validate(contact);
-        Optional<ConstraintViolation<ContactEntity>> violation = violations.stream().findFirst();
-
-        Assertions.assertTrue(violation.isPresent());
-        Assertions.assertEquals("ville", violation.get().getPropertyPath().toString());
-        Assertions.assertEquals("La ville fournie n'est pas valide", violation.get().getMessage());
-    }
-
-    @Test
-    @DisplayName("test validation creation etablissement Blank ")
-    void testValidateCreatEtabBlank() {
+    @DisplayName("test validation creation contact Blank ")
+    void testValidateCreatContactBlank() {
         ContactEntity contact = new ContactEntity("", "", "", "", "", "", "", "","","");
 
         Set<ConstraintViolation<ContactEntity>> violationsContact = validator.validate(contact);
@@ -149,5 +127,33 @@ public class EtablissementEntityTest {
         Assertions.assertEquals("L'adresse mail fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("mail")).findFirst().get().getMessage());
         Assertions.assertEquals("Le nom fourni n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
         Assertions.assertEquals("Le prénom fourni n'est pas valide", violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
+    }
+
+    @Test
+    @DisplayName("test validation creation contact null ")
+    void testValidateCreatContactNull() {
+        ContactEntity contact = new ContactEntity(null, null, null, null, null, null, null, null,null,null);
+
+        Set<ConstraintViolation<ContactEntity>> violationsContact = validator.validate(contact);
+        Assertions.assertEquals(7,violationsContact.size());
+        Assertions.assertEquals("ne doit pas être nul", violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("telephone")).findFirst().get().getMessage());
+        Assertions.assertEquals("ne doit pas être nul",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("codePostal")).findFirst().get().getMessage());
+        Assertions.assertEquals("ne doit pas être nul",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("adresse")).findFirst().get().getMessage());
+        Assertions.assertEquals("La ville fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("ville")).findFirst().get().getMessage());
+        Assertions.assertEquals("ne doit pas être nul",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("mail")).findFirst().get().getMessage());
+        Assertions.assertEquals("Le nom fourni n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals("Le prénom fourni n'est pas valide", violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
+    }
+
+    @Test
+    @DisplayName("test validation creation etablissement Blank ")
+    void testValidateCreatEtablissemenBlank() {
+        EtablissementEntity etab = new EtablissementEntity("","",new TypeEtablissementEntity(1,""),"",new ContactEntity("","","","","","","",""));
+
+        Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etab);
+        Assertions.assertEquals(2,violationsEtab.size());
+        Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals("Le SIREN doit contenir 9 chiffres", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
+
     }
 }
