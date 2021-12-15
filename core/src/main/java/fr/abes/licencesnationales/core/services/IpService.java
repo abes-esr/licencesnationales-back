@@ -62,9 +62,6 @@ public class IpService {
     }
 
     public void save(IpEntity ipEntity) {
-        if (ipEntity.getId() != null) {
-            ipEntity.setDateModification(new Date());
-        }
         ipRepository.save(ipEntity);
     }
 

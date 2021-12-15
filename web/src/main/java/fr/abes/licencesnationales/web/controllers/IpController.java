@@ -4,10 +4,7 @@ package fr.abes.licencesnationales.web.controllers;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.IpValideeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.*;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
@@ -19,9 +16,11 @@ import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
+import fr.abes.licencesnationales.web.exception.UnknownActionIpException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -37,10 +36,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Log
 @RestController
@@ -54,6 +51,9 @@ public class IpController {
 
     @Autowired
     private IpService ipService;
+
+    @Autowired
+    private EmailService emailService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -116,14 +116,44 @@ public class IpController {
         eventRepository.save(ipModifieeEvent);
     }
 
-    @PostMapping(value = "/valider")
+    @PostMapping(value = "/gerer/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void validate(@RequestBody List<Integer> ids) {
-        ids.forEach(id -> {
-            IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
-            applicationEventPublisher.publishEvent(ipValideeEvent);
-            eventRepository.save(ipValideeEvent);
+    public void gererIp(@PathVariable String siren, @RequestBody List<IpGereeWebDto> ips) throws UnknownActionIpException {
+        List<String> errors = new ArrayList<>();
+        List<Map<String, String>> resultat = new ArrayList<>();
+        ips.forEach(ip -> {
+            Map<String, String> result = new HashMap<>();
+            Integer id = ip.getIdIp();
+            result.put("ip", id.toString());
+            switch(ip.getAction()) {
+                case VALIDER:
+                    IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
+                    applicationEventPublisher.publishEvent(ipValideeEvent);
+                    eventRepository.save(ipValideeEvent);
+                    result.put("action", "validation");
+                    break;
+                case REJETER:
+                    IpRejeteeEventEntity ipRejeteeEvent = new IpRejeteeEventEntity(this, id);
+                    applicationEventPublisher.publishEvent(ipRejeteeEvent);
+                    eventRepository.save(ipRejeteeEvent);
+                    result.put("action", "rejet");
+                    break;
+                case SUPPRIMER:
+                    IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
+                    applicationEventPublisher.publishEvent(ipSupprimeeEvent);
+                    eventRepository.save(ipSupprimeeEvent);
+                    result.put("action", "suppression");
+                    break;
+                default:
+                    errors.add(ip.getIdIp().toString());
+            }
+            resultat.add(result);
         });
+        EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
+        emailService.constructBilanRecapActionIp(etab.getContact().getMail(), resultat);
+        if (errors.size() != 0) {
+            throw new UnknownActionIpException(errors.stream().collect(Collectors.joining(", ")));
+        }
 
     }
 
