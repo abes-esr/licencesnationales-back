@@ -76,14 +76,12 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructSuppressionCompteMailUser(Locale locale, String motifSuppression, String nomEtab, String emailUser) throws RestClientException {
+    public void constructSuppressionCompteMailUser(Locale locale, String nomEtab, String emailUser) throws RestClientException {
         StringBuilder message = new StringBuilder();
         message.append("Bonjour,<br>");
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
         message.append(" sur le site Licencesnationales.fr vient d'être supprimé.<br>");
-        message.append("Raison de la suppression : <br>");
-        message.append(motifSuppression);
         message.append("<br>");
         message.append("Pour toute question, contactez l’équipe d’assistance de l’Abes : https://stp.abes.fr/node/3?origine=LicencesNationales<br>");
         message.append("Bien cordialement,<br>");
@@ -97,14 +95,12 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructSuppressionCompteMailAdmin(Locale locale, String motifSuppression, String emailUser, String nomEtab, String siren) {
+    public void constructSuppressionCompteMailAdmin(Locale locale, String emailUser, String nomEtab, String siren) {
         StringBuilder message = new StringBuilder();
         message.append(messageSource.getMessage("message.suppressionCompteAdmin", null, locale));
         message.append(nomEtab);
         message.append(" avec le siren ");
         message.append(siren);
-        message.append(" pour le motif : ");
-        message.append(motifSuppression);
         String jsonRequestConstruct = mailToJSON(emailUser, null, messageSource.getMessage("message.CompteSupprimeAdmin",null,locale), message.toString());
         sendMail(jsonRequestConstruct);
     }
