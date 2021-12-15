@@ -154,6 +154,17 @@ public class EtablissementEntityTest {
         Assertions.assertEquals(2,violationsEtab.size());
         Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
         Assertions.assertEquals("Le SIREN doit contenir 9 chiffres", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
+    }
+
+    @Test
+    @DisplayName("test validation creation etablissement Null ")
+    void testValidateCreatEtablissemenNull() {
+        EtablissementEntity etab = new EtablissementEntity(null,null,new TypeEtablissementEntity(1,""),"",new ContactEntity("","","","","","","",""));
+
+        Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etab);
+        Assertions.assertEquals(2,violationsEtab.size());
+        Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals("ne doit pas être nul", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
 
     }
 }
