@@ -92,6 +92,7 @@ public class EtablissementEntity implements Serializable {
             throw new IllegalArgumentException("Le contact est obligatoire");
         }
         this.contact = contact;
+        this.valide = false;
     }
 
     /**
@@ -112,6 +113,7 @@ public class EtablissementEntity implements Serializable {
             throw new IllegalArgumentException("Le contact est obligatoire");
         }
         this.contact = contact;
+        this.valide = false;
     }
 
     public EtablissementEntity(String nom, String siren, ContactEntity contact) {
