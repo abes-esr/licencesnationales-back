@@ -2,10 +2,6 @@ package fr.abes.licencesnationales.core.entities.etablissement;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
@@ -25,17 +21,15 @@ public class ContactEntity implements Serializable {
     @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotNull
-    @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le nom fourni n'est pas valide")
+    @NotBlank(message = "Le nom fourni n'est pas valide")
     private String nom;
 
-    @NotNull
-    @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le prénom fourni n'est pas valide")
+    @NotBlank( message = "Le prénom fourni n'est pas valide")
     private String prenom;
 
     @NotNull
     @Email
-    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "L'adresse mail fournie n'est pas valide")
+    @Pattern(regexp = ".+@.+\\..+", message = "L'adresse mail fournie n'est pas valide")
     private String mail;
 
     /**
@@ -48,7 +42,7 @@ public class ContactEntity implements Serializable {
     private String telephone;
 
     @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "L'adresse postale fournie n'est pas valide")
+    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]+)$", message = "L'adresse postale fournie n'est pas valide")
     private String adresse;
 
     private String boitePostale;
@@ -59,8 +53,7 @@ public class ContactEntity implements Serializable {
 
     private String cedex;
 
-    @NotNull
-    @Pattern(regexp = "^([a-zA-Z\\u0080-\\u024F]+(?:. |-| |'))*[a-zA-Z\\u0080-\\u024F]*$", message = "La ville fournie n'est pas valide")
+    @NotBlank(message = "La ville fournie n'est pas valide")
     private String ville;
 
     private String role = "etab";
