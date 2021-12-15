@@ -198,12 +198,6 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
-    @ExceptionHandler(UnknownActionIpException.class)
-    protected ResponseEntity<Object> handleUnknownActionIpException(UnknownActionIpException ex) {
-        String error = Constant.ERROR_IP_ACTION_INCONNUE + ex.getMessage();
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
-    }
-
     @ExceptionHandler(UnknownEtablissementException.class)
     protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
         String error = Constant.ERROR_ETAB_INCONNU + ex.getMessage();
