@@ -211,7 +211,7 @@ public class EtablissementController {
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, @RequestBody MotifSuppressionWebDto motif, HttpServletRequest request) throws RestClientException, JsonProcessingException {
+    public void suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
@@ -221,8 +221,8 @@ public class EtablissementController {
 
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructSuppressionCompteMailUser(locale, motif.getMotif(), ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
-        emailService.constructSuppressionCompteMailAdmin(locale, motif.getMotif(), admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        emailService.constructSuppressionCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructSuppressionCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
     }
 
     @PostMapping(value = "/validation/{siren}")
