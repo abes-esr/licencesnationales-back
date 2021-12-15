@@ -20,14 +20,16 @@ import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
-import fr.abes.licencesnationales.web.exception.UnknownActionIpException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,7 +39,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Log
 @RestController
@@ -118,43 +119,45 @@ public class IpController {
 
     @PostMapping(value = "/gerer/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void gererIp(@PathVariable String siren, @RequestBody List<IpGereeWebDto> ips) throws UnknownActionIpException {
-        List<String> errors = new ArrayList<>();
+    public ResponseEntity<Object> gererIp(@PathVariable String siren, @RequestBody List<IpGereeWebDto> ips) {
         List<Map<String, String>> resultat = new ArrayList<>();
         ips.forEach(ip -> {
             Map<String, String> result = new HashMap<>();
-            Integer id = ip.getIdIp();
-            result.put("ip", id.toString());
-            switch(ip.getAction()) {
-                case VALIDER:
-                    IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
-                    applicationEventPublisher.publishEvent(ipValideeEvent);
-                    eventRepository.save(ipValideeEvent);
-                    result.put("action", "validation");
-                    break;
-                case REJETER:
-                    IpRejeteeEventEntity ipRejeteeEvent = new IpRejeteeEventEntity(this, id);
-                    applicationEventPublisher.publishEvent(ipRejeteeEvent);
-                    eventRepository.save(ipRejeteeEvent);
-                    result.put("action", "rejet");
-                    break;
-                case SUPPRIMER:
-                    IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
-                    applicationEventPublisher.publishEvent(ipSupprimeeEvent);
-                    eventRepository.save(ipSupprimeeEvent);
-                    result.put("action", "suppression");
-                    break;
-                default:
-                    errors.add(ip.getIdIp().toString());
+            try {
+                Integer id = ip.getIdIp();
+                result.put("ip", id.toString());
+                switch (ip.getAction()) {
+                    case VALIDER:
+                        IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
+                        applicationEventPublisher.publishEvent(ipValideeEvent);
+                        eventRepository.save(ipValideeEvent);
+                        result.put("action", "validation");
+                        break;
+                    case REJETER:
+                        IpRejeteeEventEntity ipRejeteeEvent = new IpRejeteeEventEntity(this, id);
+                        applicationEventPublisher.publishEvent(ipRejeteeEvent);
+                        eventRepository.save(ipRejeteeEvent);
+                        result.put("action", "rejet");
+                        break;
+                    case SUPPRIMER:
+                        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
+                        applicationEventPublisher.publishEvent(ipSupprimeeEvent);
+                        eventRepository.save(ipSupprimeeEvent);
+                        result.put("action", "suppression");
+                        break;
+                    default:
+                        result.put("action", "action inconnue");
+                }
+            } catch (Exception e) {
+                result.put("erreur", e.getMessage());
             }
             resultat.add(result);
         });
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         emailService.constructBilanRecapActionIp(etab.getContact().getMail(), resultat);
-        if (errors.size() != 0) {
-            throw new UnknownActionIpException(errors.stream().collect(Collectors.joining(", ")));
-        }
-
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new ResponseEntity(resultat, headers, HttpStatus.OK);
     }
 
     @DeleteMapping(value = "/{id}")

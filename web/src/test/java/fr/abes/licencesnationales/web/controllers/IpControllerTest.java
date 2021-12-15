@@ -308,7 +308,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(post("/v1/ip/gerer/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].ip", oneOf("1", "2", "3")))
+                .andExpect(jsonPath("$.[0].action", oneOf("validation", "suppression", "rejet")));
     }
 
     @Test
@@ -369,7 +371,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         contact.setRole("etab");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
         StatutIpEntity statutIp = new StatutIpEntity(1, "validé");
-        IpV4 ip = new IpV4(1,"192.128.0.1","test",statutIp);
+        IpV4 ip = new IpV4(1, "192.128.0.1", "test", statutIp);
         etab.ajouterIp(ip);
         List list = new ArrayList();
         list.add(ip);
@@ -380,7 +382,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
         fileContent += "09-12-2021;IP V4;192.128.0.1;;validé;test\r\n";
         String json = "[]";
-
 
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
