@@ -5,6 +5,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -20,12 +21,10 @@ public class ContactEntity implements Serializable {
     @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]+)$", message = "Le nom fourni n'est pas valide")
+    @NotBlank(message = "Le nom fourni n'est pas valide")
     private String nom;
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]+)$", message = "Le prénom fourni n'est pas valide")
+    @NotBlank( message = "Le prénom fourni n'est pas valide")
     private String prenom;
 
     @NotNull
@@ -54,8 +53,7 @@ public class ContactEntity implements Serializable {
 
     private String cedex;
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]+)$", message = "La ville fournie n'est pas valide")
+    @NotBlank(message = "La ville fournie n'est pas valide")
     private String ville;
 
     private String role = "etab";

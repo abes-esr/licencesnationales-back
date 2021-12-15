@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -27,8 +28,7 @@ public class EtablissementEntity implements Serializable {
     @Getter @Setter
     private Integer id;
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-])$", message = "Le nom d'établissement fourni n'est pas valide")
+    @NotBlank( message = "Le nom d'établissement fourni n'est pas valide")
     @Getter @Setter
     private String nom;
 
