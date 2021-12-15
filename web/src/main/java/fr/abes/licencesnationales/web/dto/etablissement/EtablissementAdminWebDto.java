@@ -23,4 +23,15 @@ public class EtablissementAdminWebDto extends EtablissementWebDto {
     @JsonProperty("idAbes")
     private String idAbes;
 
+    @JsonProperty("statut")
+    private String statut;
+
+    @JsonProperty("statutIps")
+    private String statutIps;
+
+    @JsonProperty("dateModificationDerniereIp")
+    private String dateModificationDerniereIp;
+
+
+
 }

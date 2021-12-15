@@ -40,6 +40,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {UtilsMapper.class, EtablissementWebDtoConverter.class, ObjectMapper.class, IpWebDtoConverter.class})
@@ -420,12 +421,19 @@ public class EtablissementWebDtoConverterTest {
 
     @Test
     @DisplayName("test conversion EtablissementEntity / EtablissementAdminWebDto")
-    void testEtabAdminWebDto() {
+    void testEtabAdminWebDto() throws IpException {
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Date dateJour = Calendar.getInstance().getTime();
         ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
-        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
         etab.setDateCreation(dateJour);
+        StatutIpEntity statutIpEntity = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation à envoyer");
+        IpEntity ip1 = new IpV4("1.1.1.1", "test", statutIpEntity);
+        ip1.setDateModification(new GregorianCalendar(2020, 1, 1).getTime());
+        IpEntity ip2 = new IpV4("2.2.2.2", "test", statutIpEntity);
+        ip2.setDateModification(new GregorianCalendar(2021, 2, 2).getTime());
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
         EtablissementAdminWebDto dto = utilsMapper.map(etab, EtablissementAdminWebDto.class);
 
         Assertions.assertEquals(1, dto.getId().intValue());
@@ -433,7 +441,10 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("123456789", dto.getSiren());
         Assertions.assertEquals("nomEtab", dto.getName());
         Assertions.assertEquals("123456", dto.getIdAbes());
-        Assertions.assertEquals("validé", dto.getTypeEtablissement());
+        Assertions.assertEquals("test type", dto.getTypeEtablissement());
+        Assertions.assertEquals("Nouveau", dto.getStatut());
+        Assertions.assertEquals(Constant.STATUT_ETAB_ATTENTEATTESTATION, dto.getStatutIps());
+        Assertions.assertEquals("02-03-2021", dto.getDateModificationDerniereIp());
         Assertions.assertEquals("nom2", dto.getContact().getNom());
         Assertions.assertEquals("prenom2", dto.getContact().getPrenom());
         Assertions.assertEquals("adresse2", dto.getContact().getAdresse());
