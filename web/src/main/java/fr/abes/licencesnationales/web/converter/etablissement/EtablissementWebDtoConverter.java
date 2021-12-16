@@ -26,10 +26,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 
 @Component
@@ -308,7 +305,9 @@ public class EtablissementWebDtoConverter {
                 dto.setStatutIps(source.getStatut());
                 dto.setDateCreation(format.format(source.getDateCreation()));
                 if (source.getIps().size() != 0) {
-                    dto.setDateModificationDerniereIp(format.format(source.getIps().stream().sorted(Comparator.comparing(IpEntity::getDateModification).reversed()).findFirst().get().getDateModification()));
+                    Optional<IpEntity> dernierDateModif = source.getIps().stream().filter(i -> i.getDateModification() != null).sorted(Comparator.comparing(IpEntity::getDateModification).reversed()).findFirst();
+                    if (dernierDateModif.isPresent())
+                        dto.setDateModificationDerniereIp(format.format(dernierDateModif.get().getDateModification()));
                 }
                 ContactWebDto contact = getContactWebDto(source);
 
