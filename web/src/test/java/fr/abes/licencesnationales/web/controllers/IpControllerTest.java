@@ -27,7 +27,12 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.List;
 
 import static org.hamcrest.Matchers.oneOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -312,6 +317,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test export IP")
     @WithMockUser(authorities = {"etab"})
     void testExportIp() throws Exception {
+        Calendar dateDuJour = Calendar.getInstance();
+        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
+
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
         contact.setRole("etab");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
@@ -325,7 +333,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(dao.findAllBySiren(Mockito.any())).thenReturn(list);
 
         String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
-        fileContent += "09-12-2021;IP V4;192.128.0.1;;validé;test\r\n";
+        fileContent += format.format(dateDuJour.getTime())+";IP V4;192.128.0.1;;validé;test\r\n";
         String json = "[]";
 
 
