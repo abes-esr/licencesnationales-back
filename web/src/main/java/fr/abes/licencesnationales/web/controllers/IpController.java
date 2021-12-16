@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
@@ -43,7 +44,7 @@ import java.util.*;
 @Log
 @RestController
 @RequestMapping("/v1/ip")
-public class IpController {
+public class IpController extends AbstractController {
     @Autowired
     private IpEventRepository eventRepository;
 
@@ -73,7 +74,7 @@ public class IpController {
 
 
     @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public void ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
+    public ResponseEntity<Object> ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
         List<String> errors = new ArrayList<>();
         filtrerAccesServices.autoriserServicesParSiren(siren);
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
@@ -93,11 +94,12 @@ public class IpController {
         if (errors.size() > 0) {
             throw new IpException(errors.toString());
         }
+        return buildResponseEntity(Constant.MESSAGE_AJOUTIP_OK);
 
     }
 
     @PostMapping(value = "/{id}")
-    public void modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
+    public ResponseEntity<Object> modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
         EtablissementEntity etab = ipService.getEtablissementByIp(id);
         filtrerAccesServices.autoriserServicesParSiren(etab.getSiren());
         if (dto instanceof IpModifieeUserWebDto) {
@@ -115,6 +117,7 @@ public class IpController {
         ipModifieeEvent.setIpId(id);
         applicationEventPublisher.publishEvent(ipModifieeEvent);
         eventRepository.save(ipModifieeEvent);
+        return buildResponseEntity(Constant.MESSAGE_MODIFIP_OK);
     }
 
     @PostMapping(value = "/gerer/{siren}")
@@ -155,19 +158,18 @@ public class IpController {
         });
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         emailService.constructBilanRecapActionIp(etab.getContact().getMail(), resultat);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-        return new ResponseEntity(resultat, headers, HttpStatus.OK);
+        return buildResponseEntity(resultat);
     }
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void delete(@PathVariable Integer id) throws UnknownIpException {
+    public ResponseEntity<Object> delete(@PathVariable Integer id) throws UnknownIpException {
         IpEntity ip = ipService.getFirstById(id);
         IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id, ip.getIp());
         ipSupprimeeEvent.setSiren(ip.getEtablissement().getSiren());
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(ipSupprimeeEvent);
+        return buildResponseEntity(Constant.MESSAGE_SUPPIP_OK);
     }
 
     @GetMapping(value = "/{siren}")

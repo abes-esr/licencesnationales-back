@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -31,7 +30,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.oneOf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -112,7 +112,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("IP ajoutée avec succès"));
 
         json = "[" +
                 "{\n" +
@@ -129,7 +130,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
     }
 
     @Test
@@ -201,7 +203,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(post("/v1/ip/1")
                 .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
     }
 
     @Test
@@ -230,7 +233,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(post("/v1/ip/1")
                 .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
     }
 
     @Test
@@ -245,7 +249,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(ipService.getFirstById(1)).thenReturn(ip);
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_SUPPIP_OK));
     }
 
     @Test
