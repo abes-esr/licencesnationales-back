@@ -113,7 +113,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("IP ajoutée avec succès"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
 
         json = "[" +
                 "{\n" +
