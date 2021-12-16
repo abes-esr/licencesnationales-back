@@ -10,8 +10,11 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
+import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
+import fr.abes.licencesnationales.web.dto.ip.gestion.ActionIp;
+import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -27,11 +30,8 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
 import java.util.List;
 
 import static org.hamcrest.Matchers.oneOf;
@@ -58,6 +58,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @MockBean
     private EventService eventService;
+
+    @MockBean
+    private IpEventRepository ipEventRepository;
 
     @MockBean
     private IpService ipService;
@@ -110,7 +113,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
 
         json = "[" +
                 "{\n" +
@@ -127,7 +131,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
     }
 
     @Test
@@ -199,7 +204,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(post("/v1/ip/1")
                 .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
     }
 
     @Test
@@ -228,47 +234,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         this.mockMvc.perform(post("/v1/ip/1")
                 .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
     }
-
-    @Test
-    @DisplayName("test validation IP")
-    @WithMockUser(authorities = {"admin"})
-    void testValiderIp() throws Exception {
-        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
-        List<Integer> listIps = Arrays.asList(1, 2, 3);
-        IpEntity entity1 = new IpV4(1, "1.1.1.1", "test", statutIp);
-        IpEntity entity2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", statutIp);
-        IpEntity entity3 = new IpV4(3, "1.1-10.2.3", "test3", statutIp);
-        Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.when(ipService.getFirstById(1)).thenReturn(entity1);
-        Mockito.when(ipService.getFirstById(2)).thenReturn(entity2);
-        Mockito.when(ipService.getFirstById(3)).thenReturn(entity3);
-
-        this.mockMvc.perform(post("/v1/ip/valider/")
-                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("test validation IP Utilisateur Etab")
-    @WithMockUser(authorities = {"etab"})
-    void testValiderIpWrongUser() throws Exception {
-        List<Integer> listIps = Arrays.asList(1, 2, 3);
-
-        this.mockMvc.perform(post("/v1/ip/valider/")
-                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @DisplayName("test suppression IP sans auth")
-    void testValiderIpNoUser() throws Exception {
-        List<Integer> listIps = Arrays.asList(1, 2, 3);
-        this.mockMvc.perform(post("/v1/ip/valider/").content(mapper.writeValueAsString(listIps)))
-                .andExpect(status().isUnauthorized());
-    }
-
 
     @Test
     @DisplayName("test suppression IP")
@@ -282,7 +250,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(ipService.getFirstById(1)).thenReturn(ip);
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_SUPPIP_OK));
     }
 
     @Test
@@ -312,6 +281,93 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
                 .andExpect(status().isUnauthorized());
     }
 
+    @Test
+    @DisplayName("test gestion Ip")
+    @WithMockUser(authorities = {"admin"})
+    void testGestionIp() throws Exception {
+        IpGereeWebDto dto1 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.REJETER);
+        dto1.setIdIp(1);
+
+        IpGereeWebDto dto2 = new IpGereeWebDto();
+        dto2.setAction(ActionIp.VALIDER);
+        dto2.setIdIp(2);
+
+        IpGereeWebDto dto3 = new IpGereeWebDto();
+        dto3.setAction(ActionIp.SUPPRIMER);
+        dto3.setIdIp(3);
+
+        List<IpGereeWebDto> listIps = new ArrayList<>();
+        listIps.add(dto1);
+        listIps.add(dto2);
+        listIps.add(dto3);
+
+        ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
+        contact.setRole("etab");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.doNothing().when(emailService).constructBilanRecapActionIp(Mockito.anyString(), Mockito.any());
+        Mockito.when(ipService.getFirstById(Mockito.anyInt())).thenReturn(new IpV4());
+        Mockito.doNothing().when(ipService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/ip/gerer/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].ip", oneOf("1", "2", "3")))
+                .andExpect(jsonPath("$.[0].action", oneOf("validation", "suppression", "rejet")));
+    }
+
+    @Test
+    @DisplayName("test gestion IP Utilisateur Etab")
+    @WithMockUser(authorities = {"etab"})
+    void testGestionIpWrongUser() throws Exception {
+        IpGereeWebDto dto1 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.REJETER);
+        dto1.setIdIp(1);
+
+        IpGereeWebDto dto2 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.VALIDER);
+        dto1.setIdIp(2);
+
+        IpGereeWebDto dto3 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.SUPPRIMER);
+        dto1.setIdIp(3);
+
+        List<IpGereeWebDto> listIps = new ArrayList<>();
+        listIps.add(dto1);
+        listIps.add(dto2);
+        listIps.add(dto3);
+
+        this.mockMvc.perform(post("/v1/ip/gerer/111111111")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @DisplayName("test gestion IP sans auth")
+    void testGestionIpNoUser() throws Exception {
+        IpGereeWebDto dto1 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.REJETER);
+        dto1.setIdIp(1);
+
+        IpGereeWebDto dto2 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.VALIDER);
+        dto1.setIdIp(2);
+
+        IpGereeWebDto dto3 = new IpGereeWebDto();
+        dto1.setAction(ActionIp.SUPPRIMER);
+        dto1.setIdIp(3);
+
+        List<IpGereeWebDto> listIps = new ArrayList<>();
+        listIps.add(dto1);
+        listIps.add(dto2);
+        listIps.add(dto3);
+
+        this.mockMvc.perform(post("/v1/ip/gerer/111111111").content(mapper.writeValueAsString(listIps)))
+                .andExpect(status().isUnauthorized());
+    }
 
     @Test
     @DisplayName("test export IP")
@@ -324,7 +380,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         contact.setRole("etab");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
         StatutIpEntity statutIp = new StatutIpEntity(1, "validé");
-        IpV4 ip = new IpV4(1,"192.128.0.1","test",statutIp);
+        IpV4 ip = new IpV4(1, "192.128.0.1", "test", statutIp);
         etab.ajouterIp(ip);
         List list = new ArrayList();
         list.add(ip);
@@ -335,7 +391,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
         fileContent += format.format(dateDuJour.getTime())+";IP V4;192.128.0.1;;validé;test\r\n";
         String json = "[]";
-
 
 
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
