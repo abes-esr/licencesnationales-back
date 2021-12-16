@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @Component
 @Slf4j
@@ -138,8 +139,21 @@ public class EmailService {
                 "Bien cordialement,<br>" +
                 "L’équipe Licences nationales<br>" +
                 urlSite;
-        String jsonRequestContruct = mailToJSON(emailUser, null, "Relance pour création d'IP sur votre compte Licences Nationales", message);
-        sendMail(jsonRequestContruct);
+        String jsonRequestConstruct = mailToJSON(emailUser, null, "Relance pour création d'IP sur votre compte Licences Nationales", message);
+        sendMail(jsonRequestConstruct);
+    }
+
+    public void constructBilanRecapActionIp(String emailUser, List<Map<String, String>> listIps) throws RestClientException {
+        StringBuilder message = new StringBuilder("Bonjour,<br>");
+        message.append("Les actions suivantes viennent d'être réalisées sur les IPs de votre établissement : ");
+        listIps.forEach(ip -> {
+            message.append(ip.get("ip"));
+            message.append(" : ");
+            message.append(ip.get("action"));
+            message.append("<br>");
+        });
+        String jsonRequestConstruct = mailToJSON(emailUser, null, "Action sur les IPs de votre établissement", message.toString());
+        sendMail(jsonRequestConstruct);
     }
 
     public void sendMail(String requestJson) throws RestClientException {
