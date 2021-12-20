@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.Lists;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -31,8 +30,6 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -132,7 +129,7 @@ public class EtablissementController extends AbstractController {
         /*******************************************/
         emailService.constructCreationCompteEmailUser(locale, etablissementCreeWebDto.getContact().getMail());
         emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
-        return buildResponseEntity(Constant.MESSAGE_CREATIONCOMPTE_OK);
+        return buildResponseEntity(Constant.MESSAGE_CREATIONETAB_OK);
     }
 
     @PostMapping(value = "/{siren}")
