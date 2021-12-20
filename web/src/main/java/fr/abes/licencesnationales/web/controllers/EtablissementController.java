@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -52,7 +53,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/v1/etablissements")
-public class EtablissementController {
+public class EtablissementController extends AbstractController {
 
     @Autowired
     private UtilsMapper mapper;
@@ -98,7 +99,7 @@ public class EtablissementController {
 
 
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
+    public ResponseEntity<Object> creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
@@ -131,10 +132,11 @@ public class EtablissementController {
         /*******************************************/
         emailService.constructCreationCompteEmailUser(locale, etablissementCreeWebDto.getContact().getMail());
         emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
+        return buildResponseEntity(Constant.MESSAGE_CREATIONCOMPTE_OK);
     }
 
     @PostMapping(value = "/{siren}")
-    public void edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
+    public ResponseEntity<Object> edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
                 etablissementModifieWebDto.setSiren(siren);
@@ -154,11 +156,12 @@ public class EtablissementController {
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_MODIFETAB_OK);
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
+    public ResponseEntity<Object> fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEventEntity event = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
         event.setSource(this);
         // On genère un identifiant Abes
@@ -168,11 +171,13 @@ public class EtablissementController {
         event.setValide(true);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_FUSIONETAB_OK);
+
     }
 
     @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
+    public ResponseEntity<Object> scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
         EtablissementEntity etablissement = etablissementService.getFirstBySiren(etablissementDiviseEvent.getAncienSiren());
         etablissementDiviseEvent.setTypeEtablissement(etablissement.getTypeEtablissement().getLibelle());
@@ -207,6 +212,7 @@ public class EtablissementController {
         //on formatte les nouveaux établissements en json pour sauvegarde
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventService.save(etablissementDiviseEvent);
+        return buildResponseEntity(Constant.MESSAGE_SCISSIONETAB_OK);
     }
 
     @DeleteMapping(value = "{siren}")
@@ -227,7 +233,7 @@ public class EtablissementController {
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
@@ -242,7 +248,7 @@ public class EtablissementController {
         UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructValidationCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
         emailService.constructValidationCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
-
+        return buildResponseEntity(Constant.MESSAGE_VALIDATIONETAB_OK);
     }
 
     @GetMapping(value = "/{siren}")
