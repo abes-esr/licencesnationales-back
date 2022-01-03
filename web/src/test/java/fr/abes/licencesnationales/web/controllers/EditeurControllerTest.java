@@ -127,6 +127,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
 
         this.mockMvc.perform(put("/v1/editeurs/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_CREATIONEDITEUR_OK))
                 .andExpect(status().isOk());
     }
 
@@ -220,6 +221,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
 
         this.mockMvc.perform(post("/v1/editeurs/1")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurModifieWebDto)))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFEDITEUR_OK))
                 .andExpect(status().isOk());
     }
 
@@ -310,7 +312,9 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(editeurService).deleteById(1);
-        this.mockMvc.perform(delete("/v1/editeurs/1")).andExpect(status().isOk());
+        this.mockMvc.perform(delete("/v1/editeurs/1"))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_SUPPEDITEUR_OK))
+                .andExpect(status().isOk());
     }
 
     @Test
