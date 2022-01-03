@@ -131,7 +131,10 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_CREATIONETAB_OK))
                 .andExpect(status().isOk());
+
+
     }
 
     @Test
@@ -301,6 +304,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFETAB_OK))
                 .andExpect(status().isOk());
 
     }
@@ -467,6 +471,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         this.mockMvc.perform(post("/v1/etablissements/fusion")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_FUSIONETAB_OK))
                 .andExpect(status().isOk());
 
     }
@@ -507,6 +512,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(Locale.FRANCE, etab.getNom(), etab.getContact().getMail(), etab.getSiren());
 
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_VALIDATIONETAB_OK))
                 .andExpect(status().isOk());
     }
 
