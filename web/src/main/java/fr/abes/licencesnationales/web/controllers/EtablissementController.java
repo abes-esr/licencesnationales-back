@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.Lists;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -31,8 +30,6 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -94,12 +91,11 @@ public class EtablissementController {
     private ExportEtablissementAdmin exportEtablissementAdmin;
 
     @Value("${ln.dest.notif.admin}")
-    private String admin;
+    private String mailAdmin;
 
 
     @PutMapping
     public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
         if (captcha == null) {
@@ -129,8 +125,8 @@ public class EtablissementController {
         eventService.save(event);
 
         /*******************************************/
-        emailService.constructCreationCompteEmailUser(locale, etablissementCreeWebDto.getContact().getMail());
-        emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
+        emailService.constructCreationCompteEmailUser(event);
+        emailService.constructCreationCompteEmailAdmin(mailAdmin, event);
     }
 
     @PostMapping(value = "/{siren}")
@@ -212,23 +208,20 @@ public class EtablissementController {
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public void suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
-        EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
-        applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        eventService.save(etablissementSupprimeEvent);
+        EtablissementSupprimeEventEntity event = new EtablissementSupprimeEventEntity(this, siren);
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
 
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructSuppressionCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
-        emailService.constructSuppressionCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        emailService.constructSuppressionCompteMailUserEtAdmin(event, ((UserDetailsImpl) user).getEmail(), mailAdmin);
     }
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public void validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
             throw new BadStatutException("L'établissement ne doit pas déjà être validé");
@@ -240,8 +233,8 @@ public class EtablissementController {
 
         //envoi du mail de validation
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructValidationCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
-        emailService.constructValidationCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        emailService.constructValidationCompteMailUser(((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructValidationCompteMailAdmin(mailAdmin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
 
     }
 
