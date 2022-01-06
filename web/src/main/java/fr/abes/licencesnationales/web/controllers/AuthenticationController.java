@@ -108,7 +108,6 @@ public class AuthenticationController {
             notes = "le ")
     @PostMapping("/motDePasseOublie")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto dto, HttpServletRequest request) throws RestClientException, CaptchaException, JsonIncorrectException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
@@ -142,7 +141,7 @@ public class AuthenticationController {
         }
 
         String jwt = tokenProvider.generateToken(user);
-        emailService.constructResetTokenEmail(locale, jwt, user.getEmail(), user.getNameEtab());
+        emailService.constructResetTokenEmail(jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
         response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");
