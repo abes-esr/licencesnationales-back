@@ -144,12 +144,13 @@ public class EtablissementController {
             }
         }
         EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
-        if (!(etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail())) && (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail()))) {
-            throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
-        }
-        if (!etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail())) {
+        if (!(etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail()))) {
+            if (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail())) {
+                throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
+            }
             envoiMail = true;
         }
+
         EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);
