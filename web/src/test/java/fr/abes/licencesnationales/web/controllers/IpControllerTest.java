@@ -311,7 +311,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.doNothing().when(emailService).constructBilanRecapActionIp(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructBilanRecapActionIpUser(Mockito.anyString(), Mockito.anyString(), Mockito.any());
         Mockito.when(ipService.getFirstById(Mockito.anyInt())).thenReturn(new IpV4());
         Mockito.doNothing().when(ipService).save(Mockito.any());
 

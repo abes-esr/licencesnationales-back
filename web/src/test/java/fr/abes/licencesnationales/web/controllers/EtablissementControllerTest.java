@@ -36,6 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -296,7 +297,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
-
+        Mockito.doNothing().when(emailService).constructModificationMailAdmin(Mockito.anyString(), Mockito.anyString(), "test@test.com", "mail1@test.com");
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/etablissements/123456789")
@@ -504,7 +505,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
         Mockito.doNothing().when(emailService).constructValidationCompteMailUser(etab.getNom(), etab.getContact().getMail());
-        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(etab.getNom(), etab.getContact().getMail(), etab.getSiren());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(etab.getNom(), etab.getContact().getMail());
 
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isOk());
