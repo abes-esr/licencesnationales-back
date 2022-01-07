@@ -22,7 +22,6 @@ import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,13 +30,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Locale;
 
 
 @Slf4j
@@ -141,7 +138,7 @@ public class AuthenticationController {
         }
 
         String jwt = tokenProvider.generateToken(user);
-        emailService.constructResetTokenEmail(jwt, user.getEmail(), user.getNameEtab());
+        emailService.constructResetTokenEmailUser(jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
         response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");

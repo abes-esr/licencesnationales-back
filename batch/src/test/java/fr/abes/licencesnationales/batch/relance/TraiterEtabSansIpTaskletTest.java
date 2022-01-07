@@ -56,7 +56,7 @@ public class TraiterEtabSansIpTaskletTest {
 
     @Test
     void testTaskletTraiteEtabSansIp() throws Exception {
-        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructRelanceEtabMailUser(Mockito.anyString(), Mockito.anyString());
         Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
         Mockito.when(eventService.getDateCreationEtab(Mockito.any())).thenReturn(Calendar.getInstance().getTime());
 

@@ -47,9 +47,9 @@ public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
         for (EtablissementDto dto : etablissementDtos) {
             try {
                 if (skipMail) {
-                    emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), dto.getNomEtab(), mailAdmin, null);
+                    emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), mailAdmin, null);
                 } else {
-                    emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), dto.getNomEtab(), dto.getEmail(), mailAdmin);
+                    emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), dto.getEmail(), mailAdmin);
                 }
             } catch (RestClientException ex) {
                 log.error("JOB Suppression IP : Erreur dans l'envoi du mail pour l'établissement " + dto.getNomEtab());
