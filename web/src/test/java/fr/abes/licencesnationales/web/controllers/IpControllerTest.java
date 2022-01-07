@@ -309,16 +309,20 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         contact.setRole("etab");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
 
+        StatutIpEntity statut = new StatutIpEntity(1, "Nouveau");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(emailService).constructBilanRecapActionIpUser(Mockito.anyString(), Mockito.anyString(), Mockito.any());
-        Mockito.when(ipService.getFirstById(Mockito.anyInt())).thenReturn(new IpV4());
+        Mockito.when(ipService.getFirstById(1)).thenReturn(new IpV4(1, "1.1.1.1", "test", statut));
+        Mockito.when(ipService.getFirstById(2)).thenReturn(new IpV4(1, "2.2.2.2", "test", statut));
+        Mockito.when(ipService.getFirstById(3)).thenReturn(new IpV4(1, "3.3.3.3", "test", statut));
+
         Mockito.doNothing().when(ipService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/ip/gerer/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].ip", oneOf("1", "2", "3")))
+                .andExpect(jsonPath("$.[0].ip", oneOf("1.1.1.1", "2.2.2.2", "3.3.3.3")))
                 .andExpect(jsonPath("$.[0].action", oneOf("validation", "suppression", "rejet")));
     }
 

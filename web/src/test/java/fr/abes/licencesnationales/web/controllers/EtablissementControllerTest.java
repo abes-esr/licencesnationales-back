@@ -297,7 +297,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructModificationMailAdmin(Mockito.anyString(), Mockito.anyString(), "test@test.com", "mail1@test.com");
+        Mockito.doNothing().when(emailService).constructModificationMailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/etablissements/123456789")
@@ -486,7 +486,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUserEtAdmin(Mockito.any(), etab.getContact().getMail(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUserEtAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON))
