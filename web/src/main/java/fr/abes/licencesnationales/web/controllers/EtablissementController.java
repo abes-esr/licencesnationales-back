@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.google.common.collect.Lists;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -13,7 +12,10 @@ import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.TypeEtablissementDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
@@ -31,8 +33,6 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.core.io.Resource;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -246,13 +246,13 @@ public class EtablissementController {
     }
 
     @GetMapping(value = "/{siren}")
-    public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
+    public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException, SirenIntrouvableException, AccesInterditException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
-        UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
+        //UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }
-        if (user.getSiren().equals(siren)) {
+        if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
             return mapper.map(entity, EtablissementUserWebDto.class);
         } else {
             throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");

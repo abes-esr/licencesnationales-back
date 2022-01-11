@@ -8,27 +8,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class EtablissementAdminWebDto extends EtablissementWebDto {
-    @JsonProperty("id")
-    private Integer id;
-
-    @JsonProperty("nom")
-    private String name;
-
-    @JsonProperty("siren")
-    private String siren;
-
-    @JsonProperty("typeEtablissement")
-    private String typeEtablissement;
-
-    @JsonProperty("idAbes")
-    private String idAbes;
-
-    @JsonProperty("statut")
-    private String statut;
-
-    @JsonProperty("statutIps")
-    private String statutIps;
-
     @JsonProperty("dateModificationDerniereIp")
     private String dateModificationDerniereIp;
 
