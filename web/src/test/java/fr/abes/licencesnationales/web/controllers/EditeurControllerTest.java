@@ -174,7 +174,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : " + Constant.ERROR_DOUBLON_MAIL));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.ERROR_DOUBLON_MAIL));
     }
 
     @Test
