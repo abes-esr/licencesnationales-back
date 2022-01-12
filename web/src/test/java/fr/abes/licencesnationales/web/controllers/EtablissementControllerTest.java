@@ -36,6 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -126,8 +127,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -164,8 +165,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -205,8 +206,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -296,7 +297,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
-
+        Mockito.doNothing().when(emailService).constructModificationMailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/etablissements/123456789")
@@ -485,7 +486,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUserEtAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -503,8 +504,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructValidationCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
-        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(Locale.FRANCE, etab.getNom(), etab.getContact().getMail(), etab.getSiren());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailUser(etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(etab.getNom(), etab.getContact().getMail());
 
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isOk());

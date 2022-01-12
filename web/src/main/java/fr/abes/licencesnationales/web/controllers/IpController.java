@@ -19,16 +19,14 @@ import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
-import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
+import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -128,7 +126,8 @@ public class IpController extends AbstractController {
             Map<String, String> result = new HashMap<>();
             try {
                 Integer id = ip.getIdIp();
-                result.put("ip", id.toString());
+                IpEntity ipInBdd = ipService.getFirstById(id);
+                result.put("ip", ipInBdd.getIp());
                 switch (ip.getAction()) {
                     case VALIDER:
                         IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
@@ -156,8 +155,30 @@ public class IpController extends AbstractController {
             }
             resultat.add(result);
         });
+        //agencement de la map des résultats par action / IP au lieu de IP / action
+        Map<String, List<String>> mapResultat = new HashMap<>();
+        List<String> listValidation = new ArrayList<>();
+        List<String> listSuppression = new ArrayList<>();
+        List<String> listRejet = new ArrayList<>();
+        resultat.forEach(r -> {
+            switch (r.get("action")) {
+                case "validation":
+                    listValidation.add(r.get("ip"));
+                    break;
+                case "suppression":
+                    listSuppression.add(r.get("ip"));
+                    break;
+                case "rejet":
+                    listRejet.add(r.get("ip"));
+                    break;
+                default:
+            }
+        });
+        mapResultat.put("validation", listValidation);
+        mapResultat.put("suppression", listSuppression);
+        mapResultat.put("rejet", listRejet);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
-        emailService.constructBilanRecapActionIp(etab.getContact().getMail(), resultat);
+        emailService.constructBilanRecapActionIpUser(etab.getContact().getMail(), etab.getNom(), mapResultat);
         return buildResponseEntity(resultat);
     }
 
