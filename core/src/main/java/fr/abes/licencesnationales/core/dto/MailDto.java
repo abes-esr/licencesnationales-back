@@ -4,7 +4,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * TODO A quoi sert cette classe ?
+ * Classe permettant de créer un objet mail qui sera envoyé au ws
+ * Contient toutes les informations nécessaires au mail : destinataire(s), copie(s), copie(s) cachée(s), sujet et corps
  */
 @Setter
 @Getter

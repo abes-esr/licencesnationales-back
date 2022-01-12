@@ -74,7 +74,7 @@ public class EditeurController {
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void edit (@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
+    public void edit(@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
         editeurModifieWebDto.setId(id);
         EditeurModifieEventEntity event = mapper.map(editeurModifieWebDto, EditeurModifieEventEntity.class);
         event.setSource(this);
