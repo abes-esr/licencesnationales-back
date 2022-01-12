@@ -12,7 +12,7 @@ import org.apache.commons.lang3.NotImplementedException;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
@@ -30,15 +30,13 @@ public class EditeurEntity implements Serializable {
     @SequenceGenerator(name = "editeur_Sequence", sequenceName = "EDITEUR_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "Le nom de l'éditeur fourni n'est pas valide")
+    @NotBlank(message = "Le nom de l'éditeur fourni n'est pas valide")
     private String nom;
 
     @Pattern(regexp = "^[0-9]*$", message = "L'identifiant éditeur est uniquement composé de chiffres")
     private String identifiant = "identifiant editeur non renseigné";
 
-    @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]{5,80})$", message = "L'adresse postale fournie n'est pas valide")
+    @NotBlank( message = "L'adresse postale fournie n'est pas valide")
     private String adresse;
 
     private Date dateCreation = new Date();

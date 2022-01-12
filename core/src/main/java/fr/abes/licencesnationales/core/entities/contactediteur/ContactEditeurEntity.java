@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.DiscriminatorOptions;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.io.Serializable;
@@ -26,14 +28,14 @@ public abstract class ContactEditeurEntity implements Serializable {
     @SequenceGenerator(name = "contact_editeur_Sequence", sequenceName = "CONTACT_EDITEUR_SEQ", allocationSize = 1)
     protected Integer id;
 
-    @NotNull
-    @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le nom fourni n'est pas valide")
+    @NotBlank(message = "Le nom fourni n'est pas valide")
     protected String nom;
-    @NotNull
-    @Pattern(regexp = "^([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+([-]([A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+(( |')[A-Za-zàáâäçèéêëìíîïñòóôöùúûü]+)*)+)*$", message = "Le prénom fourni n'est pas valide")
+    @NotBlank(message = "Le prénom fourni n'est pas valide")
     protected String prenom;
+
     @NotNull
-    @Pattern(regexp = "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$", message = "L'adresse mail fournie n'est pas valide")
+    @Email
+    @Pattern(regexp = ".+@.+\\..+", message = "L'adresse mail fournie n'est pas valide")
     protected String mail;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false, targetEntity = EditeurEntity.class)
