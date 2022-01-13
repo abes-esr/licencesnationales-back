@@ -215,7 +215,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_DOUBLON_MAIL))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
     }
 
@@ -418,7 +418,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : L'adresse mail saisie est déjà utilisée"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.ERROR_DOUBLON_MAIL))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
 
     }

@@ -187,7 +187,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(UnknownEditeurException.class)
-    protected ResponseEntity<Object> handleUnknownIpException(UnknownEditeurException ex) {
+    protected ResponseEntity<Object> handleUnknownEditeurException(UnknownEditeurException ex) {
         String error = Constant.ERROR_EDITEUR_INCONNU + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
