@@ -300,7 +300,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         //cas éditeur inconnu
         Mockito.when(editeurService.getFirstEditeurById(1)).thenThrow(new UnknownEditeurException("id : 1"));
         this.mockMvc.perform(delete("/v1/editeurs/1")).andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Editeur inconnu : id : 1"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_EDITEUR_INCONNU + "id : 1"))
                 .andExpect(jsonPath("$.debugMessage").value("id : 1"));
     }
 
