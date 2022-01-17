@@ -530,7 +530,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans le statut de l'établissement : L'établissement ne doit pas déjà être validé"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_ETAB+"L'établissement ne doit pas déjà être validé"))
                 .andExpect(jsonPath("$.debugMessage").value("L'établissement ne doit pas déjà être validé"));
     }
 

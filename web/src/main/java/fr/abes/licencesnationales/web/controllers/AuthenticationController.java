@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
@@ -22,7 +23,6 @@ import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +31,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestClientException;
 
@@ -112,7 +111,7 @@ public class AuthenticationController {
         String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
@@ -145,7 +144,7 @@ public class AuthenticationController {
         emailService.constructResetTokenEmail(locale, jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
-        response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");
+        response.setMessage(Constant.MESSAGE_MDP_OUBLIE);
 
         return ResponseEntity.ok(response);
     }
@@ -157,7 +156,7 @@ public class AuthenticationController {
         String captcha = request.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
@@ -185,7 +184,7 @@ public class AuthenticationController {
         }
 
         ReinitialiserMotDePasseResponseDto response = new ReinitialiserMotDePasseResponseDto();
-        response.setMessage("Votre mot de passe a bien été réinitialisé");
+        response.setMessage(Constant.MESSAGE_RESET_MDP);
 
         return ResponseEntity.ok(response);
     }
@@ -245,7 +244,7 @@ public class AuthenticationController {
         }
 
         ModifierMotDePasseResponseDto response = new ModifierMotDePasseResponseDto();
-        response.setMessage("Votre mot de passe a bien été modifié");
+        response.setMessage(Constant.MESSAGE_MDP_MODIFIER);
         return ResponseEntity.ok(response);
     }
 }
