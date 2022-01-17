@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -177,7 +178,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_OUBLIE));
     }
 
     @Test
@@ -210,7 +211,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_OUBLIE));
     }
 
     @Test
@@ -230,7 +231,8 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("Le champs 'recaptcha' est obligatoire"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.EXCEPTION_CAPTCHA_OBLIGATOIR))
+                .andExpect(jsonPath("$.debugMessage").value(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR));
     }
 
     @Test
@@ -251,6 +253,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value("Au moins un des champs 'siren' ou 'email' est obligatoire"))
                 .andExpect(jsonPath("$.debugMessage").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
     }
 
@@ -290,7 +293,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Votre mot de passe a bien été réinitialisé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_RESET_MDP));
 
     }
 
@@ -380,7 +383,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Votre mot de passe a bien été modifié"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_MODIFIER));
     }
 
     @Test

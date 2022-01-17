@@ -81,6 +81,10 @@ public class Constant implements Serializable {
     public static final String MESSAGE_CREATIONEDITEUR_OK = "Editeur ajouté avec succès";
     public static final String MESSAGE_MODIFEDITEUR_OK = "Editeur modifié avec succès";
     public static final String MESSAGE_SUPPEDITEUR_OK = "Editeur supprimé avec succès";
+    public static final String MESSAGE_MDP_OUBLIE = "Un mail avec un lien de réinitialisation vous a été envoyé";
+    public static final String MESSAGE_RESET_MDP = "Votre mot de passe a bien été réinitialisé";
+    public static final String EXCEPTION_CAPTCHA_OBLIGATOIR = "Le champs 'recaptcha' est obligatoire";
+    public static final String MESSAGE_MDP_MODIFIER = "Votre mot de passe a bien été modifié";
 
 
 
