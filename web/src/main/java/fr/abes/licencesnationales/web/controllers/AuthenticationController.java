@@ -174,7 +174,7 @@ public class AuthenticationController {
             String siren = tokenProvider.getSirenFromJwtToken(request.getTokenFromMail());
             EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
             ContactEntity contact = etab.getContact();
-            contact.setMotDePasse(request.getMotDePasse());
+            contact.setMotDePasse(passwordService.getEncodedMotDePasse(request.getMotDePasse()));
             etablissementService.save(etab);
         } else {
             throw new InvalidTokenException("Le token n'est pas valide");
