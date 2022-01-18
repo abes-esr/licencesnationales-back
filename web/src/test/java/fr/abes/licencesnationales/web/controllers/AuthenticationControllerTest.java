@@ -253,7 +253,6 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Au moins un des champs 'siren' ou 'email' est obligatoire"))
                 .andExpect(jsonPath("$.debugMessage").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
     }
 
