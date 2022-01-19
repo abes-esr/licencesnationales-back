@@ -218,7 +218,7 @@ public class EtablissementController {
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
+    public void suppression(@PathVariable String siren) throws RestClientException, JsonProcessingException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity event = new EtablissementSupprimeEventEntity(this, siren);

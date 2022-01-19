@@ -65,7 +65,7 @@ public class EmailService {
         message.append(" sur le site Licencesnationales.fr. ");
         message.append("Pour créer un nouveau mot de passe, cliquez sur le lien ci-dessous :  <br>");
         message.append(url);
-        message.append("Le lien sera valable 24 heures.<br>");
+        message.append("<br><br>Le lien sera valable 24 heures.<br>");
         message.append(lienAssistance());
         message.append(signature());
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
@@ -273,7 +273,7 @@ public class EmailService {
 
     private String signature() {
         StringBuilder signature = new StringBuilder();
-        signature.append("Bien cordialement,<br><br>");
+        signature.append("<br>Bien cordialement,<br><br>");
         signature.append("L'équipe Licences nationales<br>");
         signature.append("<a href='");
         signature.append(urlSite);
