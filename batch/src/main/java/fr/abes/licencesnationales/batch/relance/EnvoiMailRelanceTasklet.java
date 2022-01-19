@@ -22,9 +22,6 @@ public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
 
     private EmailService emailService;
 
-    @Value("${ln.skipMail}")
-    private boolean skipMail;
-
     @Value("${ln.dest.notif.admin}")
     private String mailAdmin;
 
@@ -46,11 +43,7 @@ public class EnvoiMailRelanceTasklet implements Tasklet, StepExecutionListener {
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         for (EtablissementDto dto : etablissementDtos) {
             try {
-                if (skipMail) {
-                    emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), mailAdmin, null);
-                } else {
                     emailService.constructSuppresionIpMail(dto.getIpsSupprimees(), dto.getIpsAttestation(), dto.getEmail(), mailAdmin);
-                }
             } catch (RestClientException ex) {
                 log.error("JOB Suppression IP : Erreur dans l'envoi du mail pour l'établissement " + dto.getNomEtab());
             }

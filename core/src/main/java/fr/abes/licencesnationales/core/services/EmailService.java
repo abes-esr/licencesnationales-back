@@ -36,13 +36,13 @@ public class EmailService {
     private String urlSite;
 
     public void constructCreationCompteEmailAdmin(String emailUser, String nomEtab) throws RestClientException {
-        String subject = "[Appli LN] Nouveau compte Etablissement créé";
+        String subject = getEnv() + "[Appli LN] Nouveau compte Etablissement créé";
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, "Le compte établissement suivant a été créé par : " + nomEtab);
         sendMail(jsonRequestConstruct);
     }
 
     public void constructCreationCompteEmailUser(EtablissementCreeEventEntity etab) throws RestClientException {
-        String subject = "[Appli LN] Compte Etablissement créé";
+        String subject = getEnv() + "[Appli LN] Compte Etablissement créé";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous venez de créer le compte établissement ci-dessous sur l'");
         message.append("<a href='");
@@ -58,7 +58,7 @@ public class EmailService {
 
     public void constructResetTokenEmailUser(String token, String emailUser, String nomEtab) throws RestClientException {
         final String url = this.urlSite + "/reinitialisationPass?token=" + token;
-        String subject = "[Appli LN] Réinitialisation de votre mot de passe";
+        String subject = getEnv() + "[Appli LN] Réinitialisation de votre mot de passe";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous souhaitez accéder au compte de ");
         message.append(nomEtab);
@@ -73,7 +73,7 @@ public class EmailService {
     }
 
     public void constructSuppressionCompteMailUserEtAdmin(String nomEtab, String emailUser, String emailAdmin) throws RestClientException {
-        String subject = "[Appli LN] Suppression du compte Etablissement";
+        String subject = getEnv() + "[Appli LN] Suppression du compte Etablissement";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
@@ -86,7 +86,7 @@ public class EmailService {
     }
 
     public void constructValidationCompteMailAdmin(String emailUser, String nomEtab) {
-        String subject = "[Appli LN] Validation du compte Etablissement";
+        String subject = getEnv() + "[Appli LN] Validation du compte Etablissement";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Après vérifications, le compte de l’établissement ");
         message.append(nomEtab);
@@ -96,7 +96,7 @@ public class EmailService {
     }
 
     public void constructValidationCompteMailUser(String nomEtab, String emailUser) {
-        String subject = "[Appli LN] Validation du compte sur le site Licencesnationales.fr";
+        String subject = getEnv() + "[Appli LN] Validation du compte sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Après vérifications, le compte de l’établissement");
         message.append(nomEtab);
@@ -111,7 +111,7 @@ public class EmailService {
     }
 
     public void constructRelanceEtabMailUser(String nomEtab, String emailUser) throws RestClientException {
-        String subject = "[Appli LN] Relance : aucune IP déclarée sur le site Licencesnationales.fr";
+        String subject = getEnv() + "[Appli LN] Relance : aucune IP déclarée sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Aucune IP n’est déclarée sur le compte établissement ");
         message.append(nomEtab);
@@ -124,8 +124,21 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    private String getEnv() {
+        switch(System.getenv("SPRING_PROFILE_ACTIVE")) {
+            case "DEV":
+                return "[DEV]";
+            case "TEST":
+                return "[TEST]";
+            case "PROD":
+                return "";
+            default:
+                return "[LOCAL]";
+        }
+    }
+
     public void constructBilanRecapActionIpUser(String emailUser, String nomEtab, Map<String, List<String>> listIps) throws RestClientException {
-        String subject = "[Appli LN] Vérification des nouvelles IP déclarées";
+        String subject = getEnv() + "[Appli LN] Vérification des nouvelles IP déclarées";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous avez déclaré une ou plusieurs IP sur le compte de l’établissement ");
         message.append(nomEtab);
@@ -183,7 +196,7 @@ public class EmailService {
     }
 
     public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String to, String cc) {
-        String subject = "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
+        String subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("<table>");
         if (!ipsSupprimees.isEmpty()) {
@@ -212,7 +225,7 @@ public class EmailService {
     }
 
     public void constructModificationMailAdmin(String mailAdmin, String nomEtab, String ancienMail, String nouveauMail) {
-        String subject = "[Appli LN] Changement de mail de contact";
+        String subject = getEnv() + "[Appli LN] Changement de mail de contact";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Le mail de contact du compte établissement suivant a été modifié : ");
         message.append(nomEtab);
@@ -227,7 +240,7 @@ public class EmailService {
     }
 
     public void constructSuppressionMailUser(String nomEtab, String mailUser) {
-        String subject = "[Appli LN] Suppression du compte Etablissement";
+        String subject = getEnv() + "[Appli LN] Suppression du compte Etablissement";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
@@ -239,8 +252,8 @@ public class EmailService {
     }
 
     public void constructSuppressionMailAdmin(String mailAdmin, List<EtablissementEntity> listeEtab) {
-        String subject = "[Appli LN] Bilan mensuel des comptes Etab supprimés car sans IP depuis au moins un an";
-        StringBuilder message = new StringBuilder("Bonjour, <br><br>");
+        String subject = getEnv() + "[Appli LN] Bilan mensuel des comptes Etab supprimés car sans IP depuis au moins un an";
+        StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Les comptes établissements ci-dessous, ont été supprimés automatiquement de l’application licences nationales car ils sont restés sans aucune IP déclarée depuis plus d’un an :");
         listeEtab.forEach(etab -> {
             message.append(etab.getNom());
