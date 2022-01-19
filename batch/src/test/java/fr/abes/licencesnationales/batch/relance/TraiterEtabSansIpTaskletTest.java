@@ -35,8 +35,6 @@ import java.util.List;
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
 @ContextConfiguration(classes = {JobRelancesConfig.class})
 public class TraiterEtabSansIpTaskletTest {
-
-
     @Autowired
     private EmailService emailService;
 
