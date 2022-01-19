@@ -17,7 +17,7 @@ public class JobGestionCompteConfig extends JobConfiguration {
 
     @Bean(name = "jobGestionCompte")
     public Job jobGestionCompte() {
-        return this.jobBuilderFactory.get("gestionCompte").incrementer(new RunIdIncrementer())
+        return this.jobBuilderFactory.get("jobGestionCompte").incrementer(new RunIdIncrementer())
                 .start(stepSelectEtablissement()).on("AUCUNETAB").stop()
                 .on("COMPLETED").to(stepSuppressionCompte())
                 .build().build();
