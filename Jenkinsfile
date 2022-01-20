@@ -291,6 +291,7 @@ node {
                             string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
                             string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin'),
                             string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl'),
+                            string(credentialsId: "LN-site-url", variable: 'siteUrl')
                         ]) {
                             newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
                             newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
@@ -298,6 +299,7 @@ node {
                             newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
                             newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
                             newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
+                            newconfig = newconfig.replaceAll("site.url=*", "site.url=${siteUrl}")
                         }
                     }
 
