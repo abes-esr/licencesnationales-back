@@ -9,6 +9,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.event.Etablissemen
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -27,6 +28,10 @@ import java.util.Map;
 public class EmailService {
     private static final String BONJOUR = "Bonjour,<br><br>";
     private static final String ENDOFLINE = "</td></tr>";
+
+    @Value("${spring.profiles.active:Unknown}")
+    private String activeProfile;
+
     @Autowired
     private RestTemplate restTemplate;
 
@@ -126,7 +131,7 @@ public class EmailService {
     }
 
     private String getEnv() {
-        switch(System.getenv("SPRING_PROFILE_ACTIVE").toUpperCase(Locale.ROOT)) {
+        switch(activeProfile.toUpperCase(Locale.ROOT)) {
             case "DEV":
                 return "[DEV]";
             case "TEST":
