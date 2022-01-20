@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 @Component
@@ -125,7 +126,7 @@ public class EmailService {
     }
 
     private String getEnv() {
-        switch(System.getenv("SPRING_PROFILE_ACTIVE")) {
+        switch(System.getenv("SPRING_PROFILE_ACTIVE").toUpperCase(Locale.ROOT)) {
             case "DEV":
                 return "[DEV]";
             case "TEST":
