@@ -291,7 +291,7 @@ node {
                             string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
                             string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin'),
                             string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl'),
-                            string(credentialsId: "LN-site-url", variable: 'siteUrl')
+                            string(credentialsId: "LN-site-url-${mavenProfil}", variable: 'siteUrl')
                         ]) {
                             newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
                             newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
