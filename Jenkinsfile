@@ -284,7 +284,21 @@ node {
 
                     // Module batch
                     if ("${candidateModules[moduleIndex]}" == 'batch') {
-
+                        withCredentials([
+                            string(credentialsId: "url-orpins-${mavenProfil}", variable: 'url'),
+                            string(credentialsId: "LN-username-orpins", variable: 'BDusername'),
+                            string(credentialsId: "LN-password-orpins", variable: 'BDpassword'),
+                            string(credentialsId: "LN-jwt-token-secret", variable: 'jwtToken'),
+                            string(credentialsId: "LN-ln-dest-notif-admin", variable: 'lnDestNotifAdmin'),
+                            string(credentialsId: "LN-mail-ws-url", variable: 'mailWsUrl'),
+                        ]) {
+                            newconfig = newconfig.replaceAll("spring.datasource.url=*", "spring.datasource.url=${url}")
+                            newconfig = newconfig.replaceAll("spring.datasource.username=*", "spring.datasource.username=${BDusername}")
+                            newconfig = newconfig.replaceAll("spring.datasource.password=*", "spring.datasource.password=${BDpassword}")
+                            newconfig = newconfig.replaceAll("jwt.token.secret=*", "jwt.token.secret=${jwtToken}")
+                            newconfig = newconfig.replaceAll("ln.dest.notif.admin=*", "ln.dest.notif.admin=${lnDestNotifAdmin}")
+                            newconfig = newconfig.replaceAll("mail.ws.url=*", "mail.ws.url=${mailWsUrl}")
+                        }
                     }
 
                     // **** FIN DE ZONE A EDITER n°2 ****
