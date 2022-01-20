@@ -204,7 +204,7 @@ public class EmailService {
     public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String to, String cc) {
         String subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
-        message.append("<table>");
+        message.append("<table style='border:solid'>");
         if (!ipsSupprimees.isEmpty()) {
             message.append("<tr><td><b>Bilan IP supprimé(es)</b><br><br>Les IP en attente d’attestation depuis plus d’un an sont supprimées automatiquement.</td><td>");
             ipsSupprimees.forEach(ip -> {
