@@ -46,11 +46,7 @@ public class SelectEtablissementTasklet implements Tasklet, StepExecutionListene
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        try {
-            this.listeEtab = service.getEtabASupprimer();
-        } catch (UnknownEtablissementException ex) {
-            log.error("Etablissement inconnu : " + ex.getMessage());
-        }
+        this.listeEtab = service.getEtabASupprimer();
         return RepeatStatus.FINISHED;
     }
 }
