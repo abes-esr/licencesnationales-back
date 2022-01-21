@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.converter.ip;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
@@ -70,7 +71,7 @@ public class IpWebDtoConverter {
                 try {
                     Ipv4AjouteeWebDto source = context.getSource();
                     if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_IP_OBLIGATOIRE);
                     }
                     IpCreeEventEntity eventEntity = new IpCreeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
@@ -93,7 +94,7 @@ public class IpWebDtoConverter {
                 try {
                     Ipv6AjouteeWebDto source = context.getSource();
                     if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_IP_OBLIGATOIRE);
                     }
                     IpCreeEventEntity eventEntity = new IpCreeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
@@ -115,7 +116,7 @@ public class IpWebDtoConverter {
                 try {
                     IpModifieeUserWebDto source = context.getSource();
                     if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_IP_OBLIGATOIRE);
                     }
                     IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
@@ -140,7 +141,7 @@ public class IpWebDtoConverter {
                 try {
                     IpModifieeAdminWebDto source = context.getSource();
                     if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_IP_OBLIGATOIRE);
                     }
                     IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");

@@ -157,9 +157,8 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(MappingException.class)
     protected ResponseEntity<Object> handleMappingException(MappingException ex) {
-        String error = "Malformed JSON request : " + ex.getMessage();
-        log.error(ex.getCause().getLocalizedMessage());
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+        String message = Constant.ERROR_SAISIE + ((MappingException) ex.getCause()).getErrorMessages().stream().findFirst().get().getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, ex));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
