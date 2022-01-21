@@ -111,7 +111,7 @@ public class AuthenticationController {
         String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR);
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
@@ -156,7 +156,7 @@ public class AuthenticationController {
         String captcha = request.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR);
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha

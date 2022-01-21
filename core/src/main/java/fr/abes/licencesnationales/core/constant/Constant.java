@@ -69,6 +69,9 @@ public class Constant implements Serializable {
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 
+    /**  Messages champs manquant IP  **/
+    public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champs 'ip' est obligatoire";
+
     /** Messages de retour controller **/
     public static final String MESSAGE_AJOUTIP_OK = "IP ajoutée avec succès";
     public static final String MESSAGE_MODIFIP_OK = "IP modifiée avec succès";
@@ -83,7 +86,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_SUPPEDITEUR_OK = "Editeur supprimé avec succès";
     public static final String MESSAGE_MDP_OUBLIE = "Un mail avec un lien de réinitialisation vous a été envoyé";
     public static final String MESSAGE_RESET_MDP = "Votre mot de passe a bien été réinitialisé";
-    public static final String EXCEPTION_CAPTCHA_OBLIGATOIR = "Le champs 'recaptcha' est obligatoire";
+    public static final String EXCEPTION_CAPTCHA_OBLIGATOIRE = "Le champs 'recaptcha' est obligatoire";
     public static final String MESSAGE_MDP_MODIFIER = "Votre mot de passe a bien été modifié";
 
 

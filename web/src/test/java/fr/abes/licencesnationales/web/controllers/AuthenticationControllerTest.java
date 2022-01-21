@@ -231,8 +231,8 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.EXCEPTION_CAPTCHA_OBLIGATOIR))
-                .andExpect(jsonPath("$.debugMessage").value(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE))
+                .andExpect(jsonPath("$.debugMessage").value(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE));
     }
 
     @Test

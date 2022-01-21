@@ -101,7 +101,7 @@ public class EtablissementController extends AbstractController {
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIR);
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
