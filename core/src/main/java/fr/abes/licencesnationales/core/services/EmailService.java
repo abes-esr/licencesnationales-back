@@ -204,9 +204,9 @@ public class EmailService {
     public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String to, String cc) {
         String subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
-        message.append("<table style='border:solid'>");
+        message.append("<table>");
         if (!ipsSupprimees.isEmpty()) {
-            message.append("<tr><td><b>Bilan IP supprimé(es)</b><br><br>Les IP en attente d’attestation depuis plus d’un an sont supprimées automatiquement.</td><td>");
+            message.append("<tr><td style='border: solid'><b>Bilan IP supprimé(es)</b><br><br>Les IP en attente d’attestation depuis plus d’un an sont supprimées automatiquement.</td><td style='border: solid'>");
             ipsSupprimees.forEach(ip -> {
                 message.append("<b>");
                 message.append(ip);
@@ -215,7 +215,7 @@ public class EmailService {
             message.append(ENDOFLINE);
         }
         if (!ipsAttestation.isEmpty()) {
-            message.append("<tr><td><b>RAPPEL : IP en attente d’attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : ln-admin@abes.fr<br><br>Pour en savoir plus sur la vérification des IP, vous pouvez consulter <a href='http://documentation.abes.fr/aidelicencesnationales/co/DeclarerAdressesIP.html#h6cleoZtHXSMiDIX5wCuf' target='_blank'>cette page</a>.</td><td>");
+            message.append("<tr><td style='border: solid'><b>RAPPEL : IP en attente d’attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : ln-admin@abes.fr<br><br>Pour en savoir plus sur la vérification des IP, vous pouvez consulter <a href='http://documentation.abes.fr/aidelicencesnationales/co/DeclarerAdressesIP.html#h6cleoZtHXSMiDIX5wCuf' target='_blank'>cette page</a>.</td><td style='border: solid'>");
             ipsAttestation.forEach(ip -> {
                 message.append("<b>");
                 message.append(ip);
@@ -250,7 +250,7 @@ public class EmailService {
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
-        message.append(" sur le site Licencesnationales.fr vient d'être supprimé automatiquement de l’application Licencesnationales car, malgré nos  relances, aucune IP n’a été déclarée depuis plus d’un an.");
+        message.append(" sur le site Licencesnationales.fr vient d'être supprimé automatiquement de l’application Licencesnationales car, malgré nos  relances, aucune IP n’a été déclarée depuis plus d’un an.<br><br>");
         message.append(lienAssistance());
         message.append(signature());
         String jsonRequestConstruct = mailToJSON(mailUser, null, subject, message.toString());
@@ -260,11 +260,14 @@ public class EmailService {
     public void constructSuppressionMailAdmin(String mailAdmin, List<EtablissementEntity> listeEtab) {
         String subject = getEnv() + "[Appli LN] Bilan mensuel des comptes Etab supprimés car sans IP depuis au moins un an";
         StringBuilder message = new StringBuilder(BONJOUR);
-        message.append("Les comptes établissements ci-dessous, ont été supprimés automatiquement de l’application licences nationales car ils sont restés sans aucune IP déclarée depuis plus d’un an :");
+        message.append("Les comptes établissements ci-dessous, ont été supprimés automatiquement de l’application licences nationales car ils sont restés sans aucune IP déclarée depuis plus d’un an :<br>");
+        message.append("<ul>");
         listeEtab.forEach(etab -> {
+            message.append("<li>");
             message.append(etab.getNom());
-            message.append("<br>");
+            message.append("</li>");
         });
+        message.append("</ul>");
         String jsonRequestConstruct = mailToJSON(mailAdmin, null, subject, message.toString());
         sendMail(jsonRequestConstruct);
     }

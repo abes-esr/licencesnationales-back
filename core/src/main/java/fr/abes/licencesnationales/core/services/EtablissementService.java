@@ -90,7 +90,7 @@ public class EtablissementService {
         return etablissementDao.getEtablissementEntityByContact_MailContains(mail).orElseThrow(() -> new UnknownEtablissementException("mail : " + mail));
     }
 
-    public List<EtablissementEntity> getEtabASupprimer() throws UnknownEtablissementException {
+    public List<EtablissementEntity> getEtabASupprimer() {
         List<EtablissementEntity> emptyEtab = etablissementDao.getEtablissementEntityByIps_Empty();
         List<EtablissementEntity> listeOut = new ArrayList<>();
         for (EtablissementEntity etab : emptyEtab) {
@@ -103,9 +103,13 @@ public class EtablissementService {
             }
             else {
                 //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
-                Date dateCreationEtab = eventService.getDateCreationEtab(etab);
-                if (dateCreationEtab.before(oneYearAgo.getTime())) {
-                    listeOut.add(etab);
+                try {
+                    Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                    if (dateCreationEtab.before(oneYearAgo.getTime())) {
+                        listeOut.add(etab);
+                    }
+                } catch (UnknownEtablissementException ex) {
+                    log.warn("L'établissement " + etab.getSiren() + " ne dispose pas d'évènement de création");
                 }
             }
         }
