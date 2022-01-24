@@ -43,7 +43,7 @@ import java.util.Locale;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(value = "/v1/authentification", produces = MediaType.APPLICATION_JSON_VALUE)
-public class AuthenticationController {
+public class AuthenticationController extends AbstractController{
 
     private final AuthenticationManager authenticationManager;
 
@@ -99,7 +99,7 @@ public class AuthenticationController {
         response.setUserSiren(user.getSiren());
         response.setRole(user.getRole());
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
 
     }
 
@@ -146,7 +146,7 @@ public class AuthenticationController {
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
         response.setMessage(Constant.MESSAGE_MDP_OUBLIE);
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @ApiOperation(value = "permet de ",
@@ -186,7 +186,7 @@ public class AuthenticationController {
         ReinitialiserMotDePasseResponseDto response = new ReinitialiserMotDePasseResponseDto();
         response.setMessage(Constant.MESSAGE_RESET_MDP);
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @PostMapping("/verifierValiditeToken")
@@ -209,7 +209,7 @@ public class AuthenticationController {
             response.setValid(false);
         }
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
@@ -245,7 +245,7 @@ public class AuthenticationController {
 
         ModifierMotDePasseResponseDto response = new ModifierMotDePasseResponseDto();
         response.setMessage(Constant.MESSAGE_MDP_MODIFIER);
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 }
 

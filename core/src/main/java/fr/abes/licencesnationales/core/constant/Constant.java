@@ -70,7 +70,31 @@ public class Constant implements Serializable {
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
 
     /**  Messages champs manquant IP  **/
-    public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champs 'ip' est obligatoire";
+    public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";
+    public static final String ERROR_IP_TYPE_IP_OBLIGATOIRE = "Le champ 'typeIp' est obligatoire";
+    public static final String ERROR_IP_STATUT_OBLIGATOIRE = "Le champ 'statut' est obligatoire";
+
+    /**  Messages champs manquant Etablissement  **/
+    public static final String ERROR_ETAB_NOM_OBLIGATOIRE = "Le champ 'nom' est obligatoire";
+    public static final String ERROR_ETAB_SIREN_OBLIGATOIRE = "Le champ 'siren' est obligatoire";
+    public static final String ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE = "Le champ 'typeEtablissement' est obligatoire";
+    public static final String ERROR_ETAB_CONTACT_OBLIGATOIRE = "Le champ 'contact' est obligatoire";
+    public static final String ERROR_ETAB_MDP_OBLIGATOIRE = "Le champ 'motDePasse' du contact est obligatoire";
+    public static final String ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE = "Le champ 'nom' du contact est obligatoire";
+    public static final String ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE = "Le champ 'prenom' du contact est obligatoire";
+    public static final String ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE = "Le champ 'telephone' du contact est obligatoire";
+    public static final String ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE = "Le champ 'mail' du contact est obligatoire";
+    public static final String ERROR_ETAB_ADRESSE_CONTACT_OBLIGATOIRE = "Le champ 'adresse' du contact est obligatoire";
+    public static final String ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE = "Le champ 'codePostal' du contact est obligatoire";
+    public static final String ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE = "Le champ 'ville' du contact est obligatoire";
+    public static final String ERROR_ETAB_2_ETAB_OBLIGATOIRE = "La fusion doit porter sur au moins 2 établissements";
+
+    /**  Messages champs manquant Editeur  **/
+    public static final String ERROR_EDITEUR_ID_OBLIGATOIRE = "Le champ 'id' est obligatoire";
+    public static final String ERROR_EDITEUR_NOM_OBLIGATOIRE = "Le champ 'nom' de l'éditeur est obligatoire";
+    public static final String ERROR_EDITEUR_ADRESSE_OBLIGATOIRE = "Le champ 'adresse' de l'éditeur est obligatoire";
+    public static final String ERROR_EDITEUR_CONTACT_OBLIGATOIRE = "Au moins un 'contact commercial' ou un 'contact technique' est obligatoire";
+
 
     /** Messages de retour controller **/
     public static final String MESSAGE_AJOUTIP_OK = "IP ajoutée avec succès";

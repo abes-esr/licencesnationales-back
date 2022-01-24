@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.converter.editeur;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -60,7 +61,7 @@ public class EditeurWebDtoConverter {
                     EditeurModifieWebDto source = context.getSource();
 
                     if (source.getId() == null) {
-                        throw new IllegalArgumentException("Le champ 'id' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_EDITEUR_ID_OBLIGATOIRE);
                     }
                     EditeurModifieEventEntity editeurModifieEvent = new EditeurModifieEventEntity(this, source.getId());
 
@@ -76,21 +77,21 @@ public class EditeurWebDtoConverter {
 
     private void setEditeur(EditeurEventEntity eventEntity, String nom, String identifiantBis, String adresse, Set<ContactEditeurWebDto> contactsCommerciaux, Set<ContactEditeurWebDto> contactsTechniques) {
         if (nom == null) {
-            throw new IllegalArgumentException("Le champ 'nom' de l'éditeur est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_EDITEUR_NOM_OBLIGATOIRE);
         }
         eventEntity.setNom(nom);
 
         eventEntity.setIdentifiant(identifiantBis);
 
         if (adresse == null) {
-            throw new IllegalArgumentException("Le champ 'adresse' de l'éditeur est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_EDITEUR_ADRESSE_OBLIGATOIRE);
         }
         eventEntity.setAdresse(adresse);
 
         if ((contactsCommerciaux == null && contactsTechniques == null)
                 && (contactsCommerciaux != null && contactsTechniques == null && contactsCommerciaux.size() == 0)
                 && (contactsTechniques != null && contactsCommerciaux == null && contactsTechniques.size() == 0)) {
-            throw new IllegalArgumentException("Au moins un 'contact commercial' ou un 'contact technique' est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_EDITEUR_CONTACT_OBLIGATOIRE);
         }
         try {
             for (ContactEditeurWebDto cc : contactsCommerciaux) {
