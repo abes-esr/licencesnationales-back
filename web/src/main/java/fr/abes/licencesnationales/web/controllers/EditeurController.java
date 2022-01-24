@@ -112,7 +112,7 @@ public class EditeurController {
         return mapper.mapList(editeurService.findAllEditeur(), EditeurWebDto.class);
     }
 
-    @GetMapping(value = "/export")
+    @PostMapping(value = "/export")
     @PreAuthorize("hasAuthority('admin')")
     public void exportEditeur(@RequestBody List<Integer> ids, HttpServletResponse response) throws IOException{
         response.setContentType("text/csv;charset=UTF-8");
