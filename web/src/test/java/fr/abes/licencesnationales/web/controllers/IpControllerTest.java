@@ -185,7 +185,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("[L'IP 1.1.1.1 est déjà utilisée]"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"[L'IP 1.1.1.1 est déjà utilisée]"))
+                .andExpect(jsonPath("$.debugMessage").exists());
 
         json = "[" +
                 "{\n" +

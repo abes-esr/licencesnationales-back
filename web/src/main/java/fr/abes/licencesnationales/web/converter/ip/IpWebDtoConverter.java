@@ -121,7 +121,7 @@ public class IpWebDtoConverter {
                     IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
                     if (source.getTypeIp() == null) {
-                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_TYPE_IP_OBLIGATOIRE);
                     }
                     eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
                     return eventEntity;
@@ -146,11 +146,11 @@ public class IpWebDtoConverter {
                     IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
                     if (source.getTypeIp() == null) {
-                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_TYPE_IP_OBLIGATOIRE);
                     }
                     eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
                     if (source.getStatut() == null) {
-                        throw new IllegalArgumentException("Le champ 'statut' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_IP_STATUT_OBLIGATOIRE);
                     }
                     eventEntity.setStatut(source.getStatut());
                     return eventEntity;
