@@ -56,7 +56,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("abcdefgABCDEFG", "test", statut);
         });
-        assertEquals("Invalid IPv4 address: 'abcdefgABCDEFG'", exception.getLocalizedMessage());
+        assertEquals("IP v4 invalide : abcdefgABCDEFG", exception.getLocalizedMessage());
     }
 
     @Test

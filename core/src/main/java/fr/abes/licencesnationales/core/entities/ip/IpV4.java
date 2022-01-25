@@ -50,9 +50,13 @@ public class IpV4 extends IpEntity implements Serializable {
      */
     public IpV4(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         super(ip, commentaires, statut);
-        // On transforme la chaîne de caractère normée en Objet Java
-        this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
-        this.checkIfReserved();
+        try {
+            // On transforme la chaîne de caractère normée en Objet Java
+            this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
+            this.checkIfReserved();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException("IP v4 invalide : " + ip);
+        }
     }
 
     /**
