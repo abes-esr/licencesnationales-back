@@ -12,7 +12,10 @@ import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.TypeEtablissementDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
@@ -214,7 +217,7 @@ public class EtablissementController extends AbstractController {
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
+    public ResponseEntity<Object> suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
@@ -226,6 +229,7 @@ public class EtablissementController extends AbstractController {
         UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructSuppressionCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
         emailService.constructSuppressionCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        return buildResponseEntity(Constant.MESSAGE_SUPPETAB_OK);
     }
 
     @PostMapping(value = "/validation/{siren}")
