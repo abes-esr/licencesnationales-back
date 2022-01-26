@@ -105,6 +105,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_FUSIONETAB_OK = "Etablissements fusionnés avec succès";
     public static final String MESSAGE_SCISSIONETAB_OK = "Etablissement scissionné avec succès";
     public static final String MESSAGE_VALIDATIONETAB_OK = "Etablissement validé avec succès";
+    public static final String MESSAGE_SUPPETAB_OK = "Etablissement supprimé avec succès";
     public static final String MESSAGE_CREATIONEDITEUR_OK = "Editeur ajouté avec succès";
     public static final String MESSAGE_MODIFEDITEUR_OK = "Editeur modifié avec succès";
     public static final String MESSAGE_SUPPEDITEUR_OK = "Editeur supprimé avec succès";

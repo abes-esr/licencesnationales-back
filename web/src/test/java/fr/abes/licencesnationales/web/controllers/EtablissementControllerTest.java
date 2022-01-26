@@ -494,6 +494,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_SUPPETAB_OK))
                 .andExpect(status().isOk());
     }
 
