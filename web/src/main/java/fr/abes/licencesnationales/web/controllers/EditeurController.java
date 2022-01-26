@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.web.controllers;
 
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
@@ -22,11 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
@@ -36,7 +39,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("/v1/editeurs")
-public class EditeurController {
+public class EditeurController extends AbstractController {
 
     @Autowired
     private UtilsMapper mapper;
@@ -120,5 +123,9 @@ public class EditeurController {
         InputStream stream = exportEditeur.generateCsv(ids);
         IOUtils.copy(stream , response.getOutputStream());
         response.flushBuffer();
+    }
+
+    public ResponseEntity<Object> envoiMensuel() throws FileNotFoundException, IOException {
+        return buildResponseEntity(Constant.MESSAGE_ENVOI_OK);
     }
 }
