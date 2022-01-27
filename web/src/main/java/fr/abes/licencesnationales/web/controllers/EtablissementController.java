@@ -113,7 +113,7 @@ public class EtablissementController extends AbstractController {
             throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
         }
         if (etablissementService.existeSiren(etablissementCreeWebDto.getSiren())) {
-            throw new SirenExistException("Le siren saisi est déjà utilisé");
+            throw new SirenExistException(Constant.SIREN_DEJA_UTILISE);
         }
         if (etablissementService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
             throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
@@ -141,11 +141,11 @@ public class EtablissementController extends AbstractController {
             if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
                 etablissementModifieWebDto.setSiren(siren);
             } else {
-                throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+                throw new InvalidTokenException(Constant.SIREN_NE_CORRESPOND_PAS);
             }
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
-                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
+                throw new AccesInterditException(Constant.OPERATION_QUE_PAR_ADMIN);
             }
         }
         EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
@@ -238,7 +238,7 @@ public class EtablissementController extends AbstractController {
         Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
-            throw new BadStatutException("L'établissement ne doit pas déjà être validé");
+            throw new BadStatutException(Constant.DEJA_VALIDE);
         }
         EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
         etablissementValideEvent.setValide(true);
@@ -262,7 +262,7 @@ public class EtablissementController extends AbstractController {
         if (user.getSiren().equals(siren)) {
             return mapper.map(entity, EtablissementUserWebDto.class);
         } else {
-            throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+            throw new InvalidTokenException(Constant.SIREN_NE_CORRESPOND_PAS);
         }
     }
 
