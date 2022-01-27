@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.exception.UnknownStatutException;
@@ -45,7 +46,7 @@ public class ReferenceService {
     public StatutEntity findStatutById(Integer id) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findById(id);
         if (!entity.isPresent()) {
-            throw new UnknownStatutException("Statut inconnu");
+            throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();
     }
@@ -53,7 +54,7 @@ public class ReferenceService {
     public StatutEntity findStatutByLibelle(String libelle) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findFirstByLibelleStatut(libelle);
         if (!entity.isPresent()) {
-            throw new UnknownStatutException("Statut inconnu");
+            throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();
     }

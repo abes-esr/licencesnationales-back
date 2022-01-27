@@ -83,7 +83,7 @@ public class AuthenticationController extends AbstractController{
         Authentication authentication = authenticationManager.authenticate(credential);
 
         if (authentication == null) {
-            throw new AuthenticationServiceException("La méthode d'authentification n'est pas supportée");
+            throw new AuthenticationServiceException(Constant.METHODE_AUTHENTIFICATION_PAS_SUPPORTEE);
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -137,7 +137,7 @@ public class AuthenticationController extends AbstractController{
                 throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + dto.getSiren() + "' n'existe pas");
             }
         } else {
-            throw new JsonIncorrectException("Au moins un des champs 'siren' ou 'email' est obligatoire");
+            throw new JsonIncorrectException(Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE);
         }
 
         String jwt = tokenProvider.generateToken(user);
@@ -166,11 +166,11 @@ public class AuthenticationController extends AbstractController{
         }
 
         if (request.getTokenFromMail() == null) {
-            throw new JsonIncorrectException("Le champs 'token' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE);
         }
 
         if (request.getMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'nouveauMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE);
         }
 
         if (tokenProvider.validateToken(request.getTokenFromMail())) {
@@ -180,7 +180,7 @@ public class AuthenticationController extends AbstractController{
             contact.setMotDePasse(request.getMotDePasse());
             etablissementService.save(etab);
         } else {
-            throw new InvalidTokenException("Le token n'est pas valide");
+            throw new InvalidTokenException(Constant.ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE);
         }
 
         ReinitialiserMotDePasseResponseDto response = new ReinitialiserMotDePasseResponseDto();
@@ -193,7 +193,7 @@ public class AuthenticationController extends AbstractController{
     public ResponseEntity<?> verifierValiditeToken(@Valid @RequestBody VerifierValiditeTokenRequestDto request) throws JsonIncorrectException {
 
         if (request.getToken() == null) {
-            throw new JsonIncorrectException("Le champs 'token' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE);
         }
 
         VerifierValiditeTokenResponseDto response = new VerifierValiditeTokenResponseDto();
@@ -219,11 +219,11 @@ public class AuthenticationController extends AbstractController{
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(requestHtttp));
 
         if (request.getAncienMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'ancienMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_ANCIEN_MDP_OBLIGATOIRE);
         }
 
         if (request.getNouveauMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'nouveauMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE);
         }
 
         String oldPassword = request.getAncienMotDePasse();
@@ -237,10 +237,10 @@ public class AuthenticationController extends AbstractController{
                 contact.setMotDePasse(newPassword);
                 etablissementService.save(etab);
             } else {
-                throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");
+                throw new PasswordMismatchException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN);
             }
         } else {
-            throw new PasswordMismatchException("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel.");
+            throw new PasswordMismatchException(Constant.ERROR_AUTHENTIFICATION_ANCIEN_MDP_DIFFERENT_DE_ACTUEL);
         }
 
         ModifierMotDePasseResponseDto response = new ModifierMotDePasseResponseDto();
