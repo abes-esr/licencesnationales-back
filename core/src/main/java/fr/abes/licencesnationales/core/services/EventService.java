@@ -2,13 +2,13 @@ package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
@@ -64,7 +64,7 @@ public class EventService {
     public Date getDateCreationEtab(EtablissementEntity etab) {
         Optional<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
         if (!etablissement.isPresent()){
-            throw new UnknownEtablissementException("Etablissement inconnu");
+            throw new UnknownEtablissementException(Constant.ETAB_INCONNU);
         }
         return etablissement.get().getDateCreationEvent();
     }
