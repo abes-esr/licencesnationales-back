@@ -108,7 +108,7 @@ public class IpController extends AbstractController {
             }
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
-                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
+                throw new AccesInterditException(Constant.OPERATION_QUE_PAR_ADMIN);
             }
         }
         IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);

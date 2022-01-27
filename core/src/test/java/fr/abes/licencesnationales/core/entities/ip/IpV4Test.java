@@ -65,7 +65,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("192.168.20-5.15-2", "test", statut);
         });
-        assertEquals("Invalid range [192.168.20.15..192.168.5.2]", exception.getLocalizedMessage());
+        assertEquals("IP v4 invalide : 192.168.20-5.15-2", exception.getLocalizedMessage());
     }
 
     @Test
@@ -113,7 +113,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("154.1399.0.289", "test", statut);
         });
-        assertEquals("Invalid IPv4 address: '154.1399.0.289'", exception.getLocalizedMessage());
+        assertEquals("IP v4 invalide : 154.1399.0.289", exception.getLocalizedMessage());
     }
 
     @Test

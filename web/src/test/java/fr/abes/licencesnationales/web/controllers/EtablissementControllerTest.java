@@ -175,7 +175,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("Erreur dans la saisie : Le siren saisi est déjà utilisé"))
-                .andExpect(jsonPath("$.debugMessage").value("Le siren saisi est déjà utilisé"));
+                .andExpect(jsonPath("$.debugMessage").value(Constant.SIREN_DEJA_UTILISE));
     }
 
     @Test
@@ -266,7 +266,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value("Credentials not valid : L'opération ne peut être effectuée que par un administrateur"))
-                .andExpect(jsonPath("$.debugMessage").value("L'opération ne peut être effectuée que par un administrateur"));
+                .andExpect(jsonPath("$.debugMessage").value(Constant.OPERATION_QUE_PAR_ADMIN));
 
     }
 
@@ -531,8 +531,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_ETAB+"L'établissement ne doit pas déjà être validé"))
-                .andExpect(jsonPath("$.debugMessage").value("L'établissement ne doit pas déjà être validé"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_ETAB+Constant.DEJA_VALIDE))
+                .andExpect(jsonPath("$.debugMessage").value(Constant.DEJA_VALIDE));
     }
 
     @Test
