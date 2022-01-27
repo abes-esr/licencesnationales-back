@@ -29,7 +29,7 @@ class IpV6Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV6 ip = new IpV6(null, "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
@@ -38,7 +38,7 @@ class IpV6Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV6 ip = new IpV6("", "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
