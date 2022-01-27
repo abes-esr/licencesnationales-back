@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.security.services.impl;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import lombok.SneakyThrows;
@@ -35,7 +36,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Transactional
     public UserDetails loadUser(EtablissementEntity etab) {
         if (etab == null) {
-            throw new IllegalArgumentException("L'établissement ne peut pas être nul");
+            throw new IllegalArgumentException(Constant.ETAB_NOTNULL);
         }
         return new UserDetailsImpl(etab);
     }

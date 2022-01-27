@@ -95,6 +95,13 @@ public class Constant implements Serializable {
     public static final String ERROR_EDITEUR_ADRESSE_OBLIGATOIRE = "Le champ 'adresse' de l'éditeur est obligatoire";
     public static final String ERROR_EDITEUR_CONTACT_OBLIGATOIRE = "Au moins un 'contact commercial' ou un 'contact technique' est obligatoire";
 
+    /**  Messages champs manquant Editeur  **/
+    public static final String ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE = "Le champs 'token' est obligatoire";
+    public static final String ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE = "Le champs 'nouveauMotDePasse' est obligatoire";
+    public static final String ERROR_AUTHENTIFICATION_ANCIEN_MDP_OBLIGATOIRE = "Le champs 'ancienMotDePasse' est obligatoire";
+    public static final String ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE = "Le token n'est pas valide";
+    public static final String ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN = "Votre nouveau mot de passe doit être différent de l'ancien";
+    public static final String ERROR_AUTHENTIFICATION_ANCIEN_MDP_DIFFERENT_DE_ACTUEL = "L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel.";
 
     /** Messages de retour controller **/
     public static final String MESSAGE_AJOUTIP_OK = "IP ajoutée avec succès";
@@ -120,6 +127,15 @@ public class Constant implements Serializable {
     public static final String IP_NOTNULL = "Ip ne peut pas être nulle";
     public static final String ETAB_INCONNU = "Etablissement inconnu";
     public static final String IP_UNABLE_TO_DECODE = "Unable to decode IP";
+    public static final String MDP_NOTNULL = "Le mot de passe ne doit pas être nulle ou vide";
+    public static final String ETAB_NOTNULL = "L'établissement ne peut pas être nul";
+    public static final String SIREN_DEJA_UTILISE = "Le siren saisi est déjà utilisé";
+    public static final String SIREN_NE_CORRESPOND_PAS = "Le siren demandé ne correspond pas au siren de l'utilisateur connecté";
+    public static final String STATUT_INCONNU = "Statut inconnu";
+    public static final String METHODE_AUTHENTIFICATION_PAS_SUPPORTEE = "La méthode d'authentification n'est pas supportée";
+    public static final String CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE = "Au moins un des champs 'siren' ou 'email' est obligatoire";
+    public static final String OPERATION_QUE_PAR_ADMIN = "L'opération ne peut être effectuée que par un administrateur";
+    public static final String DEJA_VALIDE = "L'établissement ne doit pas déjà être validé";
 
 
 
