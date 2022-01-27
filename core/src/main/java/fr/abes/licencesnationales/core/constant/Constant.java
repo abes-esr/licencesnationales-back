@@ -114,7 +114,12 @@ public class Constant implements Serializable {
     public static final String EXCEPTION_CAPTCHA_OBLIGATOIRE = "Le champs 'recaptcha' est obligatoire";
     public static final String MESSAGE_MDP_MODIFIER = "Votre mot de passe a bien été modifié";
 
-
+    /** Illegal argument message entité **/
+    public static final String CONTACT_OBLIGATOIRE = "Le contact est obligatoire";
+    public static final String CONTACT_COM_OU_TECH_OBLIGATOIRE = "Le contact doit forcément être commercial ou technique";
+    public static final String IP_NOTNULL = "Ip ne peut pas être nulle";
+    public static final String ETAB_INCONNU = "Etablissement inconnu";
+    public static final String IP_UNABLE_TO_DECODE = "Unable to decode IP";
 
 
 

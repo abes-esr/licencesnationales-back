@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -15,7 +16,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -99,6 +99,6 @@ public class EventServiceTest {
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
         Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact)));
-        Assertions.assertEquals("Etablissement inconnu", ex.getLocalizedMessage());
+        Assertions.assertEquals(Constant.ETAB_INCONNU, ex.getLocalizedMessage());
     }
 }
