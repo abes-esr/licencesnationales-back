@@ -89,7 +89,7 @@ public class EtablissementEntity implements Serializable {
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         if (contact == null) {
-            throw new IllegalArgumentException("Le contact est obligatoire");
+            throw new IllegalArgumentException(Constant.CONTACT_OBLIGATOIRE);
         }
         this.contact = contact;
         this.valide = false;
@@ -110,7 +110,7 @@ public class EtablissementEntity implements Serializable {
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         if (contact == null) {
-            throw new IllegalArgumentException("Le contact est obligatoire");
+            throw new IllegalArgumentException(Constant.CONTACT_OBLIGATOIRE);
         }
         this.contact = contact;
         this.valide = false;
