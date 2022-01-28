@@ -89,7 +89,7 @@ public class JwtTokenProvider {
         try {
             return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody().getSubject();
         } catch (IllegalArgumentException ex) {
-            throw new InvalidTokenException("Token invalide ou absent");
+            throw new InvalidTokenException(Constant.ERROR_TOKEN_INVALID);
         }
     }
 }

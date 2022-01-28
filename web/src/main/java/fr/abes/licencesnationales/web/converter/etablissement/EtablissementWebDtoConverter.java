@@ -217,11 +217,11 @@ public class EtablissementWebDtoConverter {
                         throw new IllegalArgumentException(Constant.ERROR_ETAB_2_ETAB_OBLIGATOIRE);
                     }
                     if (source.getNouveauEtab().getSiren() == null) {
-                        throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                     }
                     EtablissementFusionneEventEntity event = new EtablissementFusionneEventEntity(this, source.getNouveauEtab().getSiren(), Sets.newHashSet(source.getSirenFusionnes()));
                     if (source.getNouveauEtab().getNom() == null) {
-                        throw new IllegalArgumentException("Le champ 'nom' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
                     }
                     event.setNomEtab(source.getNouveauEtab().getNom());
                     event.setTypeEtablissement(source.getNouveauEtab().getTypeEtablissement());
@@ -251,7 +251,7 @@ public class EtablissementWebDtoConverter {
                 EtablissementDiviseWebDto source = context.getSource();
 
                 if (source.getSirenScinde() == null) {
-                    throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                    throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                 }
                 EtablissementDiviseEventEntity etablissementDiviseEvent = new EtablissementDiviseEventEntity(this, source.getSirenScinde());
                 List<EtablissementEntity> listeEtab = new ArrayList<>();

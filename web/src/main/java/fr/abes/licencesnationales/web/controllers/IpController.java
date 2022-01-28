@@ -104,7 +104,7 @@ public class IpController extends AbstractController {
         filtrerAccesServices.autoriserServicesParSiren(etab.getSiren());
         if (dto instanceof IpModifieeUserWebDto) {
             if (!filtrerAccesServices.getSirenFromSecurityContextUser().equals(etab.getSiren())) {
-                throw new AccesInterditException("Impossible de modifier un autre établissement que celui de l'utilisateur");
+                throw new AccesInterditException(Constant.ERROR_MODIFIER_MAUVAIS_ETAB);
             }
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {

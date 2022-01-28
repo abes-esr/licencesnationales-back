@@ -136,6 +136,11 @@ public class Constant implements Serializable {
     public static final String CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE = "Au moins un des champs 'siren' ou 'email' est obligatoire";
     public static final String OPERATION_QUE_PAR_ADMIN = "L'opération ne peut être effectuée que par un administrateur";
     public static final String DEJA_VALIDE = "L'établissement ne doit pas déjà être validé";
+    public static final String ERROR_MODIFIER_MAUVAIS_ETAB = "Impossible de modifier un autre établissement que celui de l'utilisateur";
+    public static final String ERROR_TOKEN_INVALID = "Token invalide ou absent";
+    public static final String ERROR_ACCES_INTERDIT = "Acces interdit";
+    public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
+
 
 
 
