@@ -340,7 +340,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
 
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenThrow(new AccesInterditException("Acces interdit"));
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenThrow(new AccesInterditException(Constant.ERROR_ACCES_INTERDIT));
         this.mockMvc.perform(post("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isUnauthorized());
