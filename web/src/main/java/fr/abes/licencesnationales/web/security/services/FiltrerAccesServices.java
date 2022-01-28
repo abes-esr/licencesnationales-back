@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.security.services;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
@@ -34,12 +35,12 @@ public class FiltrerAccesServices {
 
 
         if (!sirenFromSecurityContextUser.equals(sirenFromController) && !userDetails.getRole().equals("admin")) {
-            log.error("Acces interdit");
-            throw new AccesInterditException("Acces interdit");
+            log.error(Constant.ERROR_ACCES_INTERDIT);
+            throw new AccesInterditException(Constant.ERROR_ACCES_INTERDIT);
         }
         if (!service.existeSiren(sirenFromJwt)) {
-            log.error("Siren absent de la base");
-            throw new SirenIntrouvableException("Siren absent de la base");
+            log.error(Constant.ERROR_SIREN_INTROUVABLE);
+            throw new SirenIntrouvableException(Constant.ERROR_SIREN_INTROUVABLE);
         }
     }
 
@@ -48,14 +49,14 @@ public class FiltrerAccesServices {
         String sirenFromSecurityContextUser = userDetails.getUsername();
         log.debug("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
         if (sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser == null) {
-            log.error("Acces interdit");
-            throw new AccesInterditException("Acces interdit");
+            log.error(Constant.ERROR_ACCES_INTERDIT);
+            throw new AccesInterditException(Constant.ERROR_ACCES_INTERDIT);
         }
         boolean existeSiren = service.existeSiren(sirenFromSecurityContextUser);
         log.debug("existeSiren = " + existeSiren);
         if (!existeSiren) {
-            log.error("Siren absent de la base");
-            throw new SirenIntrouvableException("Siren absent de la base");
+            log.error(Constant.ERROR_SIREN_INTROUVABLE);
+            throw new SirenIntrouvableException(Constant.ERROR_SIREN_INTROUVABLE);
         }
         return sirenFromSecurityContextUser;
     }
