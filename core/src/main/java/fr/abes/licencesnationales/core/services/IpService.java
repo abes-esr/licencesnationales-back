@@ -111,12 +111,12 @@ public class IpService {
     public EtablissementEntity getEtablissementByIp(Integer id) throws UnknownIpException, UnknownEtablissementException {
         Optional<IpEntity> ip = ipRepository.getFirstById(id);
         if (!ip.isPresent()) {
-            throw new UnknownIpException("L'IP " + id + " n'existe pas");
+            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,id));
         }
         IpEntity ipEntity = ip.get();
         EtablissementEntity etab = ipEntity.getEtablissement();
         if (etab == null) {
-            throw new UnknownEtablissementException("L'IP " + ipEntity.getIp() + " n'est pas rattachée à un établissement");
+            throw new UnknownEtablissementException(String.format(Constant.ERROR_IP_MAUVAIS, ipEntity.getIp()));
         }
         return etab;
     }
@@ -124,7 +124,7 @@ public class IpService {
     public IpEntity getFirstById(Integer id) throws UnknownIpException {
         Optional<IpEntity> ipEntity = ipRepository.getFirstById(id);
         if (!ipEntity.isPresent()) {
-            throw new UnknownIpException("L'IP " + id + " n'existe pas");
+            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,id));
         }
         return ipEntity.get();
     }

@@ -110,7 +110,7 @@ public class EtablissementController extends AbstractController {
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
         if (etablissementService.existeSiren(etablissementCreeWebDto.getSiren())) {
             throw new SirenExistException(Constant.SIREN_DEJA_UTILISE);
@@ -295,7 +295,7 @@ public class EtablissementController extends AbstractController {
             }
             return res;
         } catch (Exception e) {
-            throw new DateException("Erreur lors de la recupération de la dernière date de modification : " + e);
+            throw new DateException(Constant.ERROR_RECUP_DERNIERE_DATE_MODIF + e);
         }
     }
 
