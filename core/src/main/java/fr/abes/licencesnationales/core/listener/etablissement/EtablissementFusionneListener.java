@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -57,7 +58,7 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
             throw new MailDoublonException("L'adresse mail " + etab.getContact().getMail() + " renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
         }
         if (service.existeSiren(etab.getSiren())) {
-            throw new SirenExistException("L'établissement " + etab.getSiren() + " existe déjà");
+            throw new SirenExistException(String.format(Constant.ERROR_ETAB_EXISTE_DEJA,etab.getSiren()));
         }
 
         service.save(etab);
