@@ -117,7 +117,7 @@ public class AuthenticationController extends AbstractController{
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
 
         UserDetailsImpl user;
@@ -162,7 +162,7 @@ public class AuthenticationController extends AbstractController{
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.REINITIALISER_MOT_DE_PASSE);
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
 
         if (request.getTokenFromMail() == null) {
