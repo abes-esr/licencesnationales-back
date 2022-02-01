@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.entities.ip;
 
 import com.github.jgonian.ipmath.Ipv6;
 import com.github.jgonian.ipmath.Ipv6Range;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.ip.Ipv6RangeConverter;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
@@ -84,7 +85,7 @@ public class IpV6 extends IpEntity implements Serializable {
         while (iter.hasNext()) {
             Ipv6Range candidate = iter.next();
             if (candidate.contains(this.ipRange)) {
-                throw new IpException(this.ipRange.toString() + " est inclus dans les IP réservées " + candidate.toString());
+                throw new IpException(String.format(Constant.ERROR_IP_RESERVEES,this.ipRange.toString(),candidate));
             }
         }
     }

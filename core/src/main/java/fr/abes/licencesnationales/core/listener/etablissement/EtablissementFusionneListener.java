@@ -1,14 +1,11 @@
 package fr.abes.licencesnationales.core.listener.etablissement;
 
 import fr.abes.licencesnationales.core.constant.Constant;
-import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
-import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
-import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
 import lombok.SneakyThrows;
@@ -16,7 +13,6 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
 import javax.transaction.Transactional;
-import java.util.Optional;
 
 @Component
 public class EtablissementFusionneListener implements ApplicationListener<EtablissementFusionneEventEntity> {
@@ -55,10 +51,10 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
         }
 
         if (service.existeMail(etab.getContact().getMail())) {
-            throw new MailDoublonException("L'adresse mail " + etab.getContact().getMail() + " renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.");
+            throw new MailDoublonException(String.format(Constant.ERROR_MAIL_DOUBLON,etab.getContact().getMail()));
         }
         if (service.existeSiren(etab.getSiren())) {
-            throw new SirenExistException(String.format(Constant.ERROR_ETAB_EXISTE_DEJA,etab.getSiren()));
+            throw new SirenExistException(String.format(Constant.ERROR_ETAB_DOUBLON,etab.getSiren()));
         }
 
         service.save(etab);
