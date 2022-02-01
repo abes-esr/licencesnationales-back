@@ -71,6 +71,7 @@ public class Constant implements Serializable {
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
+    public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
 
     /**  Messages champs manquant IP  **/
     public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";
@@ -145,11 +146,14 @@ public class Constant implements Serializable {
     public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
 
     /** STRING avec variable **/
-    public static final String ERROR_ETAB_EXISTE_DEJA = "L'établissement %s existe déjà";
+    public static final String ERROR_ETAB_DOUBLON = "L'établissement %s existe déjà";
+    public static final String ERROR_IP_DOUBLON = "L'IP %s est déjà utilisée";
+    public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
     public static final String ERROR_IP_MAUVAIS = "L'IP %s n'est pas rattachée à un établissement";
     public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
-    public static final String ERROR_IPV4_IP_RESERVEES = "%s est inclus dans les IP réservées %s";
+    public static final String ERROR_IP_RESERVEES = "%s est inclus dans les IP réservées %s";
+
 
 
 }
