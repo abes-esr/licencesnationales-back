@@ -86,7 +86,7 @@ public class IpV4 extends IpEntity implements Serializable {
         while (iter.hasNext()) {
             Ipv4Range candidate = iter.next();
             if (candidate.contains(this.ipRange)) {
-                throw new IpException(String.format(Constant.ERROR_IPV4_IP_RESERVEES,this.ipRange.toString(),candidate));
+                throw new IpException(String.format(Constant.ERROR_IP_RESERVEES,this.ipRange.toString(),candidate));
             }
         }
     }
