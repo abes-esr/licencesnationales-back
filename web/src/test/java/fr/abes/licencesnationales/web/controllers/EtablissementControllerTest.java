@@ -265,7 +265,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(etab)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Credentials not valid : L'opération ne peut être effectuée que par un administrateur"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS + "L'opération ne peut être effectuée que par un administrateur"))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.OPERATION_QUE_PAR_ADMIN));
 
     }

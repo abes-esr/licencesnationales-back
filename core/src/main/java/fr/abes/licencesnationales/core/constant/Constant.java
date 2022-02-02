@@ -72,6 +72,7 @@ public class Constant implements Serializable {
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
+    public static final String ERROR_CREDENTIALS = "Credentials not valid : " ;
 
     /**  Messages champs manquant IP  **/
     public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";
