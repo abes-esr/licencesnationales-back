@@ -113,7 +113,7 @@ public class EtablissementController extends AbstractController {
             throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
         if (etablissementService.existeSiren(etablissementCreeWebDto.getSiren())) {
-            throw new SirenExistException(Constant.SIREN_DEJA_UTILISE);
+            throw new SirenExistException(Constant.SIREN_DOUBLON);
         }
         if (etablissementService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
             throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);

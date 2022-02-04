@@ -99,6 +99,6 @@ public class EventServiceTest {
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
         Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact)));
-        Assertions.assertEquals(Constant.ETAB_INCONNU, ex.getLocalizedMessage());
+        Assertions.assertEquals(String.format(Constant.ERROR_ETAB_EXISTE_PAS,"111111111"), ex.getMessage());
     }
 }
