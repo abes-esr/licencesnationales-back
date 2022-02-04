@@ -25,7 +25,7 @@ public class ReferenceService {
 
     public TypeEtablissementEntity findTypeEtabById(Integer id) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findById(id);
-        if (!entity.isPresent()) {
+        if (entity.isEmpty()) {
             throw new UnknownTypeEtablissementException(Constant.ERROR_TYPEETAB_INCONNU + id);
         }
         return entity.get();
@@ -33,7 +33,7 @@ public class ReferenceService {
 
     public TypeEtablissementEntity findTypeEtabByLibelle(String libelle) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findFirstByLibelle(libelle);
-        if (!entity.isPresent()) {
+        if (entity.isEmpty()) {
             throw new UnknownTypeEtablissementException(Constant.ERROR_TYPEETAB_INCONNU + libelle);
         }
         return entity.get();
@@ -45,7 +45,7 @@ public class ReferenceService {
 
     public StatutEntity findStatutById(Integer id) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findById(id);
-        if (!entity.isPresent()) {
+        if (entity.isEmpty()) {
             throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();
@@ -53,7 +53,7 @@ public class ReferenceService {
 
     public StatutEntity findStatutByLibelle(String libelle) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findFirstByLibelleStatut(libelle);
-        if (!entity.isPresent()) {
+        if (entity.isEmpty()) {
             throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();

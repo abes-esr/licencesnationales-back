@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.batch.gestionCompte;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.services.EtablissementService;

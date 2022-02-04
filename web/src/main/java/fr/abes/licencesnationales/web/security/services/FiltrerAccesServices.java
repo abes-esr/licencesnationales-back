@@ -35,8 +35,8 @@ public class FiltrerAccesServices {
 
 
         if (!sirenFromSecurityContextUser.equals(sirenFromController) && !userDetails.getRole().equals("admin")) {
-            log.error(Constant.ERROR_ACCES_INTERDIT);
-            throw new AccesInterditException(Constant.ERROR_ACCES_INTERDIT);
+            log.error(Constant.ACCES_INTERDIT);
+            throw new AccesInterditException(Constant.ACCES_INTERDIT);
         }
         if (!service.existeSiren(sirenFromJwt)) {
             log.error(Constant.ERROR_SIREN_INTROUVABLE);
@@ -49,8 +49,8 @@ public class FiltrerAccesServices {
         String sirenFromSecurityContextUser = userDetails.getUsername();
         log.debug("sirenFromSecurityContextUser = " + sirenFromSecurityContextUser);
         if (sirenFromSecurityContextUser.equals("") || sirenFromSecurityContextUser == null) {
-            log.error(Constant.ERROR_ACCES_INTERDIT);
-            throw new AccesInterditException(Constant.ERROR_ACCES_INTERDIT);
+            log.error(Constant.ACCES_INTERDIT);
+            throw new AccesInterditException(Constant.ACCES_INTERDIT);
         }
         boolean existeSiren = service.existeSiren(sirenFromSecurityContextUser);
         log.debug("existeSiren = " + existeSiren);

@@ -73,6 +73,7 @@ public class Constant implements Serializable {
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
     public static final String ERROR_CREDENTIALS = "Credentials not valid : " ;
+    public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
 
     /**  Messages champs manquant IP  **/
     public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";
@@ -100,10 +101,10 @@ public class Constant implements Serializable {
     public static final String ERROR_EDITEUR_ADRESSE_OBLIGATOIRE = "Le champ 'adresse' de l'éditeur est obligatoire";
     public static final String ERROR_EDITEUR_CONTACT_OBLIGATOIRE = "Au moins un 'contact commercial' ou un 'contact technique' est obligatoire";
 
-    /**  Messages champs manquant Editeur  **/
-    public static final String ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE = "Le champs 'token' est obligatoire";
-    public static final String ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE = "Le champs 'nouveauMotDePasse' est obligatoire";
-    public static final String ERROR_AUTHENTIFICATION_ANCIEN_MDP_OBLIGATOIRE = "Le champs 'ancienMotDePasse' est obligatoire";
+    /**  Messages champs manquant Authentification  **/
+    public static final String ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE = "Le champ 'token' est obligatoire";
+    public static final String ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE = "Le champ 'nouveauMotDePasse' est obligatoire";
+    public static final String ERROR_AUTHENTIFICATION_ANCIEN_MDP_OBLIGATOIRE = "Le champ 'ancienMotDePasse' est obligatoire";
     public static final String ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE = "Le token n'est pas valide";
     public static final String ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN = "Votre nouveau mot de passe doit être différent de l'ancien";
     public static final String ERROR_AUTHENTIFICATION_ANCIEN_MDP_DIFFERENT_DE_ACTUEL = "L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel.";
@@ -130,11 +131,10 @@ public class Constant implements Serializable {
     public static final String CONTACT_OBLIGATOIRE = "Le contact est obligatoire";
     public static final String CONTACT_COM_OU_TECH_OBLIGATOIRE = "Le contact doit forcément être commercial ou technique";
     public static final String IP_NOTNULL = "Ip ne peut pas être nulle";
-    public static final String ETAB_INCONNU = "Etablissement inconnu";
     public static final String IP_UNABLE_TO_DECODE = "Unable to decode IP";
     public static final String MDP_NOTNULL = "Le mot de passe ne doit pas être nulle ou vide";
     public static final String ETAB_NOTNULL = "L'établissement ne peut pas être nul";
-    public static final String SIREN_DEJA_UTILISE = "Le siren saisi est déjà utilisé";
+    public static final String SIREN_DOUBLON = "Le siren saisi est déjà utilisé";
     public static final String SIREN_NE_CORRESPOND_PAS = "Le siren demandé ne correspond pas au siren de l'utilisateur connecté";
     public static final String STATUT_INCONNU = "Statut inconnu";
     public static final String METHODE_AUTHENTIFICATION_PAS_SUPPORTEE = "La méthode d'authentification n'est pas supportée";
@@ -143,7 +143,6 @@ public class Constant implements Serializable {
     public static final String DEJA_VALIDE = "L'établissement ne doit pas déjà être validé";
     public static final String ERROR_MODIFIER_MAUVAIS_ETAB = "Impossible de modifier un autre établissement que celui de l'utilisateur";
     public static final String ERROR_TOKEN_INVALID = "Token invalide ou absent";
-    public static final String ERROR_ACCES_INTERDIT = "Acces interdit";
     public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
 
     /** STRING avec variable **/
@@ -151,10 +150,11 @@ public class Constant implements Serializable {
     public static final String ERROR_IP_DOUBLON = "L'IP %s est déjà utilisée";
     public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
+    public static final String ERROR_ETAB_EXISTE_PAS = "L'Etablissement %s n'existe pas";
     public static final String ERROR_IP_MAUVAIS = "L'IP %s n'est pas rattachée à un établissement";
-    public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
     public static final String ERROR_IP_RESERVEES = "%s est inclus dans les IP réservées %s";
-
+    public static final String ERROR_UTILISATEUR_NOT_FOUND_MAIL = "L'utilisateur avec l'email '%s' n'existe pas";
+    public static final String ERROR_UTILISATEUR_NOT_FOUND_SIREN = "L'utilisateur avec le SIREN '%s' n'existe pas";
 
 
 }

@@ -127,14 +127,14 @@ public class AuthenticationController extends AbstractController{
                 user = (UserDetailsImpl)userService.loadUser(etablissementService.getUserByMail(dto.getEmail()));
 
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec l'email '" + dto.getEmail() + "' n'existe pas");
+                throw new UsernameNotFoundException(String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_MAIL,dto.getEmail()));
             }
         }
         else if (dto.getSiren() != null) {
             try {
                 user = (UserDetailsImpl)userService.loadUser(etablissementService.getFirstBySiren(dto.getSiren()));
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + dto.getSiren() + "' n'existe pas");
+                throw new UsernameNotFoundException(String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_SIREN,dto.getSiren()));
             }
         } else {
             throw new JsonIncorrectException(Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE);
