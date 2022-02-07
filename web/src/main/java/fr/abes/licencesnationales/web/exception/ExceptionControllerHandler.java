@@ -181,6 +181,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler({AuthenticationException.class, AccesInterditException.class, SirenIntrouvableException.class})
     protected ResponseEntity<Object> handleAuthentificationException(Exception ex) {
         String error = Constant.ERROR_CREDENTIALS + ex.getMessage();
+
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
