@@ -4,6 +4,7 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
@@ -12,16 +13,18 @@ import fr.abes.licencesnationales.core.exception.AccesInterditException;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
-import fr.abes.licencesnationales.core.services.EditeurService;
-import fr.abes.licencesnationales.core.services.EventService;
-import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
+import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEditeur;
+import fr.abes.licencesnationales.core.services.export.editeur.*;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurWebDto;
+import fr.abes.licencesnationales.web.exception.SendMailException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,11 +32,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -57,7 +58,40 @@ public class EditeurController extends AbstractController {
     private ReferenceService referenceService;
 
     @Autowired
+    private EmailService emailService;
+
+    @Autowired
     private ExportEditeur exportEditeur;
+
+    @Autowired
+    private ExportEditeurDeletedAccess exportEditeurDeletedAccess;
+
+    @Autowired
+    private ExportEditeurDeletedInstitutions exportEditeurDeletedInstitutions;
+
+    @Autowired
+    private ExportEditeurListAll exportEditeurListAll;
+
+    @Autowired
+    private ExportEditeurMergedInstitutions exportEditeurMergedInstitutions;
+
+    @Autowired
+    private ExportEditeurModifiedInstitutions exportEditeurModifiedInstitutions;
+
+    @Autowired
+    private ExportEditeurNewAccess exportEditeurNewAccess;
+
+    @Autowired
+    private ExportEditeurNewInstitutions exportEditeurNewInstitutions;
+
+    @Autowired
+    private ExportEditeurSplitInstitutions exportEditeurSplitInstitutions;
+
+    @Autowired
+    private DateEnvoiEditeurRepository dateEnvoiEditeurRepository;
+
+    @Value("${ln.dest.notif.admin}")
+    private String mailAdmin;
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
@@ -125,7 +159,33 @@ public class EditeurController extends AbstractController {
         response.flushBuffer();
     }
 
-    public ResponseEntity<Object> envoiMensuel() throws FileNotFoundException, IOException {
+    @GetMapping(value = "/exportMensuelEditeur")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<Object> envoiMensuel() throws SendMailException {
+        List<String> erreurMails = new ArrayList<>();
+        editeurService.findAllEditeur().stream().forEach(editeurEntity -> {
+            Map<String, ByteArrayInputStream> mapFichiers = new HashMap<>();
+            List<Integer> listeTypesEditeurs = editeurEntity.getTypeEtablissements().stream().map(t -> t.getId()).collect(Collectors.toList());
+            mapFichiers.put("deletedAccess.csv", exportEditeurDeletedAccess.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("newAccess.csv", exportEditeurNewAccess.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(listeTypesEditeurs));
+            mapFichiers.put("splitInstitutions.csv", exportEditeurSplitInstitutions.generateCsv(listeTypesEditeurs));
+            try {
+                //on envoie le mail aux contacts techniques (concaténation des adresse mails avec un ;) avec copie à l'admin LN
+                emailService.constructEnvoiFichierEditeurs(editeurEntity.getContactsTechniques().stream().map(c -> c.getMail()).collect(Collectors.joining(";")), mailAdmin, mapFichiers);
+            } catch (IOException e) {
+                erreurMails.add(editeurEntity.getNom());
+            }
+        });
+        if (erreurMails.size() != 0) {
+            throw new SendMailException("aux éditeurs : " + String.join(",", erreurMails));
+        }
+        //sauvegarde de la date d'envoi des fichiers aux éditeurs pour envois ultérieurs
+        dateEnvoiEditeurRepository.save(new DateEnvoiEditeurEntity(Calendar.getInstance().getTime()));
         return buildResponseEntity(Constant.MESSAGE_ENVOI_OK);
     }
 }

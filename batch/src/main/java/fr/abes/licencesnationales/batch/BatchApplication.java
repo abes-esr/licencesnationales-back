@@ -35,7 +35,7 @@ public class BatchApplication {
         jobLauncher.run((Job) ctx.getBean("jobRelances"), new JobParameters());
 
         long endTime = System.currentTimeMillis();
-        log.debug("Timing " + (endTime - startTime) + " ms");
+        log.info("Timing " + (endTime - startTime) + " ms");
         System.exit(SpringApplication.exit(ctx));
     }
 }
