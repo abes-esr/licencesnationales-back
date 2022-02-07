@@ -266,7 +266,7 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void constructEnvoiFichierEditeurs(String mailEditeur, String mailAdmin, List<File> listeFichier) throws IOException {
+    public void constructEnvoiFichierEditeurs(String mailEditeur, String mailAdmin, Map<String, ByteArrayInputStream> listeFichier) throws IOException {
         String subject = getEnv() + "Licences nationales France – Mise à jour des adresses IP des bénéficiaires / French national licences - beneficiaries' IP update";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Veuillez trouver en pièce jointe les adresses IP ainsi que les informations afférentes des bénéficiaires de la licence nationale.<br><br>");
@@ -321,18 +321,18 @@ public class EmailService {
     }
 
 
-    public void sendMailWithAttachments(String requestJson, List<File> listeFichiers) throws FileNotFoundException, IOException {
+    public void sendMailWithAttachments(String requestJson, Map<String,ByteArrayInputStream> listeFichiers) throws IOException {
         HttpPost uploadFile = new HttpPost(mailServerURL + "v2/htmlMailAttachment/");
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addTextBody("mail", requestJson, ContentType.APPLICATION_JSON);
 
         /*Ajout des fichiers au mail d'envoi*/
-        for(File f : listeFichiers){
+        for(Map.Entry nomFichier : listeFichiers.entrySet()){
                 builder.addBinaryBody(
                         "attachment",
-                        new FileInputStream(f),
+                        ((ByteArrayInputStream)nomFichier.getValue()).readAllBytes(),
                         ContentType.APPLICATION_OCTET_STREAM,
-                        f.getName()
+                        (String)nomFichier.getKey()
                 );
         }
 

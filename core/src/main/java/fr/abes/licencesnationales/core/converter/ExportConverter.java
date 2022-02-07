@@ -4,6 +4,7 @@ import fr.abes.licencesnationales.core.dto.export.*;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
@@ -174,6 +175,56 @@ public class ExportConverter {
                 dto.setDateModificationStatut(format.format(entity.getDateModification()));
                 dto.setStatut(entity.getStatut().getLibelleStatut());
                 dto.setCommentaire(entity.getCommentaires());
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterExportEtablissementEditeur() {
+        Converter<EtablissementEntity, ExportEtablissementEditeurDto> myConverter = new Converter<EtablissementEntity, ExportEtablissementEditeurDto>() {
+
+            public ExportEtablissementEditeurDto convert(MappingContext<EtablissementEntity, ExportEtablissementEditeurDto> context) {
+                EtablissementEntity etab = context.getSource();
+                ExportEtablissementEditeurDto dto = new ExportEtablissementEditeurDto();
+                dto.setIdEtablissement(etab.getIdAbes());
+                dto.setNomEtablissement(etab.getNom());
+                dto.setTypeEtablissement(etab.getTypeEtablissement().getLibelle());
+                dto.setAdresse(etab.getContact().getAdresse());
+                dto.setBoitePostale(etab.getContact().getBoitePostale());
+                dto.setCodePostal(etab.getContact().getCodePostal());
+                dto.setCedex(etab.getContact().getCedex());
+                dto.setVille(etab.getContact().getVille());
+                dto.setNomContact(etab.getContact().getNom() + " " + etab.getContact().getPrenom());
+                dto.setMailContact(etab.getContact().getMail());
+                dto.setTelephoneContact(etab.getContact().getTelephone());
+                etab.getIps().forEach(i -> dto.ajouterAcces(i.getIp()));
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterExportEtablissementFusionneEditeur() {
+        Converter<EtablissementFusionneEventEntity, ExportEtablissementEditeurFusionDto> myConverter = new Converter<EtablissementFusionneEventEntity, ExportEtablissementEditeurFusionDto>() {
+
+            public ExportEtablissementEditeurFusionDto convert(MappingContext<EtablissementFusionneEventEntity, ExportEtablissementEditeurFusionDto> context) {
+                EtablissementFusionneEventEntity etab = context.getSource();
+                ExportEtablissementEditeurFusionDto dto = new ExportEtablissementEditeurFusionDto();
+                dto.setIdEtablissement(etab.getIdAbes());
+                dto.setNomEtablissement(etab.getNomEtab());
+                dto.setTypeEtablissement(etab.getTypeEtablissement());
+                dto.setAdresse(etab.getAdresseContact());
+                dto.setBoitePostale(etab.getBoitePostaleContact());
+                dto.setCodePostal(etab.getCodePostalContact());
+                dto.setCedex(etab.getCedexContact());
+                dto.setVille(etab.getVilleContact());
+                dto.setNomContact(etab.getNomContact() + " " + etab.getPrenomContact());
+                dto.setMailContact(etab.getMailContact());
+                dto.setTelephoneContact(etab.getTelephoneContact());
+                dto.setSirensFusionnes(etab.getSirenAnciensEtablissements());
                 return dto;
             }
         };

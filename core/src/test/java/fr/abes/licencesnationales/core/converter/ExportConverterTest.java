@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.converter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEditeurDto;
+import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
 import fr.abes.licencesnationales.core.dto.export.ExportIpDto;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -215,5 +216,31 @@ class ExportConverterTest {
         Assertions.assertEquals("testType",dto.getStatut());
         Assertions.assertEquals(format.format(today),dto.getDateCreation());
         Assertions.assertEquals(format.format(today),dto.getDateModificationStatut());
+    }
+
+    @Test
+    @DisplayName("Test convertisseur export éditeur établissement")
+    void testMapperExportEtablissementEditeur() throws IpException {
+        ContactEntity contact = new ContactEntity("nom2", "prenom2", "adresse", "BP2", "11111", "ville2", null, "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        IpEntity ip1 = new IpV4(1,"192.162.0-0.1-10","test",new StatutIpEntity(1,"Validé"));
+        IpEntity ip2 = new IpV4(2,"192.162.0-0.1-20","test",new StatutIpEntity(1,"Validé"));
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+
+
+        ExportEtablissementEditeurDto dto = mapper.map(etab, ExportEtablissementEditeurDto.class);
+        Assertions.assertEquals("123456", dto.getIdEtablissement());
+        Assertions.assertEquals("nomEtab", dto.getNomEtablissement());
+        Assertions.assertEquals("validé", dto.getTypeEtablissement());
+        Assertions.assertEquals("adresse", dto.getAdresse());
+        Assertions.assertEquals("BP2", dto.getBoitePostale());
+        Assertions.assertEquals("11111", dto.getCodePostal());
+        Assertions.assertEquals(null, dto.getCedex());
+        Assertions.assertEquals("ville2", dto.getVille());
+        Assertions.assertEquals("nom2 prenom2", dto.getNomContact());
+        Assertions.assertEquals("mail2@test.com", dto.getMailContact());
+        Assertions.assertEquals("1111111111", dto.getTelephoneContact());
+        Assertions.assertEquals(2, dto.getListeAcces().size());
     }
 }
