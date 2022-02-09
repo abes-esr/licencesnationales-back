@@ -147,7 +147,8 @@ public class EtablissementController {
             }
         }
         EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
-        if (!(etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail()))) {
+        String ancienMail = etabInBdd.getContact().getMail();
+        if (!(ancienMail.equals(etablissementModifieWebDto.getContact().getMail()))) {
             if (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail())) {
                 throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
             }
@@ -159,7 +160,7 @@ public class EtablissementController {
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
         if (envoiMail) {
-            emailService.constructModificationMailAdmin(mailAdmin, etabInBdd.getNom(), etabInBdd.getContact().getMail(), etablissementModifieWebDto.getContact().getMail());
+            emailService.constructModificationMailAdmin(mailAdmin, etabInBdd.getNom(), ancienMail, etablissementModifieWebDto.getContact().getMail());
         }
     }
 
