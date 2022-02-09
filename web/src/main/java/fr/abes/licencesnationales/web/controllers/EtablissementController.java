@@ -253,7 +253,6 @@ public class EtablissementController {
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException, SirenIntrouvableException, AccesInterditException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
-        //UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }
