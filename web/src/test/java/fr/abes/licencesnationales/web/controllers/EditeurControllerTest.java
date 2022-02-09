@@ -351,7 +351,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         fileContent += "identifiant2;nomEditeur2;adresse2;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
         String json = "[1,2]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
@@ -379,7 +379,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         String fileContent = "ID éditeur;Nom de l'éditeur;Adresse de l'éditeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         String json = "[1]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
@@ -410,7 +410,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         fileContent += "identifiant;nomEditeur;adresse;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         String json = "[1]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());

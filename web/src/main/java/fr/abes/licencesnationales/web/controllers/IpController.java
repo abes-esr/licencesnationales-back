@@ -18,8 +18,6 @@ import fr.abes.licencesnationales.core.services.export.ExportIp;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeWebDto;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
 import lombok.extern.java.Log;
@@ -94,28 +92,6 @@ public class IpController extends AbstractController {
         }
         return buildResponseEntity(Constant.MESSAGE_AJOUTIP_OK);
 
-    }
-
-    @PostMapping(value = "/{id}")
-    public ResponseEntity<Object> modifIp(@PathVariable Integer id, @Valid @RequestBody IpModifieeWebDto dto, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, UnknownIpException, InvalidTokenException {
-        EtablissementEntity etab = ipService.getEtablissementByIp(id);
-        filtrerAccesServices.autoriserServicesParSiren(etab.getSiren());
-        if (dto instanceof IpModifieeUserWebDto) {
-            if (!filtrerAccesServices.getSirenFromSecurityContextUser().equals(etab.getSiren())) {
-                throw new AccesInterditException("Impossible de modifier un autre établissement que celui de l'utilisateur");
-            }
-        } else {
-            if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
-                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
-            }
-        }
-        IpModifieeEventEntity ipModifieeEvent = mapper.map(dto, IpModifieeEventEntity.class);
-        ipModifieeEvent.setSource(this);
-        ipModifieeEvent.setSiren(etab.getSiren());
-        ipModifieeEvent.setIpId(id);
-        applicationEventPublisher.publishEvent(ipModifieeEvent);
-        eventRepository.save(ipModifieeEvent);
-        return buildResponseEntity(Constant.MESSAGE_MODIFIP_OK);
     }
 
     @PostMapping(value = "/gerer/{siren}")

@@ -6,12 +6,9 @@ import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.event.IpModifieeEventEntity;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.Ipv4AjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.Ipv6AjouteeWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeAdminWebDto;
-import fr.abes.licencesnationales.web.dto.ip.modification.IpModifieeUserWebDto;
 import org.modelmapper.Converter;
 import org.modelmapper.MappingException;
 import org.modelmapper.spi.ErrorMessage;
@@ -98,60 +95,6 @@ public class IpWebDtoConverter {
                     IpCreeEventEntity eventEntity = new IpCreeEventEntity(this, source.getIp(), source.getCommentaires());
                     eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
                     eventEntity.setTypeIp(IpType.IPV6);
-                    return eventEntity;
-                } catch (IllegalArgumentException ex) {
-                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
-                }
-            }
-        };
-        utilsMapper.addConverter(myConverter);
-    }
-
-    @Bean
-    public void converterIpv4ModifieeUserWebDtoIpModidieEvent() {
-        Converter<IpModifieeUserWebDto, IpModifieeEventEntity> myConverter = new Converter<IpModifieeUserWebDto, IpModifieeEventEntity>() {
-
-            public IpModifieeEventEntity convert(MappingContext<IpModifieeUserWebDto, IpModifieeEventEntity> context) {
-                try {
-                    IpModifieeUserWebDto source = context.getSource();
-                    if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
-                    }
-                    IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
-                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
-                    if (source.getTypeIp() == null) {
-                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
-                    }
-                    eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
-                    return eventEntity;
-                } catch (IllegalArgumentException ex) {
-                    throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
-                }
-            }
-        };
-        utilsMapper.addConverter(myConverter);
-    }
-
-    @Bean
-    public void converterIpModifieeAdminWebDtoIpModidieEvent() {
-        Converter<IpModifieeAdminWebDto, IpModifieeEventEntity> myConverter = new Converter<IpModifieeAdminWebDto, IpModifieeEventEntity>() {
-
-            public IpModifieeEventEntity convert(MappingContext<IpModifieeAdminWebDto, IpModifieeEventEntity> context) {
-                try {
-                    IpModifieeAdminWebDto source = context.getSource();
-                    if (source.getIp() == null) {
-                        throw new IllegalArgumentException("Le champs 'ip' est obligatoire");
-                    }
-                    IpModifieeEventEntity eventEntity = new IpModifieeEventEntity(this, source.getIp(), source.getCommentaires());
-                    eventEntity.setTypeAcces((source.getIp().contains("-")) ? "range" : "ip");
-                    if (source.getTypeIp() == null) {
-                        throw new IllegalArgumentException("Le champ 'typeIp' est obligatoire");
-                    }
-                    eventEntity.setTypeIp(Enum.valueOf(IpType.class, source.getTypeIp()));
-                    if (source.getStatut() == null) {
-                        throw new IllegalArgumentException("Le champ 'statut' est obligatoire");
-                    }
-                    eventEntity.setStatut(source.getStatut());
                     return eventEntity;
                 } catch (IllegalArgumentException ex) {
                     throw new MappingException(Arrays.asList(new ErrorMessage(ex.getMessage())));
