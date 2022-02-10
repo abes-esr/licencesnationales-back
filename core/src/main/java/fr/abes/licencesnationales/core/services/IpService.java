@@ -19,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.*;
 
 
@@ -134,5 +137,24 @@ public class IpService {
         Calendar dateJour = new GregorianCalendar();
         dateJour.add(Calendar.YEAR, -1);
         return ipRepository.getAllByStatutAndDateModificationIsBefore((StatutIpEntity) statut, dateJour.getTime());
+    }
+
+    public String whoIs(String ip) throws Exception {
+        String result = "";
+        try {
+            Runtime r = Runtime.getRuntime();
+            Process p = r.exec("whois " + ip);
+            p.waitFor();
+            BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            result = stdInput.readLine();
+            int c;
+            while ((c = stdInput.read()) != -1) {
+                result += (char) c;
+            }
+        } catch (IOException | InterruptedException e) {
+            log.error("ERREUR LORS DU WHOIS : " + e.toString());
+            throw new Exception("Impossible d'éxecuter le WhoIs");
+        }
+        return result.replaceAll("\n", "<br />");
     }
 }
