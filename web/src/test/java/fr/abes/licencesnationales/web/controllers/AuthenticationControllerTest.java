@@ -111,9 +111,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS + "Bad credentials"))
-                .andExpect(jsonPath("$.debugMessage").value("test"))
-                .andExpect(content().string(containsString("Bad credentials")));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS + Constant.WRONG_LOGIN_AND_OR_PASS));
     }
 
     @Test
@@ -128,10 +126,9 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(jsonPath("$.debugMessage").value("test"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS))
                 .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")))
-                .andExpect(content().string(containsString("SIREN obligatoire (login)")))
+                .andExpect(content().string(containsString(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE)))
                 .andExpect(content().string(containsString("Mot de passe obligatoire (password)")));
     }
 
@@ -146,7 +143,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS))
                 .andExpect(jsonPath("$.debugMessage").value("test"))
                 .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")));
     }
@@ -338,7 +335,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS))
                 .andExpect(jsonPath("$.debugMessage").value("test"))
                 .andExpect(content().string(containsString("Votre mot de passe doit contenir au minimum 8 caractères")));
 
@@ -442,7 +439,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS))
                 .andExpect(jsonPath("$.debugMessage").value("test"))
                 .andExpect(content().string(containsString("Votre mot de passe doit contenir au minimum 8 caractères")));
     }

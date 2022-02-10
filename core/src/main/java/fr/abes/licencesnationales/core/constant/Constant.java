@@ -62,7 +62,7 @@ public class Constant implements Serializable {
     public static final String ERROR_SAISIE = "Erreur dans la saisie : ";
     public static final String ERROR_RECAPTCHA = "Erreur Recaptcha : " ;
     public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
-    public static final String ERROR_ETAB = "Erreur dans le statut de l'établissement : ";
+    public static final String ERROR_STATUT_IP = "Erreur statut Ip : ";
     public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
     public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
@@ -72,8 +72,9 @@ public class Constant implements Serializable {
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
-    public static final String ERROR_CREDENTIALS = "Credentials not valid : " ;
+    public static final String ERROR_CREDENTIALS = "Erreur d'authentification : " ;
     public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
+    public static final String ERROR_IPV6_INVALIDE = "IP v6 invalide : ";
 
     /**  Messages champs manquant IP  **/
     public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";

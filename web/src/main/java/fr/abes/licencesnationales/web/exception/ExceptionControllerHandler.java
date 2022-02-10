@@ -105,7 +105,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = "The credentials are not valid";
+        String error = Constant.ERROR_CREDENTIALS;
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
         StringBuilder msg = new StringBuilder("Incorrect fields : ");
@@ -211,7 +211,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BadStatutException.class)
     protected ResponseEntity<Object> handleBadStatutEcception(BadStatutException ex) {
-        String error = Constant.ERROR_ETAB + ex.getMessage();
+        String error = Constant.ERROR_STATUT_IP + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 

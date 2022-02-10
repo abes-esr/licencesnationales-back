@@ -531,7 +531,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_ETAB+Constant.DEJA_VALIDE))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_STATUT_IP +Constant.DEJA_VALIDE))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.DEJA_VALIDE));
     }
 

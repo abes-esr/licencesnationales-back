@@ -29,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -79,9 +80,14 @@ public class AuthenticationController extends AbstractController{
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/connexion")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody ConnexionRequestDto loginRequest) {
-        UsernamePasswordAuthenticationToken credential = new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(credential);
+        Authentication authentication;
+        try {
+            UsernamePasswordAuthenticationToken credential = new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword());
 
+            authentication = authenticationManager.authenticate(credential);
+        }catch (AuthenticationException ex){
+            throw new AuthenticationServiceException(Constant.WRONG_LOGIN_AND_OR_PASS);
+        }
         if (authentication == null) {
             throw new AuthenticationServiceException(Constant.METHODE_AUTHENTIFICATION_PAS_SUPPORTEE);
         }
