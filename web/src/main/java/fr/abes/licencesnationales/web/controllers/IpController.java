@@ -201,4 +201,10 @@ public class IpController extends AbstractController {
         IOUtils.copy(stream , response.getOutputStream());
         response.flushBuffer();
     }
+
+    @GetMapping(value = "/whois/{ip}")
+    public String whoIs(@PathVariable String ip) throws Exception {
+        return ipService.whoIs(ip);
+    }
+
 }
