@@ -43,9 +43,13 @@ public class IpV6 extends IpEntity implements Serializable {
      */
     public IpV6(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         super(ip, commentaires, statut);
-        // On transforme la chaîne de caractère normée en Objet Java
-        this.ipRange = Ipv6Range.from(IpUtils.getIP(ip, IpType.IPV6, 1)).to(IpUtils.getIP(ip, IpType.IPV6, 2));
-        this.checkIfReserved();
+        try {
+            // On transforme la chaîne de caractère normée en Objet Java
+            this.ipRange = Ipv6Range.from(IpUtils.getIP(ip, IpType.IPV6, 1)).to(IpUtils.getIP(ip, IpType.IPV6, 2));
+            this.checkIfReserved();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(Constant.ERROR_IPV6_INVALIDE + ip);
+        }
     }
 
     /**
