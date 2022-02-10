@@ -51,10 +51,10 @@ public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportE
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurScissionDto item) throws IOException {
         List<String> output = writeCommonLine(item.getIdEtablissement(), item.getNomEtablissement(), item.getTypeEtablissement(), item.getAdresse(), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), item.getVille(), item.getNomContact(), item.getMailContact(), item.getTelephoneContact());
+        output.add(item.getSirenScinde());
         for (String ip : item.getListeAcces()) {
             output.add(ip);
         }
-        output.add(item.getSirenScinde());
         printer.printRecord(output);
     }
 
@@ -62,7 +62,7 @@ public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportE
     protected List<ExportEtablissementEditeurScissionDto> getItems(List<Integer> ids) {
         List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(ids);
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
-        return mapper.mapList(etabs.stream().filter(e -> {
+        List<ExportEtablissementEditeurScissionDto> dtos = mapper.mapList(etabs.stream().filter(e -> {
             Date dateModificationEtab = eventService.getDateScissionEtab(e);
             if (dateModificationEtab == null) {
                 return false;
@@ -70,6 +70,7 @@ public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportE
                 return dateModificationEtab.after(dateDernierEnvoi);
             }
         }).collect(Collectors.toList()), ExportEtablissementEditeurScissionDto.class);
-
+        dtos.forEach(dto -> dto.setSirenScinde(eventService.getEtabScissionEvent(dto.getSirenEtablissement()).getAncienSiren()));
+        return dtos;
     }
 }

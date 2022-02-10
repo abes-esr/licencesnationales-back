@@ -25,6 +25,9 @@ import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -266,6 +269,17 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructEnvoiFichierEditeursConfirmationAdmin(String mailAdmin, Date dateEnvoi) {
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        String subject = getEnv() + "[Appli LN] Confirmation envoi fichiers éditeurs";
+        StringBuilder message = new StringBuilder(BONJOUR);
+        message.append("Le traitement d'envoi des fichiers aux éditeurs s'est déroulé avec succès. <br>");
+        message.append("la date d'envoi a été mise à jour au ");
+        message.append(format.format(dateEnvoi));
+        String jsonRequestConstruct = mailToJSON(mailAdmin, null, subject, message.toString());
+        sendMail(jsonRequestConstruct);
+    }
+
     public void constructEnvoiFichierEditeurs(String mailEditeur, String mailAdmin, Map<String, ByteArrayInputStream> listeFichier) throws IOException {
         String subject = getEnv() + "Licences nationales France – Mise à jour des adresses IP des bénéficiaires / French national licences - beneficiaries' IP update";
         StringBuilder message = new StringBuilder(BONJOUR);
@@ -398,5 +412,6 @@ public class EmailService {
         message.append("</li></ul>");
         return message.toString();
     }
+
 
 }

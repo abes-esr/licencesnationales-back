@@ -10,6 +10,7 @@ import java.util.List;
 @Setter
 public class ExportEtablissementEditeurDto {
     protected String idEtablissement;
+    protected String sirenEtablissement;
     protected String nomEtablissement;
     protected String typeEtablissement;
     protected String adresse;

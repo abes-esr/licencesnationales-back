@@ -185,7 +185,9 @@ public class EditeurController extends AbstractController {
             throw new SendMailException("aux éditeurs : " + String.join(",", erreurMails));
         }
         //sauvegarde de la date d'envoi des fichiers aux éditeurs pour envois ultérieurs
-        dateEnvoiEditeurRepository.save(new DateEnvoiEditeurEntity(Calendar.getInstance().getTime()));
+        Date dateEnvoi = Calendar.getInstance().getTime();
+        dateEnvoiEditeurRepository.save(new DateEnvoiEditeurEntity(dateEnvoi));
+        emailService.constructEnvoiFichierEditeursConfirmationAdmin(mailAdmin, dateEnvoi);
         return buildResponseEntity(Constant.MESSAGE_ENVOI_OK);
     }
 }

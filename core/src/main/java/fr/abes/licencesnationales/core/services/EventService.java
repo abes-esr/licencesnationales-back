@@ -125,4 +125,11 @@ public class EventService {
             throw new UnknownEtablissementException("Etablissement inconnu");
         return etab.get();
     }
+
+    public EtablissementDiviseEventEntity getEtabScissionEvent(String siren) {
+        Optional<EtablissementDiviseEventEntity> etab = etablissementDao.getEventScission(siren);
+        if (!etab.isPresent())
+            throw new UnknownEtablissementException("Etablissement inconnu");
+        return etab.get();
+    }
 }

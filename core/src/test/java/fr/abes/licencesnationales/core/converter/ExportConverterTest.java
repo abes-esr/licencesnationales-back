@@ -231,6 +231,7 @@ class ExportConverterTest {
 
         ExportEtablissementEditeurDto dto = mapper.map(etab, ExportEtablissementEditeurDto.class);
         Assertions.assertEquals("123456", dto.getIdEtablissement());
+        Assertions.assertEquals("123456789", dto.getSirenEtablissement());
         Assertions.assertEquals("nomEtab", dto.getNomEtablissement());
         Assertions.assertEquals("validé", dto.getTypeEtablissement());
         Assertions.assertEquals("adresse", dto.getAdresse());

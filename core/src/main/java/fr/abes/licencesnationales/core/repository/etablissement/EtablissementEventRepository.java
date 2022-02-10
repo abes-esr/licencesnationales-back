@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.repository.etablissement;
 
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -32,4 +33,7 @@ public interface EtablissementEventRepository extends JpaRepository<Etablissemen
 
     @Query("select e from EtablissementEventEntity e where TYPE(e)=EtablissementFusionneEventEntity and e.siren = :siren")
     Optional<EtablissementFusionneEventEntity> getEventFusion(@Param("siren") String siren);
+
+    @Query("select e from EtablissementEventEntity e where TYPE(e)=EtablissementDiviseEventEntity and e.siren = :siren")
+    Optional<EtablissementDiviseEventEntity> getEventScission(@Param(("siren")) String siren);
 }
