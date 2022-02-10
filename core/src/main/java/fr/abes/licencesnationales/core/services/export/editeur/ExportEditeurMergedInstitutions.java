@@ -52,10 +52,10 @@ public class ExportEditeurMergedInstitutions extends ExportEditeurService<Export
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurFusionDto item) throws IOException {
         List<String> output = writeCommonLine(item.getIdEtablissement(), item.getNomEtablissement(), item.getTypeEtablissement(), item.getAdresse(), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), item.getVille(), item.getNomContact(), item.getMailContact(), item.getTelephoneContact());
+        output.add(String.join(",", item.getSirensFusionnes()));
         for (String ip : item.getListeAcces()) {
             output.add(ip);
         }
-        output.add(String.join(",", item.getSirensFusionnes()));
         printer.printRecord(output);
     }
 
@@ -73,7 +73,7 @@ public class ExportEditeurMergedInstitutions extends ExportEditeurService<Export
                 return dateModificationEtab.after(dateDernierEnvoi);
             }
         }).collect(Collectors.toList()), ExportEtablissementEditeurFusionDto.class);
-        dtos.forEach(dto -> dto.setSirensFusionnes(eventService.getEtabFusionEvent(dto.getIdEtablissement()).getSirenAnciensEtablissements()));
+        dtos.forEach(dto -> dto.setSirensFusionnes(eventService.getEtabFusionEvent(dto.getSirenEtablissement()).getSirenAnciensEtablissements()));
         return dtos;
     }
 }

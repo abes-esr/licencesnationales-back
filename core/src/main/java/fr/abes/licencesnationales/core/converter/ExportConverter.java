@@ -189,6 +189,7 @@ public class ExportConverter {
                 EtablissementEntity etab = context.getSource();
                 ExportEtablissementEditeurDto dto = new ExportEtablissementEditeurDto();
                 dto.setIdEtablissement(etab.getIdAbes());
+                dto.setSirenEtablissement(etab.getSiren());
                 dto.setNomEtablissement(etab.getNom());
                 dto.setTypeEtablissement(etab.getTypeEtablissement().getLibelle());
                 dto.setAdresse(etab.getContact().getAdresse());
