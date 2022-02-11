@@ -76,6 +76,9 @@ public class Constant implements Serializable {
     public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
     public static final String ERROR_IPV6_INVALIDE = "IP v6 invalide : ";
 
+    /**  Messages Format Attribut  **/
+    public static final String SIREN_DOIT_CONTENIR_9_CHIFFRES = "Le SIREN doit contenir 9 chiffres";
+
     /**  Messages champs manquant IP  **/
     public static final String ERROR_IP_IP_OBLIGATOIRE = "Le champ 'ip' est obligatoire";
     public static final String ERROR_IP_TYPE_IP_OBLIGATOIRE = "Le champ 'typeIp' est obligatoire";
