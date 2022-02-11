@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.batch;
 
 import fr.abes.licencesnationales.batch.relance.ConstructionListeEtabTasklet;
 import fr.abes.licencesnationales.batch.relance.DateHelperTest;
-import fr.abes.licencesnationales.batch.relance.TraiterEtabSansIpTasklet;
 import fr.abes.licencesnationales.batch.relance.dto.EtablissementDto;
 import fr.abes.licencesnationales.batch.utils.BatchUtil;
 import fr.abes.licencesnationales.batch.utils.DateHelper;
@@ -22,18 +21,11 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.batch.core.*;
-import org.springframework.batch.core.job.SimpleJob;
-import org.springframework.batch.core.repository.JobRepository;
-import org.springframework.batch.core.repository.dao.*;
-import org.springframework.batch.core.repository.support.SimpleJobRepository;
-import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
-import org.springframework.batch.test.MetaDataInstanceFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -115,7 +107,7 @@ public class JobRelancesConfigTest {
         listIn.add(etabIn2);
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
-        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructRelanceEtabMailUser(Mockito.anyString(), Mockito.anyString());
         Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
         Mockito.when(eventService.getDateCreationEtab(Mockito.any())).thenReturn(Calendar.getInstance().getTime());
 
@@ -166,8 +158,8 @@ public class JobRelancesConfigTest {
         Mockito.when(ipEventRepository.save(Mockito.any())).thenReturn(null);
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
-        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructRelanceEtabMailUser(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString());
 
         JobExecution jobExecution = jobLauncherTestUtils.launchJob();
         JobInstance actualJobInstance = jobExecution.getJobInstance();
@@ -228,8 +220,8 @@ public class JobRelancesConfigTest {
         BatchUtil.load(mockDate);
 
         Mockito.when(etablissementService.findAll()).thenReturn(listIn);
-        Mockito.doNothing().when(emailService).constructRelanceEtabMail(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructRelanceEtabMailUser(Mockito.anyString(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructSuppresionIpMail(Mockito.any(), Mockito.anyList(), Mockito.anyString(), Mockito.anyString());
         Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
         Mockito.when(eventService.getDateCreationEtab(Mockito.any())).thenReturn(Calendar.getInstance().getTime());
 

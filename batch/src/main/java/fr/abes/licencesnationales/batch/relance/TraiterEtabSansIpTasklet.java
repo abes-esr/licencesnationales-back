@@ -13,11 +13,7 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -48,7 +44,6 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         Calendar dateSuppressionEtab = new GregorianCalendar();
         for (EtablissementEntity etab : etabSansIp) {
             //calcul de la date de suppression de l'établissement
@@ -66,7 +61,7 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
                 }
             }
             dateSuppressionEtab.add(Calendar.YEAR, 1);
-            emailService.constructRelanceEtabMail(etab.getNom(), etab.getContact().getMail(), format.format(dateSuppressionEtab.getTime()));
+            emailService.constructRelanceEtabMailUser(etab.getNom(), etab.getContact().getMail());
         }
         return RepeatStatus.FINISHED;
     }

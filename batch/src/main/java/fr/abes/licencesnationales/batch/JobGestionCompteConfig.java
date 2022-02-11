@@ -14,9 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableBatchProcessing
 public class JobGestionCompteConfig extends JobConfiguration {
+
     @Bean(name = "jobGestionCompte")
     public Job jobGestionCompte() {
-        return this.jobBuilderFactory.get("gestionCompte").incrementer(new RunIdIncrementer())
+        return this.jobBuilderFactory.get("jobGestionCompte").incrementer(new RunIdIncrementer())
                 .start(stepSelectEtablissement()).on("AUCUNETAB").stop()
                 .on("COMPLETED").to(stepSuppressionCompte())
                 .build().build();
@@ -33,7 +34,7 @@ public class JobGestionCompteConfig extends JobConfiguration {
     @Bean
     public Step stepSuppressionCompte() {
         return stepBuilderFactory.get("stepSuppressionCompte").allowStartIfComplete(true)
-                .tasklet(new SuppressionEtEnvoiMailTasklet(etablissementService, emailService))
+                .tasklet(new SuppressionEtEnvoiMailTasklet(etablissementService, emailService, mailAdmin))
                 .build();
     }
 }

@@ -36,6 +36,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -126,8 +127,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -167,8 +168,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -208,8 +209,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(listenerCreation).onApplicationEvent(Mockito.any());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
-        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any(), Mockito.anyString());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailAdmin(Mockito.anyString(), Mockito.any());
+        Mockito.doNothing().when(emailService).constructCreationCompteEmailUser(Mockito.any());
 
         this.mockMvc.perform(put("/v1/etablissements")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
@@ -299,7 +300,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
-
+        Mockito.doNothing().when(emailService).constructModificationMailAdmin(Mockito.anyString(), Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
         Mockito.doNothing().when(eventService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/etablissements/123456789")
@@ -490,7 +491,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(etablissementService).deleteBySiren(siren);
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructSuppressionCompteMailUserEtAdmin(Mockito.any(), Mockito.anyString(), Mockito.anyString());
 
         this.mockMvc.perform(delete("/v1/etablissements/123456789")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -509,8 +510,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
-        Mockito.doNothing().when(emailService).constructValidationCompteMailUser(Locale.FRANCE, etab.getNom(), etab.getContact().getMail());
-        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(Locale.FRANCE, etab.getNom(), etab.getContact().getMail(), etab.getSiren());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailUser(etab.getNom(), etab.getContact().getMail());
+        Mockito.doNothing().when(emailService).constructValidationCompteMailAdmin(etab.getNom(), etab.getContact().getMail());
 
         this.mockMvc.perform(post("/v1/etablissements/validation/123456789"))
                 .andExpect(jsonPath("$.message").value(Constant.MESSAGE_VALIDATIONETAB_OK))
@@ -543,7 +544,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
 
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
-        Mockito.when(userDetailsService.loadUser(etab)).thenReturn(new UserDetailsImpl(etab));
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
 
         mockMvc.perform(get("/v1/etablissements/123456789")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.contact.nom").value("nom2"))
@@ -638,7 +639,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         String fileContent = "ID Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP\r\n";
         fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com\r\n";
         String json = "[]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
@@ -666,7 +667,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.1\r\n";
         fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.2\r\n";
         String json = "[]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
@@ -696,7 +697,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com\r\n";
         fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
         String json = "[\"123456789\",\"111111111\"]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
@@ -728,7 +729,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com;192.162.0.1;192.162.0.2\r\n";
         fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
         String json = "[\"123456789\",\"111111111\"]";
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());

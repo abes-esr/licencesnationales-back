@@ -8,6 +8,7 @@ import org.springframework.batch.core.configuration.annotation.EnableBatchProces
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +37,8 @@ public abstract class JobConfiguration {
     protected EventService eventService;
     @Autowired
     protected EtablissementService etablissementService;
+    @Value("${ln.dest.notif.admin}")
+    protected String mailAdmin;
 
     @Bean
     public RestTemplate restTemplate() {

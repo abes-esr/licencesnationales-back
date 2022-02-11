@@ -280,64 +280,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("Test modification IP")
-    @WithMockUser
-    void testModificationIp() throws Exception {
-        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
-        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
-        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
-        IpEntity ipEntity = new IpV4(1, "1.1.1.1", "test", statutIp);
-        entity.ajouterIp(ipEntity);
-
-        Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
-
-        StringBuilder json = new StringBuilder("{\n");
-        json.append("\"typeIp\":\"IPV4\",\n");
-        json.append("\"role\":\"etab\",\n");
-        json.append("\"ip\":\"1.1.1.1\",\n");
-        json.append("\"commentaires\":\"test\"\n");
-        json.append("}");
-
-        this.mockMvc.perform(post("/v1/ip/1")
-                .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
-    }
-
-    @Test
-    @DisplayName("Test modification IP admin")
-    @WithMockUser(authorities = {"admin"})
-    void testModificationIpAdmin() throws Exception {
-        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
-        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
-        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
-        IpEntity ipEntity = new IpV6(1, "1111:1111:1111:1111:1111:1111:1111:1111", "test", statutIp);
-        entity.ajouterIp(ipEntity);
-
-        Mockito.when(ipService.getEtablissementByIp(1)).thenReturn(entity);
-        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
-        Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.when(ipService.getFirstById(1)).thenReturn(ipEntity);
-        Mockito.when(referenceService.findStatutByLibelle(Mockito.anyString())).thenReturn(new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation"));
-
-        StringBuilder json = new StringBuilder("{\n");
-        json.append("\"typeIp\":\"IPV6\",\n");
-        json.append("\"role\":\"etab\",\n");
-        json.append("\"ip\":\"1111:1111:1111:1111:1111:1111:1111:1111\",\n");
-        json.append("\"commentaires\":\"test\",\n");
-        json.append("\"statut\":\"En validation\"\n");
-        json.append("}");
-
-        this.mockMvc.perform(post("/v1/ip/1")
-                .contentType(MediaType.APPLICATION_JSON).content(json.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MODIFIP_OK));
-    }
-
-    @Test
     @DisplayName("test suppression IP")
     @WithMockUser(authorities = {"admin"})
     void testSupprimerIp() throws Exception {
@@ -405,16 +347,20 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         contact.setRole("etab");
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
 
+        StatutIpEntity statut = new StatutIpEntity(1, "Nouveau");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.doNothing().when(eventService).save(Mockito.any());
-        Mockito.doNothing().when(emailService).constructBilanRecapActionIp(Mockito.anyString(), Mockito.any());
-        Mockito.when(ipService.getFirstById(Mockito.anyInt())).thenReturn(new IpV4());
+        Mockito.doNothing().when(emailService).constructBilanRecapActionIpUser(Mockito.anyString(), Mockito.anyString(), Mockito.any());
+        Mockito.when(ipService.getFirstById(1)).thenReturn(new IpV4(1, "1.1.1.1", "test", statut));
+        Mockito.when(ipService.getFirstById(2)).thenReturn(new IpV4(1, "2.2.2.2", "test", statut));
+        Mockito.when(ipService.getFirstById(3)).thenReturn(new IpV4(1, "3.3.3.3", "test", statut));
+
         Mockito.doNothing().when(ipService).save(Mockito.any());
 
         this.mockMvc.perform(post("/v1/ip/gerer/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].ip", oneOf("1", "2", "3")))
+                .andExpect(jsonPath("$.[0].ip", oneOf("1.1.1.1", "2.2.2.2", "3.3.3.3")))
                 .andExpect(jsonPath("$.[0].action", oneOf("validation", "suppression", "rejet")));
     }
 
@@ -492,7 +438,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         String json = "[]";
 
 
-        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.get("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
+        MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/ip/export/123456789").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
