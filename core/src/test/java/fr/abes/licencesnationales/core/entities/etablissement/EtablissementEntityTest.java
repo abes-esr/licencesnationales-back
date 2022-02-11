@@ -153,7 +153,7 @@ public class EtablissementEntityTest {
         Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etab);
         Assertions.assertEquals(2,violationsEtab.size());
         Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
-        Assertions.assertEquals("Le SIREN doit contenir 9 chiffres", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES, violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
     }
 
     @Test

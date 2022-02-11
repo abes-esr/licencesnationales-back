@@ -73,6 +73,7 @@ public class Constant implements Serializable {
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
     public static final String ERROR_CREDENTIALS = "Erreur d'authentification : " ;
+    public static final String ERROR_TOKEN = "Erreur de token d'authentification : ";
     public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
     public static final String ERROR_IPV6_INVALIDE = "IP v6 invalide : ";
 

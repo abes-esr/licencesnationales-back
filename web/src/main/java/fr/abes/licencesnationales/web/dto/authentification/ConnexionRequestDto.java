@@ -12,11 +12,11 @@ import javax.validation.constraints.Pattern;
 public class ConnexionRequestDto {
 
 	@NotBlank(message = Constant.ERROR_ETAB_SIREN_OBLIGATOIRE)
-	@Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
+	@Pattern(regexp = "^\\d{9}$", message = Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)
 	@ApiModelProperty(value = "identifiant siren", name = "login", dataType = "String", example = "123456789")
 	private String login; //siren
 
-	@NotBlank(message = "Mot de passe obligatoire (password)")
+	@NotBlank(message = Constant.ERROR_ETAB_MDP_OBLIGATOIRE)
 	@ApiModelProperty(value = "Mot de passe de l'utilisateur", name = "password", dataType = "String", example = "?Ll2020!")
 	private String password;
 }
