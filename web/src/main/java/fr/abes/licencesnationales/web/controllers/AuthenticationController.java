@@ -37,7 +37,6 @@ import org.springframework.web.client.RestClientException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
-import java.util.Locale;
 
 
 @Slf4j
@@ -113,7 +112,6 @@ public class AuthenticationController extends AbstractController{
             notes = "le ")
     @PostMapping("/motDePasseOublie")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto dto, HttpServletRequest request) throws RestClientException, CaptchaException, JsonIncorrectException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
@@ -147,7 +145,7 @@ public class AuthenticationController extends AbstractController{
         }
 
         String jwt = tokenProvider.generateToken(user);
-        emailService.constructResetTokenEmail(locale, jwt, user.getEmail(), user.getNameEtab());
+        emailService.constructResetTokenEmailUser(jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
         response.setMessage(Constant.MESSAGE_MDP_OUBLIE);
@@ -183,7 +181,7 @@ public class AuthenticationController extends AbstractController{
             String siren = tokenProvider.getSirenFromJwtToken(request.getTokenFromMail());
             EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
             ContactEntity contact = etab.getContact();
-            contact.setMotDePasse(request.getMotDePasse());
+            contact.setMotDePasse(passwordService.getEncodedMotDePasse(request.getMotDePasse()));
             etablissementService.save(etab);
         } else {
             throw new InvalidTokenException(Constant.ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE);

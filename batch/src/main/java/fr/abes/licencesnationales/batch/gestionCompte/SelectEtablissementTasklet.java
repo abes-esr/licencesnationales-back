@@ -52,6 +52,7 @@ public class SelectEtablissementTasklet implements Tasklet, StepExecutionListene
         } catch (UnknownEtablissementException ex) {
             log.error(Constant.ERROR_ETAB_INCONNU + ex.getMessage());
         }
+        this.listeEtab = service.getEtabASupprimer();
         return RepeatStatus.FINISHED;
     }
 }

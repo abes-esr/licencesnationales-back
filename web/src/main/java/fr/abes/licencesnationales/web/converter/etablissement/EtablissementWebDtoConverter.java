@@ -7,7 +7,9 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.ContactWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
@@ -276,6 +278,13 @@ public class EtablissementWebDtoConverter {
                 EtablissementEntity source = context.getSource();
 
                 EtablissementUserWebDto dto = new EtablissementUserWebDto();
+                dto.setId(source.getId());
+                dto.setName(source.getNom());
+                dto.setTypeEtablissement(source.getTypeEtablissement().getLibelle());
+                dto.setSiren(source.getSiren());
+                dto.setIdAbes(source.getIdAbes());
+                dto.setStatut(source.isValide()?"Validé":"Nouveau");
+                dto.setStatutIps(source.getStatut());
                 dto.setDateCreation(format.format(source.getDateCreation()));
                 ContactWebDto contact = getContactWebDto(source);
                 dto.setContact(contact);

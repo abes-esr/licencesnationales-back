@@ -11,7 +11,6 @@ import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +19,14 @@ import java.util.List;
 public class SuppressionEtEnvoiMailTasklet implements Tasklet, StepExecutionListener {
     private EtablissementService etablissementService;
     private EmailService emailService;
+    private String mailAdmin;
 
     private List<EtablissementEntity> listeEtab;
 
-    public SuppressionEtEnvoiMailTasklet(EtablissementService etablissementService, EmailService emailService) {
+    public SuppressionEtEnvoiMailTasklet(EtablissementService etablissementService, EmailService emailService, String mailAdmin) {
         this.etablissementService = etablissementService;
         this.emailService = emailService;
+        this.mailAdmin = mailAdmin;
         this.listeEtab = new ArrayList<>();
     }
 
@@ -44,12 +45,12 @@ public class SuppressionEtEnvoiMailTasklet implements Tasklet, StepExecutionList
         for (EtablissementEntity etab : this.listeEtab) {
             try {
                 etablissementService.deleteBySiren(etab.getSiren());
-                String motif = "Suppression automatique après un an d'inactivité";
-                emailService.constructSuppressionMail(motif, etab.getNom(), etab.getContact().getMail());
+                emailService.constructSuppressionMailUser(etab.getNom(), etab.getContact().getMail());
             } catch (Exception ex) {
                 log.error("Erreur dans la suppression de l'établissement. Siren : " + etab.getSiren() + " / cause : " + ex.getMessage());
             }
         }
+        emailService.constructSuppressionMailAdmin(this.mailAdmin, this.listeEtab);
         return RepeatStatus.FINISHED;
     }
 }

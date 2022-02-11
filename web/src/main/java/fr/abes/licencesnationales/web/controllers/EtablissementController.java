@@ -95,7 +95,7 @@ public class EtablissementController extends AbstractController {
     private ExportEtablissementAdmin exportEtablissementAdmin;
 
     @Value("${ln.dest.notif.admin}")
-    private String admin;
+    private String mailAdmin;
 
 
     @PutMapping
@@ -130,13 +130,14 @@ public class EtablissementController extends AbstractController {
         eventService.save(event);
 
         /*******************************************/
-        emailService.constructCreationCompteEmailUser(locale, etablissementCreeWebDto.getContact().getMail());
-        emailService.constructCreationCompteEmailAdmin(locale, admin, etablissementCreeWebDto.getSiren(), etablissementCreeWebDto.getName());
+        emailService.constructCreationCompteEmailUser(event);
+        emailService.constructCreationCompteEmailAdmin(mailAdmin, event.getNomEtab());
         return buildResponseEntity(Constant.MESSAGE_CREATIONETAB_OK);
     }
 
     @PostMapping(value = "/{siren}")
     public ResponseEntity<Object> edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
+        boolean envoiMail = false;
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
                 etablissementModifieWebDto.setSiren(siren);
@@ -149,13 +150,21 @@ public class EtablissementController extends AbstractController {
             }
         }
         EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
-        if (!(etabInBdd.getContact().getMail().equals(etablissementModifieWebDto.getContact().getMail())) && (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail()))) {
-            throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
+        String ancienMail = etabInBdd.getContact().getMail();
+        if (!(ancienMail.equals(etablissementModifieWebDto.getContact().getMail()))) {
+            if (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail())) {
+                throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
+            }
+            envoiMail = true;
         }
+
         EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        if (envoiMail) {
+            emailService.constructModificationMailAdmin(mailAdmin, etabInBdd.getNom(), ancienMail, etablissementModifieWebDto.getContact().getMail());
+        }
         return buildResponseEntity(Constant.MESSAGE_MODIFETAB_OK);
     }
 
@@ -218,24 +227,21 @@ public class EtablissementController extends AbstractController {
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Object> suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
-        EtablissementSupprimeEventEntity etablissementSupprimeEvent = new EtablissementSupprimeEventEntity(this, siren);
-        applicationEventPublisher.publishEvent(etablissementSupprimeEvent);
-        eventService.save(etablissementSupprimeEvent);
+        EtablissementSupprimeEventEntity event = new EtablissementSupprimeEventEntity(this, siren);
+        applicationEventPublisher.publishEvent(event);
+        eventService.save(event);
 
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructSuppressionCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
-        emailService.constructSuppressionCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        emailService.constructSuppressionCompteMailUserEtAdmin(etab.getNom(), ((UserDetailsImpl) user).getEmail(), mailAdmin);
         return buildResponseEntity(Constant.MESSAGE_SUPPETAB_OK);
     }
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
             throw new BadStatutException(Constant.DEJA_VALIDE);
@@ -247,19 +253,19 @@ public class EtablissementController extends AbstractController {
 
         //envoi du mail de validation
         UserDetails user = userDetailsService.loadUser(etab);
-        emailService.constructValidationCompteMailUser(locale, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
-        emailService.constructValidationCompteMailAdmin(locale, admin, ((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getSiren());
+        emailService.constructValidationCompteMailUser(((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+        emailService.constructValidationCompteMailAdmin(mailAdmin, ((UserDetailsImpl) user).getNameEtab());
         return buildResponseEntity(Constant.MESSAGE_VALIDATIONETAB_OK);
+
     }
 
     @GetMapping(value = "/{siren}")
-    public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException {
+    public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException, SirenIntrouvableException, AccesInterditException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
-        UserDetailsImpl user = (UserDetailsImpl) userDetailsService.loadUser(entity);
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }
-        if (user.getSiren().equals(siren)) {
+        if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
             return mapper.map(entity, EtablissementUserWebDto.class);
         } else {
             throw new InvalidTokenException(Constant.SIREN_NE_CORRESPOND_PAS);
@@ -311,7 +317,7 @@ public class EtablissementController extends AbstractController {
         return mapper.mapList(referenceService.findAllTypeEtab(), TypeEtablissementDto.class);
     }
 
-    @GetMapping(value = "/export")
+    @PostMapping(value = "/export")
     public void exportEtab(@RequestBody List<String> sirens, HttpServletResponse response) throws IOException, SirenIntrouvableException, AccesInterditException {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
