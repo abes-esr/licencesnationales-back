@@ -17,6 +17,7 @@ import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
+import fr.abes.licencesnationales.web.dto.ip.creation.IpCreeResultWebDto;
 import fr.abes.licencesnationales.web.dto.ip.gestion.IpGereeWebDto;
 import fr.abes.licencesnationales.web.exception.InvalidTokenException;
 import fr.abes.licencesnationales.web.security.services.FiltrerAccesServices;
@@ -70,27 +71,21 @@ public class IpController extends AbstractController {
 
 
     @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> ajoutIp(@Valid @RequestBody List<IpAjouteeWebDto> dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
-        List<String> errors = new ArrayList<>();
+    public ResponseEntity<Object> ajoutIp(@Valid @RequestBody IpAjouteeWebDto dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
-        String etab = etablissementService.getFirstBySiren(siren).getNom();
-        dto.forEach(e -> {
-            IpCreeEventEntity ipAjouteeEvent = mapper.map(e, IpCreeEventEntity.class);
-            ipAjouteeEvent.setSource(this);
-            ipAjouteeEvent.setSiren(siren);
-            try {
-                applicationEventPublisher.publishEvent(ipAjouteeEvent);
-                eventRepository.save(ipAjouteeEvent);
-            } catch (Exception exception) {
-                errors.add(exception.getLocalizedMessage());
-            }
-        });
-
-        if (errors.size() > 0) {
-            throw new IpException(errors.toString());
+        IpCreeResultWebDto dtoResult = new IpCreeResultWebDto();
+        IpCreeEventEntity ipAjouteeEvent = mapper.map(dto, IpCreeEventEntity.class);
+        ipAjouteeEvent.setSource(this);
+        ipAjouteeEvent.setSiren(siren);
+        try {
+            applicationEventPublisher.publishEvent(ipAjouteeEvent);
+            eventRepository.save(ipAjouteeEvent);
+            dtoResult.setId(ipAjouteeEvent.getIpId());
+        } catch (Exception exception) {
+            throw new IpException(exception.getLocalizedMessage());
         }
-        return buildResponseEntity(Constant.MESSAGE_AJOUTIP_OK);
+        dtoResult.setMessage(Constant.MESSAGE_AJOUTIP_OK);
+        return buildResponseEntity(dtoResult);
 
     }
 
@@ -198,7 +193,7 @@ public class IpController extends AbstractController {
         List<String> sirens = new ArrayList<>();
         sirens.add(siren);
         stream = exportIp.generateCsv(sirens);
-        IOUtils.copy(stream , response.getOutputStream());
+        IOUtils.copy(stream, response.getOutputStream());
         response.flushBuffer();
     }
 

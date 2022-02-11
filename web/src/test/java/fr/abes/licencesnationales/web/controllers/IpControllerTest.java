@@ -108,29 +108,11 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"1.1.1.1\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
-
-        this.mockMvc.perform(put("/v1/ip/123456789")
-                .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
-
-        json = "[" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"1.1.1.1\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "},\n" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"2.2.2.2\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "}\n" +
-                "]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
@@ -153,34 +135,17 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(ipService.isIpAlreadyExists(Mockito.any(IpV4.class))).thenReturn(true);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"1.1.1.1\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("[L'IP 1.1.1.1 est déjà utilisée]"));
+                .andExpect(jsonPath("$.debugMessage").value("L'IP 1.1.1.1 est déjà utilisée"));
 
-        json = "[" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"1.1.1.1\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "},\n" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"2.2.2.2\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "}\n" +
-                "]";
-
-        this.mockMvc.perform(put("/v1/ip/123456789")
-                .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("[L'IP 1.1.1.1 est déjà utilisée, L'IP 2.2.2.2 est déjà utilisée]"));
     }
 
     @Test
