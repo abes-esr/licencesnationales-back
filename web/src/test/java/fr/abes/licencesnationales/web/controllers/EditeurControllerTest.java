@@ -81,9 +81,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
 
         this.mockMvc.perform(put("/v1/editeurs/")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(editeurCreeWebDto)))
-                .andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.message").value("test"))
-                .andExpect(jsonPath("$.debugMessage").value("test"));
+                .andExpect(status().isForbidden());
     }
 
     @Test
