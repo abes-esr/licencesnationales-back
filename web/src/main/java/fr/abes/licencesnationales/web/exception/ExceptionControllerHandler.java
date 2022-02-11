@@ -105,15 +105,18 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = Constant.ERROR_CREDENTIALS;
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        StringBuilder msg = new StringBuilder("Incorrect fields : ");
-        for (FieldError fieldError : fieldErrors) {
-            msg.append(fieldError.getDefaultMessage() + ", ");
+        StringBuilder msg = new StringBuilder(Constant.ERROR_SAISIE);
+        for (int i=0;i<fieldErrors.size();i++) {
+            if(i==(fieldErrors.size()-1)){
+                msg.append(fieldErrors.get(i).getDefaultMessage());
+            } else{
+                msg.append(fieldErrors.get(i).getDefaultMessage() + ", ");
+            }
         }
         log.error(msg.toString());
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new JsonIncorrectException(msg.toString())));
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, msg.toString(),ex));
     }
 
     /**
@@ -168,8 +171,8 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     protected ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException ex) {
-        String error = "Erreur de token d'authentification";
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+        String message = Constant.ERROR_TOKEN+ ex.getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, ex));
     }
 
     /**
