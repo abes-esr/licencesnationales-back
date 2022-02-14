@@ -172,9 +172,9 @@ class EtablissementServiceTest {
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
         etabIn1.setValide(false);
-        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000000", type, "12345", contact);
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "111111111", type, "12345", contact);
         etabIn2.setValide(true);
-        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "000000000", type, "12345", contact);
+        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "333333333", type, "12345", contact);
         etabIn3.setValide(false);
 
         List<EtablissementEntity> listIn = new ArrayList<>();
@@ -184,8 +184,10 @@ class EtablissementServiceTest {
 
         List<NotificationAdminDto> notifs = service.getEtabNonValides(listIn);
         Assertions.assertEquals(2, notifs.size());
+        Assertions.assertEquals("000000000", notifs.get(0).getSiren());
         Assertions.assertEquals("testNom", notifs.get(0).getNomEtab());
         Assertions.assertEquals("Nouvel établissement", notifs.get(0).getTypeNotif());
+        Assertions.assertEquals("333333333", notifs.get(1).getSiren());
         Assertions.assertEquals("testNom3", notifs.get(1).getNomEtab());
         Assertions.assertEquals("Nouvel établissement", notifs.get(1).getTypeNotif());
     }
@@ -196,8 +198,8 @@ class EtablissementServiceTest {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
-        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000000", type, "12345", contact);
-        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "000000000", type, "12345", contact);
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "111111111", type, "12345", contact);
+        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "333333333", type, "12345", contact);
 
         StatutIpEntity statutAValider = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
         StatutIpEntity statutValide = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
@@ -229,8 +231,10 @@ class EtablissementServiceTest {
 
         List<NotificationAdminDto> notifs = service.getEtabIpEnValidation(listIn);
         Assertions.assertEquals(2, notifs.size());
+        Assertions.assertEquals("111111111", notifs.get(0).getSiren());
         Assertions.assertEquals("testNom2", notifs.get(0).getNomEtab());
         Assertions.assertEquals("Nouvelle IP", notifs.get(0).getTypeNotif());
+        Assertions.assertEquals("333333333", notifs.get(1).getSiren());
         Assertions.assertEquals("testNom3", notifs.get(1).getNomEtab());
         Assertions.assertEquals("Nouvelle IP", notifs.get(1).getTypeNotif());
     }
@@ -240,9 +244,9 @@ class EtablissementServiceTest {
     void testGetEtabIpSupprimee() throws IpException {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
-        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
-        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000000", type, "12345", contact);
-        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "000000000", type, "12345", contact);
+        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "111111111", type, "12345", contact);
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "222222222", type, "12345", contact);
+        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "333333333", type, "12345", contact);
 
         List<EtablissementEntity> listIn = new ArrayList<>();
         listIn.add(etabIn1);
@@ -258,6 +262,7 @@ class EtablissementServiceTest {
         List<NotificationAdminDto> notif = service.getEtabIpSupprimee(listIn);
 
         Assertions.assertEquals(1, notif.size());
+        Assertions.assertEquals("111111111", notif.get(0).getSiren());
         Assertions.assertEquals("testNom1", notif.get(0).getNomEtab());
         Assertions.assertEquals("Suppression IP depuis dernier envoi", notif.get(0).getTypeNotif());
     }
