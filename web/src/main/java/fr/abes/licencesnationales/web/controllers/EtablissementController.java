@@ -4,18 +4,15 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.TypeEtablissementDto;
+import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.modification.EtablissementModifieUserWebDto;
@@ -43,8 +40,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -238,7 +233,7 @@ public class EtablissementController {
         if (etab.isValide()) {
             throw new BadStatutException("L'établissement ne doit pas déjà être validé");
         }
-        EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        EtablissementValideEventEntity etablissementValideEvent = new EtablissementValideEventEntity(this, siren);
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
         eventService.save(etablissementValideEvent);
@@ -260,39 +255,6 @@ public class EtablissementController {
             return mapper.map(entity, EtablissementUserWebDto.class);
         } else {
             throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
-        }
-    }
-
-    @PostMapping(value = "/getDerniereDateModificationIp/{siren}")
-    @PreAuthorize("hasAuthority('admin')")
-    public String getDerniereDateModificationIp(@PathVariable String siren) throws DateException {
-        log.info("debut getDerniereDateModificationIp");
-        log.info("siren = " + siren);
-        String res = "";
-
-        try {
-            ArrayList<String> listDateModifIp = new ArrayList<>();
-            List<IpEntity> listeIpsEtab = ipRepository.findAllBySiren(siren);
-            for (IpEntity i : listeIpsEtab) {
-                Date dateModif;
-                if (i.getDateModification() != null) {
-                    dateModif = i.getDateModification();
-                    listDateModifIp.add(dateModif.toString());
-                }
-            }
-            if (!listeIpsEtab.isEmpty() && listeIpsEtab.size() > 1) {
-                ArrayList<String> listDateModifCourtes = new ArrayList<>();
-                for (String date : listDateModifIp) listDateModifCourtes.add(date.substring(0, 10));
-                log.info("dtaModif = " + listDateModifCourtes.get(0));
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                Collections.sort(listDateModifCourtes, Comparator.comparing(s -> LocalDate.parse(s, formatter).atStartOfDay()));
-                log.info("dtaModif = " + listDateModifCourtes.get(0));
-                log.info("dtaModif = " + listDateModifCourtes.get(listDateModifCourtes.size() - 1));
-                res = listDateModifCourtes.get(listDateModifCourtes.size() - 1);
-            }
-            return res;
-        } catch (Exception e) {
-            throw new DateException("Erreur lors de la recupération de la dernière date de modification : " + e);
         }
     }
 
@@ -320,8 +282,31 @@ public class EtablissementController {
             liste.add(filtrerAccesServices.getSirenFromSecurityContextUser());
             stream = exportEtablissementUser.generateCsv(liste);
         }
-        IOUtils.copy(stream , response.getOutputStream());
+        IOUtils.copy(stream, response.getOutputStream());
         response.flushBuffer();
     }
+
+    @GetMapping(value = "/notifications/{siren}")
+    public NotificationsDto getNotificationsEtab(@PathVariable String siren) throws SirenIntrouvableException, AccesInterditException, InvalidTokenException {
+        if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
+            EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
+            return mapper.map(entity, NotificationsDto.class);
+        } else {
+            throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+        }
+    }
+
+    @GetMapping(value = "/notificationsAdmin")
+    @PreAuthorize("hasAuthority('admin')")
+    public NotificationsAdminDto getNotificationsAdmin() {
+        NotificationsAdminDto dtos = new NotificationsAdminDto();
+        List<EtablissementEntity> listEtab = etablissementService.findAll();
+        dtos.ajouterListNotif(etablissementService.getEtabNonValides(listEtab));
+        dtos.ajouterListNotif(etablissementService.getEtabIpEnValidation(listEtab));
+        dtos.ajouterListNotif(etablissementService.getEtabIpSupprimee(listEtab));
+        return dtos;
+    }
+
+
 
 }

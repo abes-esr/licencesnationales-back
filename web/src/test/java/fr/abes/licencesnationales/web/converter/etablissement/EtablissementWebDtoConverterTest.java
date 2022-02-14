@@ -456,4 +456,130 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("mail@mail.com", dto.getContact().getMail());
         Assertions.assertEquals("etab", dto.getContact().getRole());
     }
+
+    @DisplayName("test conversion établissement -> notifications : cas aucune ip")
+    @Test
+    void testEtabNotifAucuneIp() {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(1, dto.getNotifications().size());
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Aucune IP déclarée"));
+    }
+
+    @DisplayName("test conversion établissement -> notifications : cas que des IP nouvelles")
+    @Test
+    void testEtabNotifNouvellesIp() throws IpException {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        StatutEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", (StatutIpEntity) ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", (StatutIpEntity) ipStatut);
+
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(1, dto.getNotifications().size());
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Toutes les adresses IP déclarées sont en attente d'examen par l'Abes"));
+    }
+
+    @DisplayName("test conversion établissement -> notifications : cas 2 nouvelles IP")
+    @Test
+    void testEtabNotifNouvelleIp() throws IpException {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        StatutIpEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        StatutIpEntity ipStatut2 = new StatutIpEntity(Constant.STATUT_IP_VALIDEE, "validée");
+
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", ipStatut);
+        IpEntity ip3 = new IpV4("2.2.2.2", "test", ipStatut2);
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+        etab.ajouterIp(ip3);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(2, dto.getNotifications().size());
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1.1.1.1. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("Nouvelle adresse IP"));
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1111:1111:1111:1111:1111:1111:1111:1111. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("Nouvelle adresse IP"));
+    }
+
+    @DisplayName("test conversion établissement -> notifications : cas IPs en attente attestation")
+    @Test
+    void testEtabNotifAttestations() throws IpException {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        StatutIpEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
+
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", ipStatut);
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(1, dto.getNotifications().size());
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Aucune IP validée"));
+    }
+
+    @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation")
+    @Test
+    void testEtabNotifAttestation() throws IpException {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        StatutIpEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
+        StatutIpEntity ipStatut1 = new StatutIpEntity(Constant.STATUT_IP_VALIDEE, "Nouvelle IP");
+
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", ipStatut);
+        IpEntity ip3 = new IpV4("2.2.2.2", "test", ipStatut1);
+
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+        etab.ajouterIp(ip3);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(2, dto.getNotifications().size());
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(0).get("IP en attente de validation : 1.1.1.1. Envoyer l'attestation à ln-admin@abes.fr."));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("IP en attente de validation : 1111:1111:1111:1111:1111:1111:1111:1111. Envoyer l'attestation à ln-admin@abes.fr."));
+    }
+
+    @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation + nouvelles IP")
+    @Test
+    void testEtabNotifAttestationEtNouvelle() throws IpException {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        StatutIpEntity ipStatut = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation demandée");
+        StatutIpEntity ipStatut1 = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "Nouvelle IP");
+        StatutIpEntity ipStatut2 = new StatutIpEntity(Constant.STATUT_IP_VALIDEE, "Ip validée");
+
+        IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", ipStatut);
+        IpEntity ip2 = new IpV6(2, "1111:1111:1111:1111:1111:1111:1111:1111", "test2", ipStatut);
+        IpEntity ip3 = new IpV4("2.2.2.2", "test", ipStatut1);
+        IpEntity ip4 = new IpV4("3.3.3.3", "test", ipStatut2);
+
+        etab.ajouterIp(ip1);
+        etab.ajouterIp(ip2);
+        etab.ajouterIp(ip3);
+        etab.ajouterIp(ip4);
+
+        NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
+
+        Assertions.assertEquals(3, dto.getNotifications().size());
+        Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("Nouvelle adresse IP"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("IP en attente de validation : 1.1.1.1. Envoyer l'attestation à ln-admin@abes.fr."));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("IP en attente de validation : 1111:1111:1111:1111:1111:1111:1111:1111. Envoyer l'attestation à ln-admin@abes.fr."));
+
+    }
 }
