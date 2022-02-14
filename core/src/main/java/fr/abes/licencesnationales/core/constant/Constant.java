@@ -73,6 +73,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_AJOUTIP_OK = "IP ajoutée avec succès";
     public static final String MESSAGE_MODIFIP_OK = "IP modifiée avec succès";
     public static final String MESSAGE_SUPPIP_OK = "IP supprimée avec succès";
+    public static final String MESSAGE_ENVOI_OK = "Envoi des mails effectué avec succès";
 
 }
 
