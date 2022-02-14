@@ -1,6 +1,9 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
@@ -100,8 +103,7 @@ public class EtablissementService {
                 if (dateSuppressionDerniereIp.before(oneYearAgo.getTime())) {
                     listeOut.add(etab);
                 }
-            }
-            else {
+            } else {
                 //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
                 try {
                     Date dateCreationEtab = eventService.getDateCreationEtab(etab);
@@ -115,4 +117,52 @@ public class EtablissementService {
         }
         return listeOut;
     }
-}
+
+    public List<EtablissementEntity> getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(List<EtablissementEntity> listeEtab, Date date) {
+        List<EtablissementEntity> listeOut = new ArrayList<>();
+        listeEtab.stream().forEach(e -> {
+            Date dateSupp = eventService.getLastDateSuppressionIpEtab(e);
+            if (dateSupp != null && dateSupp.after(date)) {
+                listeOut.add(e);
+            }
+        });
+        return listeOut;
+    }
+
+    public List<NotificationAdminDto> getEtabNonValides(List<EtablissementEntity> listEtab) {
+        List<NotificationAdminDto> dtos = new ArrayList<>();
+        //ajout établissement non validés
+        listEtab.stream().filter(e -> !e.isValide()).forEach(e -> {
+            NotificationAdminDto dto = new NotificationAdminDto(e.getDateCreation(), "Nouvel établissement", e.getNom());
+            dtos.add(dto);
+        });
+        return dtos;
+    }
+
+    public List<NotificationAdminDto> getEtabIpEnValidation(List<EtablissementEntity> listEtab) {
+        List<NotificationAdminDto> dtos = new ArrayList<>();
+        //ajout établissements avec IP en validation
+        listEtab.stream().forEach(e -> {
+            Optional<IpEntity> ip = e.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_NOUVELLE)).findFirst();
+            if (ip.isPresent()) {
+                IpEntity i = ip.get();
+                Date dateIp = (i.getDateModification() != null) ? i.getDateModification() : i.getDateCreation();
+                NotificationAdminDto dto = new NotificationAdminDto(dateIp, "Nouvelle IP", e.getNom());
+                dtos.add(dto);
+            }
+        });
+        return dtos;
+        }
+
+        public List<NotificationAdminDto> getEtabIpSupprimee (List <EtablissementEntity> listEtab) {
+            List<NotificationAdminDto> dtos = new ArrayList<>();
+            //ajout etab ayant supprimé toutes leurs IPs depuis le dernier envoi du batch éditeur
+            Date dateDernierEnvoiEditeur = new Date();
+            List<EtablissementEntity> listEtabSupprime = getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(listEtab, dateDernierEnvoiEditeur);
+            listEtab.stream().filter(e -> e.getIps().size() == 0).filter(listEtabSupprime::contains).forEach(e -> {
+                NotificationAdminDto dto = new NotificationAdminDto(e.getDateCreation(), e.getNom(), "Suppression IP depuis dernier envoi");
+                dtos.add(dto);
+            });
+            return dtos;
+        }
+    }

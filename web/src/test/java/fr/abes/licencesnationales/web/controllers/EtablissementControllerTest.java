@@ -728,4 +728,5 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
 
     }
+
 }
