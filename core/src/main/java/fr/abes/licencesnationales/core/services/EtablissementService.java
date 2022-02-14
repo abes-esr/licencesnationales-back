@@ -1,6 +1,8 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
@@ -16,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -30,7 +33,7 @@ public class EtablissementService {
     private ContactRepository contactEtablissementDao;
 
     @Autowired
-    private StatutRepository statutRepository;
+    private ReferenceService referenceService;
 
     @Setter
     private Calendar oneYearAgo;
@@ -117,6 +120,23 @@ public class EtablissementService {
         }
         return listeOut;
     }
+
+    /**
+     * Permet de récupérer les établissements pour l'export Editeur
+     * Condition sur le type d'établissement
+     * Ne retourne que les établissements validés et ayant au moins une IP validée, après avoir supprimés les IP non validées
+     * @param ids liste des types d'établissements devant être retournés
+     * @return liste d'établissements dont le type est un des types passé en paramètre, ayant au moins une IP validée, et purgé de ses IP non validées
+     */
+    public List<EtablissementEntity> getAllEtabEditeur(List<Integer> ids) {
+        List<TypeEtablissementEntity> typesEtab = referenceService.findTypeEtabByIds(ids);
+        List<EtablissementEntity> listeEtab = etablissementDao.findAllByValideAndTypeEtablissementIn(true, typesEtab);
+        List<EtablissementEntity> listeEtabFiltres = listeEtab.stream().filter(e -> e.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() > 0).collect(Collectors.toList());
+        //on supprime les IP non validés des établissements retournés
+        listeEtabFiltres.stream().forEach(e -> e.getIps().removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
+        return listeEtabFiltres;
+    }
+}
 
     public List<EtablissementEntity> getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(List<EtablissementEntity> listeEtab, Date date) {
         List<EtablissementEntity> listeOut = new ArrayList<>();
