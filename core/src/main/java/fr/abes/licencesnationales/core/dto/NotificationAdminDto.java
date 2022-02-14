@@ -10,6 +10,7 @@ import java.util.Date;
 @Setter
 @AllArgsConstructor
 public class NotificationAdminDto {
+    private String siren;
     private Date dateEvent;
     private String typeNotif;
     private String nomEtab;
