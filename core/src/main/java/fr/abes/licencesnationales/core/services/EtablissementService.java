@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
@@ -9,6 +10,7 @@ import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
+import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
@@ -37,6 +39,9 @@ public class EtablissementService {
 
     @Setter
     private Calendar oneYearAgo;
+    
+    @Autowired
+    private DateEnvoiEditeurRepository dateEnvoiEditeurRepository;
 
     public EtablissementService() {
         this.oneYearAgo = Calendar.getInstance();
@@ -125,6 +130,7 @@ public class EtablissementService {
      * Permet de récupérer les établissements pour l'export Editeur
      * Condition sur le type d'établissement
      * Ne retourne que les établissements validés et ayant au moins une IP validée, après avoir supprimés les IP non validées
+     *
      * @param ids liste des types d'établissements devant être retournés
      * @return liste d'établissements dont le type est un des types passé en paramètre, ayant au moins une IP validée, et purgé de ses IP non validées
      */
@@ -136,7 +142,6 @@ public class EtablissementService {
         listeEtabFiltres.stream().forEach(e -> e.getIps().removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
         return listeEtabFiltres;
     }
-}
 
     public List<EtablissementEntity> getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(List<EtablissementEntity> listeEtab, Date date) {
         List<EtablissementEntity> listeOut = new ArrayList<>();
@@ -172,17 +177,22 @@ public class EtablissementService {
             }
         });
         return dtos;
-        }
-
-        public List<NotificationAdminDto> getEtabIpSupprimee (List <EtablissementEntity> listEtab) {
-            List<NotificationAdminDto> dtos = new ArrayList<>();
-            //ajout etab ayant supprimé toutes leurs IPs depuis le dernier envoi du batch éditeur
-            Date dateDernierEnvoiEditeur = new Date();
-            List<EtablissementEntity> listEtabSupprime = getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(listEtab, dateDernierEnvoiEditeur);
-            listEtab.stream().filter(e -> e.getIps().size() == 0).filter(listEtabSupprime::contains).forEach(e -> {
-                NotificationAdminDto dto = new NotificationAdminDto(e.getSiren(), e.getDateCreation(), e.getNom(), "Suppression IP depuis dernier envoi");
-                dtos.add(dto);
-            });
-            return dtos;
-        }
     }
+
+    public List<NotificationAdminDto> getEtabIpSupprimee(List<EtablissementEntity> listEtab) {
+        List<NotificationAdminDto> dtos = new ArrayList<>();
+        //ajout etab ayant supprimé toutes leurs IPs depuis le dernier envoi du batch éditeur
+        Optional<DateEnvoiEditeurEntity> dateEnvoiEditeurEntity = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc();
+        Date dateDernierEnvoiEditeur = new Date();
+        if (dateEnvoiEditeurEntity.isPresent()) {
+            dateDernierEnvoiEditeur = dateEnvoiEditeurEntity.get().getDateEnvoi();
+        }
+        List<EtablissementEntity> listEtabSupprime = getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(listEtab, dateDernierEnvoiEditeur);
+        final Date finalDateDernierEnvoiEditeur = dateDernierEnvoiEditeur;
+        listEtab.stream().filter(e -> e.getIps().size() == 0).filter(listEtabSupprime::contains).forEach(e -> {
+            NotificationAdminDto dto = new NotificationAdminDto(e.getSiren(), finalDateDernierEnvoiEditeur,  "Suppression IP depuis dernier envoi", e.getNom());
+            dtos.add(dto);
+        });
+        return dtos;
+    }
+}
