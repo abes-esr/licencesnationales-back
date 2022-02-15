@@ -36,7 +36,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,7 +49,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -175,7 +177,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Erreur dans la saisie : Le siren saisi est déjà utilisé"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.SIREN_DOUBLON))
                 .andExpect(jsonPath("$.debugMessage").value(Constant.SIREN_DOUBLON));
     }
 
@@ -476,6 +478,110 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(status().isOk());
 
     }
+
+
+    @Test
+    @DisplayName("test fusion établissement siren doublon")
+    @WithMockUser(authorities = {"admin"})
+    void testFusionEtabDoublon() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        EtablissementFusionneWebDto dto = new EtablissementFusionneWebDto();
+        dto.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
+        EtablissementCreeSansCaptchaWebDto dtoNouvelEtab = new EtablissementCreeSansCaptchaWebDto();
+        dtoNouvelEtab.setNom("nomEtab");
+        dtoNouvelEtab.setTypeEtablissement("Nouveau");
+        dtoNouvelEtab.setSiren("654987321");
+        ContactCreeWebDto dtoContact = new ContactCreeWebDto();
+        dtoContact.setNom("nomContact");
+        dtoContact.setPrenom("prenomContact");
+        dtoContact.setMail("test@test.com");
+        dtoContact.setMotDePasse("motDePasseContact");
+        dtoContact.setAdresse("adresseContact");
+        dtoContact.setCodePostal("00000");
+        dtoContact.setVille("VilleContact");
+        dtoContact.setBoitePostale("BPContact");
+        dtoContact.setTelephone("0000000000");
+        dtoContact.setCedex("cedexContact");
+        dtoNouvelEtab.setContact(dtoContact);
+        dto.setNouveauEtab(dtoNouvelEtab);
+
+        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        ContactEntity contactEntity1 = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity1 = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity1);
+
+        ContactEntity contactEntity2 = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity entity2 = new EtablissementEntity(1, "nomEtab2", "987654321", new TypeEtablissementEntity(3, "Validé"), "654321", contactEntity2);
+
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.when(etablissementService.existeSiren("654987321")).thenReturn(true);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity1);
+        Mockito.when(etablissementService.getFirstBySiren("987654321")).thenReturn(entity2);
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+        Mockito.doNothing().when(etablissementService).deleteBySiren("123456789");
+        Mockito.doNothing().when(etablissementService).deleteBySiren("987654321");
+        Mockito.doNothing().when(etablissementService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/fusion")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + String.format(Constant.ERROR_ETAB_DOUBLON,"654987321")))
+                .andExpect(jsonPath("$.debugMessage").exists());
+
+    }
+
+    @Test
+    @DisplayName("test fusion établissement mail doublon")
+    @WithMockUser(authorities = {"admin"})
+    void testFusionEtabMailDoublon() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        EtablissementFusionneWebDto dto = new EtablissementFusionneWebDto();
+        dto.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
+        EtablissementCreeSansCaptchaWebDto dtoNouvelEtab = new EtablissementCreeSansCaptchaWebDto();
+        dtoNouvelEtab.setNom("nomEtab");
+        dtoNouvelEtab.setTypeEtablissement("Nouveau");
+        dtoNouvelEtab.setSiren("654987321");
+        ContactCreeWebDto dtoContact = new ContactCreeWebDto();
+        dtoContact.setNom("nomContact");
+        dtoContact.setPrenom("prenomContact");
+        dtoContact.setMail("test@test.com");
+        dtoContact.setMotDePasse("motDePasseContact");
+        dtoContact.setAdresse("adresseContact");
+        dtoContact.setCodePostal("00000");
+        dtoContact.setVille("VilleContact");
+        dtoContact.setBoitePostale("BPContact");
+        dtoContact.setTelephone("0000000000");
+        dtoContact.setCedex("cedexContact");
+        dtoNouvelEtab.setContact(dtoContact);
+        dto.setNouveauEtab(dtoNouvelEtab);
+
+        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        ContactEntity contactEntity1 = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity1 = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity1);
+
+        ContactEntity contactEntity2 = new ContactEntity("nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail2@test.com", "mdp2");
+        EtablissementEntity entity2 = new EtablissementEntity(1, "nomEtab2", "987654321", new TypeEtablissementEntity(3, "Validé"), "654321", contactEntity2);
+
+        Mockito.when(referenceService.findTypeEtabByLibelle(Mockito.anyString())).thenReturn(type);
+        Mockito.doNothing().when(applicationEventPublisher).publishEvent(Mockito.any());
+        Mockito.doNothing().when(eventService).save(Mockito.any());
+        Mockito.when(etablissementService.existeMail("test@test.com")).thenReturn(true);
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity1);
+        Mockito.when(etablissementService.getFirstBySiren("987654321")).thenReturn(entity2);
+        Mockito.doNothing().when(listenerModification).onApplicationEvent(Mockito.any());
+        Mockito.doNothing().when(etablissementService).deleteBySiren("123456789");
+        Mockito.doNothing().when(etablissementService).deleteBySiren("987654321");
+        Mockito.doNothing().when(etablissementService).save(Mockito.any());
+
+        this.mockMvc.perform(post("/v1/etablissements/fusion")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + String.format(Constant.ERROR_MAIL_DOUBLON,"test@test.com")))
+                .andExpect(jsonPath("$.debugMessage").exists());
+
+    }
+
 
     @Test
     @DisplayName("test suppression Etablissement")

@@ -63,7 +63,7 @@ public class EventService {
 
     public Date getDateCreationEtab(EtablissementEntity etab) {
         Optional<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
-        if (!etablissement.isPresent()){
+        if (etablissement.isEmpty()){
             throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS,etab.getSiren()));
         }
         return etablissement.get().getDateCreationEvent();

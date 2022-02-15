@@ -59,6 +59,7 @@ public class Constant implements Serializable {
     public static final String ERROR_SENDING_MAIL_END_OF_TREATMENT="Erreur lors de l'envoi du mail'";
 
     /** Gestion des erreurs */
+    public static final String MALFORMED_JSON = "Paramètre incorrect";
     public static final String ERROR_SAISIE = "Erreur dans la saisie : ";
     public static final String ERROR_RECAPTCHA = "Erreur Recaptcha : " ;
     public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
@@ -155,7 +156,7 @@ public class Constant implements Serializable {
     public static final String ERROR_IP_DOUBLON = "L'IP %s est déjà utilisée";
     public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
-    public static final String ERROR_ETAB_EXISTE_PAS = "L'Etablissement %s n'existe pas";
+    public static final String ERROR_ETAB_EXISTE_PAS = "L'établissement %s n'existe pas";
     public static final String ERROR_IP_MAUVAIS = "L'IP %s n'est pas rattachée à un établissement";
     public static final String ERROR_IP_RESERVEES = "%s est inclus dans les IP réservées %s";
     public static final String ERROR_UTILISATEUR_NOT_FOUND_MAIL = "L'utilisateur avec l'email '%s' n'existe pas";

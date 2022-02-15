@@ -257,7 +257,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"[L'IP 1.1.1.1 est déjà utilisée]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+"]"))
                 .andExpect(jsonPath("$.debugMessage").exists());
 
         json = "[" +
@@ -276,7 +276,8 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("[L'IP 1.1.1.1 est déjà utilisée, L'IP 2.2.2.2 est déjà utilisée]"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+", "+String.format(Constant.ERROR_IP_DOUBLON,"2.2.2.2")+"]"))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -299,12 +300,12 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test suppression IP Inconnue")
     @WithMockUser(authorities = {"admin"})
     void testSupprimerIpInconnue() throws Exception {
-        Mockito.when(ipService.getFirstById(1)).thenThrow(new UnknownIpException("L'IP 1 n'existe pas"));
+        Mockito.when(ipService.getFirstById(1)).thenThrow(new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,1)));
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("IP inconnue : L'IP 1 n'existe pas"))
-                .andExpect(jsonPath("$.debugMessage").value("L'IP 1 n'existe pas"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_IP_INCONNUE+String.format(Constant.ERROR_IP_EXISTE_PAS,1)))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
