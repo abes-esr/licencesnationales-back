@@ -10,9 +10,9 @@ import java.util.List;
 @Getter
 @Setter
 public class NotificationsAdminDto {
-    List<NotificationAdminDto> notif = new ArrayList<>();
+    List<NotificationAdminDto> notifications = new ArrayList<>();
 
     public void ajouterListNotif(List<NotificationAdminDto> notif) {
-        this.notif.addAll(notif);
+        this.notifications.addAll(notif);
     }
 }
