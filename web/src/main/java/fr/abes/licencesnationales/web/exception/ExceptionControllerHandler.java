@@ -58,7 +58,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        String error = "Malformed JSON request";
+        String error = Constant.MALFORMED_JSON;
 
         if (ex.getCause() instanceof MismatchedInputException) {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
