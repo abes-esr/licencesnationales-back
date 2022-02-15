@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.core.services;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -13,6 +14,7 @@ import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
+import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
@@ -50,6 +52,9 @@ class EtablissementServiceTest {
 
     @MockBean
     private StatutRepository statutRepository;
+
+    @MockBean
+    private DateEnvoiEditeurRepository dateEnvoiEditeurRepository;
 
     @DisplayName("test getFirstBySiren success")
     @Test
@@ -302,7 +307,7 @@ class EtablissementServiceTest {
 
     @DisplayName("test récupération établissement ayant supprimé toutes ses IP depuis le dernier envoi éditeur")
     @Test
-    void testGetEtabIpSupprimee() throws IpException {
+    void testGetEtabIpSupprimee() {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
         EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "111111111", type, "12345", contact);
@@ -314,7 +319,12 @@ class EtablissementServiceTest {
         listIn.add(etabIn2);
         listIn.add(etabIn3);
 
-        Mockito.when(eventService.getLastDateSuppressionIpEtab(etabIn1)).thenReturn(Calendar.getInstance().getTime());
+        Calendar dateDernierEnvoi = Calendar.getInstance();
+        dateDernierEnvoi.set(2022, 2, 1);
+        Mockito.when(dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc()).thenReturn(Optional.of(new DateEnvoiEditeurEntity(dateDernierEnvoi.getTime())));
+        Calendar enDedans = Calendar.getInstance();
+        enDedans.set(2022, 2, 2);
+        Mockito.when(eventService.getLastDateSuppressionIpEtab(etabIn1)).thenReturn(enDedans.getTime());
         Mockito.when(eventService.getLastDateSuppressionIpEtab(etabIn2)).thenReturn(null);
         Calendar enDehors = Calendar.getInstance();
         enDehors.set(2022, 0, 1);
@@ -324,7 +334,7 @@ class EtablissementServiceTest {
 
         Assertions.assertEquals(1, notif.size());
         Assertions.assertEquals("111111111", notif.get(0).getSiren());
-        Assertions.assertEquals("testNom1", notif.get(0).getNomEtab());
+        Assertions.assertEquals("testNom", notif.get(0).getNomEtab());
         Assertions.assertEquals("Suppression IP depuis dernier envoi", notif.get(0).getTypeNotif());
     }
 }
