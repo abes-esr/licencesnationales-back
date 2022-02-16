@@ -178,7 +178,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.SIREN_DOUBLON))
-                .andExpect(jsonPath("$.debugMessage").value(Constant.SIREN_DOUBLON));
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -219,7 +219,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_DOUBLON_MAIL))
-                .andExpect(jsonPath("$.debugMessage").value(Constant.ERROR_DOUBLON_MAIL));
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test

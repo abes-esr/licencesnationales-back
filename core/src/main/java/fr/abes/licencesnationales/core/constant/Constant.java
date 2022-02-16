@@ -137,7 +137,7 @@ public class Constant implements Serializable {
     public static final String CONTACT_OBLIGATOIRE = "Le contact est obligatoire";
     public static final String CONTACT_COM_OU_TECH_OBLIGATOIRE = "Le contact doit forcément être commercial ou technique";
     public static final String IP_NOTNULL = "Ip ne peut pas être nulle";
-    public static final String IP_UNABLE_TO_DECODE = "Unable to decode IP";
+    public static final String IP_UNABLE_TO_DECODE = "Impossible de décoder l'IP";
     public static final String MDP_NOTNULL = "Le mot de passe ne doit pas être nulle ou vide";
     public static final String ETAB_NOTNULL = "L'établissement ne peut pas être nul";
     public static final String SIREN_DOUBLON = "Le siren saisi est déjà utilisé";
