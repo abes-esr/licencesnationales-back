@@ -138,9 +138,9 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
-    @DisplayName("test Ajout IP Nulle")
+    @DisplayName("test Ajout IP sans IP")
     @WithMockUser
-    void testAjoutIpNulle() throws Exception {
+    void testAjoutIpSansIp() throws Exception {
         ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
         EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
 
@@ -157,6 +157,29 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
                         .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IP_IP_OBLIGATOIRE))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+    @Test
+    @DisplayName("test Ajout IP Nulle")
+    @WithMockUser
+    void testAjoutIpNulle() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "[{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"ip\":\"\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}]";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+Constant.IP_NOTNULL+"]"))
                 .andExpect(jsonPath("$.debugMessage").exists());
     }
 
