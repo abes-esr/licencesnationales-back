@@ -244,7 +244,7 @@ public class EtablissementController extends AbstractController {
     public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
-            throw new BadStatutException(Constant.DEJA_VALIDE);
+            throw new BadStatutException(Constant.DEJA_VALIDE_IP);
         }
         EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
         etablissementValideEvent.setValide(true);

@@ -67,12 +67,11 @@ public class Constant implements Serializable {
     public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
     public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
-    public static final String ERROR_IP_ACTION_INCONNUE = "Action inconnue sur les IPs : ";
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
     public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
-    public static final String ERROR_CSV_WRITING = "Csv writing error: " ;
+    public static final String ERROR_CSV_WRITING = "Erreur d'ecriture dans le fichier CSV" ;
     public static final String ERROR_CREDENTIALS = "Erreur d'authentification : " ;
     public static final String ERROR_TOKEN = "Erreur de token d'authentification : ";
     public static final String ERROR_IPV4_INVALIDE = "IP v4 invalide : ";
@@ -146,8 +145,7 @@ public class Constant implements Serializable {
     public static final String METHODE_AUTHENTIFICATION_PAS_SUPPORTEE = "La méthode d'authentification n'est pas supportée";
     public static final String CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE = "Au moins un des champs 'siren' ou 'email' est obligatoire";
     public static final String OPERATION_QUE_PAR_ADMIN = "L'opération ne peut être effectuée que par un administrateur";
-    public static final String DEJA_VALIDE = "L'établissement ne doit pas déjà être validé";
-    public static final String ERROR_MODIFIER_MAUVAIS_ETAB = "Impossible de modifier un autre établissement que celui de l'utilisateur";
+    public static final String DEJA_VALIDE_IP = "L'Ip ne doit pas déjà être validé";
     public static final String ERROR_TOKEN_INVALID = "Token invalide ou absent";
     public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
 

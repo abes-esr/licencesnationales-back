@@ -322,7 +322,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE))
-                .andExpect(jsonPath("$.debugMessage").value(Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE));
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
