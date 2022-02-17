@@ -94,7 +94,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setIdentifiantBis("1238975");
         editeurCreeWebDto.setAdresse("adresse TestD");
 
-        ArrayList typesEtablissements = new ArrayList();
+        ArrayList<String> typesEtablissements = new ArrayList<>();
         typesEtablissements.add("EPCI");
         typesEtablissements.add("Ecole de Management");
 
@@ -141,7 +141,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurCreeWebDto.setIdentifiantBis("1238975");
         editeurCreeWebDto.setAdresse("adresse TestD");
 
-        ArrayList typesEtablissements = new ArrayList();
+        ArrayList<String> typesEtablissements = new ArrayList<>();
         typesEtablissements.add("EPCI");
         typesEtablissements.add("Ecole de Management");
 
@@ -188,7 +188,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         editeurModifieWebDto.setIdentifiantBis("1238975");
         editeurModifieWebDto.setAdresse("adresse TestD");
 
-        ArrayList typeEtablissements = new ArrayList();
+        ArrayList<String> typeEtablissements = new ArrayList<String>();
         typeEtablissements.add("EPCI");
         typeEtablissements.add("Ecole de Management");
 
@@ -336,7 +336,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     void testExportEditeurAdminDeuxEditeursUnSeulContact() throws Exception {
         ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
         TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
-        Set types = new HashSet();
+        Set<TypeEtablissementEntity> types = new HashSet<TypeEtablissementEntity>();
         types.add(type);
         EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
         editeur.ajouterContact(contact);
@@ -344,7 +344,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         EditeurEntity editeur2 = new EditeurEntity(2,"nomEditeur2","identifiant2","adresse2",types);
         editeur2.ajouterContact(contact2);
 
-        List listEditeur = new ArrayList();
+        List<EditeurEntity> listEditeur = new ArrayList<EditeurEntity>();
         listEditeur.add(editeur);
         listEditeur.add(editeur2);
 
@@ -369,12 +369,12 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     void testExportEditeurAdminUnSeulEditeurUnSeulContact() throws Exception {
         ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
         TypeEtablissementEntity type = new TypeEtablissementEntity(1,"test");
-        Set types = new HashSet();
+        Set<TypeEtablissementEntity> types = new HashSet<TypeEtablissementEntity>();
         types.add(type);
         EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
         editeur.ajouterContact(contact);
 
-        List listEditeur = new ArrayList();
+        List<EditeurEntity> listEditeur = new ArrayList<EditeurEntity>();
         listEditeur.add(editeur);
 
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
@@ -397,14 +397,14 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
     void testExportEditeurAdminUnSeulEditeurDeuxContact() throws Exception {
         ContactEditeurEntity contact = new ContactTechniqueEditeurEntity(1,"nomTech", "prenomTech", "mailTech@mail.com");
         TypeEtablissementEntity type = new TypeEtablissementEntity(4,"test");
-        Set types = new HashSet();
+        Set<TypeEtablissementEntity> types = new HashSet<>();
         types.add(type);
         EditeurEntity editeur = new EditeurEntity(1,"nomEditeur","identifiant","adresse",types);
         ContactEditeurEntity contact2 = new ContactCommercialEditeurEntity(2,"nomCom", "prenomCom", "mailCom@mail.com");
         editeur.ajouterContact(contact);
         editeur.ajouterContact(contact2);
 
-        List listEditeur = new ArrayList();
+        List<EditeurEntity> listEditeur = new ArrayList<>();
         listEditeur.add(editeur);
 
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");

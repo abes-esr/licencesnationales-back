@@ -26,7 +26,7 @@ public class ReferenceService {
     public TypeEtablissementEntity findTypeEtabById(Integer id) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findById(id);
         if (entity.isEmpty()) {
-            throw new UnknownTypeEtablissementException(Constant.ERROR_TYPEETAB_INCONNU + id);
+            throw new UnknownTypeEtablissementException(id.toString());
         }
         return entity.get();
     }
@@ -34,7 +34,7 @@ public class ReferenceService {
     public TypeEtablissementEntity findTypeEtabByLibelle(String libelle) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findFirstByLibelle(libelle);
         if (entity.isEmpty()) {
-            throw new UnknownTypeEtablissementException(Constant.ERROR_TYPEETAB_INCONNU + libelle);
+            throw new UnknownTypeEtablissementException(libelle);
         }
         return entity.get();
     }
