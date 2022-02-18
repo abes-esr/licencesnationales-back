@@ -130,10 +130,10 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                         .contentType(MediaType.APPLICATION_JSON).content(json))
@@ -152,16 +152,16 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                         .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+Constant.IP_NOTNULL+"]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.IP_NOTNULL))
                 .andExpect(jsonPath("$.debugMessage").exists());
     }
 
@@ -177,16 +177,16 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"0.0.0.0\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+String.format(Constant.ERROR_IP_RESERVEES,"0.0.0.0/32","0.0.0.0/32")+"]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_RESERVEES,"0.0.0.0/32","0.0.0.0/32")))
                 .andExpect(jsonPath("$.debugMessage").exists());
     }
 
@@ -201,16 +201,16 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"1.1.1\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+Constant.ERROR_IPV4_INVALIDE+"1.1.1"+"]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IPV4_INVALIDE+"1.1.1"))
                 .andExpect(jsonPath("$.debugMessage").exists());
     }
 
@@ -225,16 +225,16 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
-        String json = "[{\n" +
+        String json = "{\n" +
                 "\"typeIp\":\"IPV4\",\n" +
                 "\"ip\":\"1.1.1-1.1-0\",\n" +
                 "\"commentaires\":\"test\"\n" +
-                "}]";
+                "}";
 
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+Constant.ERROR_IPV4_INVALIDE+"1.1.1-1.1-0"+"]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IPV4_INVALIDE+"1.1.1-1.1-0"))
                 .andExpect(jsonPath("$.debugMessage").exists());
     }
 
@@ -262,27 +262,26 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+"]"))
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")))
                 .andExpect(jsonPath("$.debugMessage").exists());
 
-        json = "[" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"1.1.1.1\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "},\n" +
-                "{\n" +
-                "\"typeIp\":\"IPV4\",\n" +
-                "\"ip\":\"2.2.2.2\",\n" +
-                "\"commentaires\":\"test\"\n" +
-                "}\n" +
-                "]";
-
-        this.mockMvc.perform(put("/v1/ip/123456789")
-                .contentType(MediaType.APPLICATION_JSON).content(json))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+"["+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+", "+String.format(Constant.ERROR_IP_DOUBLON,"2.2.2.2")+"]"))
-                .andExpect(jsonPath("$.debugMessage").exists());
+//        json =
+//                "{\n" +
+//                "\"typeIp\":\"IPV4\",\n" +
+//                "\"ip\":\"1.1.1.1\",\n" +
+//                "\"commentaires\":\"test\"\n" +
+//                "},\n" +
+//                "{\n" +
+//                "\"typeIp\":\"IPV4\",\n" +
+//                "\"ip\":\"2.2.2.2\",\n" +
+//                "\"commentaires\":\"test\"\n" +
+//                "}\n";
+//
+//        this.mockMvc.perform(put("/v1/ip/123456789")
+//                .contentType(MediaType.APPLICATION_JSON).content(json))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+", "+String.format(Constant.ERROR_IP_DOUBLON,"2.2.2.2")))
+//                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
