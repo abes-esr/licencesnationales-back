@@ -125,8 +125,8 @@ public class EtablissementEntityTest {
         Assertions.assertEquals("L'adresse postale fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("adresse")).findFirst().get().getMessage());
         Assertions.assertEquals("La ville fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("ville")).findFirst().get().getMessage());
         Assertions.assertEquals("L'adresse mail fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("mail")).findFirst().get().getMessage());
-        Assertions.assertEquals("Le nom fourni n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
-        Assertions.assertEquals("Le prénom fourni n'est pas valide", violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE,violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE, violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
     }
 
     @Test
@@ -141,8 +141,8 @@ public class EtablissementEntityTest {
         Assertions.assertEquals("ne doit pas être nul",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("adresse")).findFirst().get().getMessage());
         Assertions.assertEquals("La ville fournie n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("ville")).findFirst().get().getMessage());
         Assertions.assertEquals("ne doit pas être nul",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("mail")).findFirst().get().getMessage());
-        Assertions.assertEquals("Le nom fourni n'est pas valide",violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
-        Assertions.assertEquals("Le prénom fourni n'est pas valide", violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE,violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE, violationsContact.stream().filter(v -> v.getPropertyPath().toString().equals("prenom")).findFirst().get().getMessage());
     }
 
     @Test
@@ -152,7 +152,7 @@ public class EtablissementEntityTest {
 
         Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etab);
         Assertions.assertEquals(2,violationsEtab.size());
-        Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE, violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
         Assertions.assertEquals(Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES, violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
     }
 
@@ -163,8 +163,8 @@ public class EtablissementEntityTest {
 
         Set<ConstraintViolation<EtablissementEntity>> violationsEtab = validator.validate(etab);
         Assertions.assertEquals(2,violationsEtab.size());
-        Assertions.assertEquals("Le nom d'établissement fourni n'est pas valide", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
-        Assertions.assertEquals("ne doit pas être nul", violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE, violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("nom")).findFirst().get().getMessage());
+        Assertions.assertEquals(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE, violationsEtab.stream().filter(v -> v.getPropertyPath().toString().equals("siren")).findFirst().get().getMessage());
 
     }
 }
