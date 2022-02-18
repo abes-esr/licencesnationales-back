@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.repository.etablissement;
 
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,5 +27,7 @@ public interface EtablissementRepository extends JpaRepository<EtablissementEnti
     List<EtablissementEntity> getEtablissementEntityByIps_Empty();
 
     List<EtablissementEntity> findAllBySirenIn(List<String> ids);
+
+    List<EtablissementEntity> findAllByValideAndTypeEtablissementIn(boolean valide, List<TypeEtablissementEntity> ids);
 
 }

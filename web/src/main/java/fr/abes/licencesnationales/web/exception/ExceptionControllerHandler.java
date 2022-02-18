@@ -151,6 +151,13 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
+    /** Erreur dans l'envoi d'un mail */
+    @ExceptionHandler(SendMailException.class)
+    protected ResponseEntity<Object> handleSendMailException(SendMailException ex) {
+        String error = "Erreur dans l'envoi du mail " + ex.getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+    }
+
     /**
      * Si la transformation DTO a échoué
      *
