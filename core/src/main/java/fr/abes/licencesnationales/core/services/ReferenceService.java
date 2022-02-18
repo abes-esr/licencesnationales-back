@@ -31,6 +31,10 @@ public class ReferenceService {
         return entity.get();
     }
 
+    public List<TypeEtablissementEntity> findTypeEtabByIds(List<Integer> ids) {
+        return typeEtabRepository.findAllByIdIn(ids);
+    }
+
     public TypeEtablissementEntity findTypeEtabByLibelle(String libelle) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findFirstByLibelle(libelle);
         if (entity.isEmpty()) {

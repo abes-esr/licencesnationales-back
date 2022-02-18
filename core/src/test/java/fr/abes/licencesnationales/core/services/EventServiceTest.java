@@ -7,6 +7,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
@@ -101,4 +102,37 @@ public class EventServiceTest {
         Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact)));
         Assertions.assertEquals(String.format(Constant.ERROR_ETAB_EXISTE_PAS,"111111111"), ex.getMessage());
     }
+
+    @DisplayName("test récupération de la dernière date de modification d'un établissement")
+    @Test
+    void testGetLastDateModificationEtab() throws ParseException {
+        DateFormat format = new SimpleDateFormat("dd/mm/yyyy");
+        EtablissementEventEntity etab1 = new EtablissementModifieEventEntity(this,"111111111");
+        etab1.setDateCreationEvent(format.parse("10/02/2020"));
+
+        EtablissementEventEntity etab2 = new EtablissementModifieEventEntity(this,"111111111");
+        etab2.setDateCreationEvent(format.parse("15/03/2021"));
+
+        List<EtablissementEventEntity> listeEtab = new ArrayList<>();
+        listeEtab.add(etab1);
+        listeEtab.add(etab2);
+
+        Mockito.when(etablissementRepository.getLastModicationEtab("111111111")).thenReturn(listeEtab);
+
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+
+        Date dateDerniereModif = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact));
+        Assertions.assertEquals("15/03/2021", format.format(dateDerniereModif));
+    }
+
+    @DisplayName("test récupération dernière date de modification d'un établissement : pas de modification")
+    @Test
+    void testGetLastDateModificationEtabNoModif(){
+        Mockito.when(etablissementRepository.getLastModicationEtab("111111111")).thenReturn(new ArrayList<>());
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        Date dateLastModification = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact));
+
+        Assertions.assertEquals(null, dateLastModification);
+    }
+
 }

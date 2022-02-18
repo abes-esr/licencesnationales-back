@@ -7,6 +7,11 @@ import fr.abes.licencesnationales.core.dto.MailDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementCreeEventEntity;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -18,7 +23,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -190,18 +199,6 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
-    public void sendMail(String requestJson) throws RestClientException {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
-
-        restTemplate.getMessageConverters()
-                .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
-
-        restTemplate.postForObject(mailServerURL + "/htmlMail/", entity, String.class);
-    }
-
     public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String to, String cc) {
         String subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
@@ -273,6 +270,95 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructEnvoiFichierEditeursConfirmationAdmin(String mailAdmin, Date dateEnvoi) {
+        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
+        String subject = getEnv() + "[Appli LN] Confirmation envoi fichiers éditeurs";
+        StringBuilder message = new StringBuilder(BONJOUR);
+        message.append("Le traitement d'envoi des fichiers aux éditeurs s'est déroulé avec succès. <br>");
+        message.append("la date d'envoi a été mise à jour au ");
+        message.append(format.format(dateEnvoi));
+        String jsonRequestConstruct = mailToJSON(mailAdmin, null, subject, message.toString());
+        sendMail(jsonRequestConstruct);
+    }
+
+    public void constructEnvoiFichierEditeurs(String mailEditeur, String mailAdmin, Map<String, ByteArrayInputStream> listeFichier) throws IOException {
+        String subject = getEnv() + "Licences nationales France – Mise à jour des adresses IP des bénéficiaires / French national licences - beneficiaries' IP update";
+        StringBuilder message = new StringBuilder(BONJOUR);
+        message.append("Veuillez trouver en pièce jointe les adresses IP ainsi que les informations afférentes des bénéficiaires de la licence nationale.<br><br>");
+        message.append("Dans l'objectif de faciliter l'exploitation de ces données, notre équipe a remis en place le service d'envoi des fichiers incrémentaux d'ajouts, modifications et suppressions de comptes et d'IP.<br><br>");
+        message.append("Cet envoi comporte donc :<br><br><ul>");
+        message.append("<li>Un fichier listant les IP à supprimer (\"ListeDeletedAcces\")</li>");
+        message.append("<li>Un fichier listant les nouvelles IP à ajouter (\"ListeNewAccess\"). Dans un souci d’homogénéité, les plages IP v4 déclarées par les établissements sont sous forme XXX.XXX.XXX-XXX.XXX-XXX (où XXX est un chiffre de 1 à 255) et ne contiennent aucun caractère spécial. Par exemple : la plage 100.100.100.* est ainsi transcrite dans le fichier : 100.100.100-100.0-255 ; et 100.100.100.100-180 de cette manière : 100.100.100-100.100-180.</li>");
+        message.append("<li>Un fichier listant les comptes établissements à supprimer (\"ListeDeletedInstitutions\")</li>");
+        message.append("<li>Un fichier listant les nouveaux comptes établissements à créer (\"ListeNewInstitutions\")</li>");
+        message.append("<li>Un fichier listant les comptes établissements pour lesquels des modifications ont été apportées (nom de l’établissement, adresse, nom ou adresse mail du contact…) (\"ListeModifiedInstitutions\")</li>");
+        message.append("<li>Un fichier listant les comptes établissements fusionnés (Merged institutions)</li>");
+        message.append("<li>Un fichier listant les comptes établissements scindés (Split institutions)</li>");
+        message.append("<li>Un fichier récapitulatif avec l'ensemble des comptes validés et leurs IP associées (\"ListeALL\").</li></ul><br><br>");
+        message.append("A noter que si l’un de ces fichiers ne figure pas dans la liste des pièces jointes, cela signifie qu’aucune donnée n’a été modifiée.<br><br>");
+        message.append("Si vous observez des erreurs ou la moindre incohérence, ou si vous rencontrez des difficultés pour ouvrir ces fichiers, merci de nous en informer dans les meilleurs délais en écrivant à l’adresse <a mailto:ln-admin@abes.fr>ln-admin@abes.fr</a>. Nous vous conseillons d'enregistrer la pièce jointe avant de l'ouvrir dans un tableur pour modifier éventuellement les paramètres - pour rappel, les fichiers sont encodés en UTF-8.<br><br>");
+        message.append("Nous vous rappelons que vous disposez d'un délai contractuel de trois (3) semaines pour ouvrir les accès aux contenus sur votre plate-forme.<br><br>");
+        message.append(signature());
+        message.append("<br><br><hr><br><br>");
+        message.append("Dear all,<br><br>");
+        message.append("Please find attached the IP addresses for licensees of the French national license for your product.<br><br>");
+        message.append("In order to facilitate the data exploitation, our team has set up the service of sending files for additions, modifications and deletions of accounts and IP.<br><br>");
+        message.append("You will find :<br><br><ul>");
+        message.append("<li>A file listing the IPs to be deleted (\"ListeDeletedAcces\")</li>");
+        message.append("<li>A file listing the new IPs to add (\"ListeNewAccess\"). In order to homogenize IP formats, IP v4 ranges reported by institutions are in the form XXX.XXX.XXX-XXX.XXX-XXX (where XXX is a number from 1 to 255) and don’t contain any special symbol. For example: the range 100.100.100. * is also transcribed in the file: 100.100.100-100.0-255 ; and 100.100.100.100-180 in this way: 100.100.100-100.100-180.</li>");
+        message.append("<li>A file listing the institutions accounts to be deleted (\"ListeDeletedInstitutions\")</li>");
+        message.append("<li>A file listing the new institutions accounts to be created (\"ListeNewInstitutions\")</li>");
+        message.append("<li>A file listing the institutions accounts for which changes have been made (institution’s name , address, contact name or contact email address...) (\"ListeModifiedInstitutions\")</li>");
+        message.append("<li>A file listing the institutions accounts to be merged into new institutions (Merged institutions)</li>");
+        message.append("<li>A file listing the institutions accounts to be split into new institutions (Split institutions)</li>");
+        message.append("<li>A global file with all validated accounts and their associated IPs (\"ListeALL\")</li></ul><br><br>");
+        message.append("Please note that if one of these files does not appear in the attachment list, it means that no data has been modified.<br><br>");
+        message.append("If you observe any errors or if you have any difficulties with opening these files, please inform us as soon as possible: <a mailto:ln-admin@abes.fr>ln-admin@abes.fr</a>. We would like to remind you that the best way to proceed is usually to download the files before opening it, and that it has been encoded in UTF-8.<br><br>");
+        message.append("As specified in the license agreement, the accesses have to be set up within three (3) weeks.<br><br>");
+        message.append("Best regards,<br><br>");
+        message.append("French national licences team");
+
+        String jsonRequestConstruct = mailToJSON(mailEditeur, mailAdmin, subject, message.toString());
+        sendMailWithAttachments(jsonRequestConstruct, listeFichier);
+
+    }
+
+    public void sendMail(String requestJson) throws RestClientException {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        HttpEntity<String> entity = new HttpEntity<>(requestJson, headers);
+
+        restTemplate.getMessageConverters()
+                .add(0, new StringHttpMessageConverter(StandardCharsets.UTF_8));
+
+        restTemplate.postForObject(mailServerURL + "/htmlMail/", entity, String.class);
+    }
+
+
+    public void sendMailWithAttachments(String requestJson, Map<String,ByteArrayInputStream> listeFichiers) throws IOException {
+        HttpPost uploadFile = new HttpPost(mailServerURL + "v2/htmlMailAttachment/");
+        MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+        builder.addTextBody("mail", requestJson, ContentType.APPLICATION_JSON);
+
+        /*Ajout des fichiers au mail d'envoi*/
+        for(Map.Entry nomFichier : listeFichiers.entrySet()){
+                builder.addBinaryBody(
+                        "attachment",
+                        ((ByteArrayInputStream)nomFichier.getValue()).readAllBytes(),
+                        ContentType.APPLICATION_OCTET_STREAM,
+                        (String)nomFichier.getKey()
+                );
+        }
+
+        org.apache.http.HttpEntity multipart = builder.build();
+        uploadFile.setEntity(multipart);
+
+        /*Envoi du mail*/
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        httpClient.execute(uploadFile);
+    }
+
     protected String mailToJSON(String to, String cc, String subject, String text) {
         String json = "";
         ObjectMapper mapper = new ObjectMapper();
@@ -327,5 +413,6 @@ public class EmailService {
         message.append("</li></ul>");
         return message.toString();
     }
+
 
 }

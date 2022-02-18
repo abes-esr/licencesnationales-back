@@ -18,7 +18,7 @@ public class SwaggerConfig {
     public Docket api() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("fr.abes.lnevent.controller"))
+                .apis(RequestHandlerSelectors.basePackage("fr.abes.licencesnationales.web.controllers"))
                 .paths(PathSelectors.any())
                 .build()
                 .apiInfo(metadata());
@@ -26,7 +26,7 @@ public class SwaggerConfig {
 
     private ApiInfo metadata() {
         return new ApiInfoBuilder()
-                .title("WebService Hello Abes")
+                .title("WebService Licences Nationales")
                 .description("Le service web RESTful permet d'exposer un message public de bienvenue et un message privé aux utilisateurs authentifiés sur le service.</br>" +
                         "Les échanges s'opèrent via des requêtes HTTP contenant des fichiers JSON dans le corps des requêtes (Body) et une clé 'Authorization' dans l'entête des requêtes pour les appels à des fr.abes.licencesnationales.core.services sécurisés.")
                 .version("0.0.1")

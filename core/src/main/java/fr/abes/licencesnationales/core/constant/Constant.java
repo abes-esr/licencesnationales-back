@@ -160,6 +160,7 @@ public class Constant implements Serializable {
     public static final String ERROR_UTILISATEUR_NOT_FOUND_MAIL = "L'utilisateur avec l'email '%s' n'existe pas";
     public static final String ERROR_UTILISATEUR_NOT_FOUND_SIREN = "L'utilisateur avec le SIREN '%s' n'existe pas";
 
+    public static final String MESSAGE_ENVOI_OK = "Envoi des mails effectué avec succès";
 
 }
 
