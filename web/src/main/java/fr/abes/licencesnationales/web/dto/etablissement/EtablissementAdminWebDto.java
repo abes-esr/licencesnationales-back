@@ -10,7 +10,4 @@ import lombok.Setter;
 public class EtablissementAdminWebDto extends EtablissementWebDto {
     @JsonProperty("dateModificationDerniereIp")
     private String dateModificationDerniereIp;
-
-
-
 }
