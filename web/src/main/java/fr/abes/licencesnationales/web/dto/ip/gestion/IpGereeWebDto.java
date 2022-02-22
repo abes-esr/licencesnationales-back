@@ -7,4 +7,5 @@ import lombok.Setter;
 public class IpGereeWebDto {
     private Integer idIp;
     private ActionIp action;
+    private String commentaire;
 }

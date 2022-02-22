@@ -342,6 +342,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         IpGereeWebDto dto3 = new IpGereeWebDto();
         dto3.setAction(ActionIp.SUPPRIMER);
         dto3.setIdIp(3);
+        dto3.setCommentaire("test");
 
         List<IpGereeWebDto> listIps = new ArrayList<>();
         listIps.add(dto1);
@@ -365,7 +366,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(post("/v1/ip/gerer/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(listIps)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.[0].ip", oneOf("1.1.1.1", "2.2.2.2", "3.3.3.3")))
+                .andExpect(jsonPath("$.[0].ip", oneOf("1.1.1.1", "2.2.2.2 | test", "3.3.3.3")))
                 .andExpect(jsonPath("$.[0].action", oneOf("validation", "suppression", "rejet")));
     }
 
