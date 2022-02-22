@@ -30,7 +30,6 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -121,6 +120,125 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     }
 
     @Test
+    @DisplayName("test Ajout IP sans IP")
+    @WithMockUser
+    void testAjoutIpSansIp() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IP_IP_OBLIGATOIRE))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+    @Test
+    @DisplayName("test Ajout IP Nulle")
+    @WithMockUser
+    void testAjoutIpNulle() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"ip\":\"\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                        .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.IP_NOTNULL))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+
+
+    @Test
+    @DisplayName("test Ajout IP Reservee")
+    @WithMockUser
+    void testAjoutIpReservee() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"ip\":\"0.0.0.0\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_RESERVEES,"0.0.0.0/32","0.0.0.0/32")))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+
+    @Test
+    @DisplayName("test Ajout IP Mauvais format")
+    @WithMockUser
+    void testAjoutIpMauvaisFormat() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"ip\":\"1.1.1\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IPV4_INVALIDE+"1.1.1"))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+
+    @Test
+    @DisplayName("test Ajout Range IP Mauvais format")
+    @WithMockUser
+    void testAjoutRangeIpMauvaisFormat() throws Exception {
+        ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
+        EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
+
+        Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
+        Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+
+        //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
+        String json = "{\n" +
+                "\"typeIp\":\"IPV4\",\n" +
+                "\"ip\":\"1.1.1-1.1-0\",\n" +
+                "\"commentaires\":\"test\"\n" +
+                "}";
+
+        this.mockMvc.perform(put("/v1/ip/123456789")
+                .contentType(MediaType.APPLICATION_JSON).content(json))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_IPV4_INVALIDE+"1.1.1-1.1-0"))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+
+    @Test
     @DisplayName("test Ajout IP avec doublon")
     @WithMockUser
     void testAjoutIpAvecDoublon() throws Exception {
@@ -144,8 +262,26 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("L'IP 1.1.1.1 est déjà utilisée"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")))
+                .andExpect(jsonPath("$.debugMessage").exists());
 
+//        json =
+//                "{\n" +
+//                "\"typeIp\":\"IPV4\",\n" +
+//                "\"ip\":\"1.1.1.1\",\n" +
+//                "\"commentaires\":\"test\"\n" +
+//                "},\n" +
+//                "{\n" +
+//                "\"typeIp\":\"IPV4\",\n" +
+//                "\"ip\":\"2.2.2.2\",\n" +
+//                "\"commentaires\":\"test\"\n" +
+//                "}\n";
+//
+//        this.mockMvc.perform(put("/v1/ip/123456789")
+//                .contentType(MediaType.APPLICATION_JSON).content(json))
+//                .andExpect(status().isBadRequest())
+//                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+", "+String.format(Constant.ERROR_IP_DOUBLON,"2.2.2.2")))
+//                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -168,12 +304,12 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
     @DisplayName("test suppression IP Inconnue")
     @WithMockUser(authorities = {"admin"})
     void testSupprimerIpInconnue() throws Exception {
-        Mockito.when(ipService.getFirstById(1)).thenThrow(new UnknownIpException("L'IP 1 n'existe pas"));
+        Mockito.when(ipService.getFirstById(1)).thenThrow(new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,1)));
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("IP inconnue : L'IP 1 n'existe pas"))
-                .andExpect(jsonPath("$.debugMessage").value("L'IP 1 n'existe pas"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_IP_INCONNUE+String.format(Constant.ERROR_IP_EXISTE_PAS,1)))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test

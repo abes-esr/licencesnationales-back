@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -31,7 +32,7 @@ public abstract class ExportService<T, E> {
             printer.flush();
             return new ByteArrayInputStream(stream.toByteArray());
         } catch (final IOException e) {
-            throw new RuntimeException("Csv writing error: " + e.getMessage());
+            throw new RuntimeException(Constant.ERROR_CSV_WRITING + e.getMessage());
         }
     }
 }

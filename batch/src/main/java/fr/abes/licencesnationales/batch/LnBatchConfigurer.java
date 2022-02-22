@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.batch;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.configuration.annotation.BatchConfigurer;
 import org.springframework.batch.core.explore.JobExplorer;
@@ -83,7 +84,7 @@ public class LnBatchConfigurer implements BatchConfigurer {
             this.jobExplorer = jobExplorerFactory.getObject();
         }
         catch (Exception ex) {
-            throw new IllegalStateException("Ne peut pas initialiser spring batch : ", ex);
+            throw new IllegalStateException(Constant.ERROR_SPRING_BATCH, ex);
         }
     }
 }

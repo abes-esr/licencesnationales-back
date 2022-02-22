@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities.editeur;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercialEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
@@ -106,7 +107,7 @@ public class EditeurEntity implements Serializable {
         else if(contact instanceof ContactTechniqueEditeurEntity)
             this.contactsTechniques.add((ContactTechniqueEditeurEntity) contact);
         else {
-            throw new NotImplementedException("Le contact doit forcément être commercial ou technique");
+            throw new NotImplementedException(Constant.CONTACT_COM_OU_TECH_OBLIGATOIRE);
         }
     }
 

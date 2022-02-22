@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -110,8 +111,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("Credentials not valid : Bad credentials"))
-                .andExpect(content().string(containsString("Bad credentials")));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS + Constant.WRONG_LOGIN_AND_OR_PASS));
     }
 
     @Test
@@ -126,10 +126,11 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")))
-                .andExpect(content().string(containsString("SIREN obligatoire (login)")))
-                .andExpect(content().string(containsString("Mot de passe obligatoire (password)")));
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(content().string(containsString(Constant.ERROR_SAISIE)))
+                .andExpect(content().string(containsString(Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)))
+                .andExpect(content().string(containsString(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE)))
+                .andExpect(content().string(containsString(Constant.ERROR_ETAB_MDP_OBLIGATOIRE)));
     }
 
     @Test
@@ -143,8 +144,9 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/connexion")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(content().string(containsString("Le SIREN doit contenir 9 chiffres")));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES))
+                .andExpect(jsonPath("$.debugMessage").exists())
+                .andExpect(content().string(containsString(Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)));
     }
 
     @Test
@@ -177,7 +179,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_OUBLIE));
     }
 
     @Test
@@ -210,7 +212,74 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Un mail avec un lien de réinitialisation vous a été envoyé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_OUBLIE));
+    }
+
+
+    @Test
+    @DisplayName("Mot de passe oublié - SIREN invalide")
+    public void testMotDePasseOublieSirenCorrespondAPersonne() throws Exception {
+
+        // Mock user
+        String motDePasse = "password";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren(etabIn.getSiren())).thenReturn(null); //Etablissement simulation pas en bdd
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(emailService).constructResetTokenEmailUser(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+        request.setSiren(etabIn.getSiren());
+        request.setRecaptcha("4566");
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS+String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_SIREN,"000000000")));
+    }
+
+    @Test
+    @DisplayName("Mot de passe oublié - Email invalide")
+    public void testMotDePasseOublieEmailCorrespondAPersonne() throws Exception {
+
+        // Mock user
+        String motDePasse = "password";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        Mockito.when(etablissementService.getUserByMail(etabIn.getContact().getMail())).thenReturn(null);//etablissement simulation pas en bdd
+
+        // Mock ReCaptcha
+        ReCaptchaResponse response = new ReCaptchaResponse();
+        response.setSuccess(true);
+        response.setAction(ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
+
+        Mockito.when(reCaptchaService.verify(Mockito.anyString(), Mockito.anyString())).thenReturn(response);
+        Mockito.doNothing().when(emailService).constructResetTokenEmailUser(Mockito.anyString(), Mockito.anyString(), Mockito.anyString());
+
+        // Début
+        MotDePasseOublieRequestDto request = new MotDePasseOublieRequestDto();
+        request.setEmail(etabIn.getContact().getMail());
+        request.setRecaptcha("4566");
+
+        this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_CREDENTIALS+String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_MAIL,"mail@mail.com")));
     }
 
     @Test
@@ -230,7 +299,8 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("Le champs 'recaptcha' est obligatoire"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE + Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -251,7 +321,8 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/motDePasseOublie")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("Au moins un des champs 'siren' ou 'email' est obligatoire"));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -290,7 +361,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Votre mot de passe a bien été réinitialisé"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_RESET_MDP));
 
     }
 
@@ -314,7 +385,10 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("Le token n'est pas valide"));
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.debugMessage").exists())
+                .andExpect(content().string(containsString(Constant.ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE)))
+                .andExpect(content().string(containsString(Constant.ERROR_TOKEN)));
 
     }
 
@@ -331,9 +405,10 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(content().string(containsString("Votre mot de passe doit contenir au minimum 8 caractères")));
-
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.debugMessage").exists())
+                .andExpect(content().string(containsString(Constant.ERROR_SAISIE)))
+                .andExpect(content().string(containsString(Constant.MESSAGE_REGEXP_PASSWORD)));
     }
 
     @Test
@@ -354,7 +429,9 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/reinitialiserMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("Le champs 'token' est obligatoire"));
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.debugMessage").exists())
+                .andExpect(content().string(containsString(Constant.ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE)));
     }
 
     @Test
@@ -380,7 +457,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Votre mot de passe a bien été modifié"));
+                .andExpect(jsonPath("$.message").value(Constant.MESSAGE_MDP_MODIFIER));
     }
 
     @Test
@@ -406,7 +483,35 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.debugMessage").value("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel."));
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_AUTHENTIFICATION_ANCIEN_MDP_DIFFERENT_DE_ACTUEL))
+                .andExpect(jsonPath("$.debugMessage").exists());
+    }
+
+    @Test
+    @DisplayName("Modifier mot de passe - ancien passe meme que nouveau")
+    public void testUpdatePasswordAncienMemeQueNouveau() throws Exception {
+        // Mock user
+        String motDePasse = "OldPass1Test&";
+        String motDePasseCrypte = passwordEncoder.encode(motDePasse);
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", motDePasseCrypte);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+
+        Mockito.when(etablissementService.getFirstBySiren(etabIn.getSiren())).thenReturn(etabIn);
+
+        // Mock Token
+        Mockito.when(tokenProvider.getSirenFromJwtToken(Mockito.any())).thenReturn(etabIn.getSiren());
+
+        ModifierMotDePasseRequestDto dto = new ModifierMotDePasseRequestDto();
+        dto.setAncienMotDePasse("OldPass1Test&");
+        dto.setNouveauMotDePasse("OldPass1Test&");
+
+        this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
+                .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN))
+                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test
@@ -432,7 +537,7 @@ public class AuthenticationControllerTest extends LicencesNationalesAPIApplicati
         this.mockMvc.perform(post("/v1/authentification/modifierMotDePasse")
                 .contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.message").value("The credentials are not valid"))
-                .andExpect(content().string(containsString("Votre mot de passe doit contenir au minimum 8 caractères")));
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(content().string(containsString(Constant.MESSAGE_REGEXP_PASSWORD)));
     }
 }

@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.exception.UnknownStatutException;
@@ -24,8 +25,8 @@ public class ReferenceService {
 
     public TypeEtablissementEntity findTypeEtabById(Integer id) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findById(id);
-        if (!entity.isPresent()) {
-            throw new UnknownTypeEtablissementException("Type d'établissement inconnu : " + id);
+        if (entity.isEmpty()) {
+            throw new UnknownTypeEtablissementException(id.toString());
         }
         return entity.get();
     }
@@ -36,8 +37,8 @@ public class ReferenceService {
 
     public TypeEtablissementEntity findTypeEtabByLibelle(String libelle) throws UnknownTypeEtablissementException {
         Optional<TypeEtablissementEntity> entity = typeEtabRepository.findFirstByLibelle(libelle);
-        if (!entity.isPresent()) {
-            throw new UnknownTypeEtablissementException("Type d'établissement inconnu : " + libelle);
+        if (entity.isEmpty()) {
+            throw new UnknownTypeEtablissementException(libelle);
         }
         return entity.get();
     }
@@ -48,16 +49,16 @@ public class ReferenceService {
 
     public StatutEntity findStatutById(Integer id) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findById(id);
-        if (!entity.isPresent()) {
-            throw new UnknownStatutException("Statut inconnu");
+        if (entity.isEmpty()) {
+            throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();
     }
 
     public StatutEntity findStatutByLibelle(String libelle) throws UnknownStatutException {
         Optional<StatutEntity> entity = statutRepository.findFirstByLibelleStatut(libelle);
-        if (!entity.isPresent()) {
-            throw new UnknownStatutException("Statut inconnu");
+        if (entity.isEmpty()) {
+            throw new UnknownStatutException(Constant.STATUT_INCONNU);
         }
         return entity.get();
     }
