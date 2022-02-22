@@ -160,35 +160,51 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" dans l’<a href='https://acces.licencesnationales.fr/' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("L’Abes a vérifié l’éligibilité des nouvelles IP déclarées comme suit :");
-        message.append("<table>");
-        message.append("<tr><td><b>IP supprimé(es)</b></td><td>");
+        message.append("<table style=\"border-collapse:collapse;border:1px solid\">");
+        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>IP supprimé(es)</b></td><td style=\"width:30%\">");
         if (listIps.get("suppression").isEmpty()) {
             message.append("Aucune IP");
         } else {
+            message.append("<table style=\"border-collapse:collapse;width:100%\">");
             listIps.get("suppression").stream().forEach(ip -> {
-                message.append(ip);
+                //on découpe le résultat sur | pour avoir l'IP en première position et le commentaire en seconde
+                String[] commentaire = ip.split("|");
+                message.append("<tr><td style=\"border:1px solid\">" + commentaire[0]);
                 message.append("<br>");
+                if (commentaire.length >= 1)
+                    message.append("<u>Raison de la suppression</u> :<br>");
+                    message.append(commentaire[1]);
+                message.append("<br></td></tr>");
             });
+            message.append("</table>");
             message.append(ENDOFLINE);
         }
-        message.append("<tr><td><b>IP en attente d'attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : <a href='mailto:ln-admin@abes.fr'>ln-admin@abes.fr</a></td><td>");
+        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>IP en attente d'attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : <a href='mailto:ln-admin@abes.fr'>ln-admin@abes.fr</a></td><td style=\"width:30%\">");
         if (listIps.get("rejet").isEmpty()) {
             message.append("Aucune IP");
         } else {
+            message.append("<table style=\"border-collapse:collapse;width:100%\">");
             listIps.get("rejet").stream().forEach(ip -> {
+                message.append("<tr><td style=\"border:1px solid\">");
                 message.append(ip);
                 message.append("<br>");
+                message.append("</td></tr>");
             });
+            message.append("</table>");
             message.append(ENDOFLINE);
         }
-        message.append("<tr><td><b>Ip Validées<b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td>");
+        message.append("<tr><td><b style=\"border:1px solid;width:70%\">Ip Validées<b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"width:30%\">");
         if (listIps.get("validation").isEmpty()) {
             message.append("Aucune IP");
         } else {
+            message.append("<table style=\"border-collapse:collapse;width:100%\">");
             listIps.get("validation").stream().forEach(ip -> {
+                message.append("<tr><td style=\"border:1px solid\">");
                 message.append(ip);
                 message.append("<br>");
+                message.append("</td></tr>");
             });
+            message.append("</table>");
             message.append(ENDOFLINE);
         }
 

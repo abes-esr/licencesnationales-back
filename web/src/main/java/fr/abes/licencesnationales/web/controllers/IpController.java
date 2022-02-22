@@ -117,6 +117,7 @@ public class IpController extends AbstractController {
                         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
                         eventRepository.save(ipSupprimeeEvent);
                         result.put("action", "suppression");
+                        result.put("commentaire", ip.getCommentaire());
                         break;
                     default:
                         result.put("action", "action inconnue");
@@ -137,7 +138,7 @@ public class IpController extends AbstractController {
                     listValidation.add(r.get("ip"));
                     break;
                 case "suppression":
-                    listSuppression.add(r.get("ip"));
+                    listSuppression.add(r.get("ip") + "|" + r.get("commentaire"));
                     break;
                 case "rejet":
                     listRejet.add(r.get("ip"));
