@@ -10,7 +10,6 @@ import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpDoublonException;
-import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
@@ -39,12 +38,12 @@ public class IpAjouteeListener implements ApplicationListener<IpCreeEventEntity>
         if (ipCreeEvent.getTypeIp().equals(IpType.IPV4)) {
             ip = new IpV4(ipCreeEvent.getIp(), ipCreeEvent.getCommentaires(), statut);
             if (ipService.isIpAlreadyExists((IpV4) ip)) {
-                throw new IpDoublonException("L'IP " + ip.getIp() + " est déjà utilisée");
+                throw new IpDoublonException(String.format(Constant.ERROR_IP_DOUBLON,ip.getIp()));
             }
         } else {
             ip = new IpV6(ipCreeEvent.getIp(), ipCreeEvent.getCommentaires(), statut);
             if (ipService.isIpAlreadyExists((IpV6) ip)) {
-                throw new IpDoublonException("L'IP " + ip.getIp() + " est déjà utilisée");
+                throw new IpDoublonException(String.format(Constant.ERROR_IP_DOUBLON,ip.getIp()));
             }
         }
         etablissementEntity.ajouterIp(ip);

@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.batch.gestionCompte;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.services.EtablissementService;
@@ -46,6 +47,11 @@ public class SelectEtablissementTasklet implements Tasklet, StepExecutionListene
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+        try {
+            this.listeEtab = service.getEtabASupprimer();
+        } catch (UnknownEtablissementException ex) {
+            log.error(Constant.ERROR_ETAB_INCONNU + ex.getMessage());
+        }
         this.listeEtab = service.getEtabASupprimer();
         return RepeatStatus.FINISHED;
     }

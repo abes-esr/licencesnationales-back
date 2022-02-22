@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.entities.ip;
 
 import com.github.jgonian.ipmath.Ipv4;
 import com.github.jgonian.ipmath.Ipv4Range;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.ip.Ipv4RangeConverter;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
@@ -50,9 +51,13 @@ public class IpV4 extends IpEntity implements Serializable {
      */
     public IpV4(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         super(ip, commentaires, statut);
-        // On transforme la chaîne de caractère normée en Objet Java
-        this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
-        this.checkIfReserved();
+        try {
+            // On transforme la chaîne de caractère normée en Objet Java
+            this.ipRange = Ipv4Range.from(IpUtils.getIP(ip, IpType.IPV4, 1)).to(IpUtils.getIP(ip, IpType.IPV4, 2));
+            this.checkIfReserved();
+        } catch (IllegalArgumentException ex) {
+            throw new IllegalArgumentException(Constant.ERROR_IPV4_INVALIDE + ip);
+        }
     }
 
     /**
@@ -81,7 +86,7 @@ public class IpV4 extends IpEntity implements Serializable {
         while (iter.hasNext()) {
             Ipv4Range candidate = iter.next();
             if (candidate.contains(this.ipRange)) {
-                throw new IpException(this.ipRange.toString() + " est inclus dans les IP réservées " + candidate.toString());
+                throw new IpException(String.format(Constant.ERROR_IP_RESERVEES,this.ipRange.toString(),candidate));
             }
         }
     }

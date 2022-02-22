@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.utils;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.exception.IpException;
 
@@ -16,7 +17,7 @@ public class IpUtils {
     public static String getIP(String ip, IpType typeIp, int whichValue) throws IpException {
 
         if (ip == null || ip.isEmpty()) {
-            throw new IpException("Ip ne peut pas être nulle");
+            throw new IpException(Constant.IP_NOTNULL);
         }
 
         try {
@@ -43,7 +44,7 @@ public class IpUtils {
             }
             return temp;
         } catch (Exception ex) {
-            throw new IpException("Unable to decode IP");
+            throw new IpException(Constant.IP_UNABLE_TO_DECODE);
         }
     }
 

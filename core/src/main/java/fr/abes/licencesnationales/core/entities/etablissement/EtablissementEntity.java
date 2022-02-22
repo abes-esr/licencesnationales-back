@@ -28,20 +28,20 @@ public class EtablissementEntity implements Serializable {
     @Getter @Setter
     private Integer id;
 
-    @NotBlank( message = "Le nom d'établissement fourni n'est pas valide")
+    @NotBlank( message = Constant.ERROR_ETAB_NOM_OBLIGATOIRE)
     @Getter @Setter
     private String nom;
 
-    @NotNull
+    @NotNull( message = Constant.ERROR_ETAB_SIREN_OBLIGATOIRE)
     @Column(name = "siren", unique = true)
-    @Pattern(regexp = "^\\d{9}$", message = "Le SIREN doit contenir 9 chiffres")
+    @Pattern(regexp = "^\\d{9}$", message = Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)
     @Getter @Setter
     private String siren;
 
     @Getter @Setter
     private Date dateCreation = new Date();
 
-    @NotNull
+    @NotNull( message = Constant.ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE)
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "ref_typeEtablissement")
     @Getter @Setter
@@ -89,7 +89,7 @@ public class EtablissementEntity implements Serializable {
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         if (contact == null) {
-            throw new IllegalArgumentException("Le contact est obligatoire");
+            throw new IllegalArgumentException(Constant.CONTACT_OBLIGATOIRE);
         }
         this.contact = contact;
         this.valide = false;
@@ -110,7 +110,7 @@ public class EtablissementEntity implements Serializable {
         this.typeEtablissement = typeEtablissement;
         this.idAbes = idAbes;
         if (contact == null) {
-            throw new IllegalArgumentException("Le contact est obligatoire");
+            throw new IllegalArgumentException(Constant.CONTACT_OBLIGATOIRE);
         }
         this.contact = contact;
         this.valide = false;

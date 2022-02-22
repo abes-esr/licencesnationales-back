@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/v1/editeurs")
-public class EditeurController extends AbstractController {
+public class EditeurController extends AbstractController{
 
     @Autowired
     private UtilsMapper mapper;
@@ -95,7 +95,7 @@ public class EditeurController extends AbstractController {
 
     @PutMapping("/")
     @PreAuthorize("hasAuthority('admin')")
-    public void creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDto) throws IOException, UnknownTypeEtablissementException {
+    public ResponseEntity<Object> creationEditeur(@Valid @RequestBody EditeurCreeWebDto editeurCreeWebDto) throws IOException, UnknownTypeEtablissementException {
         // On convertit la DTO web (Json) en objet métier d'événement de création d'éditeur
         EditeurCreeEventEntity event = mapper.map(editeurCreeWebDto, EditeurCreeEventEntity.class);
         event.setSource(this);
@@ -107,11 +107,12 @@ public class EditeurController extends AbstractController {
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_CREATIONEDITEUR_OK);
     }
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void edit(@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
+    public ResponseEntity<Object> edit (@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
         editeurModifieWebDto.setId(id);
         EditeurModifieEventEntity event = mapper.map(editeurModifieWebDto, EditeurModifieEventEntity.class);
         event.setSource(this);
@@ -122,17 +123,19 @@ public class EditeurController extends AbstractController {
         // On publie l'événement et on le sauvegarde
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_MODIFEDITEUR_OK);
     }
 
     @DeleteMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable Integer id) throws JsonProcessingException {
+    public ResponseEntity<Object> suppression(@PathVariable Integer id) throws JsonProcessingException {
         //on cherche l'editeur uniquement pour gérer le cas où il n'existe pas
         editeurService.getFirstEditeurById(id);
 
         EditeurSupprimeEventEntity event = new EditeurSupprimeEventEntity(this, id);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_SUPPEDITEUR_OK);
     }
 
     @GetMapping(value = "/{id}")

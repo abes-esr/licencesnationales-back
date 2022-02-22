@@ -90,41 +90,41 @@ public class EtablissementWebDtoConverterTest {
     public void testMissingFieldsConverterEtabCreeWebDto() {
         EtablissementCreeWebDto etablissement = new EtablissementCreeWebDto();
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
 
         etablissement.setName("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
 
         etablissement.setSiren("123456789");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'typeEtablissement' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE);
 
         etablissement.setTypeEtablissement("testType");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'contact' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CONTACT_OBLIGATOIRE);
 
         ContactCreeWebDto contact = new ContactCreeWebDto();
         etablissement.setContact(contact);
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setNom("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'prenom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setPrenom("testPrenom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'telephone' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setTelephone("0000000000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'mail' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setMail("test@test.com");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MDP_OBLIGATOIRE);
 
         etablissement.getContact().setMotDePasse("testPassword");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'adresse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_ADRESSE_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setCodePostal("00000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setVille("villeTest");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementCreeEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE);
 
     }
 
@@ -165,39 +165,39 @@ public class EtablissementWebDtoConverterTest {
     public void testMissingFieldsConverterEtabModifieAdminWebDto() {
         EtablissementModifieAdminWebDto etablissement = new EtablissementModifieAdminWebDto();
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
 
         etablissement.setNom("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
 
         etablissement.setSiren("123456789");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'typeEtablissement' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE);
 
         etablissement.setTypeEtablissement("testType");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'contact' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CONTACT_OBLIGATOIRE);
 
         ContactModifieWebDto contact = new ContactModifieWebDto();
         etablissement.setContact(contact);
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setNom("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'prenom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setPrenom("testPrenom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'telephone' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setTelephone("0000000000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'mail' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setMail("test@test.com");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MDP_OBLIGATOIRE);
 
         etablissement.getContact().setCodePostal("00000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setVille("villeTest");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE);
 
     }
 
@@ -232,30 +232,30 @@ public class EtablissementWebDtoConverterTest {
     public void testMissingFieldsConverterEtabModifieWebDto() {
         EtablissementModifieUserWebDto etablissement = new EtablissementModifieUserWebDto();
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
 
         ContactModifieWebDto contact = new ContactModifieWebDto();
         etablissement.setContact(contact);
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setNom("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'prenom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setPrenom("testPrenom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'telephone' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setTelephone("0000000000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'mail' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setMail("test@test.com");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MDP_OBLIGATOIRE);
 
         etablissement.getContact().setCodePostal("00000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE);
 
         etablissement.getContact().setVille("villeTest");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementModifieEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE);
 
     }
 
@@ -301,44 +301,44 @@ public class EtablissementWebDtoConverterTest {
     @DisplayName("Test converter EtablissementFusionneWebDto / EtablissementFusionneEvent avec champs manquants")
     public void testMissingFieldsConverterEtabFusionneWebDto() {
         EtablissementFusionneWebDto etablissement = new EtablissementFusionneWebDto();
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("La fusion doit porter sur au moins 2 établissements");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_2_ETAB_OBLIGATOIRE);
         etablissement.setSirenFusionnes(Lists.newArrayList("123456789", "987654321"));
 
         EtablissementCreeSansCaptchaWebDto nouvelEtab = new EtablissementCreeSansCaptchaWebDto();
         etablissement.setNouveauEtab(nouvelEtab);
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'siren' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
         etablissement.getNouveauEtab().setSiren("654321987");
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().setNom("nomEtab");
 
         ContactCreeWebDto contact = new ContactCreeWebDto();
         etablissement.getNouveauEtab().setContact(contact);
 
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'nom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setNom("testNom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'prenom' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setPrenom("testPrenom");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'telephone' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setTelephone("0000000000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'mail' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setMail("test@test.com");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'motDePasse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_MDP_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setMotDePasse("testPassword");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'adresse' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_ADRESSE_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setCodePostal("00000");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'codePostal' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE);
 
         etablissement.getNouveauEtab().getContact().setVille("villeTest");
-        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals("Le champs 'ville' du contact est obligatoire");
+        Assertions.assertThrows(MappingException.class, () -> utilsMapper.map(etablissement, EtablissementFusionneEventEntity.class)).getErrorMessages().stream().findFirst().get().equals(Constant.ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE);
 
     }
 

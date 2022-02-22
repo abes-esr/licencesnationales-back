@@ -23,7 +23,6 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.NoHandlerFoundException;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -59,7 +58,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
     @Override
     protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
 
-        String error = "Malformed JSON request";
+        String error = Constant.MALFORMED_JSON;
 
         if (ex.getCause() instanceof MismatchedInputException) {
             String targetType = ((MismatchedInputException) ex.getCause()).getTargetType().getSimpleName();
@@ -106,15 +105,18 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        String error = "The credentials are not valid";
         BindingResult result = ex.getBindingResult();
         List<FieldError> fieldErrors = result.getFieldErrors();
-        StringBuilder msg = new StringBuilder("Incorrect fields : ");
-        for (FieldError fieldError : fieldErrors) {
-            msg.append(fieldError.getDefaultMessage() + ", ");
+        StringBuilder msg = new StringBuilder(Constant.ERROR_SAISIE);
+        for (int i=0;i<fieldErrors.size();i++) {
+            if(i==(fieldErrors.size()-1)){
+                msg.append(fieldErrors.get(i).getDefaultMessage());
+            } else{
+                msg.append(fieldErrors.get(i).getDefaultMessage() + ", ");
+            }
         }
         log.error(msg.toString());
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, new JsonIncorrectException(msg.toString())));
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, msg.toString(),ex));
     }
 
     /**
@@ -164,9 +166,8 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler(MappingException.class)
     protected ResponseEntity<Object> handleMappingException(MappingException ex) {
-        String error = "Malformed JSON request : " + ex.getMessage();
-        log.error(ex.getCause().getLocalizedMessage());
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+        String message = Constant.ERROR_SAISIE + ((MappingException) ex.getCause()).getErrorMessages().stream().findFirst().get().getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, ex));
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
@@ -177,8 +178,8 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     protected ResponseEntity<Object> handleInvalidTokenException(InvalidTokenException ex) {
-        String error = "Erreur de token d'authentification";
-        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
+        String message = Constant.ERROR_TOKEN+ ex.getMessage();
+        return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, message, ex));
     }
 
     /**
@@ -189,12 +190,13 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
      */
     @ExceptionHandler({AuthenticationException.class, AccesInterditException.class, SirenIntrouvableException.class})
     protected ResponseEntity<Object> handleAuthentificationException(Exception ex) {
-        String error = "Credentials not valid : " + ex.getMessage();
+        String error = Constant.ERROR_CREDENTIALS + ex.getMessage();
+
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 
     @ExceptionHandler(UnknownEditeurException.class)
-    protected ResponseEntity<Object> handleUnknownIpException(UnknownEditeurException ex) {
+    protected ResponseEntity<Object> handleUnknownEditeurException(UnknownEditeurException ex) {
         String error = Constant.ERROR_EDITEUR_INCONNU + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
@@ -219,7 +221,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(BadStatutException.class)
     protected ResponseEntity<Object> handleBadStatutEcception(BadStatutException ex) {
-        String error = Constant.ERROR_ETAB + ex.getMessage();
+        String error = Constant.ERROR_STATUT_IP + ex.getMessage();
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 

@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.EventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
@@ -74,8 +75,8 @@ public class EventService {
      */
     public Date getDateCreationEtab(EtablissementEntity etab) throws UnknownEtablissementException{
         Optional<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
-        if (!etablissement.isPresent()){
-            throw new UnknownEtablissementException("Etablissement inconnu");
+        if (etablissement.isEmpty()){
+            throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS,etab.getSiren()));
         }
         return etablissement.get().getDateCreationEvent();
     }

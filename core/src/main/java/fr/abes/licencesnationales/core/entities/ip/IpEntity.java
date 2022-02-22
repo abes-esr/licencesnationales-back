@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.ip;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
@@ -68,7 +69,7 @@ public abstract class IpEntity implements Serializable, Comparable {
      */
     public IpEntity(String ip, String commentaires, StatutIpEntity statut) throws IpException {
         if (ip == null || ip.isEmpty()) {
-            throw new IpException("Ip ne peut pas être nulle");
+            throw new IpException(Constant.IP_NOTNULL);
         }
         this.statut = statut;
         this.ip = ip;
@@ -90,7 +91,7 @@ public abstract class IpEntity implements Serializable, Comparable {
         this.id = id;
 
         if (ip.isEmpty()) {
-            throw new IpException("Ip ne peut pas être nulle");
+            throw new IpException(Constant.IP_NOTNULL);
         }
         this.statut = statut;
         this.ip = ip;

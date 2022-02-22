@@ -29,7 +29,7 @@ class IpV6Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV6 ip = new IpV6(null, "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
@@ -38,7 +38,7 @@ class IpV6Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV6 ip = new IpV6("", "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
@@ -47,7 +47,7 @@ class IpV6Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV6 ip = new IpV6("192.168.1.1", "test", statut);
         });
-        assertEquals("Invalid IPv6 address: '192.168.1.1'", exception.getLocalizedMessage());
+        assertEquals(Constant.ERROR_IPV6_INVALIDE+"192.168.1.1", exception.getLocalizedMessage());
     }
 
     @Test
@@ -62,7 +62,7 @@ class IpV6Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV6 ip = new IpV6("5800:10C3:E3C3:F1AA:48E3:D923:D497-D494:BBFF-AAFF", "test", statut);
         });
-        assertEquals("Invalid range [5800:10c3:e3c3:f1aa:48e3:d923:d497:bbff..5800:10c3:e3c3:f1aa:48e3:d923:d494:aaff]", exception.getLocalizedMessage());
+        assertEquals(Constant.ERROR_IPV6_INVALIDE+"5800:10C3:E3C3:F1AA:48E3:D923:D497-D494:BBFF-AAFF", exception.getLocalizedMessage());
     }
 
     @Test
