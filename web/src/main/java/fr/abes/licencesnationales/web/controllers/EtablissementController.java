@@ -282,7 +282,7 @@ public class EtablissementController extends AbstractController {
         return mapper.mapList(referenceService.findAllTypeEtab(), TypeEtablissementDto.class);
     }
 
-    @GetMapping(value = "/export")
+    @PostMapping(value = "/export")
     public void exportEtab(@RequestBody List<String> sirens, HttpServletResponse response) throws IOException, SirenIntrouvableException, AccesInterditException {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");

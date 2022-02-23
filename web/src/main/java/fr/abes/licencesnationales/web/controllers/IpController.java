@@ -196,7 +196,7 @@ public class IpController extends AbstractController {
         return mapper.map(ipService.getFirstById(ipDto.getId()), IpWebDto.class);
     }
 
-    @GetMapping(value = "/export/{siren}")
+    @PostMapping(value = "/export/{siren}")
     public void exportIp(@PathVariable String siren, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
