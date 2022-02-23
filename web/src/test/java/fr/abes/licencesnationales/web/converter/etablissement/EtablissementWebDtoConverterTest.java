@@ -466,7 +466,7 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(1, dto.getNotifications().size());
-        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Aucune IP déclarée"));
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas que des IP nouvelles")
@@ -485,7 +485,7 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(1, dto.getNotifications().size());
-        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Toutes les adresses IP déclarées sont en attente d'examen par l'Abes"));
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas 2 nouvelles IP")
@@ -507,8 +507,8 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(2, dto.getNotifications().size());
-        Assertions.assertEquals("en attente d'examen par l'Abes : 1.1.1.1. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("Nouvelle adresse IP"));
-        Assertions.assertEquals("en attente d'examen par l'Abes : 1111:1111:1111:1111:1111:1111:1111:1111. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("Nouvelle adresse IP"));
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1.1.1.1. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("description"));
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1111:1111:1111:1111:1111:1111:1111:1111. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas IPs en attente attestation")
@@ -527,7 +527,7 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(1, dto.getNotifications().size());
-        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("Aucune IP validée"));
+        Assertions.assertEquals("les accès aux corpus acquis ne sont pas ouverts.", dto.getNotifications().get(0).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation")
@@ -550,8 +550,8 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(2, dto.getNotifications().size());
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(0).get("IP en attente de validation : 1.1.1.1. Envoyer l'attestation à ln-admin@abes.fr."));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("IP en attente de validation : 1111:1111:1111:1111:1111:1111:1111:1111. Envoyer l'attestation à ln-admin@abes.fr."));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(0).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation + nouvelles IP")
@@ -577,9 +577,9 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(3, dto.getNotifications().size());
-        Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("Nouvelle adresse IP"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("IP en attente de validation : 1.1.1.1. Envoyer l'attestation à ln-admin@abes.fr."));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("IP en attente de validation : 1111:1111:1111:1111:1111:1111:1111:1111. Envoyer l'attestation à ln-admin@abes.fr."));
+        Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("description"));
 
     }
 }
