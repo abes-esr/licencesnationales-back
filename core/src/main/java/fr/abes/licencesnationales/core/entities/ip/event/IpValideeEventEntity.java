@@ -20,4 +20,8 @@ public class IpValideeEventEntity extends IpEventEntity {
     public IpValideeEventEntity(Object source, Integer ipId) {
         super(source, ipId);
     }
+
+    public IpValideeEventEntity(Object source, Integer ipId, String ip, String siren) {
+        super(source, ipId, ip, siren);
+    }
 }

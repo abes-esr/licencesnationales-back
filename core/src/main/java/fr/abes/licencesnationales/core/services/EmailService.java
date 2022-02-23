@@ -14,7 +14,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -23,7 +22,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -194,7 +194,7 @@ public class EmailService {
             message.append("</table>");
             message.append(ENDOFLINE);
         }
-        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>Ip Validées<b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"width:30%\">");
+        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>Ip Validées</b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"width:30%\">");
         if (listIps.get("validation").isEmpty()) {
             message.append("Aucune IP");
         } else {

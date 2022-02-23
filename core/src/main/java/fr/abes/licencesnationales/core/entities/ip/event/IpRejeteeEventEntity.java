@@ -20,4 +20,8 @@ public class IpRejeteeEventEntity extends IpEventEntity {
     public IpRejeteeEventEntity(Object source, Integer ipId) {
         super(source, ipId);
     }
+
+    public IpRejeteeEventEntity(Object source, Integer id, String ip, String siren) {
+        super(source, id, ip, siren);
+    }
 }

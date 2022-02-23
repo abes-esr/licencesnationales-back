@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.core.entities.ip.event;
 
 import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -30,6 +31,12 @@ public class IpEventEntity extends EventEntity implements Serializable {
 
     protected transient Integer ipId;
 
+    @Column(name = "TYPE_ACCES")
+    protected String typeAcces;
+
+    @Column(name = "TYPE_IP")
+    protected IpType typeIp;
+
     public IpEventEntity(Object source) {
         super(source);
     }
@@ -50,4 +57,10 @@ public class IpEventEntity extends EventEntity implements Serializable {
         this.ipId = ipId;
     }
 
+    public IpEventEntity(Object source, Integer ipId, String ip, String siren) {
+        super(source);
+        this.ip = ip;
+        this.ipId = ipId;
+        this.siren = siren;
+    }
 }

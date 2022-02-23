@@ -13,6 +13,8 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 public class IpSupprimeeEventEntity extends IpEventEntity {
+    private String commentaire;
+
     public IpSupprimeeEventEntity(Object source) {
         super(source);
     }
@@ -25,4 +27,7 @@ public class IpSupprimeeEventEntity extends IpEventEntity {
         super(source, ipId, ip);
     }
 
+    public IpSupprimeeEventEntity(Object source, Integer id, String ip, String siren) {
+        super(source, id, ip, siren);
+    }
 }

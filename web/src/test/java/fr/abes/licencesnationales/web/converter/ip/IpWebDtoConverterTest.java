@@ -2,11 +2,16 @@ package fr.abes.licencesnationales.web.converter.ip;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpRejeteeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpValideeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
@@ -146,5 +151,86 @@ class IpWebDtoConverterTest {
         Ipv6AjouteeWebDto ipv6 = new Ipv6AjouteeWebDto();
 
         Assertions.assertThrows(MappingException.class, () -> mapper.map(ipv6, IpCreeEventEntity.class));
+    }
+
+    @Test
+    @DisplayName("test convertisseur IpEntity / IpSupprimeeEvent")
+    void testIpEntityIpSupprimeeEvent() throws IpException {
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etab = new EtablissementEntity("nomTest", "111111111", contact);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ipv4 = new IpV4("1.1.1.1", "test", statut);
+        ipv4.setEtablissement(etab);
+
+        IpSupprimeeEventEntity event = mapper.map(ipv4, IpSupprimeeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event.getSiren());
+        Assertions.assertEquals("1.1.1.1", event.getIp());
+        Assertions.assertEquals("ip", event.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV4, event.getTypeIp());
+
+        IpEntity ipv6 = new IpV6("1111:1111:1111:1111:1111:1111:1111:1111", "test", statut);
+        ipv6.setEtablissement(etab);
+
+        IpSupprimeeEventEntity event2 = mapper.map(ipv6, IpSupprimeeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event2.getSiren());
+        Assertions.assertEquals("1111:1111:1111:1111:1111:1111:1111:1111", event2.getIp());
+        Assertions.assertEquals("ip", event2.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV6, event2.getTypeIp());
+    }
+
+    @Test
+    @DisplayName("test convertisseur IpEntity / IpRejeteeEvent")
+    void testIpEntityIpRejeteeEvent() throws IpException {
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etab = new EtablissementEntity("nomTest", "111111111", contact);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ipv4 = new IpV4("1.1.1.1", "test", statut);
+        ipv4.setEtablissement(etab);
+
+        IpRejeteeEventEntity event = mapper.map(ipv4, IpRejeteeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event.getSiren());
+        Assertions.assertEquals("1.1.1.1", event.getIp());
+        Assertions.assertEquals("ip", event.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV4, event.getTypeIp());
+
+        IpEntity ipv6 = new IpV6("1111:1111:1111:1111:1111:1111:1111:1111", "test", statut);
+        ipv6.setEtablissement(etab);
+
+        IpRejeteeEventEntity event2 = mapper.map(ipv6, IpRejeteeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event2.getSiren());
+        Assertions.assertEquals("1111:1111:1111:1111:1111:1111:1111:1111", event2.getIp());
+        Assertions.assertEquals("ip", event2.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV6, event2.getTypeIp());
+    }
+
+    @Test
+    @DisplayName("test convertisseur IpEntity / IpValideeEvent")
+    void testIpEntityIpValideeEvent() throws IpException {
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etab = new EtablissementEntity("nomTest", "111111111", contact);
+        StatutIpEntity statut = new StatutIpEntity(1, "Valide");
+        IpEntity ipv4 = new IpV4("1.1.1.1", "test", statut);
+        ipv4.setEtablissement(etab);
+
+        IpValideeEventEntity event = mapper.map(ipv4, IpValideeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event.getSiren());
+        Assertions.assertEquals("1.1.1.1", event.getIp());
+        Assertions.assertEquals("ip", event.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV4, event.getTypeIp());
+
+        IpEntity ipv6 = new IpV6("1111:1111:1111:1111:1111:1111:1111:1111", "test", statut);
+        ipv6.setEtablissement(etab);
+
+        IpValideeEventEntity event2 = mapper.map(ipv6, IpValideeEventEntity.class);
+
+        Assertions.assertEquals("111111111", event2.getSiren());
+        Assertions.assertEquals("1111:1111:1111:1111:1111:1111:1111:1111", event2.getIp());
+        Assertions.assertEquals("ip", event2.getTypeAcces());
+        Assertions.assertEquals(IpType.IPV6, event2.getTypeIp());
     }
 }

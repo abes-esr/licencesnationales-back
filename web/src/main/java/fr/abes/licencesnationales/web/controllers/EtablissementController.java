@@ -230,6 +230,7 @@ public class EtablissementController extends AbstractController {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity event = new EtablissementSupprimeEventEntity(this, siren);
+        event.setNomEtab(etab.getNom());
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
 
@@ -247,6 +248,7 @@ public class EtablissementController extends AbstractController {
             throw new BadStatutException(Constant.DEJA_VALIDE_IP);
         }
         EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        etablissementValideEvent.setNomEtab(etab.getNom());
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
         eventService.save(etablissementValideEvent);
