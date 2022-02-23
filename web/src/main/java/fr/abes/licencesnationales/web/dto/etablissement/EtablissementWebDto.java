@@ -11,7 +11,6 @@ import lombok.Setter;
 @JsonSubTypes({@JsonSubTypes.Type(value = EtablissementAdminWebDto.class, name = "admin"),
         @JsonSubTypes.Type(value = EtablissementUserWebDto.class, name = "etab")})
 public class EtablissementWebDto {
-
     @JsonProperty("id")
     private Integer id;
 
