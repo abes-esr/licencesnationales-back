@@ -30,6 +30,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,7 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestController
 @RequestMapping("/v1/etablissements")
-public class EtablissementController {
+public class EtablissementController extends AbstractController {
 
     @Autowired
     private UtilsMapper mapper;
@@ -93,20 +94,21 @@ public class EtablissementController {
 
 
     @PutMapping
-    public void creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
+    public ResponseEntity<Object> creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
+        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "creationCompte");
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
         if (etablissementService.existeSiren(etablissementCreeWebDto.getSiren())) {
-            throw new SirenExistException("Le siren saisi est déjà utilisé");
+            throw new SirenExistException(Constant.SIREN_DOUBLON);
         }
         if (etablissementService.existeMail(etablissementCreeWebDto.getContact().getMail())) {
             throw new MailDoublonException(Constant.ERROR_DOUBLON_MAIL);
@@ -125,20 +127,21 @@ public class EtablissementController {
         /*******************************************/
         emailService.constructCreationCompteEmailUser(event);
         emailService.constructCreationCompteEmailAdmin(mailAdmin, event.getNomEtab());
+        return buildResponseEntity(Constant.MESSAGE_CREATIONETAB_OK);
     }
 
     @PostMapping(value = "/{siren}")
-    public void edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
+    public ResponseEntity<Object> edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
         boolean envoiMail = false;
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
                 etablissementModifieWebDto.setSiren(siren);
             } else {
-                throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+                throw new InvalidTokenException(Constant.SIREN_NE_CORRESPOND_PAS);
             }
         } else {
             if (!("admin").equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
-                throw new AccesInterditException("L'opération ne peut être effectuée que par un administrateur");
+                throw new AccesInterditException(Constant.OPERATION_QUE_PAR_ADMIN);
             }
         }
         EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
@@ -157,11 +160,12 @@ public class EtablissementController {
         if (envoiMail) {
             emailService.constructModificationMailAdmin(mailAdmin, etabInBdd.getNom(), ancienMail, etablissementModifieWebDto.getContact().getMail());
         }
+        return buildResponseEntity(Constant.MESSAGE_MODIFETAB_OK);
     }
 
     @PostMapping(value = "/fusion")
     @PreAuthorize("hasAuthority('admin')")
-    public void fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
+    public ResponseEntity<Object> fusion(@Valid @RequestBody EtablissementFusionneWebDto etablissementFusionneWebDto) throws JsonProcessingException {
         EtablissementFusionneEventEntity event = mapper.map(etablissementFusionneWebDto, EtablissementFusionneEventEntity.class);
         event.setSource(this);
         // On genère un identifiant Abes
@@ -171,11 +175,13 @@ public class EtablissementController {
         event.setValide(true);
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
+        return buildResponseEntity(Constant.MESSAGE_FUSIONETAB_OK);
+
     }
 
     @PostMapping(value = "/scission")
     @PreAuthorize("hasAuthority('admin')")
-    public void scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
+    public ResponseEntity<Object> scission(@Valid @RequestBody EtablissementDiviseWebDto etablissementDiviseWebDto) throws UnknownTypeEtablissementException, JsonProcessingException, UnknownStatutException {
         EtablissementDiviseEventEntity etablissementDiviseEvent = mapper.map(etablissementDiviseWebDto, EtablissementDiviseEventEntity.class);
         EtablissementEntity etablissement = etablissementService.getFirstBySiren(etablissementDiviseEvent.getAncienSiren());
         etablissementDiviseEvent.setTypeEtablissement(etablissement.getTypeEtablissement().getLibelle());
@@ -210,30 +216,34 @@ public class EtablissementController {
         //on formatte les nouveaux établissements en json pour sauvegarde
         applicationEventPublisher.publishEvent(etablissementDiviseEvent);
         eventService.save(etablissementDiviseEvent);
+        return buildResponseEntity(Constant.MESSAGE_SCISSIONETAB_OK);
     }
 
     @DeleteMapping(value = "{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void suppression(@PathVariable String siren) throws RestClientException, JsonProcessingException {
+    public ResponseEntity<Object> suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
         EtablissementSupprimeEventEntity event = new EtablissementSupprimeEventEntity(this, siren);
+        event.setNomEtab(etab.getNom());
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
 
         //envoi du mail de suppression
         UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructSuppressionCompteMailUserEtAdmin(etab.getNom(), ((UserDetailsImpl) user).getEmail(), mailAdmin);
+        return buildResponseEntity(Constant.MESSAGE_SUPPETAB_OK);
     }
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public void validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
-            throw new BadStatutException("L'établissement ne doit pas déjà être validé");
+            throw new BadStatutException(Constant.DEJA_VALIDE_IP);
         }
-        EtablissementValideEventEntity etablissementValideEvent = new EtablissementValideEventEntity(this, siren);
+        EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        etablissementValideEvent.setNomEtab(etab.getNom());
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
         eventService.save(etablissementValideEvent);
@@ -242,6 +252,7 @@ public class EtablissementController {
         UserDetails user = userDetailsService.loadUser(etab);
         emailService.constructValidationCompteMailUser(((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
         emailService.constructValidationCompteMailAdmin(mailAdmin, ((UserDetailsImpl) user).getNameEtab());
+        return buildResponseEntity(Constant.MESSAGE_VALIDATIONETAB_OK);
 
     }
 
@@ -254,9 +265,10 @@ public class EtablissementController {
         if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
             return mapper.map(entity, EtablissementUserWebDto.class);
         } else {
-            throw new InvalidTokenException("Le siren demandé ne correspond pas au siren de l'utilisateur connecté");
+            throw new InvalidTokenException(Constant.SIREN_NE_CORRESPOND_PAS);
         }
     }
+
 
     @GetMapping(value = "")
     @PreAuthorize("hasAuthority('admin')")

@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.entities.etablissement;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,10 +22,10 @@ public class ContactEntity implements Serializable {
     @SequenceGenerator(name = "contact_Sequence", sequenceName = "CONTACT_SEQ", allocationSize = 1)
     private Integer id;
 
-    @NotBlank(message = "Le nom fourni n'est pas valide")
+    @NotBlank(message = Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE)
     private String nom;
 
-    @NotBlank( message = "Le prénom fourni n'est pas valide")
+    @NotBlank( message = Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE)
     private String prenom;
 
     @NotNull
