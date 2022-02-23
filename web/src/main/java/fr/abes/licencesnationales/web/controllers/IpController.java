@@ -79,8 +79,8 @@ public class IpController extends AbstractController {
         ipAjouteeEvent.setSiren(siren);
         try {
             applicationEventPublisher.publishEvent(ipAjouteeEvent);
-            eventRepository.save(ipAjouteeEvent);
-            dtoResult.setId(ipAjouteeEvent.getIpId());
+            IpCreeEventEntity ipEventOut = eventRepository.save(ipAjouteeEvent);
+            dtoResult.setId(ipEventOut.getIpId());
         } catch (Exception exception) {
             throw new IpException(exception.getLocalizedMessage());
         }

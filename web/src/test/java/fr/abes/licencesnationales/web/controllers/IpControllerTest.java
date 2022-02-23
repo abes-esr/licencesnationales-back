@@ -8,6 +8,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
+import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -103,8 +105,12 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         ContactEntity contactEntity = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
         EtablissementEntity entity = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
 
+        IpCreeEventEntity event = new IpCreeEventEntity(this, "1.1.1.1", "test");
+        event.setIpId(2);
+
         Mockito.doNothing().when(filtrerAccesServices).autoriserServicesParSiren("123456789");
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(entity);
+        Mockito.when(ipEventRepository.save(Mockito.any())).thenReturn(event);
 
         //obligé de créer un JSON manuellement car l'instanciation d'un IpAjouteeWebDto ne permet pas de récupérer le type
         String json = "{\n" +
@@ -116,6 +122,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         this.mockMvc.perform(put("/v1/ip/123456789")
                 .contentType(MediaType.APPLICATION_JSON).content(json))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(2))
                 .andExpect(jsonPath("$.message").value(Constant.MESSAGE_AJOUTIP_OK));
     }
 
@@ -264,24 +271,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")))
                 .andExpect(jsonPath("$.debugMessage").exists());
-
-//        json =
-//                "{\n" +
-//                "\"typeIp\":\"IPV4\",\n" +
-//                "\"ip\":\"1.1.1.1\",\n" +
-//                "\"commentaires\":\"test\"\n" +
-//                "},\n" +
-//                "{\n" +
-//                "\"typeIp\":\"IPV4\",\n" +
-//                "\"ip\":\"2.2.2.2\",\n" +
-//                "\"commentaires\":\"test\"\n" +
-//                "}\n";
-//
-//        this.mockMvc.perform(put("/v1/ip/123456789")
-//                .contentType(MediaType.APPLICATION_JSON).content(json))
-//                .andExpect(status().isBadRequest())
-//                .andExpect(jsonPath("$.message").value(Constant.ERROR_SAISIE+String.format(Constant.ERROR_IP_DOUBLON,"1.1.1.1")+", "+String.format(Constant.ERROR_IP_DOUBLON,"2.2.2.2")))
-//                .andExpect(jsonPath("$.debugMessage").exists());
     }
 
     @Test

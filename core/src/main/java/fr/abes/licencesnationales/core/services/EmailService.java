@@ -171,9 +171,10 @@ public class EmailService {
                 String[] commentaire = ip.split("|");
                 message.append("<tr><td style=\"border:1px solid\">" + commentaire[0]);
                 message.append("<br>");
-                if (commentaire.length >= 1)
+                if (commentaire.length >= 1) {
                     message.append("<u>Raison de la suppression</u> :<br>");
                     message.append(commentaire[1]);
+                }
                 message.append("<br></td></tr>");
             });
             message.append("</table>");
@@ -193,7 +194,7 @@ public class EmailService {
             message.append("</table>");
             message.append(ENDOFLINE);
         }
-        message.append("<tr><td><b style=\"border:1px solid;width:70%\">Ip Validées<b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"width:30%\">");
+        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>Ip Validées<b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"width:30%\">");
         if (listIps.get("validation").isEmpty()) {
             message.append("Aucune IP");
         } else {
@@ -207,7 +208,6 @@ public class EmailService {
             message.append("</table>");
             message.append(ENDOFLINE);
         }
-
         message.append("</table><br>");
         message.append(aideALaSaisieIp());
         message.append(signature());
