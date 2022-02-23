@@ -57,7 +57,7 @@ public class EmailService {
     }
 
     public void constructCreationCompteEmailUser(EtablissementCreeEventEntity etab) throws RestClientException {
-        String subject = getEnv() + "[Appli LN] Compte Etablissement créé";
+        String subject = getEnv() + "[Appli LN] Compte Etablissement créé sur le site Licences Nationales";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous venez de créer le compte établissement <b>");
         message.append(etab.getNomEtab());
@@ -89,7 +89,7 @@ public class EmailService {
     }
 
     public void constructSuppressionCompteMailUserEtAdmin(String nomEtab, String emailUser, String emailAdmin) throws RestClientException {
-        String subject = getEnv() + "[Appli LN] Suppression du compte Etablissement";
+        String subject = getEnv() + "[Appli LN] Compte supprimé sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Le compte que vous avez créé pour ");
         message.append(nomEtab);
