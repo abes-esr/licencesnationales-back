@@ -275,7 +275,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
     @Test
     @DisplayName("test suppression IP")
-    @WithMockUser(authorities = {"admin"})
+    @WithMockUser(authorities = {"etab"})
     void testSupprimerIp() throws Exception {
         StatutIpEntity statut = new StatutIpEntity(1, "Nouvelle IP");
         IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
@@ -283,6 +283,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         EtablissementEntity etab = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity);
         ip.setEtablissement(etab);
         Mockito.when(ipService.getFirstById(1)).thenReturn(ip);
+        Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
         Mockito.doNothing().when(eventService).save(Mockito.any());
         this.mockMvc.perform(delete("/v1/ip/1"))
                 .andExpect(status().isOk())
@@ -299,14 +300,6 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value(Constant.ERROR_IP_INCONNUE+String.format(Constant.ERROR_IP_EXISTE_PAS,1)))
                 .andExpect(jsonPath("$.debugMessage").exists());
-    }
-
-    @Test
-    @DisplayName("test suppression IP Utilisateur Etab")
-    @WithMockUser(authorities = {"etab"})
-    void testSupprimerIpWrongUser() throws Exception {
-        this.mockMvc.perform(delete("/v1/ip/1"))
-                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -346,9 +339,15 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.doNothing().when(eventService).save(Mockito.any());
         Mockito.doNothing().when(emailService).constructBilanRecapActionIpUser(Mockito.anyString(), Mockito.anyString(), Mockito.any());
-        Mockito.when(ipService.getFirstById(1)).thenReturn(new IpV4(1, "1.1.1.1", "test", statut));
-        Mockito.when(ipService.getFirstById(2)).thenReturn(new IpV4(1, "2.2.2.2", "test", statut));
-        Mockito.when(ipService.getFirstById(3)).thenReturn(new IpV4(1, "3.3.3.3", "test", statut));
+        IpEntity ipv41 = new IpV4(1, "1.1.1.1", "test", statut);
+        ipv41.setEtablissement(etab);
+        IpEntity ipv42 = new IpV4(1, "2.2.2.2", "test", statut);
+        ipv42.setEtablissement(etab);
+        IpEntity ipv43 = new IpV4(1, "3.3.3.3", "test", statut);
+        ipv43.setEtablissement(etab);
+        Mockito.when(ipService.getFirstById(1)).thenReturn(ipv41);
+        Mockito.when(ipService.getFirstById(2)).thenReturn(ipv42);
+        Mockito.when(ipService.getFirstById(3)).thenReturn(ipv43);
 
         Mockito.doNothing().when(ipService).save(Mockito.any());
 

@@ -101,19 +101,20 @@ public class IpController extends AbstractController {
                 result.put("ip", ipInBdd.getIp());
                 switch (ip.getAction()) {
                     case VALIDER:
-                        IpValideeEventEntity ipValideeEvent = new IpValideeEventEntity(this, id);
+                        IpValideeEventEntity ipValideeEvent = mapper.map(ipInBdd, IpValideeEventEntity.class);
                         applicationEventPublisher.publishEvent(ipValideeEvent);
                         eventRepository.save(ipValideeEvent);
                         result.put("action", "validation");
                         break;
                     case REJETER:
-                        IpRejeteeEventEntity ipRejeteeEvent = new IpRejeteeEventEntity(this, id);
+                        IpRejeteeEventEntity ipRejeteeEvent = mapper.map(ipInBdd, IpRejeteeEventEntity.class);
                         applicationEventPublisher.publishEvent(ipRejeteeEvent);
                         eventRepository.save(ipRejeteeEvent);
                         result.put("action", "rejet");
                         break;
                     case SUPPRIMER:
-                        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id);
+                        IpSupprimeeEventEntity ipSupprimeeEvent = mapper.map(ipInBdd, IpSupprimeeEventEntity.class);
+                        ipSupprimeeEvent.setCommentaire(ip.getCommentaire());
                         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
                         eventRepository.save(ipSupprimeeEvent);
                         result.put("action", "suppression");
@@ -132,34 +133,43 @@ public class IpController extends AbstractController {
         List<String> listValidation = new ArrayList<>();
         List<String> listSuppression = new ArrayList<>();
         List<String> listRejet = new ArrayList<>();
+        List<String> listErreur = new ArrayList<>();
         resultat.forEach(r -> {
-            switch (r.get("action")) {
-                case "validation":
-                    listValidation.add(r.get("ip"));
-                    break;
-                case "suppression":
-                    listSuppression.add(r.get("ip") + "|" + r.get("commentaire"));
-                    break;
-                case "rejet":
-                    listRejet.add(r.get("ip"));
-                    break;
-                default:
+            if (r.get("erreur") != null) {
+                listErreur.add(r.get("erreur"));
+            }
+            else {
+                switch (r.get("action")) {
+                    case "validation":
+                        listValidation.add(r.get("ip"));
+                        break;
+                    case "suppression":
+                        listSuppression.add(r.get("ip") + "|" + r.get("commentaire"));
+                        break;
+                    case "rejet":
+                        listRejet.add(r.get("ip"));
+                        break;
+                    default:
+                }
             }
         });
         mapResultat.put("validation", listValidation);
         mapResultat.put("suppression", listSuppression);
         mapResultat.put("rejet", listRejet);
+        mapResultat.put("erreur", listErreur);
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         emailService.constructBilanRecapActionIpUser(etab.getContact().getMail(), etab.getNom(), mapResultat);
         return buildResponseEntity(resultat);
     }
 
     @DeleteMapping(value = "/{id}")
-    @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Object> delete(@PathVariable Integer id) throws UnknownIpException {
+    public ResponseEntity<Object> delete(@PathVariable Integer id) throws UnknownIpException, SirenIntrouvableException, AccesInterditException {
+        String siren = filtrerAccesServices.getSirenFromSecurityContextUser();
         IpEntity ip = ipService.getFirstById(id);
-        IpSupprimeeEventEntity ipSupprimeeEvent = new IpSupprimeeEventEntity(this, id, ip.getIp());
-        ipSupprimeeEvent.setSiren(ip.getEtablissement().getSiren());
+        if (!ip.getEtablissement().getSiren().equals(siren)) {
+            throw new AccesInterditException(Constant.ACCES_INTERDIT);
+        }
+        IpSupprimeeEventEntity ipSupprimeeEvent = mapper.map(ip, IpSupprimeeEventEntity.class);
         applicationEventPublisher.publishEvent(ipSupprimeeEvent);
         eventRepository.save(ipSupprimeeEvent);
         return buildResponseEntity(Constant.MESSAGE_SUPPIP_OK);
