@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,7 +18,7 @@ public class PasswordService {
     public String getEncodedMotDePasse(String motDePasse) {
 
         if (motDePasse == null || motDePasse.isEmpty() || motDePasse.isBlank()) {
-            throw new IllegalArgumentException("Le mot de passe ne doit pas être nulle ou vide");
+            throw new IllegalArgumentException(Constant.MDP_NOTNULL);
         }
         return passwordEncoder.encode(motDePasse);
     }

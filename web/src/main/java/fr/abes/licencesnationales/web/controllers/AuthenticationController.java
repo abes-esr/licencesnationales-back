@@ -1,6 +1,7 @@
 package fr.abes.licencesnationales.web.controllers;
 
 
+import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
@@ -28,6 +29,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
@@ -41,7 +43,7 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(value = "/v1/authentification", produces = MediaType.APPLICATION_JSON_VALUE)
-public class AuthenticationController {
+public class AuthenticationController extends AbstractController{
 
     private final AuthenticationManager authenticationManager;
 
@@ -77,11 +79,16 @@ public class AuthenticationController {
             notes = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/connexion")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody ConnexionRequestDto loginRequest) {
-        UsernamePasswordAuthenticationToken credential = new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword());
-        Authentication authentication = authenticationManager.authenticate(credential);
+        Authentication authentication;
+        try {
+            UsernamePasswordAuthenticationToken credential = new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword());
 
+            authentication = authenticationManager.authenticate(credential);
+        }catch (AuthenticationException ex){
+            throw new AuthenticationServiceException(Constant.WRONG_LOGIN_AND_OR_PASS);
+        }
         if (authentication == null) {
-            throw new AuthenticationServiceException("La méthode d'authentification n'est pas supportée");
+            throw new AuthenticationServiceException(Constant.METHODE_AUTHENTIFICATION_PAS_SUPPORTEE);
         }
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -97,7 +104,7 @@ public class AuthenticationController {
         response.setUserSiren(user.getSiren());
         response.setRole(user.getRole());
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
 
     }
 
@@ -108,13 +115,13 @@ public class AuthenticationController {
         String captcha = dto.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.MOT_DE_PASSE_OUBLIE);
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
 
         UserDetailsImpl user;
@@ -124,26 +131,26 @@ public class AuthenticationController {
                 user = (UserDetailsImpl)userService.loadUser(etablissementService.getUserByMail(dto.getEmail()));
 
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec l'email '" + dto.getEmail() + "' n'existe pas");
+                throw new UsernameNotFoundException(String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_MAIL,dto.getEmail()));
             }
         }
         else if (dto.getSiren() != null) {
             try {
                 user = (UserDetailsImpl)userService.loadUser(etablissementService.getFirstBySiren(dto.getSiren()));
             } catch (IllegalArgumentException ex) {
-                throw new UsernameNotFoundException("L'utilisateur avec le SIREN '" + dto.getSiren() + "' n'existe pas");
+                throw new UsernameNotFoundException(String.format(Constant.ERROR_UTILISATEUR_NOT_FOUND_SIREN,dto.getSiren()));
             }
         } else {
-            throw new JsonIncorrectException("Au moins un des champs 'siren' ou 'email' est obligatoire");
+            throw new JsonIncorrectException(Constant.CHAMPS_SIREN_OU_EMAIL_OBLIGATOIRE);
         }
 
         String jwt = tokenProvider.generateToken(user);
         emailService.constructResetTokenEmailUser(jwt, user.getEmail(), user.getNameEtab());
 
         MotDePasseOublieResponsetDto response = new MotDePasseOublieResponsetDto();
-        response.setMessage("Un mail avec un lien de réinitialisation vous a été envoyé");
+        response.setMessage(Constant.MESSAGE_MDP_OUBLIE);
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @ApiOperation(value = "permet de ",
@@ -153,21 +160,21 @@ public class AuthenticationController {
         String captcha = request.getRecaptcha();
 
         if (captcha == null) {
-            throw new CaptchaException("Le champs 'recaptcha' est obligatoire");
+            throw new CaptchaException(Constant.EXCEPTION_CAPTCHA_OBLIGATOIRE);
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
         ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.REINITIALISER_MOT_DE_PASSE);
         if (!reCaptchaResponse.isSuccess()) {
-            throw new CaptchaException("Erreur Recaptcha : " + reCaptchaResponse.getErrors());
+            throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
 
         if (request.getTokenFromMail() == null) {
-            throw new JsonIncorrectException("Le champs 'token' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE);
         }
 
         if (request.getMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'nouveauMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE);
         }
 
         if (tokenProvider.validateToken(request.getTokenFromMail())) {
@@ -177,20 +184,20 @@ public class AuthenticationController {
             contact.setMotDePasse(passwordService.getEncodedMotDePasse(request.getMotDePasse()));
             etablissementService.save(etab);
         } else {
-            throw new InvalidTokenException("Le token n'est pas valide");
+            throw new InvalidTokenException(Constant.ERROR_AUTHENTIFICATION_TOKEN_PAS_VALIDE);
         }
 
         ReinitialiserMotDePasseResponseDto response = new ReinitialiserMotDePasseResponseDto();
-        response.setMessage("Votre mot de passe a bien été réinitialisé");
+        response.setMessage(Constant.MESSAGE_RESET_MDP);
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @PostMapping("/verifierValiditeToken")
     public ResponseEntity<?> verifierValiditeToken(@Valid @RequestBody VerifierValiditeTokenRequestDto request) throws JsonIncorrectException {
 
         if (request.getToken() == null) {
-            throw new JsonIncorrectException("Le champs 'token' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_TOKEN_OBLIGATOIRE);
         }
 
         VerifierValiditeTokenResponseDto response = new VerifierValiditeTokenResponseDto();
@@ -206,7 +213,7 @@ public class AuthenticationController {
             response.setValid(false);
         }
 
-        return ResponseEntity.ok(response);
+        return buildResponseEntity(response);
     }
 
     @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
@@ -216,11 +223,11 @@ public class AuthenticationController {
         String siren = tokenProvider.getSirenFromJwtToken(tokenProvider.getJwtFromRequest(requestHtttp));
 
         if (request.getAncienMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'ancienMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_ANCIEN_MDP_OBLIGATOIRE);
         }
 
         if (request.getNouveauMotDePasse() == null) {
-            throw new JsonIncorrectException("Le champs 'nouveauMotDePasse' est obligatoire");
+            throw new JsonIncorrectException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_OBLIGATOIRE);
         }
 
         String oldPassword = request.getAncienMotDePasse();
@@ -234,15 +241,15 @@ public class AuthenticationController {
                 contact.setMotDePasse(newPassword);
                 etablissementService.save(etab);
             } else {
-                throw new PasswordMismatchException("Votre nouveau mot de passe doit être différent de l'ancien");
+                throw new PasswordMismatchException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN);
             }
         } else {
-            throw new PasswordMismatchException("L'ancien mot de passe renseigné ne correspond pas à votre mot de passe actuel.");
+            throw new PasswordMismatchException(Constant.ERROR_AUTHENTIFICATION_ANCIEN_MDP_DIFFERENT_DE_ACTUEL);
         }
 
         ModifierMotDePasseResponseDto response = new ModifierMotDePasseResponseDto();
-        response.setMessage("Votre mot de passe a bien été modifié");
-        return ResponseEntity.ok(response);
+        response.setMessage(Constant.MESSAGE_MDP_MODIFIER);
+        return buildResponseEntity(response);
     }
 }
 

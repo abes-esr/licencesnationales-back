@@ -29,7 +29,7 @@ class IpV4Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV4 ip = new IpV4("192.168.20.15", "test", statut);
         });
-        assertEquals("192.168.20.15/32 est inclus dans les IP réservées 192.168.0.0/16", exception.getLocalizedMessage());
+        assertEquals(String.format(Constant.ERROR_IP_RESERVEES,"192.168.20.15/32","192.168.0.0/16"), exception.getLocalizedMessage());
     }
 
     @Test
@@ -38,7 +38,7 @@ class IpV4Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV4 ip = new IpV4("", "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
@@ -47,7 +47,7 @@ class IpV4Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV4 ip = new IpV4(null, "test", statut);
         });
-        assertEquals("Ip ne peut pas être nulle", exception.getLocalizedMessage());
+        assertEquals(Constant.IP_NOTNULL, exception.getLocalizedMessage());
     }
 
     @Test
@@ -56,7 +56,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("abcdefgABCDEFG", "test", statut);
         });
-        assertEquals("Invalid IPv4 address: 'abcdefgABCDEFG'", exception.getLocalizedMessage());
+        assertEquals(Constant.ERROR_IPV4_INVALIDE+"abcdefgABCDEFG", exception.getLocalizedMessage());
     }
 
     @Test
@@ -65,7 +65,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("192.168.20-5.15-2", "test", statut);
         });
-        assertEquals("Invalid range [192.168.20.15..192.168.5.2]", exception.getLocalizedMessage());
+        assertEquals(Constant.ERROR_IPV4_INVALIDE+"192.168.20-5.15-2", exception.getLocalizedMessage());
     }
 
     @Test
@@ -74,7 +74,7 @@ class IpV4Test {
         Exception exception = assertThrows(IpException.class, () -> {
             IpV4 ip = new IpV4("192.168.5-20.2-15", "test", statut);
         });
-        assertEquals("192.168.5.2-192.168.20.15 est inclus dans les IP réservées 192.168.0.0/16", exception.getLocalizedMessage());
+        assertEquals(String.format(Constant.ERROR_IP_RESERVEES,"192.168.5.2-192.168.20.15", "192.168.0.0/16"), exception.getLocalizedMessage());
     }
 
     @Test
@@ -113,7 +113,7 @@ class IpV4Test {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             IpV4 ip = new IpV4("154.1399.0.289", "test", statut);
         });
-        assertEquals("Invalid IPv4 address: '154.1399.0.289'", exception.getLocalizedMessage());
+        assertEquals(Constant.ERROR_IPV4_INVALIDE+"154.1399.0.289", exception.getLocalizedMessage());
     }
 
     @Test

@@ -53,25 +53,25 @@ public class EtablissementWebDtoConverter {
 
                     // Nom
                     if (source.getName() == null) {
-                        throw new IllegalArgumentException("Le champs 'nom' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
                     }
                     event.setNomEtab(source.getName());
 
                     // Siren
                     if (source.getSiren() == null) {
-                        throw new IllegalArgumentException("Le champs 'siren' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                     }
                     event.setSiren(source.getSiren());
 
                     // Type d'établissement
                     if (source.getTypeEtablissement() == null) {
-                        throw new IllegalArgumentException("Le champs 'typeEtablissement' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE);
                     }
                     event.setTypeEtablissement(source.getTypeEtablissement());
 
                     // Pour le contact
                     if (source.getContact() == null) {
-                        throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_CONTACT_OBLIGATOIRE);
                     }
 
                     event.setValide(false);
@@ -80,7 +80,7 @@ public class EtablissementWebDtoConverter {
 
                     // Contact - mot de passe
                     if (source.getContact().getMotDePasse() == null) {
-                        throw new IllegalArgumentException("Le champs 'motDePasse' du contact est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_MDP_OBLIGATOIRE);
                     }
                     event.setMotDePasse(source.getContact().getMotDePasse());
                     return event;
@@ -104,19 +104,19 @@ public class EtablissementWebDtoConverter {
 
                     // Nom
                     if (source.getNom() == null) {
-                        throw new IllegalArgumentException("Le champs 'nom' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
                     }
                     event.setNomEtab(source.getNom());
 
                     // Siren
                     if (source.getSiren() == null) {
-                        throw new IllegalArgumentException("Le champs 'siren' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                     }
                     event.setSiren(source.getSiren());
 
                     // Type d'établissement
                     if (source.getTypeEtablissement() == null) {
-                        throw new IllegalArgumentException("Le champs 'typeEtablissement' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_TYPE_ETAB_OBLIGATOIRE);
                     }
                     event.setTypeEtablissement(source.getTypeEtablissement());
 
@@ -145,7 +145,7 @@ public class EtablissementWebDtoConverter {
 
                     // Pour le contact
                     if (source.getContact() == null) {
-                        throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_CONTACT_OBLIGATOIRE);
                     }
 
                     setContact(source.getContact(), event);
@@ -163,31 +163,31 @@ public class EtablissementWebDtoConverter {
 
         // Contact - nom
         if (source.getNom() == null) {
-            throw new IllegalArgumentException("Le champs 'nom' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_NOM_CONTACT_OBLIGATOIRE);
         }
         event.setNomContact(source.getNom());
 
         // Contact - prénom
         if (source.getPrenom() == null) {
-            throw new IllegalArgumentException("Le champs 'prenom' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_PRENOM_CONTACT_OBLIGATOIRE);
         }
         event.setPrenomContact(source.getPrenom());
 
         // Contact - téléphone
         if (source.getTelephone() == null) {
-            throw new IllegalArgumentException("Le champs 'telephone' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_TELEPHONE_CONTACT_OBLIGATOIRE);
         }
         event.setTelephoneContact(source.getTelephone());
 
         // Contact - mail
         if (source.getMail() == null) {
-            throw new IllegalArgumentException("Le champs 'mail' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_MAIL_CONTACT_OBLIGATOIRE);
         }
         event.setMailContact(source.getMail());
 
         // Contact - adresse
         if (source.getAdresse() == null) {
-            throw new IllegalArgumentException("Le champs 'adresse' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_ADRESSE_CONTACT_OBLIGATOIRE);
         }
         event.setAdresseContact(source.getAdresse());
 
@@ -196,7 +196,7 @@ public class EtablissementWebDtoConverter {
 
         // Contact - code postal
         if (source.getCodePostal() == null) {
-            throw new IllegalArgumentException("Le champs 'codePostal' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_CODEPOSTAL_CONTACT_OBLIGATOIRE);
         }
         event.setCodePostalContact(source.getCodePostal());
 
@@ -205,7 +205,7 @@ public class EtablissementWebDtoConverter {
 
         // Contact - ville
         if (source.getVille() == null) {
-            throw new IllegalArgumentException("Le champs 'ville' du contact est obligatoire");
+            throw new IllegalArgumentException(Constant.ERROR_ETAB_VILLE_CONTACT_OBLIGATOIRE);
         }
         event.setVilleContact(source.getVille());
     }
@@ -218,21 +218,21 @@ public class EtablissementWebDtoConverter {
                 try {
                     EtablissementFusionneWebDto source = context.getSource();
                     if (source.getSirenFusionnes().size() < 2) {
-                        throw new IllegalArgumentException("La fusion doit porter sur au moins 2 établissements");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_2_ETAB_OBLIGATOIRE);
                     }
                     if (source.getNouveauEtab().getSiren() == null) {
-                        throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                     }
                     EtablissementFusionneEventEntity event = new EtablissementFusionneEventEntity(this, source.getNouveauEtab().getSiren(), Sets.newHashSet(source.getSirenFusionnes()));
                     if (source.getNouveauEtab().getNom() == null) {
-                        throw new IllegalArgumentException("Le champ 'nom' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_NOM_OBLIGATOIRE);
                     }
                     event.setNomEtab(source.getNouveauEtab().getNom());
                     event.setTypeEtablissement(source.getNouveauEtab().getTypeEtablissement());
 
                     // Pour le contact
                     if (source.getNouveauEtab().getContact() == null) {
-                        throw new IllegalArgumentException("Le champs 'contact' est obligatoire");
+                        throw new IllegalArgumentException(Constant.ERROR_ETAB_CONTACT_OBLIGATOIRE);
                     }
 
                     setContact(source.getNouveauEtab().getContact(), event);
@@ -255,7 +255,7 @@ public class EtablissementWebDtoConverter {
                 EtablissementDiviseWebDto source = context.getSource();
 
                 if (source.getSirenScinde() == null) {
-                    throw new IllegalArgumentException("Le champ 'siren' est obligatoire");
+                    throw new IllegalArgumentException(Constant.ERROR_ETAB_SIREN_OBLIGATOIRE);
                 }
                 EtablissementDiviseEventEntity etablissementDiviseEvent = new EtablissementDiviseEventEntity(this, source.getSirenScinde());
                 List<EtablissementEntity> listeEtab = new ArrayList<>();
