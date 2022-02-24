@@ -10,6 +10,7 @@ import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpRejeteeEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpSupprimeeEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpValideeEventEntity;
+import fr.abes.licencesnationales.web.dto.ip.IpSearchWebDto;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.Ipv4AjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.Ipv6AjouteeWebDto;
@@ -203,4 +204,39 @@ public class IpWebDtoConverter {
         };
         utilsMapper.addConverter(myConverter);
     }
+
+    @Bean
+    public void converterIpV4IpSearchWebDto() {
+        Converter<IpV4, IpSearchWebDto> myConverter = new Converter<IpV4, IpSearchWebDto>() {
+
+            public IpSearchWebDto convert(MappingContext<IpV4, IpSearchWebDto> context) {
+                IpV4 source = context.getSource();
+                return getSearchDto(source);
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterIpV6IpSearchWebDto() {
+        Converter<IpV6, IpSearchWebDto> myConverter = new Converter<IpV6, IpSearchWebDto>() {
+
+            public IpSearchWebDto convert(MappingContext<IpV6, IpSearchWebDto> context) {
+                IpV6 source = context.getSource();
+                return getSearchDto(source);
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    private IpSearchWebDto getSearchDto(IpEntity source) {
+        IpSearchWebDto dto = new IpSearchWebDto();
+        dto.setId(source.getEtablissement().getId());
+        dto.setNomEtab(source.getEtablissement().getNom());
+        dto.setSiren(source.getEtablissement().getSiren());
+        dto.setIdAbes(source.getEtablissement().getIdAbes());
+        dto.setIp(source.getIp());
+        return dto;
+    }
+
 }

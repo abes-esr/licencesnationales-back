@@ -15,6 +15,8 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementSearchWebDto;
+import fr.abes.licencesnationales.web.dto.ip.IpSearchWebDto;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpCreeResultWebDto;
@@ -212,6 +214,12 @@ public class IpController extends AbstractController {
     @GetMapping(value = "/whois/{ip}")
     public String whoIs(@PathVariable String ip) throws Exception {
         return ipService.whoIs(ip);
+    }
+
+    @PostMapping(value = "/search")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<IpSearchWebDto> search(@RequestBody List<String> criteres) {
+        return mapper.mapList(ipService.search(criteres), IpSearchWebDto.class);
     }
 
 }

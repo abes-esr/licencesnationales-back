@@ -24,6 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -172,5 +173,31 @@ public class IpService {
             throw new UnknownIpException(Constant.ERROR_IP_EXISTE_PAS);
         }
         return ipResult.get().getId();
+    }
+
+    public List<IpEntity> search(List<String> criteres) {
+        List<IpEntity> resultats = new ArrayList<>();
+        searchByCriteria(ipRepository.findAll(), resultats, criteres);
+        return resultats;
+    }
+
+    /**
+     * Fonction récursive permettant d'alimenter une liste de résultats à partir d'une liste d'Ips et de critères de recherche
+     * @param ips liste des IPs sur lesquels effectuer la recherche
+     * @param resultats liste de résultat alimentée à chaque nouveau passage dans la fonction
+     * @param criteres liste des critères dépilée à chaque nouveau passage
+     */
+    private void searchByCriteria(List<IpEntity> ips, List<IpEntity> resultats, List<String> criteres) {
+        //condition de sortie de la fonction récursive
+        if (criteres.size() == 0) {
+            return;
+        }
+        String critLower = criteres.get(0).toLowerCase();
+        resultats.addAll(ips.stream().filter(ip -> {
+           if (ip.getIp().contains(critLower)) return true;
+           return false;
+        }).collect(Collectors.toList()));
+        criteres.remove(0);
+        searchByCriteria(ips, resultats, criteres);
     }
 }

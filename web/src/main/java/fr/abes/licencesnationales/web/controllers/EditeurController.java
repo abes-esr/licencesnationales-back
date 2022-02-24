@@ -19,7 +19,9 @@ import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import fr.abes.licencesnationales.core.services.export.editeur.*;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
+import fr.abes.licencesnationales.web.dto.editeur.EditeurSearchWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementSearchWebDto;
 import fr.abes.licencesnationales.web.exception.SendMailException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -192,5 +194,11 @@ public class EditeurController extends AbstractController{
         dateEnvoiEditeurRepository.save(new DateEnvoiEditeurEntity(dateEnvoi));
         emailService.constructEnvoiFichierEditeursConfirmationAdmin(mailAdmin, dateEnvoi);
         return buildResponseEntity(Constant.MESSAGE_ENVOI_OK);
+    }
+
+    @PostMapping(value = "/search")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<EditeurSearchWebDto> search(@RequestBody List<String> criteres) {
+        return mapper.mapList(editeurService.search(criteres), EditeurSearchWebDto.class);
     }
 }
