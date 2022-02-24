@@ -4,6 +4,7 @@ package fr.abes.licencesnationales.core.services;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
+import fr.abes.licencesnationales.core.entities.ip.IpType;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
@@ -40,8 +41,10 @@ public class IpService {
 
     @Autowired
     private ReferenceService referenceService;
+
     /**
      * Récupère toutes les IP V4 et V6 confondus
+     *
      * @return
      */
     public List<IpEntity> getAll() {
@@ -50,6 +53,7 @@ public class IpService {
 
     /**
      * Récupère toutes les IP V4
+     *
      * @return
      */
     public List<IpV4> getAllIpV4() {
@@ -58,6 +62,7 @@ public class IpService {
 
     /**
      * Récupère toutes les IP V6
+     *
      * @return
      */
     public List<IpV6> getAllIpV6() {
@@ -71,11 +76,13 @@ public class IpService {
     public void deleteById(Integer id) {
         ipRepository.deleteById(id);
     }
+
     /**
      * Vérifies si une adresse IpV4 existe déjà dans la base de données.
      * L'IP existe si :
-     *  - l'IP ou la plage d'IP est la même
-     *  - L'IP ou la plage d'IP est inclus dans une plage déjà existante
+     * - l'IP ou la plage d'IP est la même
+     * - L'IP ou la plage d'IP est inclus dans une plage déjà existante
+     *
      * @param ip IP à tester
      * @return Vrai si l'IP existe déjà, Faux sinon
      */
@@ -96,6 +103,7 @@ public class IpService {
      * L'IP existe si :
      * - l'IP ou la plage d'IP est la même
      * - L'IP ou la plage d'IP est inclus dans une plage déjà existante
+     *
      * @param ip
      * @return Vrai si l'IP existe déjà, Faux sinon
      */
@@ -114,7 +122,7 @@ public class IpService {
     public EtablissementEntity getEtablissementByIp(Integer id) throws UnknownIpException, UnknownEtablissementException {
         Optional<IpEntity> ip = ipRepository.getFirstById(id);
         if (!ip.isPresent()) {
-            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,id));
+            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS, id));
         }
         IpEntity ipEntity = ip.get();
         EtablissementEntity etab = ipEntity.getEtablissement();
@@ -127,7 +135,7 @@ public class IpService {
     public IpEntity getFirstById(Integer id) throws UnknownIpException {
         Optional<IpEntity> ipEntity = ipRepository.getFirstById(id);
         if (!ipEntity.isPresent()) {
-            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS,id));
+            throw new UnknownIpException(String.format(Constant.ERROR_IP_EXISTE_PAS, id));
         }
         return ipEntity.get();
     }
@@ -156,5 +164,13 @@ public class IpService {
             throw new Exception("Impossible d'éxecuter le WhoIs");
         }
         return result.replaceAll("\n", "<br />");
+    }
+
+    public Integer getIdByIp(String ip) throws UnknownIpException {
+        Optional<IpEntity> ipResult = ipRepository.getFirstByIp(ip);
+        if (ipResult.isEmpty()) {
+            throw new UnknownIpException(Constant.ERROR_IP_EXISTE_PAS);
+        }
+        return ipResult.get().getId();
     }
 }
