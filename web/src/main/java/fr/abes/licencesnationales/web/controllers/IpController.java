@@ -71,7 +71,7 @@ public class IpController extends AbstractController {
 
 
     @PutMapping(value = "/{siren}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> ajoutIp(@Valid @RequestBody IpAjouteeWebDto dto, @PathVariable String siren, HttpServletRequest request) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
+    public ResponseEntity<Object> ajoutIp(@Valid @RequestBody IpAjouteeWebDto dto, @PathVariable String siren) throws SirenIntrouvableException, AccesInterditException, IpException, InvalidTokenException {
         filtrerAccesServices.autoriserServicesParSiren(siren);
         IpCreeResultWebDto dtoResult = new IpCreeResultWebDto();
         IpCreeEventEntity ipAjouteeEvent = mapper.map(dto, IpCreeEventEntity.class);
@@ -79,8 +79,9 @@ public class IpController extends AbstractController {
         ipAjouteeEvent.setSiren(siren);
         try {
             applicationEventPublisher.publishEvent(ipAjouteeEvent);
-            IpCreeEventEntity ipEventOut = eventRepository.save(ipAjouteeEvent);
-            dtoResult.setId(ipEventOut.getIpId());
+            eventRepository.save(ipAjouteeEvent);
+            Integer ipId = ipService.getIdByIp(ipAjouteeEvent.getIp());
+            dtoResult.setId(ipId);
         } catch (Exception exception) {
             throw new IpException(exception.getLocalizedMessage());
         }

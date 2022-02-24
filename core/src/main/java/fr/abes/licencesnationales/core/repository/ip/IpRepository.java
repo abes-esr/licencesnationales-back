@@ -27,4 +27,6 @@ public interface IpRepository extends JpaRepository<IpEntity, Integer> {
     List<String> findAllIp();
 
     List<IpEntity> getAllByStatutAndDateModificationIsBefore(StatutIpEntity statut, Date dateModification);
+
+    Optional<IpEntity> getFirstByIp(String ip);
 }
