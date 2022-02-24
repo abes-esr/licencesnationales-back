@@ -420,5 +420,34 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
 
     }
+
+    @Test
+    @DisplayName("test recherche editeur")
+    @WithMockUser(authorities = {"admin"})
+    public void testSearchEditeur() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        Set<TypeEtablissementEntity> typeSet = new HashSet<>();
+        typeSet.add(type);
+
+        EditeurEntity editeurEntityA = new EditeurEntity(1, "editeurEntityA", "1238975", "adresse editeurEntityA", typeSet);
+
+        EditeurEntity editeurEntityB = new EditeurEntity(2, "editeurEntityB", "1238975646", "adresse editeurEntityB", typeSet);
+
+        List<EditeurEntity> editeursList = new ArrayList<>();
+        editeursList.add(editeurEntityA);
+        editeursList.add(editeurEntityB);
+
+        List<String> dto = new ArrayList<>();
+        dto.add("1238975");
+
+        Mockito.when(editeurService.search(Mockito.any())).thenReturn(editeursList);
+
+        this.mockMvc.perform(post("/v1/editeurs/search").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].nom").value("editeurEntityA"))
+                .andExpect(jsonPath("$.[0].adresse").value("adresse editeurEntityA"))
+                .andExpect(jsonPath("$.[0].idEditeur").value("1238975"));
+    }
 }
 

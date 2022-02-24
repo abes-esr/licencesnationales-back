@@ -582,4 +582,25 @@ public class EtablissementWebDtoConverterTest {
         Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("description"));
 
     }
+
+    @DisplayName("test convertisseur entity / searchDto")
+    @Test
+    void testEtabEntitySearchDto() {
+        ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "test type"), "123456", contact);
+
+        EtablissementSearchWebDto dto = utilsMapper.map(etab, EtablissementSearchWebDto.class);
+
+        Assertions.assertEquals(1, dto.getId());
+        Assertions.assertEquals("nomEtab", dto.getNomEtab());
+        Assertions.assertEquals("123456789", dto.getSiren());
+        Assertions.assertEquals("123456", dto.getIdAbes());
+        Assertions.assertEquals("nom2", dto.getNomContact());
+        Assertions.assertEquals("prenom2", dto.getPrenomContact());
+        Assertions.assertEquals("adresse2", dto.getAdresseContact());
+        Assertions.assertEquals("11111", dto.getCpContact());
+        Assertions.assertEquals("ville2", dto.getVilleContact());
+        Assertions.assertEquals("mail@mail.com", dto.getMailContact());
+
+    }
 }
