@@ -35,15 +35,6 @@ public class JwtTokenProvider {
 
     public String generateToken(UserDetailsImpl u) {
 
-        log.info("JwtTokenProvider");
-        log.info("Début generateToken");
-        log.info("expirationInMs = " + expirationInMs);
-        log.info("secret = " + secret);
-        log.info("u.getUsername() = " + u.getUsername());//le siren
-        log.info("u.getId() = " + u.getId());
-        log.info("u.getAuthorities() = " + u.getAuthorities());
-        log.info("role = " + u.getRole());
-        log.info("u.getPassword() = " + u.getPassword());
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expirationInMs);
 
