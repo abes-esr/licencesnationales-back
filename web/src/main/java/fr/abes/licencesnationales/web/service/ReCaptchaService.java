@@ -28,19 +28,12 @@ public class ReCaptchaService {
 
     @SneakyThrows
     public ReCaptchaResponse verify(String recaptcharesponse, String action) {
-
-        log.info("debut ReCaptchaService - verify()");
-        log.info("response = " + recaptcharesponse);
-        log.info("reCaptchaKeys.getSecret() = " + reCaptchaKeys.getSecret());
-
         //requête à l'API google
         URI verifGoogleAdr = URI.create(String.format("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s",
                         reCaptchaKeys.getSecret(), recaptcharesponse));
 
         //appel http via post
         ReCaptchaResponse reCaptchaResponse = restTemplate.postForObject(verifGoogleAdr, "", ReCaptchaResponse.class);
-
-        log.info("reCaptchaResponse = " + reCaptchaResponse);
 
         if(reCaptchaResponse!=null){
             if(reCaptchaResponse.isSuccess() && (reCaptchaResponse.getScore() < reCaptchaKeys.getThreshold()

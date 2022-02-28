@@ -31,16 +31,13 @@ public class LoginAttemptService {
     }
 
     public void loginSucceeded(final String key) {
-        log.debug(Constant.ENTER_LOGIN_SUCCEED + key);
         attemptsCache.invalidate(key);
     }
 
     public void loginFailed(final String key) {
-        log.debug(Constant.ENTER_LOGIN_FAILED);
         int attempts = 0;
         try {
             attempts = attemptsCache.get(key);
-            log.info(Constant.NUMBER_IP_TENTATIVES + key + " est : " + attempts);
         } catch (final ExecutionException e) {
             attempts = 0;
         }

@@ -60,7 +60,6 @@ public class ConstructionListeEtabTasklet implements Tasklet, StepExecutionListe
 
     @Override
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-        log.info("Récupération des établissements");
         try {
             List<EtablissementEntity> etab = service.findAll();
             this.etabSansIp = etab.stream().filter(e -> e.getIps().size() == 0).collect(Collectors.toList());

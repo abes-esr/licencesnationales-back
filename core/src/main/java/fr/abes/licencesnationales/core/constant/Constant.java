@@ -27,12 +27,8 @@ public class Constant implements Serializable {
     public static final String ERROR_GENERIC_TECHNICAL_PROBLEMS = "Nous rencontrons actuellement des problèmes techniques.";
     public static final String ERROR_ACCOUNT_BLOCKED = "Le compte est bloqué. Veuillez patienter 15 minutes.";
     public static final String ERROR_ACCESS_RESSOURCE_NOT_ALLOWED = "Vous ne pouvez pas accéder à cette ressource.";
-    public static final String ENTER_DOFILTERINTERNAL = "ENTREE DANS doFilterInternal.............................";
     public static final String ERROR_AUTHENTICATION_IN_SECURITY_CONTEXT = "Could not set user authentication in fr.abes.licencesnationales.web.security context";
     public static final String ERROR_BLOCKED_IP = "dans isblocked IP, attemptsCache.get(key) = ";
-    public static final String NUMBER_IP_TENTATIVES = "NB de tentatives pour ip =";
-    public static final String ENTER_LOGIN_FAILED = "entree dans loginFailed...";
-    public static final String ENTER_LOGIN_SUCCEED = "entree dans loginSucceeded pour IP = ";
     public static final String JWT_CLAIMS_STRING_EMPTY = "JWT claims string is empty : {}";
     public static final String JWT_TOKEN_UNSUPPORTED = "Unsupported JWT token : {}";
     public static final String JWT_TOKEN_EXPIRED = "Expired JWT token";

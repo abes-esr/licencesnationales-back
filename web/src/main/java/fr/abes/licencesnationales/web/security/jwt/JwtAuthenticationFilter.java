@@ -35,21 +35,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
-            log.debug(Constant.ENTER_DOFILTERINTERNAL);
-            log.debug("doFilterInternal début");
             final String ip = getClientIP();
             if (loginAttemptService.isBlocked(ip)) {
                 throw new RuntimeException(Constant.IP_BLOCKED);
             }
 
             String jwt = tokenProvider.getJwtFromRequest(request);
-            log.debug("StringUtils.hasText(jwt) = " + StringUtils.hasText(jwt));
-            log.debug("Si false, signifie que nous n'avons pas déjà de token, donc on vient se connecter donc on est redirigé vers l'authentification" );
 
             if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
                 String siren = tokenProvider.getSirenFromJwtToken(jwt);
-                log.debug("siren = " + siren);
-                log.debug("On charge le tuple en bdd qui match ave le siren dans userdetails ");
                 UserDetails userDetails = userDetailsService.loadUserByUsername(siren);
 
                 //on vérifie que pour le siren et le pass trouvé c'est bien celui du jeton?

@@ -53,7 +53,6 @@ public class FiltrerAccesServices {
             throw new AccesInterditException(Constant.ACCES_INTERDIT);
         }
         boolean existeSiren = service.existeSiren(sirenFromSecurityContextUser);
-        log.debug("existeSiren = " + existeSiren);
         if (!existeSiren) {
             log.error(Constant.ERROR_SIREN_INTROUVABLE);
             throw new SirenIntrouvableException(Constant.ERROR_SIREN_INTROUVABLE);
