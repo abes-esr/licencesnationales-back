@@ -178,4 +178,24 @@ public class EditeurWebDtoConverter {
         dto.setMailContact(source.getMail());
         return dto;
     }
+
+    @Bean
+    public void converterEditeurEntitySearchWebDto() {
+        Converter<EditeurEntity, EditeurSearchWebDto> myConverter = new Converter<EditeurEntity, EditeurSearchWebDto>() {
+
+            public EditeurSearchWebDto convert(MappingContext<EditeurEntity, EditeurSearchWebDto> context) {
+                EditeurEntity source = context.getSource();
+
+                EditeurSearchWebDto dto = new EditeurSearchWebDto();
+                dto.setId(source.getId());
+                dto.setNom(source.getNom());
+                dto.setIdEditeur(source.getIdentifiant());
+                dto.setAdresse(source.getAdresse());
+                source.getContactsCommerciaux().forEach(c -> dto.ajouterContactCommercial(utilsMapper.map(c, ContactEditeurWebDto.class)));
+                source.getContactsTechniques().forEach(c -> dto.ajouterContactTechnique(utilsMapper.map(c, ContactEditeurWebDto.class)));
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
 }

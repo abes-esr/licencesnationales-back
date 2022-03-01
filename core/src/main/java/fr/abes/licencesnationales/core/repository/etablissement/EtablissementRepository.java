@@ -14,7 +14,7 @@ import java.util.Optional;
 
 
 @Repository
-public interface EtablissementRepository extends JpaRepository<EtablissementEntity, Integer> , JpaSpecificationExecutor<EtablissementEntity> {
+public interface EtablissementRepository extends JpaRepository<EtablissementEntity, Integer> {
 
     void deleteBySiren(String siren);
 

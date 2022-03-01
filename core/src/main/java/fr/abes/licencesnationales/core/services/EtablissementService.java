@@ -1,26 +1,27 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
-import fr.abes.licencesnationales.core.constant.Constant;
-import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
-import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.springframework.data.jpa.domain.Specification.*;
 
 @Service
 @Slf4j
@@ -194,5 +195,30 @@ public class EtablissementService {
             dtos.add(dto);
         });
         return dtos;
+    }
+
+    public List<EtablissementEntity> search(List<String> criteres) {
+        List<EtablissementEntity> resultats = new ArrayList<>();
+        searchByCriteria(etablissementDao.findAll(), resultats, criteres);
+        return resultats;
+    }
+
+    /**
+     * Fonction récursive permettant d'alimenter une liste de résultats à partir d'une liste d'établissements et de critères de recherche
+     * @param etabs liste des établissements sur lesquels effectuer la recherche
+     * @param resultats liste de résultat alimentée à chaque nouveau passage dans la fonction
+     * @param criteres liste des critères dépilée à chaque nouveau passage
+     */
+    private void searchByCriteria(List<EtablissementEntity> etabs, List<EtablissementEntity> resultats, List<String> criteres) {
+        //condition de sortie de la fonction récursive
+        if (criteres.size() == 0) {
+            return;
+        }
+        String critLower = criteres.get(0).toLowerCase();
+        resultats.addAll(etabs.stream().filter(etab -> etab.getSiren().toLowerCase().contains(critLower) || etab.getNom().toLowerCase().contains(critLower) || etab.getIdAbes().toLowerCase().contains(critLower)
+                || etab.getContact().getNom().toLowerCase().contains(critLower) || etab.getContact().getPrenom().toLowerCase().contains(critLower) || etab.getContact().getAdresse().toLowerCase().contains(critLower)
+                || etab.getContact().getCodePostal().toLowerCase().contains(critLower) || etab.getContact().getVille().toLowerCase().contains(critLower) || etab.getContact().getMail().toLowerCase().contains(critLower)).collect(Collectors.toList()));
+        criteres.remove(0);
+        searchByCriteria(etabs, resultats, criteres);
     }
 }
