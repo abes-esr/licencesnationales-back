@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.core.services;
 import fr.abes.licencesnationales.core.constant.Constant;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
+import org.apache.commons.csv.QuoteMode;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,7 +21,7 @@ public abstract class ExportService<T, E> {
 
     public ByteArrayInputStream generateCsv(List<E> ids) {
         try (final ByteArrayOutputStream stream = new ByteArrayOutputStream();
-             final CSVPrinter printer = new CSVPrinter(new PrintWriter(stream), CSVFormat.EXCEL.withDelimiter(';').withRecordSeparator("\r\n"))) {
+             final CSVPrinter printer = new CSVPrinter(new PrintWriter(stream), CSVFormat.EXCEL.withDelimiter(';').withRecordSeparator("\r\n").withQuoteMode(QuoteMode.ALL))) {
             List<T> query = this.getItems(ids);
             if (!query.isEmpty()) {
                 this.writeHeader(printer);
