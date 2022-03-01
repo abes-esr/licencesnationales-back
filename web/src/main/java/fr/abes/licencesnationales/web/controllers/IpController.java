@@ -15,6 +15,7 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpCreeResultWebDto;
@@ -31,7 +32,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -167,7 +167,7 @@ public class IpController extends AbstractController {
     public ResponseEntity<Object> delete(@PathVariable Integer id) throws UnknownIpException, SirenIntrouvableException, AccesInterditException {
         String siren = filtrerAccesServices.getSirenFromSecurityContextUser();
         IpEntity ip = ipService.getFirstById(id);
-        if (!ip.getEtablissement().getSiren().equals(siren)) {
+        if(!"admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser()) && !ip.getEtablissement().getSiren().equals(siren)) {
             throw new AccesInterditException(Constant.ACCES_INTERDIT);
         }
         IpSupprimeeEventEntity ipSupprimeeEvent = mapper.map(ip, IpSupprimeeEventEntity.class);
