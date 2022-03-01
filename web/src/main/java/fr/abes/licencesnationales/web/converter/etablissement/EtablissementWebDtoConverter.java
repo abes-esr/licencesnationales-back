@@ -7,10 +7,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
-import fr.abes.licencesnationales.web.dto.etablissement.ContactWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.NotificationsDto;
+import fr.abes.licencesnationales.web.dto.etablissement.*;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.fusion.EtablissementFusionneWebDto;
@@ -396,6 +393,30 @@ public class EtablissementWebDtoConverter {
                     notif.put("description", "Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici");
                     dto.ajouterNotification(notif);
                 });
+                return dto;
+            }
+        };
+        utilsMapper.addConverter(myConverter);
+    }
+
+    @Bean
+    public void converterEtablissementSearchWebDto() {
+        Converter<EtablissementEntity, EtablissementSearchWebDto> myConverter = new Converter<EtablissementEntity, EtablissementSearchWebDto>() {
+            @SneakyThrows
+            public EtablissementSearchWebDto convert(MappingContext<EtablissementEntity, EtablissementSearchWebDto> context) {
+                EtablissementEntity source = context.getSource();
+
+                EtablissementSearchWebDto dto = new EtablissementSearchWebDto();
+                dto.setId(source.getId());
+                dto.setNomEtab(source.getNom());
+                dto.setSiren(source.getSiren());
+                dto.setIdAbes(source.getIdAbes());
+                dto.setNomContact(source.getContact().getNom());
+                dto.setPrenomContact(source.getContact().getPrenom());
+                dto.setCpContact(source.getContact().getCodePostal());
+                dto.setAdresseContact(source.getContact().getAdresse());
+                dto.setVilleContact(source.getContact().getVille());
+                dto.setMailContact(source.getContact().getMail());
                 return dto;
             }
         };

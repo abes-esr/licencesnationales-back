@@ -15,7 +15,7 @@ import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
+import fr.abes.licencesnationales.web.dto.ip.IpSearchWebDto;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpCreeResultWebDto;
@@ -32,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
@@ -212,6 +213,12 @@ public class IpController extends AbstractController {
     @GetMapping(value = "/whois/{ip}")
     public String whoIs(@PathVariable String ip) throws Exception {
         return ipService.whoIs(ip);
+    }
+
+    @PostMapping(value = "/search")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<IpSearchWebDto> search(@RequestBody List<String> criteres) {
+        return mapper.mapList(ipService.search(criteres), IpSearchWebDto.class);
     }
 
 }
