@@ -342,7 +342,6 @@ class EtablissementServiceTest {
     @Test
     void testSearch() {
         List<String> criteres = new ArrayList<>();
-        criteres.add("truc");
         criteres.add("Adress");
 
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
@@ -365,5 +364,11 @@ class EtablissementServiceTest {
 
         Assertions.assertEquals(1, resultat.size());
         Assertions.assertEquals("testNom", resultat.get(0).getNom());
+
+        criteres.add("truc");
+
+        resultat = service.search(criteres);
+
+        Assertions.assertEquals(0, resultat.size());
     }
 }

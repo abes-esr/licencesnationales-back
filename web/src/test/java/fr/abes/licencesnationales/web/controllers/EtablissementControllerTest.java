@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
@@ -841,6 +842,11 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(jsonPath("$.[0].cpContact").value("testCP"))
                 .andExpect(jsonPath("$.[1].id").value(2))
                 .andExpect(jsonPath("$.[2].id").value(3));
+
+        dto.add("etab");
+        this.mockMvc.perform(post("/v1/etablissements/search").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist());
     }
 
 }

@@ -198,27 +198,25 @@ public class EtablissementService {
     }
 
     public List<EtablissementEntity> search(List<String> criteres) {
-        List<EtablissementEntity> resultats = new ArrayList<>();
-        searchByCriteria(etablissementDao.findAll(), resultats, criteres);
-        return resultats;
+        return searchByCriteria(etablissementDao.findAll(), criteres);
     }
 
     /**
      * Fonction récursive permettant d'alimenter une liste de résultats à partir d'une liste d'établissements et de critères de recherche
      * @param etabs liste des établissements sur lesquels effectuer la recherche
-     * @param resultats liste de résultat alimentée à chaque nouveau passage dans la fonction
      * @param criteres liste des critères dépilée à chaque nouveau passage
      */
-    private void searchByCriteria(List<EtablissementEntity> etabs, List<EtablissementEntity> resultats, List<String> criteres) {
-        //condition de sortie de la fonction récursive
-        if (criteres.size() == 0) {
-            return;
-        }
+    private List<EtablissementEntity> searchByCriteria(List<EtablissementEntity> etabs, List<String> criteres) {
+        List<EtablissementEntity> resultats = new ArrayList<>();
         String critLower = criteres.get(0).toLowerCase();
         resultats.addAll(etabs.stream().filter(etab -> etab.getSiren().toLowerCase().contains(critLower) || etab.getNom().toLowerCase().contains(critLower) || etab.getIdAbes().toLowerCase().contains(critLower)
                 || etab.getContact().getNom().toLowerCase().contains(critLower) || etab.getContact().getPrenom().toLowerCase().contains(critLower) || etab.getContact().getAdresse().toLowerCase().contains(critLower)
                 || etab.getContact().getCodePostal().toLowerCase().contains(critLower) || etab.getContact().getVille().toLowerCase().contains(critLower) || etab.getContact().getMail().toLowerCase().contains(critLower)).collect(Collectors.toList()));
         criteres.remove(0);
-        searchByCriteria(etabs, resultats, criteres);
+        //condition de sortie de la fonction récursive
+        if (criteres.size() == 0) {
+            return resultats;
+        }
+        return searchByCriteria(resultats, criteres);
     }
 }
