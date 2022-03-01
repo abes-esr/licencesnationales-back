@@ -128,4 +128,27 @@ public class IpServiceTest {
         Mockito.when(ipRepository.getFirstById(1)).thenReturn(Optional.empty());
         Assertions.assertThrows(UnknownIpException.class, () -> ipService.getFirstById(1));
     }
+
+    @DisplayName("test search IP")
+    @Test
+    void testSearchIp() throws IpException {
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+        ip.setEtablissement(etabIn);
+
+        List<IpEntity> ipsIn = new ArrayList<>();
+        ipsIn.add(ip);
+
+        Mockito.when(ipRepository.findAll()).thenReturn(ipsIn);
+
+        List<String> criteres = new ArrayList<>();
+        criteres.add("1.1.1.1");
+        List<IpEntity> resultats = ipService.search(criteres);
+
+        Assertions.assertEquals(1, resultats.size());
+        Assertions.assertEquals("1.1.1.1", resultats.get(0).getIp());
+    }
 }
