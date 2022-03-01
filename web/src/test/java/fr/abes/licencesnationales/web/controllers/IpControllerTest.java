@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -10,6 +11,7 @@ import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
 import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
+import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
@@ -433,6 +435,33 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
+    }
 
+    @DisplayName("test search Ip")
+    @Test
+    @WithMockUser(authorities = {"admin"})
+    void testSearchIp() throws Exception {
+        StatutIpEntity statut = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
+        IpEntity ip = new IpV4(1, "1.1.1.1", "test", statut);
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+        ip.setEtablissement(etabIn);
+
+        List<IpEntity> ipsIn = new ArrayList<>();
+        ipsIn.add(ip);
+
+        Mockito.when(ipService.search(Mockito.any())).thenReturn(ipsIn);
+
+        List<String> dto = new ArrayList<>();
+        dto.add("1.1.1.1");
+
+        this.mockMvc.perform(post("/v1/ip/search").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].ip").value("1.1.1.1"))
+                .andExpect(jsonPath("$.[0].nomEtab").value("testNom"))
+                .andExpect(jsonPath("$.[0].siren").value("000000000"))
+                .andExpect(jsonPath("$.[0].idAbes").value("12345"));
     }
 }

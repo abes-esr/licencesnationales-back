@@ -146,4 +146,35 @@ public class EditeurWebDtoConverterTest {
         Assertions.assertEquals("test@test.tech", editeurModifieEvent.getContactsTechniques().stream().findFirst().get().getMail());
 
     }
+
+    @Test
+    @DisplayName("test converter EditeurEntity / SearchWebdto")
+    void testConverterEntitySearchWebDto() {
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "Nouveau");
+        Set<TypeEtablissementEntity> setType = new HashSet<>();
+        setType.add(type);
+
+        EditeurEntity entity = new EditeurEntity(1, "nom", "123456", "adresse", setType);
+        ContactEditeurEntity contactCommercial = new ContactCommercialEditeurEntity(1, "nomComm", "prenomComm", "mail@mail.com");
+        ContactEditeurEntity contactTechnique = new ContactTechniqueEditeurEntity(2, "nomTech", "prenomTech", "mail@mail.tech");
+        entity.ajouterContact(contactCommercial);
+        entity.ajouterContact(contactTechnique);
+
+        EditeurSearchWebDto dto = utilsMapper.map(entity, EditeurSearchWebDto.class);
+
+        Assertions.assertEquals("nom", dto.getNom());
+        Assertions.assertEquals(1, dto.getId());
+        Assertions.assertEquals("123456", dto.getIdEditeur());
+        Assertions.assertEquals("adresse", dto.getAdresse());
+
+        Assertions.assertEquals(1, dto.getContactsCommerciaux().get(0).getId());
+        Assertions.assertEquals("nomComm", dto.getContactsCommerciaux().get(0).getNomContact());
+        Assertions.assertEquals("prenomComm", dto.getContactsCommerciaux().get(0).getPrenomContact());
+        Assertions.assertEquals("mail@mail.com", dto.getContactsCommerciaux().get(0).getMailContact());
+
+        Assertions.assertEquals(2, dto.getContactsTechniques().get(0).getId());
+        Assertions.assertEquals("nomTech", dto.getContactsTechniques().get(0).getNomContact());
+        Assertions.assertEquals("prenomTech", dto.getContactsTechniques().get(0).getPrenomContact());
+        Assertions.assertEquals("mail@mail.tech", dto.getContactsTechniques().get(0).getMailContact());
+    }
 }
