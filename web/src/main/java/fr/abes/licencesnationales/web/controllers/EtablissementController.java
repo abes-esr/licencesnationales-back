@@ -219,7 +219,6 @@ public class EtablissementController extends AbstractController {
     }
 
     @DeleteMapping(value = "{siren}")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Object> suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
