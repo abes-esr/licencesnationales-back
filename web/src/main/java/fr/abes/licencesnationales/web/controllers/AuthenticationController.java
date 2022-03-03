@@ -238,7 +238,7 @@ public class AuthenticationController extends AbstractController{
 
         if (passwordService.estLeMotDePasse(oldPassword, contact.getMotDePasse())) {
             if (!passwordService.estLeMotDePasse(newPassword, contact.getMotDePasse())) {
-                contact.setMotDePasse(newPassword);
+                contact.setMotDePasse(passwordService.getEncodedMotDePasse(newPassword));
                 etablissementService.save(etab);
             } else {
                 throw new PasswordMismatchException(Constant.ERROR_AUTHENTIFICATION_NOUVEAU_MDP_DIFFERENT_DE_ANCIEN);
