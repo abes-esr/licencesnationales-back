@@ -164,8 +164,8 @@ public class AuthenticationController extends AbstractController{
         }
 
         //verifier la réponse fr.abes.licencesnationales.web.recaptcha
-        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, ReCaptchaAction.REINITIALISER_MOT_DE_PASSE);
-        if (!reCaptchaResponse.isSuccess()) {
+        ReCaptchaResponse reCaptchaResponse = reCaptchaService.verify(captcha, "reinitialisationPass");
+         if (!reCaptchaResponse.isSuccess()) {
             throw new CaptchaException(Constant.ERROR_RECAPTCHA + reCaptchaResponse.getErrors());
         }
 

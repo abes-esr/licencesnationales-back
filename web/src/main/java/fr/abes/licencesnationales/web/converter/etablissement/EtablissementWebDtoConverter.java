@@ -352,7 +352,7 @@ public class EtablissementWebDtoConverter {
                 //cas ou aucune IP déclarée
                 if (Constant.STATUT_ETAB_SANSIP.equals(source.getStatut())) {
                     Map<String, String> notif = new HashMap<>();
-                    notif.put("message", "Aucune IP déclarée");
+                    notif.put("message", "<strong>Aucune IP déclarée</strong>");
                     notif.put("description", "les accès aux corpus acquis ne sont pas ouverts.");
                     dto.ajouterNotification(notif);
                     return dto;
@@ -360,7 +360,7 @@ public class EtablissementWebDtoConverter {
                 //cas ou toutes les IP déclarées sont en état nouvelle IP
                 if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_NOUVELLE)).collect(Collectors.toList()).size() == source.getIps().size()) {
                     Map<String, String> notif = new HashMap<>();
-                    notif.put("message", "Toutes les adresses IP déclarées sont en attente d'examen par l'Abes");
+                    notif.put("message", "<strong>Toutes les adresses IP déclarées sont en attente d'examen par l'Abes</strong>");
                     notif.put("description", "les accès aux corpus acquis ne sont pas ouverts.");
                     dto.ajouterNotification(notif);
                     return dto;
@@ -371,14 +371,14 @@ public class EtablissementWebDtoConverter {
                     StringBuilder value =  new StringBuilder("en attente d'examen par l'Abes : ");
                     value.append(i.getIp());
                     value.append(". L'accès correspondant n'est pas ouvert");
-                    notif.put("message", "Nouvelle adresse IP");
+                    notif.put("message", "<strong>Nouvelle adresse IP</strong>");
                     notif.put("description", value.toString());
                     dto.ajouterNotification(notif);
                 });
                 //cas aucune IP validée
                 if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_ATTESTATION)).collect(Collectors.toList()).size() == source.getIps().size()) {
                     Map<String, String> notif = new HashMap<>();
-                    notif.put("message", "Aucune IP validée");
+                    notif.put("message", "<strong>Aucune IP validée</strong>");
                     notif.put("description", "les accès aux corpus acquis ne sont pas ouverts.");
                     dto.ajouterNotification(notif);
                     return dto;
@@ -386,7 +386,7 @@ public class EtablissementWebDtoConverter {
                 //cas IP attestation demandée
                 source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_ATTESTATION)).forEach(i -> {
                     Map<String, String> notif = new HashMap<>();
-                    StringBuilder key = new StringBuilder("IP en attente de validation : ");
+                    StringBuilder key = new StringBuilder("<strong>IP en attente de validation</strong> : ");
                     key.append(i.getIp());
                     key.append(". Envoyer l'attestation à ln-admin@abes.fr.");
                     notif.put("message", key.toString());
