@@ -12,7 +12,7 @@ jobs:
         uses: actions/checkout@v2          
       - name: "Build: build docker image"
         run: |
-          docker build ./image/ -t localimage:latest
+          docker build . -t localimage:latest
 
 
       - name: "Push: prepare version from git tags/branchs"
