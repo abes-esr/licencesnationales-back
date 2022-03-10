@@ -357,7 +357,7 @@ public class EmailService {
 
 
     public void sendMailWithAttachments(String requestJson, Map<String,ByteArrayInputStream> listeFichiers) throws IOException {
-        HttpPost uploadFile = new HttpPost(mailServerURL + "v2/htmlMailAttachment/");
+        HttpPost uploadFile = new HttpPost(mailServerURL + "/htmlMailAttachment/");
         MultipartEntityBuilder builder = MultipartEntityBuilder.create();
         builder.addTextBody("mail", requestJson, ContentType.APPLICATION_JSON);
 
