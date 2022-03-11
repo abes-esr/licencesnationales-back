@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Cascade;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -47,20 +48,24 @@ public class EtablissementEntity implements Serializable {
     @Getter @Setter
     private TypeEtablissementEntity typeEtablissement;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private boolean valide;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private String idAbes;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @Getter @Setter
+    @Getter
+    @Setter
     private ContactEntity contact;
 
-    @OneToMany(mappedBy = "etablissement", cascade = CascadeType.ALL,
-            orphanRemoval = true)
+    @OneToMany(mappedBy = "etablissement")
+    @Cascade(org.hibernate.annotations.CascadeType.ALL)
     @JsonIgnore
-    @Getter @Setter
+    @Getter
+    @Setter
     private Set<IpEntity> ips = new HashSet<>();
 
     @Transient
