@@ -78,17 +78,23 @@ L'environnement souhaité devra être spécifié à l'aide des profiles spring. 
 
 ### Génération des images docker
 
-Pour créer les images docker en local taper les commandes suivantes :
+Les images docker de licencesnationales-back sont générées automatiquement à chaque ``git push`` par la chaîne d'intégration continue [![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml). Les images suivantes sont disponibles (idem pour ``batch``) :
+- ``abesesr/licencesnationales:main-web`` : l'image du dernier git push sur la branche ``mail``
+- ``abesesr/licencesnationales:develop-web`` : l'image du dernier git push sur la branche ``develop``
+- ``abesesr/licencesnationales:X.X.X-web`` : l'image dont le n° de version est ``X.X.X``
+- ``abesesr/licencesnationales:latest-web`` : l'image de la dernière version publiée
+
+Il est aussi possible de générer ces images localement en tapant par exemple les commandes suivantes :
 ```bash
 cd licencesnationales-back/
 docker build . --target web-image -t abesesr/licencesnationales:latest-web
 docker build . --target batch-image -t abesesr/licencesnationales:latest-batch
 ```
 
-Remarque : utilisation de ``--target`` car le Dockerfile crée 3 images,
-- une première pour la compilation de tout licencesnationales-back (core, web et batch),
-- une seconde pour l'image du batch qui condiendra la crontab avec le JAR du batch de licencesnationales,
-- et une troisième pour l'image du web qui condient tomcat9 avec le WAR de licencesnationales.
+Remarque : utilisation de ``--target`` car le Dockerfile crée 3 images (multi-stage),
+- une première (``build-image``) pour la compilation de tout licencesnationales-back (core, web et batch),
+- une seconde (``batch-image``) pour l'image du batch qui condiendra la crontab avec le JAR du batch de licencesnationales,
+- et une troisième (``web-image``) pour l'image du web qui condient tomcat9 avec le WAR de licencesnationales.
 
 ### Démarrage des conteneurs docker
 
