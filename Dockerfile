@@ -1,6 +1,6 @@
 ###
 # Image pour la compilation de licencesnationales
-FROM maven:3-jdk-11 as ln-build
+FROM maven:3-jdk-11 as build-image
 WORKDIR /build/
 
 # On lance la compilation
@@ -27,7 +27,7 @@ COPY ./docker/batch/tasks.tmpl /etc/cron.d/tasks.tmpl
 # Le JAR et le script pour le batch de LN
 RUN dnf install -y java-11-openjdk
 COPY ./docker/batch/licencesnationales-batch1.sh /scripts/licencesnationales-batch1.sh
-COPY --from=ln-build /build/batch/target/*.jar /scripts/licencesnationales-batch1.jar
+COPY --from=build-image /build/batch/target/*.jar /scripts/licencesnationales-batch1.jar
 
 COPY ./docker/batch/docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
@@ -38,7 +38,7 @@ CMD ["crond", "-n"]
 ###
 # Image pour le module web de licencesnationales
 FROM tomcat:9-jdk11 as web-image
-COPY --from=ln-build /build/web/target/*.war /usr/local/tomcat/webapps/ROOT.war
+COPY --from=build-image /build/web/target/*.war /usr/local/tomcat/webapps/ROOT.war
 CMD [ "catalina.sh", "run" ]
 
 #FROM openjdk:11 as back-server
