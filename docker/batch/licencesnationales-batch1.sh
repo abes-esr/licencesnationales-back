@@ -1,3 +1,4 @@
 #!/bin/bash
 
-echo "TODO exec de licencenationales-batch1.sh"
+exec java -jar /scripts/licencesnationales-batch1.jar
+

@@ -14,22 +14,24 @@ RUN mvn -Dmaven.test.skip=true -Duser.timezone=Europe/Paris package
 
 ###
 # Image pour le module batch de licencesnationales
-FROM openjdk:11 as batch-image
+# Remarque: l'image openjdk:11 n'est pas utilisée car nous avons besoin de cronie
+#           qui n'est que disponible sous centos/rockylinux.
+FROM rockylinux:8 as batch-image
 WORKDIR /scripts/
-# cron: for running periodicaly scanning
-# gettext-base: for having envsubst command
-ARG DEBIAN_FRONTEND=noninteractive
-RUN apt update && apt install -y cron gettext-base
-RUN rm -rf /etc/cron.*/*
+# systeme pour les crontab
+# cronie: remplacant de crond qui support le CTRL+C dans docker (sans ce système c'est compliqué de stopper le conteneur)
+# gettext: pour avoir envsubst qui permet de gérer le template tasks.tmpl
+RUN dnf install -y cronie gettext && \
+    crond -V && rm -rf /etc/cron.*/*
 COPY ./docker/batch/tasks.tmpl /etc/cron.d/tasks.tmpl
-
 # Le JAR et le script pour le batch de LN
+RUN dnf install -y java-11-openjdk
 COPY ./docker/batch/licencesnationales-batch1.sh /scripts/licencesnationales-batch1.sh
 COPY --from=ln-build /build/batch/target/*.jar /scripts/licencesnationales-batch1.jar
 
 COPY ./docker/batch/docker-entrypoint.sh /docker-entrypoint.sh
 ENTRYPOINT ["/docker-entrypoint.sh"]
-CMD ["cron", "-f"]
+CMD ["crond", "-n"]
 
 
 
