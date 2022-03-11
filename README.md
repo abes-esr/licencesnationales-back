@@ -1,4 +1,7 @@
 # licencesnationales-back
+
+[![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml)
+
 ## API Licences Nationales
 
 Application sous forme d'API REST, permettant : 
