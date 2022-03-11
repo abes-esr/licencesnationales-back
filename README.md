@@ -71,6 +71,47 @@ Des fichiers application.properties et application-ENV.properties se trouvent à
 
 L'environnement souhaité devra être spécifié à l'aide des profiles spring. Il faut donc spécifier la valeur LOCAL, DEV, TEST, PROD à la variable spring_profiles_active, que ce soit via une variable d'environnement sur le serveur, ou à l'aide d'un paramètre de la JVM au lancement du war/jar. Plus d'informations sont disponibles dans la documentation de Spring Boot.
 
+## Utilisation avec docker
+
+### Génération des images docker
+
+Pour créer les images docker en local taper les commandes suivantes :
+```bash
+cd licencesnationales-back/
+docker build . --target web-image -t abesesr/licencesnationales:web-latest
+docker build . --target batch-image -t abesesr/licencesnationales:batch-latest
+```
+
+Remarque : utilisation de ``--target`` car le Dockerfile crée 3 images,
+- une première pour la compilation de tout licencesnationales-back (core, web et batch),
+- une seconde pour l'image du batch qui condiendra la crontab avec le JAR du batch de licencesnationales,
+- et une troisième pour l'image du web qui condient tomcat9 avec le WAR de licencesnationales.
+
+### Démarrage des conteneurs docker
+
+Pour un déploiement dans le SI de l'Abes, il faut se référer aux configurations suivantes :
+https://git.abes.fr/depots/licencesnationales-docker/
+
+Pour le déployer en local sur sa machine, une fois la génération des images terminée (cf section au dessus), voici les commandes que l'on peut utiliser (TODO, cette partie pourrait être améliorer en proposant un ``docker-compose.yml``):
+```bash
+docker run -d \
+  --name licencesnationales-web \
+  -p 8080:8080 \
+  abesesr/licencesnationales:web-latest
+
+docker run -d \
+  --name licencesnationales-batch \
+  -e LN_BATCH_CRON="0 * * * *" \
+  -e LN_BATCH_AT_STARTUP="1" \
+  abesesr/licencesnationales:batch-latest
+```
+
+Pour consulter les logs des deux conteneurs :
+```bash
+docker logs -n 100 -f licencesnationales-web
+docker logs -n 100 -f licencesnationales-batch
+```
+
 ## Licences
 
 Tous les nouveaux projets créés par l'Abes depuis 2019 produisent du code opensource.
