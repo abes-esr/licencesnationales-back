@@ -10,7 +10,7 @@ LANG=en_US.UTF-8" > /etc/environment
 
 # Charge la crontab depuis le template
 envsubst < /etc/cron.d/tasks.tmpl > /etc/cron.d/tasks
-echo "-> Installing crontab:"
+echo "-> Installation des crontab :"
 cat /etc/cron.d/tasks
 crontab /etc/cron.d/tasks
 
