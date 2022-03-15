@@ -101,7 +101,7 @@ Remarque : utilisation de ``--target`` car le Dockerfile crée 3 images (multi-s
 Pour un déploiement dans le SI de l'Abes, il faut se référer aux configurations suivantes :
 https://git.abes.fr/depots/licencesnationales-docker/
 
-Pour le déployer en local sur sa machine, une fois la génération des images terminée (cf section au dessus), voici les commandes que l'on peut utiliser (TODO, cette partie pourrait être améliorer en proposant un ``docker-compose.yml``):
+Pour le déployer en local sur sa machine, une fois la génération des images terminée (cf section au dessus), voici les commandes que l'on peut utiliser (TODO, cette partie pourrait être améliorée en proposant un ``docker-compose.yml``):
 ```bash
 docker run -d \
   --name licencesnationales-web \
