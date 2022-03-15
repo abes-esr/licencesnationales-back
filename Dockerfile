@@ -4,6 +4,9 @@ FROM maven:3-jdk-11 as build-image
 WORKDIR /build/
 
 # On lance la compilation
+# si on a un .m2 local on peut décommenter la ligne suivante pour 
+# éviter à maven de retélécharger toutes les dépendances
+#COPY ./.m2/    /root/.m2/
 COPY ./pom.xml /build/pom.xml
 COPY ./core/   /build/core/
 COPY ./batch/  /build/batch/
