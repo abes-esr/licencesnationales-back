@@ -15,6 +15,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Collections;
+import java.util.ArrayList;
+import java.util.List;
 
 @SpringBootApplication
 public class LicencesNationalesAPIApplication extends SpringBootServletInitializer implements CommandLineRunner {
