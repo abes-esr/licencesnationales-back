@@ -79,7 +79,7 @@ L'environnement souhaité devra être spécifié à l'aide des profiles spring. 
 ### Génération des images docker
 
 Les images docker de licencesnationales-back sont générées automatiquement à chaque ``git push`` par la chaîne d'intégration continue [![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml). Les images suivantes sont [disponibles sur dockerhub](https://hub.docker.com/r/abesesr/licencesnationales/tags) (idem pour ``batch``) :
-- ``abesesr/licencesnationales:main-web`` : l'image du dernier git push sur la branche ``mail``
+- ``abesesr/licencesnationales:main-web`` : l'image du dernier git push sur la branche ``main``
 - ``abesesr/licencesnationales:develop-web`` : l'image du dernier git push sur la branche ``develop``
 - ``abesesr/licencesnationales:X.X.X-web`` : l'image dont le n° de version est ``X.X.X``
 - ``abesesr/licencesnationales:latest-web`` : l'image de la dernière version publiée
