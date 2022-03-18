@@ -20,7 +20,7 @@
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>licencesnationales-backoffice</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.2-SNAPSHOT</version>
+    <version>1.0.2</version>
     <name>Licences Nationales Back</name>
     <description>API pour les licences nationales</description>
 
@@ -201,7 +201,7 @@
     </build>
     <scm>
       <connection>scm:git:https://github.com/abes-esr/licencesnationales-back.git</connection>
-      <tag>HEAD</tag>
+      <tag>1.0.2</tag>
   </scm>
         
 </project>
