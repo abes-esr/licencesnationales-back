@@ -199,5 +199,8 @@
         </plugins>
       </pluginManagement>
     </build>
+    <scm>
+      <connection>scm:git:https://github.com/abes-esr/licencesnationales-back.git</connection>
+    </scm>
         
 </project>
