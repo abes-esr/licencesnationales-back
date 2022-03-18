@@ -1,6 +1,6 @@
 # licencesnationales-back
 
-[![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml) [![Docker Pulls](https://img.shields.io/docker/pulls/abesesr/licencesnationales.svg)](https://hub.docker.com/r/abesesr/licencesnationales/)
+[![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml) [![Docker Pulls](https://img.shields.io/docker/pulls/abesesr/licencesnationales.svg)](https://hub.docker.com/r/abesesr/licencesnationales/)
 
 ## API Licences Nationales
 
@@ -78,7 +78,7 @@ L'environnement souhaité devra être spécifié à l'aide des profiles spring. 
 
 ### Génération des images docker
 
-Les images docker de licencesnationales-back sont générées automatiquement à chaque ``git push`` par la chaîne d'intégration continue [![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml). Les images suivantes sont [disponibles sur dockerhub](https://hub.docker.com/r/abesesr/licencesnationales/tags) (idem pour ``batch``) :
+Les images docker de licencesnationales-back sont générées automatiquement à chaque ``git push`` par la chaîne d'intégration continue [![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml). Les images suivantes sont [disponibles sur dockerhub](https://hub.docker.com/r/abesesr/licencesnationales/tags) (idem pour ``batch``) :
 - ``abesesr/licencesnationales:main-web`` : l'image du dernier git push sur la branche ``main``
 - ``abesesr/licencesnationales:develop-web`` : l'image du dernier git push sur la branche ``develop``
 - ``abesesr/licencesnationales:X.X.X-web`` : l'image dont le n° de version est ``X.X.X``
@@ -132,8 +132,7 @@ Pour publier une nouvelle release (version) de l'application, voici comment proc
    ![image](https://user-images.githubusercontent.com/328244/159044539-57b57fba-15b8-440d-94e7-1ee859566a04.png)
 4. Indiquez ensuite le numéro de la version à générer (doit respecter le sementic versionning) après avoir vérifié que votre numéro de version n'existe pas déjà dans la [liste des tags](https://github.com/abes-esr/licencesnationales-back/tags)  
    ![image](https://user-images.githubusercontent.com/328244/159044729-e9cc0d7a-abe3-401f-a246-84e577670493.png)
-5. Validez et attendez que le build se termine dans le [workflow "ci"](https://github.com/abes-esr/licencesnationales-back/actions/workflows/ci.yml), ce qui aura pour conséquence  de générer et [publier sur dockerhub une image docker](https://hub.docker.com/r/abesesr/licencesnationales/tags) ayant comme tag le numéro de version de votre release.
-
+5. Validez et attendez que le build se termine dans le [workflow "ci"](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml), ce qui aura pour conséquence  de générer et [publier sur dockerhub une image docker](https://hub.docker.com/r/abesesr/licencesnationales/tags) ayant comme tag le numéro de version de votre release.
 
 ## Licences
 
