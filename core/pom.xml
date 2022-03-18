@@ -36,7 +36,7 @@
     <!--     Gestion des dependances                                 -->
     <!-- =========================================================== -->
     <dependencies>
-        <!--- === DAO === -->
+        <!-- === DAO === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -54,7 +54,7 @@
         </dependency>
 
 
-        <!--- === bdd === -->
+        <!-- === bdd === -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
@@ -71,7 +71,7 @@
         </dependency>
 
 
-        <!--- === Contrôle des entités === -->
+        <!-- === Contrôle des entités === -->
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
@@ -88,7 +88,7 @@
             <version>3.9</version>
         </dependency>
 
-        <!--- === Csv pour bdd === -->
+        <!-- === Csv pour bdd === -->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-csv</artifactId>
@@ -99,14 +99,14 @@
             <artifactId>spring-security-core</artifactId>
         </dependency>
 
-        <!--- === Csv file === -->
+        <!-- === Csv file === -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
             <version>1.1</version>
         </dependency>
 
-        <!--- === Envoi mail avec PJ === -->
+        <!-- === Envoi mail avec PJ === -->
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
