@@ -187,14 +187,17 @@
             <url>${url.doc.abes}doc${doc.root.path}/${doc.root.path}-${project.version}</url>
         </site>
     </distributionManagement>
-        
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <artifactId>maven-release-plugin</artifactId>
-          <version>2.5.3</version>
-        </plugin>
-      </plugins>
-    </pluginManagement>
 
+    <!-- Pour que maven se charge de générer les releases -->
+    <build>
+      <pluginManagement>
+        <plugins>
+          <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
+          </plugin>
+        </plugins>
+      </pluginManagement>
+    </build>
+        
 </project>
