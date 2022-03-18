@@ -39,12 +39,16 @@ jobs:
         env:
           NEW_TAG: ${{ github.event.inputs.releaseVersion }}
         run: |
+          # préparation de la release qui va :
+          # - modifier le numéro de version dans les pom.xml du projet
+          # - créer un tag git du numéro de version en question
+          # - pousser le tout sur le dépôt github
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
-          mvn prepare -DreleaseVersion=$NEW_TAG
-          git diff .
-          git status .
-          exit 1
+          mvn release:prepare \
+            -DreleaseVersion=$NEW_TAG \
+            -Darguments=-DskipTests \
+            -DtagNameFormat="@{project.version}"
 
 
       - name: 'Create the github release'

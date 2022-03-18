@@ -1,0 +1,5 @@
+batch/target/*
+web/target/*
+core/target/*
+docker-compose.yml
+

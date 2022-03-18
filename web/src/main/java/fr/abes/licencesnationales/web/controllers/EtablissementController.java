@@ -4,7 +4,6 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.exception.*;
@@ -95,7 +94,6 @@ public class EtablissementController extends AbstractController {
 
     @PutMapping
     public ResponseEntity<Object> creationCompte(@Valid @RequestBody EtablissementCreeWebDto etablissementCreeWebDto, HttpServletRequest request) throws CaptchaException, RestClientException, JsonProcessingException, SirenExistException, MailDoublonException {
-        Locale locale = (request.getLocale().equals(Locale.FRANCE) ? Locale.FRANCE : Locale.ENGLISH);
         String captcha = etablissementCreeWebDto.getRecaptcha();
 
         if (captcha == null) {
@@ -220,7 +218,6 @@ public class EtablissementController extends AbstractController {
     }
 
     @DeleteMapping(value = "{siren}")
-    @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Object> suppression(@PathVariable String siren, HttpServletRequest request) throws RestClientException, JsonProcessingException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
 
@@ -318,6 +315,12 @@ public class EtablissementController extends AbstractController {
         dtos.ajouterListNotif(etablissementService.getEtabIpSupprimee(listEtab));
         dtos.getNotifications().stream().sorted((n1, n2) -> n2.getDateEvent().compareTo(n1.getDateEvent()));
         return dtos;
+    }
+
+    @PostMapping(value = "/search")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<EtablissementSearchWebDto> search(@RequestBody List<String> criteres) {
+        return mapper.mapList(etablissementService.search(criteres), EtablissementSearchWebDto.class);
     }
 
 

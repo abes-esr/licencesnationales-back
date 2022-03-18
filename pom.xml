@@ -8,9 +8,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fr.abes</groupId>
-        <artifactId>abes-spring</artifactId>
-        <version>1.1.0</version>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.5.5</version>
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <!-- ===================================================== -->
@@ -19,7 +20,7 @@
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>licencesnationales-backoffice</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
     <name>Licences Nationales Back</name>
     <description>API pour les licences nationales</description>
 
@@ -31,6 +32,10 @@
         <warName>licencesnationales</warName>
         <webBaseDir>./target/</webBaseDir>
         <batchBaseDir>./target/</batchBaseDir>
+        <java.version>11</java.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
@@ -80,11 +85,32 @@
     <!--     Gestion des dependances                                 -->
     <!-- =========================================================== -->
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>2.5.5</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
     <dependencies>
-        <!--- === Annotations === -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-dependencies</artifactId>
+            <version>2.5.5</version>
+            <type>pom</type>
+        </dependency>
+
+        <!-- === Annotations === -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
             <scope>provided</scope>
         </dependency>
 
@@ -99,12 +125,14 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
+            <version>2.5.5</version>
         </dependency>
 
         <!-- WEB -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.5.5</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework.boot</groupId>
@@ -114,10 +142,11 @@
         </dependency>
 
 
-        <!--- === Tests === -->
+        <!-- === Tests === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <version>2.5.5</version>
             <scope>test</scope>
             <exclusions>
                 <exclusion>
@@ -129,6 +158,7 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
+            <version>5.5.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -158,40 +188,20 @@
         </site>
     </distributionManagement>
 
-    <!-- =========================================================== -->
-    <!--     Librairies ABES                        -->
-    <!-- =========================================================== -->
-
-
-    <repositories>
-        <repository>
-            <id>artifactory-public</id>
-            <name>artifactory-public</name>
-            <url>https://artifactory.abes.fr/artifactory/maven-public/</url>
-        </repository>
-    </repositories>
-
-    <pluginRepositories>
-        <pluginRepository>
-            <id>artifactory-public</id>
-            <name>artifactory-public</name>
-            <url>https://artifactory.abes.fr/artifactory/maven-public/</url>
-        </pluginRepository>
-    </pluginRepositories>
-
-    <!-- =========================================================== -->
-    <!--     Configuration de la compilation                         -->
-    <!-- =========================================================== -->
+    <!-- Pour que maven se charge de générer les releases -->
     <build>
-        <finalName>${finalName}</finalName>
+      <pluginManagement>
         <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <jvmArguments>-Dfile.encoding=UTF8</jvmArguments>
-                </configuration>
-            </plugin>
+          <plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <version>2.5.3</version>
+          </plugin>
         </plugins>
+      </pluginManagement>
     </build>
+    <scm>
+      <connection>scm:git:https://github.com/abes-esr/licencesnationales-back.git</connection>
+      <tag>HEAD</tag>
+  </scm>
+        
 </project>

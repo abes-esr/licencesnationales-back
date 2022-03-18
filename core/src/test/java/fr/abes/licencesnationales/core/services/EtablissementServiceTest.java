@@ -337,4 +337,38 @@ class EtablissementServiceTest {
         Assertions.assertEquals("testNom", notif.get(0).getNomEtab());
         Assertions.assertEquals("Suppression IP depuis dernier envoi", notif.get(0).getTypeNotif());
     }
+
+    @DisplayName("test recherche multi critères")
+    @Test
+    void testSearch() {
+        List<String> criteres = new ArrayList<>();
+        criteres.add("Adress");
+
+        TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
+        ContactEntity contact1 = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        ContactEntity contact2 = new ContactEntity(2, "nom", "prenom", "test", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+        ContactEntity contact3 = new ContactEntity(3, "nom", "prenom", "Adres", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
+
+        EtablissementEntity etabIn1 = new EtablissementEntity(1, "testNom", "111111111", type, "12345", contact1);
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "222222222", type, "12345", contact2);
+        EtablissementEntity etabIn3 = new EtablissementEntity(3, "testNom3", "333333333", type, "12345", contact3);
+
+        List<EtablissementEntity> listIn = new ArrayList<>();
+        listIn.add(etabIn1);
+        listIn.add(etabIn2);
+        listIn.add(etabIn3);
+
+        Mockito.when(etablissementDao.findAll()).thenReturn(listIn);
+
+        List<EtablissementEntity> resultat = service.search(criteres);
+
+        Assertions.assertEquals(1, resultat.size());
+        Assertions.assertEquals("testNom", resultat.get(0).getNom());
+
+        criteres.add("truc");
+
+        resultat = service.search(criteres);
+
+        Assertions.assertEquals(0, resultat.size());
+    }
 }
