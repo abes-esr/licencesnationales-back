@@ -32,7 +32,7 @@
             <scope>compile</scope>
         </dependency>
 
-        <!--- === Securite === -->
+        <!-- === Securite === -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
@@ -53,7 +53,7 @@
             <artifactId>jackson-databind</artifactId>
         </dependency>
 
-        <!--- === Documentation API === -->
+        <!-- === Documentation API === -->
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-swagger2</artifactId>
