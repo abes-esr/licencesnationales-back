@@ -132,7 +132,7 @@ Pour publier une nouvelle release (version) de l'application, voici comment proc
    ![image](https://user-images.githubusercontent.com/328244/159044539-57b57fba-15b8-440d-94e7-1ee859566a04.png)
 4. Indiquez ensuite le numéro de la version à générer (doit respecter le sementic versionning) après avoir vérifié que votre numéro de version n'existe pas déjà dans la [liste des tags](https://github.com/abes-esr/licencesnationales-back/tags)  
    ![image](https://user-images.githubusercontent.com/328244/159044729-e9cc0d7a-abe3-401f-a246-84e577670493.png)
-5. Validez et attendez que le build se termine dans le [workflow "ci"](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml), ce qui aura pour conséquence  de générer et [publier sur dockerhub une image docker](https://hub.docker.com/r/abesesr/licencesnationales/tags) ayant comme tag le numéro de version de votre release.
+5. Validez et attendez que le build se termine dans le [workflow "build-test-pubtodockerhub"](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml), ce qui aura pour conséquence  de générer et [publier sur dockerhub une image docker](https://hub.docker.com/r/abesesr/licencesnationales/tags) ayant comme tag le numéro de version de votre release.
 
 ## Licences
 
