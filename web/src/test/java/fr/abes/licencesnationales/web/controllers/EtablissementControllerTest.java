@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.web.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
@@ -521,7 +522,6 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         dtoNouvelEtab.setContact(dtoContact);
         dto.setNouveauEtab(dtoNouvelEtab);
 
-        StatutIpEntity statutIp = new StatutIpEntity(Constant.STATUT_IP_NOUVELLE, "En validation");
         ContactEntity contactEntity1 = new ContactEntity("nom1", "prenom1", "adresse1", "BP1", "00000", "ville1", "cedex1", "0000000000", "mail1@test.com", "mdp1");
         EtablissementEntity entity1 = new EtablissementEntity(1, "nomEtab1", "123456789", new TypeEtablissementEntity(2, "En validation"), "123456", contactEntity1);
 
@@ -805,6 +805,48 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
         Assertions.assertEquals(fileContent, result.getResponse().getContentAsString());
 
+    }
+
+    @Test
+    @DisplayName("test recherche établissements")
+    @WithMockUser(authorities = {"admin"})
+    void testSearchEtab() throws Exception {
+        TypeEtablissementEntity type = new TypeEtablissementEntity();
+        type.setId(1);
+        type.setLibelle("typeEtab");
+        List<EtablissementEntity> etabList = new ArrayList<>();
+
+        ContactEntity contact = new ContactEntity("testNom", "testPrenom", "testAdresse", "testBP", "testCP", "testVille", "testCedex", "0000000000", "test@test.com", "12345*:KKk");
+
+        etabList.add(new EtablissementEntity(1, "testNom", "123456789", type, "1", contact));
+        etabList.add(new EtablissementEntity(2, "test", "123456789", type, "1", contact));
+        etabList.add(new EtablissementEntity(3, "etab", "123456789", type, "1", contact));
+
+        Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
+        Mockito.when(etablissementService.search(Mockito.any())).thenReturn(etabList);
+
+        List<String> dto = new ArrayList<>();
+        dto.add("test");
+
+        this.mockMvc.perform(post("/v1/etablissements/search").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.[0].id").value(1))
+                .andExpect(jsonPath("$.[0].nomEtab").value("testNom"))
+                .andExpect(jsonPath("$.[0].siren").value("123456789"))
+                .andExpect(jsonPath("$.[0].idAbes").value("1"))
+                .andExpect(jsonPath("$.[0].nomContact").value("testNom"))
+                .andExpect(jsonPath("$.[0].prenomContact").value("testPrenom"))
+                .andExpect(jsonPath("$.[0].mailContact").value("test@test.com"))
+                .andExpect(jsonPath("$.[0].adresseContact").value("testAdresse"))
+                .andExpect(jsonPath("$.[0].villeContact").value("testVille"))
+                .andExpect(jsonPath("$.[0].cpContact").value("testCP"))
+                .andExpect(jsonPath("$.[1].id").value(2))
+                .andExpect(jsonPath("$.[2].id").value(3));
+
+        dto.add("etab");
+        this.mockMvc.perform(post("/v1/etablissements/search").contentType(MediaType.APPLICATION_JSON).content(mapper.writeValueAsString(dto)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").doesNotExist());
     }
 
 }
