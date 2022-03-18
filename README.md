@@ -15,7 +15,8 @@ Application sous forme d'API REST, permettant :
   - envoyer les informations de gestion renseignées par les institutions aux éditeurs présents dans la base, via un batch mensuel, non automatisé. Ce batch comprend un identifiant Abes ad hoc, utilisé souvent comme identifiant pivot sur lequel les éditeurs et l’Inist (pour les plates-formes ISTEX et PANIST) s’appuient pour gérer les droits d’accès.
 
 
-Un client JavaScript VueJS pour cette API est développé par l'Abes, visible sur le dépôt suivant : https://github.com/abes-esr/licencesnationales-front
+Un client JavaScript VueJS pour cette API est développé par l'Abes, visible sur le dépôt suivant :  
+https://github.com/abes-esr/licencesnationales-front
 
 ## Architecture
 
