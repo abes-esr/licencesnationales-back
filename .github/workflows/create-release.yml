@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
-          mvn release:prepare -DreleaseVersion=$NEW_TAG -Dmaven.test.skip=true
+          mvn release:prepare -DreleaseVersion=$NEW_TAG -Darguments=-DskipTests
           git diff .
           git status .
           exit 1
