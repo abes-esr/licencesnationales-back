@@ -50,6 +50,7 @@ jobs:
             -Darguments=-DskipTests \
             -DtagNameFormat="@{project.version}"
 
+
       - name: 'Create the github release'
         uses: softprops/action-gh-release@v1
         with:
