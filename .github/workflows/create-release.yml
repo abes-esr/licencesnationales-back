@@ -41,7 +41,7 @@ jobs:
         run: |
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
-          mvn prepare --releaseVersion=$NEW_TAG
+          mvn prepare -DreleaseVersion=$NEW_TAG
           git diff .
           git status .
           exit 1
