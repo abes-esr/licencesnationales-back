@@ -11,7 +11,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>2.5.5</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
     <!-- ===================================================== -->
@@ -20,7 +20,7 @@
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>licencesnationales-backoffice</artifactId>
     <packaging>pom</packaging>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>Licences Nationales Back</name>
     <description>API pour les licences nationales</description>
 
@@ -201,6 +201,7 @@
     </build>
     <scm>
       <connection>scm:git:https://github.com/abes-esr/licencesnationales-back.git</connection>
-    </scm>
+      <tag>licencesnationales-backoffice-1.0.0</tag>
+  </scm>
         
 </project>
