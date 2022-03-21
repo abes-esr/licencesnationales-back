@@ -1,11 +1,12 @@
 package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
+import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.UnknownEditeurException;
+import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactEditeurRepository;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -26,6 +27,9 @@ public class EditeurService {
 
     @Autowired
     private ContactEditeurRepository contactEditeurRepository;
+
+    @Autowired
+    private DateEnvoiEditeurRepository dateEnvoiEditeurRepository;
 
 
     public void save(@Valid EditeurEntity editeur) throws MailDoublonException {
@@ -95,5 +99,14 @@ public class EditeurService {
         }).collect(Collectors.toList()));
         criteres.remove(0);
         searchByCriteria(editeurs, resultats, criteres);
+    }
+
+
+    public List<String> getDateEnvoiEditeurs() {
+        ArrayList<String> dates = new ArrayList<>();
+        for (DateEnvoiEditeurEntity date : dateEnvoiEditeurRepository.findAllByOrderByDateEnvoiDesc()) {
+            dates.add(date.getDateEnvoi().toString());
+        }
+        return dates;
     }
 }
