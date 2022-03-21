@@ -91,7 +91,8 @@ public class ExportConverter {
                 dto.setNomPrenomContact(entity.getContact().getNom() + " " + entity.getContact().getPrenom());
                 dto.setMailContact(entity.getContact().getMail());
                 for (IpEntity ip : entity.getIps()) {
-                    dto.ajouterIp(ip.getIp());
+                    if (ip.getStatut().getIdStatut() == 3)
+                        dto.ajouterIp(ip.getIp());
                 }
                 return dto;
             }
