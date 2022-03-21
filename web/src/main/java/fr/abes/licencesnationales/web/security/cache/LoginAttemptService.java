@@ -3,7 +3,6 @@ package fr.abes.licencesnationales.web.security.cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import fr.abes.licencesnationales.core.constant.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -47,7 +46,6 @@ public class LoginAttemptService {
 
     public boolean isBlocked(final String key) {
         try {
-            log.info(Constant.ERROR_BLOCKED_IP + attemptsCache.get(key));
             return attemptsCache.get(key) >= maxAttempt;
         } catch (final ExecutionException e) {
             return false;
