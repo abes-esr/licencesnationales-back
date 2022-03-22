@@ -46,6 +46,6 @@ CMD [ "catalina.sh", "run" ]
 
 #FROM openjdk:11 as back-server
 #COPY --from=web-build /app/web/target/*.jar /app/licences-nationales.jar
-#ENTRYPOINT ["java","-jar","/app/licences-nationales.jar"]
+#CMD ["java", "-jar", "/app/licences-nationales.jar"]
 
 
