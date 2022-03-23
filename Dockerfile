@@ -7,13 +7,11 @@ WORKDIR /build/
 # si on a un .m2 local on peut décommenter la ligne suivante pour 
 # éviter à maven de retélécharger toutes les dépendances
 #COPY ./.m2/    /root/.m2/
-RUN export LANG=fr_FR.UTF-8
-RUN locale -a
 COPY ./pom.xml /build/pom.xml
 COPY ./core/   /build/core/
 COPY ./batch/  /build/batch/
 COPY ./web/    /build/web/
-RUN mvn -Duser.timezone=Europe/Paris -Duser.language=fr package
+RUN mvn -Dmaven.test.skip=true -Duser.timezone=Europe/Paris -Duser.language=fr package
 
 
 
