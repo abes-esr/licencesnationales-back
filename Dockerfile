@@ -7,7 +7,7 @@ WORKDIR /build/
 # si on a un .m2 local on peut décommenter la ligne suivante pour 
 # éviter à maven de retélécharger toutes les dépendances
 #COPY ./.m2/    /root/.m2/
-RUN localectl list-locales
+RUN locale
 COPY ./pom.xml /build/pom.xml
 COPY ./core/   /build/core/
 COPY ./batch/  /build/batch/
