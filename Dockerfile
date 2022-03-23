@@ -8,7 +8,7 @@ WORKDIR /build/
 # éviter à maven de retélécharger toutes les dépendances
 #COPY ./.m2/    /root/.m2/
 RUN export LANG=fr_FR.UTF-8
-RUN locale
+RUN locale -a
 COPY ./pom.xml /build/pom.xml
 COPY ./core/   /build/core/
 COPY ./batch/  /build/batch/
