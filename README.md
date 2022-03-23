@@ -2,10 +2,11 @@
 
 [![ci](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml/badge.svg)](https://github.com/abes-esr/licencesnationales-back/actions/workflows/build-test-pubtodockerhub.yml) [![Docker Pulls](https://img.shields.io/docker/pulls/abesesr/licencesnationales.svg)](https://hub.docker.com/r/abesesr/licencesnationales/)
 
-## API Licences Nationales
+**Application en cours de développement**
 
-Application sous forme d'API REST, permettant : 
+API REST de l'application Licenses Nationales. L'[interface graphique de l'appli Licences Nationales](https://github.com/abes-esr/licencesnationales-front) repose sur cette API.
 
+Les fonctionnalités prévues sont de permettre :
 - aux institutions bénéficiaires des ressources numériques de :
   - déclarer les contacts pour l’administration technique des ressources,
   - déclarer les adresses IP.
@@ -13,6 +14,9 @@ Application sous forme d'API REST, permettant :
   - renseigner les contacts auprès des éditeurs de ces ressources
   - vérifier les informations saisies par les bénéficiaires, supprimer ou accepter les comptes, valider ou non les adresses IP
   - envoyer les informations de gestion renseignées par les institutions aux éditeurs présents dans la base, via un batch mensuel, non automatisé. Ce batch comprend un identifiant Abes ad hoc, utilisé souvent comme identifiant pivot sur lequel les éditeurs et l’Inist (pour les plates-formes ISTEX et PANIST) s’appuient pour gérer les droits d’accès.
+
+Copie d'écran de la page d'accueil de la documentation Swagger (OpenAPI) de cette API :  
+![image](https://user-images.githubusercontent.com/328244/159644528-57410331-3a78-4273-9660-c40303a05724.png)
 
 
 Un client JavaScript VueJS pour cette API est développé par l'Abes, visible sur le dépôt suivant :  
