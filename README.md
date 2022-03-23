@@ -19,7 +19,7 @@ Copie d'écran de la page d'accueil de la documentation Swagger (OpenAPI) de cet
 ![image](https://user-images.githubusercontent.com/328244/159644528-57410331-3a78-4273-9660-c40303a05724.png)
 
 
-Un client JavaScript VueJS pour cette API est développé par l'Abes, visible sur le dépôt suivant :  
+Un client JavaScript VueJS pour cette API est développé par l'Abes, son code source est disponible sur le dépôt suivant :  
 https://github.com/abes-esr/licencesnationales-front
 
 ## Architecture
