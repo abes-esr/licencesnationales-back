@@ -9,7 +9,6 @@ import fr.abes.licencesnationales.core.repository.contactediteur.ContactEditeurR
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +31,8 @@ public class EditeurServiceTest {
     private ContactEditeurRepository contactEditeurRepository;
 
 
+
     @DisplayName("test doublon email")
-    @Test
     void testDoublonEmail() throws MailDoublonException {
         Set<ContactTechniqueEditeurEntity> ctSet = new HashSet<>();
         ContactTechniqueEditeurEntity ct1 = new ContactTechniqueEditeurEntity("nom1", "prenom1", "mail1@mail.com");
@@ -70,7 +69,6 @@ public class EditeurServiceTest {
     }
 
     @DisplayName("test search editeur")
-    @Test
     void testSearchEditeur() {
         Set<ContactTechniqueEditeurEntity> ctSet = new HashSet<>();
         ContactTechniqueEditeurEntity ct1 = new ContactTechniqueEditeurEntity("nom1", "prenom1", "mail1@mail.com");

@@ -41,7 +41,7 @@ class ExportConverterTest {
     @Test
     @DisplayName("Test convertisseur export établissement")
     void testMapperExportEtab() throws IpException {
-        StatutIpEntity statut = new StatutIpEntity(1, "Validé");
+        StatutIpEntity statut = new StatutIpEntity(3, "Validé");
         IpEntity ip1 = new IpV4(1, "1.1.1.1", "test", statut);
         IpEntity ip2 = new IpV4(2, "2.2.2.2", "test2", statut);
 
