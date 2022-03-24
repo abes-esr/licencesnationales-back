@@ -6,6 +6,7 @@ import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.*;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
@@ -40,7 +41,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -234,12 +236,12 @@ public class EtablissementController extends AbstractController {
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, BadStatutException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
             throw new BadStatutException(Constant.DEJA_VALIDE_IP);
         }
-        EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        EtablissementValideEventEntity etablissementValideEvent = new EtablissementValideEventEntity(this, siren);
         etablissementValideEvent.setNomEtab(etab.getNom());
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
@@ -251,6 +253,33 @@ public class EtablissementController extends AbstractController {
         emailService.constructValidationCompteMailAdmin(mailAdmin, ((UserDetailsImpl) user).getNameEtab());
         return buildResponseEntity(Constant.MESSAGE_VALIDATIONETAB_OK);
 
+    }
+
+    @PostMapping(value = "/devalidation/{siren}")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<Object> devalidation(@Valid @PathVariable String siren, HttpServletRequest request) throws BadStatutException, JsonProcessingException {
+        EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
+        if (!etab.isValide()) {
+            throw new BadStatutException(Constant.PAS_VALIDE);
+        }
+
+        for (IpEntity ip : etab.getIps()) {
+            if (ip.getStatut().getIdStatut() == 3) {
+                throw new BadStatutException(Constant.A_IP_VALIDE);
+            }
+        }
+
+
+        EtablissementDevalideEventEntity etablissementDevalideEvent = new EtablissementDevalideEventEntity(this, siren);
+        etablissementDevalideEvent.setNomEtab(etab.getNom());
+        etablissementDevalideEvent.setValide(false);
+        applicationEventPublisher.publishEvent(etablissementDevalideEvent);
+        eventService.save(etablissementDevalideEvent);
+
+        UserDetails user = userDetailsService.loadUser(etab);
+        emailService.constructDevalidationCompteMailUser(((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+
+        return buildResponseEntity(Constant.MESSAGE_DEVALIDATIONETAB_OK);
     }
 
     @GetMapping(value = "/{siren}")

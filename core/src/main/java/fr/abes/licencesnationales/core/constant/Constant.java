@@ -119,6 +119,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_FUSIONETAB_OK = "Etablissements fusionnés avec succès";
     public static final String MESSAGE_SCISSIONETAB_OK = "Etablissement scindé avec succès";
     public static final String MESSAGE_VALIDATIONETAB_OK = "Etablissement validé avec succès";
+    public static final String MESSAGE_DEVALIDATIONETAB_OK = "Etablissement dévalidé avec succès";
     public static final String MESSAGE_SUPPETAB_OK = "Etablissement supprimé avec succès";
     public static final String MESSAGE_CREATIONEDITEUR_OK = "Editeur ajouté avec succès";
     public static final String MESSAGE_MODIFEDITEUR_OK = "Editeur modifié avec succès";
@@ -144,6 +145,9 @@ public class Constant implements Serializable {
     public static final String DEJA_VALIDE_IP = "L'Ip ne doit pas déjà être validé";
     public static final String ERROR_TOKEN_INVALID = "Token invalide ou absent";
     public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
+    public static final String PAS_VALIDE = "L'etablissement n'est pas au statut validé";
+    public static final String A_IP_VALIDE = "L'etablissement possède encore des IPs validées";
+
 
     /**
      * STRING avec variable
