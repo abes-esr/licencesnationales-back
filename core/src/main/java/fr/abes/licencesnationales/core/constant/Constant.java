@@ -18,7 +18,7 @@ public class Constant implements Serializable {
     public static final String ACCES_INTERDIT = "Accès interdit.";
     public static final String ACCES_REFUSE = "Accès refusé.";
     public static final String IP_BLOCKED = "Votre adresse IP est bloquée.";
-    public static final String WRONG_LOGIN_AND_OR_PASS = "Mauvais login et / ou mot de passe.";
+    public static final String WRONG_LOGIN_AND_OR_PASS = "La combinaison SIREN / mot de passe est incorrecte";
 
 
     /**Application log messages */
@@ -64,7 +64,7 @@ public class Constant implements Serializable {
     public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
-    public static final String ERROR_DOUBLON_MAIL = "L'adresse mail saisie est déjà utilisée";
+    public static final String ERROR_DOUBLON_MAIL = "Cette adresse est déjà présente dans la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Erreur d'ecriture dans le fichier CSV" ;
@@ -117,7 +117,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_CREATIONETAB_OK = "Etablissement ajouté avec succès";
     public static final String MESSAGE_MODIFETAB_OK = "Etablissement modifié avec succès";
     public static final String MESSAGE_FUSIONETAB_OK = "Etablissements fusionnés avec succès";
-    public static final String MESSAGE_SCISSIONETAB_OK = "Etablissement scissionné avec succès";
+    public static final String MESSAGE_SCISSIONETAB_OK = "Etablissement scindé avec succès";
     public static final String MESSAGE_VALIDATIONETAB_OK = "Etablissement validé avec succès";
     public static final String MESSAGE_SUPPETAB_OK = "Etablissement supprimé avec succès";
     public static final String MESSAGE_CREATIONEDITEUR_OK = "Editeur ajouté avec succès";
@@ -135,7 +135,7 @@ public class Constant implements Serializable {
     public static final String IP_UNABLE_TO_DECODE = "Impossible de décoder l'IP";
     public static final String MDP_NOTNULL = "Le mot de passe ne doit pas être nulle ou vide";
     public static final String ETAB_NOTNULL = "L'établissement ne peut pas être nul";
-    public static final String SIREN_DOUBLON = "Le siren saisi est déjà utilisé";
+    public static final String SIREN_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
     public static final String SIREN_NE_CORRESPOND_PAS = "Le siren demandé ne correspond pas au siren de l'utilisateur connecté";
     public static final String STATUT_INCONNU = "Statut inconnu";
     public static final String METHODE_AUTHENTIFICATION_PAS_SUPPORTEE = "La méthode d'authentification n'est pas supportée";
@@ -145,9 +145,11 @@ public class Constant implements Serializable {
     public static final String ERROR_TOKEN_INVALID = "Token invalide ou absent";
     public static final String ERROR_SIREN_INTROUVABLE = "Siren absent de la base";
 
-    /** STRING avec variable **/
-    public static final String ERROR_ETAB_DOUBLON = "L'établissement %s existe déjà";
-    public static final String ERROR_IP_DOUBLON = "L'IP %s est déjà utilisée";
+    /**
+     * STRING avec variable
+     **/
+    public static final String ERROR_ETAB_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
+    public static final String ERROR_IP_DOUBLON = "L’adresse / la plage %s est déjà déclarée pour votre établissement. Pour toute question sur la gestion des IP, contacter l’Abes via le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales ";
     public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
     public static final String ERROR_ETAB_EXISTE_PAS = "L'établissement %s n'existe pas";
