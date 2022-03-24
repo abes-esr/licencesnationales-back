@@ -126,6 +126,20 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructDevalidationCompteMailUser(String nomEtab, String emailUser) {
+        String subject = getEnv() + "[Appli LN] Modification du compte sur le site Licencesnationales.fr";
+        StringBuilder message = new StringBuilder(BONJOUR);
+        message.append("le compte de l’établissement");
+        message.append(nomEtab);
+        message.append(" créé sur l’application Licencesnationales");
+        message.append("<b> a été repassé en statut \"Nouveau\" dans l’application de gestion des accès aux licences nationales.</b><br><br>");
+        message.append("Pour toute question contacter l’Abes via le guichet d’assistance ABESstp. ");
+        message.append(signature());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
+        sendMail(jsonRequestConstruct);
+    }
+
+
     public void constructRelanceEtabMailUser(String nomEtab, String emailUser) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Relance : aucune IP déclarée sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
