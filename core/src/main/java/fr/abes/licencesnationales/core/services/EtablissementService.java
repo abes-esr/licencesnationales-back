@@ -15,13 +15,10 @@ import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRep
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static org.springframework.data.jpa.domain.Specification.*;
 
 @Service
 @Slf4j
@@ -50,7 +47,9 @@ public class EtablissementService {
     }
 
     public EtablissementEntity getFirstBySiren(String siren) {
-        return etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
+        EtablissementEntity etab = etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
+        etab.setIdAbes(GenererIdAbes.genererIdAbes(etab.getIdAbes()));
+        return etab;
     }
 
     /**
