@@ -68,7 +68,7 @@ class EtablissementServiceTest {
         Assertions.assertEquals("testNom", etabOut.getNom());
         Assertions.assertEquals("000000000", etabOut.getSiren());
         Assertions.assertEquals("testType", etabOut.getTypeEtablissement().getLibelle());
-        Assertions.assertEquals("ABES3GC9U31NH", etabOut.getIdAbes());
+        Assertions.assertEquals("3gC9u31NH4Iwf72f2fgjf5pd", etabOut.getIdAbes());
         Assertions.assertEquals("nom", etabOut.getContact().getNom());
         Assertions.assertEquals("prenom", etabOut.getContact().getPrenom());
         Assertions.assertEquals("adresse", etabOut.getContact().getAdresse());
