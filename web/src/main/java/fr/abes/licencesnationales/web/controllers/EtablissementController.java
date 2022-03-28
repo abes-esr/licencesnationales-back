@@ -285,6 +285,7 @@ public class EtablissementController extends AbstractController {
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException, SirenIntrouvableException, AccesInterditException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
+        entity.setIdAbes(GenererIdAbes.genererIdAbes(entity.getIdAbes()));
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }

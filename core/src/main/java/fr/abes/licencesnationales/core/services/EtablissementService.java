@@ -47,9 +47,7 @@ public class EtablissementService {
     }
 
     public EtablissementEntity getFirstBySiren(String siren) {
-        EtablissementEntity etab = etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
-        etab.setIdAbes(GenererIdAbes.genererIdAbes(etab.getIdAbes()));
-        return etab;
+        return etablissementDao.getFirstBySiren(siren).orElseThrow(() -> new UnknownEtablissementException("Siren : " + siren));
     }
 
     /**
