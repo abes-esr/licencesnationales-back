@@ -185,7 +185,7 @@ public class EmailService {
                 String[] commentaire = ip.split("[|]");
                 message.append("<tr><td style=\"border:1px solid\">" + commentaire[0]);
                 message.append("<br>");
-                if (commentaire.length >= 1) {
+                if (commentaire.length > 1) {
                     message.append("<u>Raison de la suppression</u> :<br>");
                     if (commentaire[1] == null || commentaire[1].equals("null")) {
                         message.append("Non précisée");
