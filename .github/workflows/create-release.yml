@@ -1,4 +1,4 @@
-name: 'Create release'
+name: 'Create Release'
 
 on: 
   workflow_dispatch:
@@ -19,9 +19,13 @@ jobs:
           fetch-depth: '0' # to get all the tags locally
           # https://stackoverflow.com/questions/67550727/push-event-doesnt-trigger-workflow-on-push-paths-github-actions
           token: ${{ secrets.TOKEN_GITHUB_FOR_GITHUB_ACTION }}
-   
 
 
+      - name: 'Verify release is created only on "main" or "master" git branch'
+        run: |
+          CURRENT_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+          echo $CURRENT_GIT_BRANCH
+          [[ "$CURRENT_GIT_BRANCH" == "main" || "$CURRENT_GIT_BRANCH" == "master" ]] && exit 0 || exit 1
       - name: 'Verify version is semver formatted (X.X.X)'
         env:
           NEW_TAG:  ${{ github.event.inputs.releaseVersion }}
@@ -33,26 +37,27 @@ jobs:
         run: |
           [[ "$(git tag --list | grep $NEW_TAG)" == "" ]] && exit 0 || exit 1
         
-
-
+        
+        
       - name: 'Generate the new version (patch few files + git tag)'
         env:
           NEW_TAG: ${{ github.event.inputs.releaseVersion }}
         run: |
-          # préparation de la release qui va :
-          # - modifier le numéro de version dans les pom.xml du projet
-          # - créer un tag git du numéro de version en question
-          # - pousser le tout sur le dépôt github
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
-          mvn release:prepare \
-            -DreleaseVersion=$NEW_TAG \
-            -Darguments=-DskipTests \
-            -DtagNameFormat="@{project.version}"
-          # merge la nouvelle version sur develop
-          # (pour pas que la branche main soit en "avance" sur develop)
+          npm config set tag-version-prefix ''
+          npm config set git-tag-version false
+          npm version $NEW_TAG
+          sed -i "s#Version: [0-9]+\.[0-9]+\.[0-9]+#Version: $NEW_TAG#g" README.md
+          git commit -m "Version $NEW_TAG" README.md package.json
+          git tag $NEW_TAG
+          git push && git push --tags
+          # merge la préparation de la nouvelle version sur develop
+          # (version X.X.X-SNAPSHOT)
+          # CURRENT_GIT_BRANCH vaut main ou master, c'est la où est créé la release
+          CURRENT_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           git switch develop
-          git merge main
+          git merge $CURRENT_GIT_BRANCH
           git push
 
       - name: 'Create the github release'
