@@ -610,7 +610,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     @WithMockUser(authorities = {"etab"})
     void testGetEtab() throws Exception {
         ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
-        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456", contact);
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "dRGB9T4ky4RUAA3hEqfhu80r", contact);
 
         Mockito.when(etablissementService.getFirstBySiren("123456789")).thenReturn(etab);
         Mockito.when(filtrerAccesServices.getSirenFromSecurityContextUser()).thenReturn("123456789");
@@ -636,7 +636,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         DateFormat format = new SimpleDateFormat("dd-MM-yyyy");
         ContactEntity contact = new ContactEntity(1, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
         contact.setRole("admin");
-        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "testType"), "123456", contact);
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "testType"), "dRGB9T4ky4RUAA3hEqfhu80r", contact);
         etab.setDateCreation(dateJour.getTime());
         StatutIpEntity statutIpEntity = new StatutIpEntity(Constant.STATUT_IP_ATTESTATION, "Attestation à envoyer");
         IpEntity ip1 = new IpV4("1.1.1.1", "test", statutIpEntity);
@@ -654,7 +654,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.nom").value("nomEtab"))
                 .andExpect(jsonPath("$.siren").value("123456789"))
-                .andExpect(jsonPath("$.idAbes").value("123456"))
+                .andExpect(jsonPath("$.idAbes").value("ABESDRGB9T4KY "))
                 .andExpect(jsonPath("$.typeEtablissement").value("testType"))
                 .andExpect(jsonPath("$.dateCreation").value(format.format(dateJour.getTime())))
                 .andExpect(jsonPath("$.statut").value("Nouveau"))
