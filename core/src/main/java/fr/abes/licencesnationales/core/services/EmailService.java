@@ -61,7 +61,7 @@ public class EmailService {
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous venez de créer le compte établissement <b>");
         message.append(etab.getNomEtab());
-        message.append("</b>sur l'<a href='");
+        message.append("</b> sur l'<a href='");
         message.append(urlSite);
         message.append("' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("Un seul compte par établissement est autorisé. L’Abes va vérifier l’éligibilité de l’établissement.<br><br>");
