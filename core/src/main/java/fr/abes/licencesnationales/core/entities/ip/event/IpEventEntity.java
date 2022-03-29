@@ -63,4 +63,10 @@ public class IpEventEntity extends EventEntity implements Serializable {
         this.ipId = ipId;
         this.siren = siren;
     }
+
+    @Transient
+    public String getDecriminatorValue() {
+        return this.getClass().getAnnotation(DiscriminatorValue.class).value();
+    }
+
 }
