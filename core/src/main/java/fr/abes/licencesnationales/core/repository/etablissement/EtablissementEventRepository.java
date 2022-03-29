@@ -36,4 +36,7 @@ public interface EtablissementEventRepository extends JpaRepository<Etablissemen
 
     @Query("select e from EtablissementEventEntity e where TYPE(e)=EtablissementDiviseEventEntity and e.siren = :siren")
     Optional<EtablissementDiviseEventEntity> getEventScission(@Param(("siren")) String siren);
+
+    @Query("select e from EtablissementEventEntity e where e.siren = :siren")
+    List<EtablissementEventEntity> findBySiren(String siren);
 }

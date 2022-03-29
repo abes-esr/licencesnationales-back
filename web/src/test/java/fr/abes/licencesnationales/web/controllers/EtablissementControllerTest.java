@@ -654,7 +654,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.nom").value("nomEtab"))
                 .andExpect(jsonPath("$.siren").value("123456789"))
-                .andExpect(jsonPath("$.idAbes").value("ABESDRGB9T4KY "))
+                .andExpect(jsonPath("$.idAbes").value("ABESDRGB9T4KY"))
                 .andExpect(jsonPath("$.typeEtablissement").value("testType"))
                 .andExpect(jsonPath("$.dateCreation").value(format.format(dateJour.getTime())))
                 .andExpect(jsonPath("$.statut").value("Nouveau"))
