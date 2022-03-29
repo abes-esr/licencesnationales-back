@@ -133,4 +133,8 @@ public class EventService {
             throw new UnknownEtablissementException("Etablissement inconnu");
         return etab.get();
     }
+
+    public List<EtablissementEventEntity> getHistoEtab(String siren) {
+        return etablissementDao.findBySiren(siren);
+    }
 }

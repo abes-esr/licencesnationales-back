@@ -61,7 +61,7 @@ public class Constant implements Serializable {
     public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
     public static final String ERROR_STATUT_IP = "Erreur statut Ip : ";
     public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
-    public static final String ERROR_ETAB_INCONNU = "Etablissement inconnu : ";
+    public static final String ERROR_ETAB_INCONNU = "Etablissement absent de la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
     public static final String ERROR_DOUBLON_MAIL = "Cette adresse est déjà présente dans la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
@@ -124,7 +124,7 @@ public class Constant implements Serializable {
     public static final String MESSAGE_CREATIONEDITEUR_OK = "Editeur ajouté avec succès";
     public static final String MESSAGE_MODIFEDITEUR_OK = "Editeur modifié avec succès";
     public static final String MESSAGE_SUPPEDITEUR_OK = "Editeur supprimé avec succès";
-    public static final String MESSAGE_MDP_OUBLIE = "Un mail avec un lien de réinitialisation vous a été envoyé";
+    public static final String MESSAGE_MDP_OUBLIE = "Si l'adresse e-mail est reconnue, vous recevrez un lien de réinitialisation du mot de passe";
     public static final String MESSAGE_RESET_MDP = "Votre mot de passe a bien été réinitialisé";
     public static final String EXCEPTION_CAPTCHA_OBLIGATOIRE = "Le champs 'recaptcha' est obligatoire";
     public static final String MESSAGE_MDP_MODIFIER = "Votre mot de passe a bien été modifié";

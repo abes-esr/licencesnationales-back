@@ -8,7 +8,6 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.*;
-import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
@@ -62,9 +61,6 @@ public class EtablissementController extends AbstractController {
 
     @Autowired
     private ReferenceService referenceService;
-
-    @Autowired
-    private IpRepository ipRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -353,6 +349,15 @@ public class EtablissementController extends AbstractController {
         return mapper.mapList(etablissementService.search(criteres), EtablissementSearchWebDto.class);
     }
 
-
-
+    @GetMapping(value = "/histo/{siren}")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public List<EtablissementHistoriqueDto> historique(@PathVariable String siren) {
+        List<EtablissementHistoriqueDto> listHisto = new ArrayList<>();
+        for (EtablissementEventEntity e : eventService.getHistoEtab(siren)) {
+            EtablissementHistoriqueDto h = mapper.map(e, EtablissementHistoriqueDto.class);
+            h.setEvent(e.getDecriminatorValue());
+            listHisto.add(h);
+        }
+        return listHisto;
+    }
 }
