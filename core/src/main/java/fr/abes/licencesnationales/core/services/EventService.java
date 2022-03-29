@@ -137,4 +137,8 @@ public class EventService {
     public List<EtablissementEventEntity> getHistoEtab(String siren) {
         return etablissementDao.findBySiren(siren);
     }
+
+    public List<IpEventEntity> getHistoIp(String siren) {
+        return ipDao.findBySiren(siren);
+    }
 }
