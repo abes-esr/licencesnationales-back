@@ -14,16 +14,13 @@ public class IpHistoriqueDto {
     @JsonProperty("date")
     private String dateCreationEvent;
 
-    @JsonProperty("type")
-    private String typeAcces;
-
     @JsonProperty("IP")
     private String IP;
 
-    @JsonProperty("commentaire")
+    @JsonProperty("Commentaire")
     private String commentaires;
 
-    @JsonProperty("commentaireAdmin")
+    @JsonProperty("CommentaireAdmin")
     private String commentaire;
 
 }

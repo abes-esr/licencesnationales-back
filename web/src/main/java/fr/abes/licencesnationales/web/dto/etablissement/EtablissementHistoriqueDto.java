@@ -14,37 +14,34 @@ public class EtablissementHistoriqueDto {
     @JsonProperty("date")
     private String dateCreationEvent;
 
-    @JsonProperty("nomEtab")
+    @JsonProperty("Etablissement")
     private String nomEtab;
 
     @JsonProperty("siren")
     private String siren;
 
-    @JsonProperty("mail")
+    @JsonProperty("Mail")
     private String mail;
 
-    @JsonProperty("mailContact")
-    private String mailContact;
-
-    @JsonProperty("nomContact")
+    @JsonProperty("Nom")
     private String nomContact;
 
-    @JsonProperty("prenomContact")
+    @JsonProperty("Prenom")
     private String prenomContact;
 
-    @JsonProperty("telephoneContact")
+    @JsonProperty("Telephone")
     private String telephoneContact;
 
-    @JsonProperty("adresseContact")
+    @JsonProperty("Adresse")
     private String adresseContact;
 
-    @JsonProperty("boitePostaleContact")
+    @JsonProperty("BP")
     private String boitePostaleContact;
 
-    @JsonProperty("codePostalContact")
+    @JsonProperty("CP")
     private String codePostalContact;
 
-    @JsonProperty("cedexContact")
+    @JsonProperty("CEDEX")
     private String cedexContact;
 
     @JsonProperty("ancienSiren")
