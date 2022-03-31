@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,7 @@ public interface IpEventRepository extends JpaRepository<IpEventEntity, Long> {
 
     @Query("select e from IpEventEntity e where e.siren = :siren")
     List<IpEventEntity> findBySiren(String siren);
+
+    @Query("select e from IpEventEntity e where e.dateCreationEvent BETWEEN :dateDebut AND :dateFin")
+    List<IpEventEntity> findBetweenDates(Date dateDebut, Date dateFin);
 }
