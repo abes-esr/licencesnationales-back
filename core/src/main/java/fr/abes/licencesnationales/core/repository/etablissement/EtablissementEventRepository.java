@@ -39,4 +39,8 @@ public interface EtablissementEventRepository extends JpaRepository<Etablissemen
 
     @Query("select e from EtablissementEventEntity e where e.siren = :siren")
     List<EtablissementEventEntity> findBySiren(String siren);
+
+    @Query("select e from EtablissementEventEntity e where e.dateCreationEvent BETWEEN :dateDebut AND :dateFin")
+    List<EtablissementEventEntity> findBetweenDates(Date dateDebut, Date dateFin);
+
 }

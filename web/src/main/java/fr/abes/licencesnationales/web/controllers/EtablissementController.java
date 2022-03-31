@@ -40,7 +40,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -359,5 +362,49 @@ public class EtablissementController extends AbstractController {
             listHisto.add(h);
         }
         return listHisto;
+    }
+
+    @GetMapping(value = "/stats")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public StatsDto statistiques(@RequestParam String dateDebut, @RequestParam String dateFin) throws ParseException {
+        int etabsCrees, etabsValides, etabsSupprimes, etabsModifies, etabsFusionnes, etabsScindes;
+        etabsCrees = etabsValides = etabsSupprimes = etabsModifies = etabsFusionnes = etabsScindes = 0;
+
+        Date date1 = new SimpleDateFormat("dd-MM-yyyy").parse(dateDebut);
+        Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(dateFin);
+
+        for (EtablissementEventEntity e : eventService.getHistoAllEtab(date1, date2)) {
+            switch (e.getDecriminatorValue()) {
+                case "cree":
+                    etabsCrees++;
+                    break;
+                case "valide":
+                    etabsValides++;
+                    break;
+                case "supprime":
+                    etabsSupprimes++;
+                    break;
+                case "modifie":
+                    etabsModifies++;
+                    break;
+                case "fusionne":
+                    etabsFusionnes++;
+                    break;
+                case "divise":
+                    etabsScindes++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        StatsDto stats = new StatsDto();
+        stats.ajouterStat("Creations", etabsCrees);
+        stats.ajouterStat("Validations", etabsValides);
+        stats.ajouterStat("Suppressions", etabsSupprimes);
+        stats.ajouterStat("Modifications", etabsModifies);
+        stats.ajouterStat("Fusions", etabsFusionnes);
+        stats.ajouterStat("Scissions", etabsScindes);
+
+        return stats;
     }
 }
