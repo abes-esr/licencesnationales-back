@@ -47,6 +47,7 @@ public class LicencesNationalesAPIApplication extends SpringBootServletInitializ
         // https://acces.licencesnationales.fr/ => for the front
         // https://acces.licencesnationales.fr/v1/ => for the back (api)
         List<String> allowedOriginsUrl = new ArrayList<>();
+        allowedOriginsUrl.add("*");
         allowedOriginsUrl.add("http://localhost:8080");
         allowedOriginsUrl.add("http://localhost:8081");
         allowedOriginsUrl.add("http://127.0.0.1:8081");
