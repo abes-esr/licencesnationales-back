@@ -31,7 +31,7 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
                "Téléphone contact",
                "Nom et prénom contact",
                "Adresse mail contact",
-               "IP"
+               "IP validées"
        });
     }
 

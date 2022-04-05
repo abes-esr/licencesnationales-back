@@ -5,6 +5,7 @@ import fr.abes.licencesnationales.core.entities.contactediteur.ContactCommercial
 import fr.abes.licencesnationales.core.entities.contactediteur.ContactTechniqueEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
+import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.repository.contactediteur.ContactEditeurRepository;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurRepository;
 import org.junit.jupiter.api.Assertions;
@@ -24,6 +25,9 @@ import java.util.*;
 public class EditeurServiceTest {
     @Autowired
     private EditeurService service;
+
+    @MockBean
+    private DateEnvoiEditeurRepository date;
 
     @MockBean
     private EditeurRepository editeurRepository;

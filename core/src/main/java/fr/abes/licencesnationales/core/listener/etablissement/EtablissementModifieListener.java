@@ -7,7 +7,6 @@ import fr.abes.licencesnationales.core.entities.etablissement.event.Etablissemen
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.ReferenceService;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
@@ -39,9 +38,6 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         // Type d'établissement
         if(event.getTypeEtablissement() != null)
             etab.setTypeEtablissement(referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()));
-
-        //statut de validation  de l'établissement
-        etab.setValide(event.isValide());
 
         // Contact - nom
         contact.setNom(event.getNomContact());

@@ -9,19 +9,18 @@ import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
-import fr.abes.licencesnationales.core.exception.AccesInterditException;
-import fr.abes.licencesnationales.core.exception.MailDoublonException;
-import fr.abes.licencesnationales.core.exception.SirenIntrouvableException;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
-import fr.abes.licencesnationales.core.services.*;
+import fr.abes.licencesnationales.core.services.EditeurService;
+import fr.abes.licencesnationales.core.services.EmailService;
+import fr.abes.licencesnationales.core.services.EventService;
+import fr.abes.licencesnationales.core.services.ReferenceService;
 import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import fr.abes.licencesnationales.core.services.export.editeur.*;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurModifieWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurSearchWebDto;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurWebDto;
-import fr.abes.licencesnationales.web.dto.etablissement.EtablissementSearchWebDto;
 import fr.abes.licencesnationales.web.exception.SendMailException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
@@ -34,7 +33,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -200,5 +201,11 @@ public class EditeurController extends AbstractController{
     @PreAuthorize("hasAuthority('admin')")
     public List<EditeurSearchWebDto> search(@RequestBody List<String> criteres) {
         return mapper.mapList(editeurService.search(criteres), EditeurSearchWebDto.class);
+    }
+
+    @GetMapping(value = "/getDateEnvoiEditeur")
+    @PreAuthorize("hasAuthority('admin')")
+    public List<String> getDateEnvoiEditeur() {
+        return editeurService.getDateEnvoiEditeurs();
     }
 }

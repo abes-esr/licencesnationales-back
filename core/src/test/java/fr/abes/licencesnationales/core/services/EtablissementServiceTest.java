@@ -2,7 +2,6 @@ package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
-import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.ContactEntity;
@@ -22,7 +21,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -61,7 +59,7 @@ class EtablissementServiceTest {
     void testGetFirstBySirenSuccess() {
         TypeEtablissementEntity type = new TypeEtablissementEntity(1, "testType");
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
-        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "12345", contact);
+        EtablissementEntity etabIn = new EtablissementEntity(1, "testNom", "000000000", type, "3gC9u31NH4Iwf72f2fgjf5pd", contact);
         etabIn.setValide(false);
         Optional<EtablissementEntity> optionEtab = Optional.of(etabIn);
         Mockito.when(etablissementDao.getFirstBySiren("000000000")).thenReturn(optionEtab);
@@ -70,7 +68,7 @@ class EtablissementServiceTest {
         Assertions.assertEquals("testNom", etabOut.getNom());
         Assertions.assertEquals("000000000", etabOut.getSiren());
         Assertions.assertEquals("testType", etabOut.getTypeEtablissement().getLibelle());
-        Assertions.assertEquals("12345", etabOut.getIdAbes());
+        Assertions.assertEquals("3gC9u31NH4Iwf72f2fgjf5pd", etabOut.getIdAbes());
         Assertions.assertEquals("nom", etabOut.getContact().getNom());
         Assertions.assertEquals("prenom", etabOut.getContact().getPrenom());
         Assertions.assertEquals("adresse", etabOut.getContact().getAdresse());

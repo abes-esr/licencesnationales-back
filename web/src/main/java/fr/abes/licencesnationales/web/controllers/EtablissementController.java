@@ -6,8 +6,8 @@ import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.*;
+import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.*;
-import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementAdmin;
 import fr.abes.licencesnationales.core.services.export.ExportEtablissementUser;
@@ -40,7 +40,11 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -60,9 +64,6 @@ public class EtablissementController extends AbstractController {
 
     @Autowired
     private ReferenceService referenceService;
-
-    @Autowired
-    private IpRepository ipRepository;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -234,12 +235,12 @@ public class EtablissementController extends AbstractController {
 
     @PostMapping(value = "/validation/{siren}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, UnknownStatutException, BadStatutException {
+    public ResponseEntity<Object> validation(@Valid @PathVariable String siren, HttpServletRequest request) throws JsonProcessingException, BadStatutException {
         EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
         if (etab.isValide()) {
             throw new BadStatutException(Constant.DEJA_VALIDE_IP);
         }
-        EtablissementValideEventEntity etablissementValideEvent= new EtablissementValideEventEntity(this, siren);
+        EtablissementValideEventEntity etablissementValideEvent = new EtablissementValideEventEntity(this, siren);
         etablissementValideEvent.setNomEtab(etab.getNom());
         etablissementValideEvent.setValide(true);
         applicationEventPublisher.publishEvent(etablissementValideEvent);
@@ -253,9 +254,37 @@ public class EtablissementController extends AbstractController {
 
     }
 
+    @PostMapping(value = "/devalidation/{siren}")
+    @PreAuthorize("hasAuthority('admin')")
+    public ResponseEntity<Object> devalidation(@Valid @PathVariable String siren, HttpServletRequest request) throws BadStatutException, JsonProcessingException {
+        EtablissementEntity etab = etablissementService.getFirstBySiren(siren);
+        if (!etab.isValide()) {
+            throw new BadStatutException(Constant.PAS_VALIDE);
+        }
+
+        for (IpEntity ip : etab.getIps()) {
+            if (ip.getStatut().getIdStatut() == 3) {
+                throw new BadStatutException(Constant.A_IP_VALIDE);
+            }
+        }
+
+
+        EtablissementDevalideEventEntity etablissementDevalideEvent = new EtablissementDevalideEventEntity(this, siren);
+        etablissementDevalideEvent.setNomEtab(etab.getNom());
+        etablissementDevalideEvent.setValide(false);
+        applicationEventPublisher.publishEvent(etablissementDevalideEvent);
+        eventService.save(etablissementDevalideEvent);
+
+        UserDetails user = userDetailsService.loadUser(etab);
+        emailService.constructDevalidationCompteMailUser(((UserDetailsImpl) user).getNameEtab(), ((UserDetailsImpl) user).getEmail());
+
+        return buildResponseEntity(Constant.MESSAGE_DEVALIDATIONETAB_OK);
+    }
+
     @GetMapping(value = "/{siren}")
     public EtablissementWebDto get(@PathVariable String siren) throws InvalidTokenException, SirenIntrouvableException, AccesInterditException {
         EtablissementEntity entity = etablissementService.getFirstBySiren(siren);
+        entity.setIdAbes(GenererIdAbes.genererIdAbes(entity.getIdAbes()));
         if ("admin".equals(filtrerAccesServices.getRoleFromSecurityContextUser())) {
             return mapper.map(entity, EtablissementAdminWebDto.class);
         }
@@ -323,6 +352,59 @@ public class EtablissementController extends AbstractController {
         return mapper.mapList(etablissementService.search(criteres), EtablissementSearchWebDto.class);
     }
 
+    @GetMapping(value = "/histo/{siren}")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public List<EtablissementHistoriqueDto> historique(@PathVariable String siren) {
+        List<EtablissementHistoriqueDto> listHisto = new ArrayList<>();
+        for (EtablissementEventEntity e : eventService.getHistoEtab(siren)) {
+            EtablissementHistoriqueDto h = mapper.map(e, EtablissementHistoriqueDto.class);
+            h.setEvent(e.getDecriminatorValue());
+            listHisto.add(h);
+        }
+        return listHisto;
+    }
 
+    @GetMapping(value = "/stats")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public StatsDto statistiques(@RequestParam String dateDebut, @RequestParam String dateFin) throws ParseException {
+        int etabsCrees, etabsValides, etabsSupprimes, etabsModifies, etabsFusionnes, etabsScindes;
+        etabsCrees = etabsValides = etabsSupprimes = etabsModifies = etabsFusionnes = etabsScindes = 0;
 
+        Date date1 = new SimpleDateFormat("dd-MM-yyyy").parse(dateDebut);
+        Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(dateFin);
+
+        for (EtablissementEventEntity e : eventService.getHistoAllEtab(date1, date2)) {
+            switch (e.getDecriminatorValue()) {
+                case "cree":
+                    etabsCrees++;
+                    break;
+                case "valide":
+                    etabsValides++;
+                    break;
+                case "supprime":
+                    etabsSupprimes++;
+                    break;
+                case "modifie":
+                    etabsModifies++;
+                    break;
+                case "fusionne":
+                    etabsFusionnes++;
+                    break;
+                case "divise":
+                    etabsScindes++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        StatsDto stats = new StatsDto();
+        stats.ajouterStat("Creations", etabsCrees);
+        stats.ajouterStat("Validations", etabsValides);
+        stats.ajouterStat("Suppressions", etabsSupprimes);
+        stats.ajouterStat("Modifications", etabsModifies);
+        stats.ajouterStat("Fusions", etabsFusionnes);
+        stats.ajouterStat("Scissions", etabsScindes);
+
+        return stats;
+    }
 }

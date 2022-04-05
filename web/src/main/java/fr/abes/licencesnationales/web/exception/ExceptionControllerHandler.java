@@ -209,7 +209,7 @@ public class ExceptionControllerHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UnknownEtablissementException.class)
     protected ResponseEntity<Object> handleUnknownEtablissementException(UnknownEtablissementException ex) {
-        String error = Constant.ERROR_ETAB_INCONNU + ex.getMessage();
+        String error = Constant.ERROR_ETAB_INCONNU;
         return buildResponseEntity(new ApiReturnError(HttpStatus.BAD_REQUEST, error, ex));
     }
 

@@ -13,8 +13,11 @@ import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.services.EmailService;
 import fr.abes.licencesnationales.core.services.EtablissementService;
+import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.IpService;
 import fr.abes.licencesnationales.core.services.export.ExportIp;
+import fr.abes.licencesnationales.web.dto.etablissement.StatsDto;
+import fr.abes.licencesnationales.web.dto.ip.IpHistoriqueDto;
 import fr.abes.licencesnationales.web.dto.ip.IpSearchWebDto;
 import fr.abes.licencesnationales.web.dto.ip.IpWebDto;
 import fr.abes.licencesnationales.web.dto.ip.creation.IpAjouteeWebDto;
@@ -32,11 +35,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Log
@@ -54,6 +58,9 @@ public class IpController extends AbstractController {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private EventService eventService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -219,6 +226,54 @@ public class IpController extends AbstractController {
     @PreAuthorize("hasAuthority('admin')")
     public List<IpSearchWebDto> search(@RequestBody List<String> criteres) {
         return mapper.mapList(ipService.search(criteres), IpSearchWebDto.class);
+    }
+
+    @GetMapping(value = "/histo/{siren}")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public List<IpHistoriqueDto> historique(@PathVariable String siren) {
+        List<IpHistoriqueDto> listHisto = new ArrayList<>();
+        for (IpEventEntity e : eventService.getHistoIp(siren)) {
+            IpHistoriqueDto h = mapper.map(e, IpHistoriqueDto.class);
+            h.setEvent(e.getDecriminatorValue());
+            listHisto.add(h);
+        }
+        return listHisto;
+    }
+
+    @GetMapping(value = "/stats")
+    @PreAuthorize("hasAnyAuthority('admin')")
+    public StatsDto statistiques(@RequestParam String dateDebut, @RequestParam String dateFin) throws ParseException {
+        int ipCrees, ipValides, ipRejetees, ipSupprimees;
+        ipCrees = ipValides = ipRejetees = ipSupprimees = 0;
+
+        Date date1 = new SimpleDateFormat("dd-MM-yyyy").parse(dateDebut);
+        Date date2 = new SimpleDateFormat("dd-MM-yyyy").parse(dateFin);
+
+        for (IpEventEntity e : eventService.getHistoAllIp(date1, date2)) {
+            switch (e.getDecriminatorValue()) {
+                case "cree":
+                    ipCrees++;
+                    break;
+                case "valide":
+                    ipValides++;
+                    break;
+                case "supprime":
+                    ipSupprimees++;
+                    break;
+                case "rejete":
+                    ipRejetees++;
+                    break;
+                default:
+                    break;
+            }
+        }
+        StatsDto stats = new StatsDto();
+        stats.ajouterStat("Creations", ipCrees);
+        stats.ajouterStat("Validations", ipValides);
+        stats.ajouterStat("Suppressions", ipSupprimees);
+        stats.ajouterStat("Rejets", ipRejetees);
+
+        return stats;
     }
 
 }
