@@ -47,7 +47,6 @@ public class LicencesNationalesAPIApplication extends SpringBootServletInitializ
         // https://acces.licencesnationales.fr/ => for the front
         // https://acces.licencesnationales.fr/v1/ => for the back (api)
         List<String> allowedOriginsUrl = new ArrayList<>();
-        allowedOriginsUrl.add("*");
         allowedOriginsUrl.add("http://localhost:8080");
         allowedOriginsUrl.add("http://localhost:8081");
         allowedOriginsUrl.add("http://127.0.0.1:8081");
@@ -56,7 +55,8 @@ public class LicencesNationalesAPIApplication extends SpringBootServletInitializ
         allowedOriginsUrl.add("http://diplotaxis-dev.v212.abes.fr:6080");
         allowedOriginsUrl.add("http://diplotaxis-prod.v102.abes.fr:6080");
         config.setAllowedOrigins(allowedOriginsUrl);
-        
+        config.allowedOriginPatterns("https://*.licencesnationales.com");
+
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
         source.registerCorsConfiguration("/**", config);
