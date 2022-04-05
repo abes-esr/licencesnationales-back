@@ -55,7 +55,7 @@ public class LicencesNationalesAPIApplication extends SpringBootServletInitializ
         allowedOriginsUrl.add("http://diplotaxis-dev.v212.abes.fr:6080");
         allowedOriginsUrl.add("http://diplotaxis-prod.v102.abes.fr:6080");
         config.setAllowedOrigins(allowedOriginsUrl);
-        config.setAllowedOriginPatterns("https://*.licencesnationales.com");
+        config.setAllowedOriginPatterns(Collections.singletonList("https://*.licencesnationales.fr"));
 
         config.setAllowedMethods(Collections.singletonList("*"));
         config.setAllowedHeaders(Collections.singletonList("*"));
