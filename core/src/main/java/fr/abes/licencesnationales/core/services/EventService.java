@@ -133,4 +133,20 @@ public class EventService {
             throw new UnknownEtablissementException("Etablissement inconnu");
         return etab.get();
     }
+
+    public List<EtablissementEventEntity> getHistoAllEtab(Date dateDebut, Date dateFin) {
+        return etablissementDao.findBetweenDates(dateDebut, dateFin);
+    }
+
+    public List<EtablissementEventEntity> getHistoEtab(String siren) {
+        return etablissementDao.findBySiren(siren);
+    }
+
+    public List<IpEventEntity> getHistoAllIp(Date dateDebut, Date dateFin) {
+        return ipDao.findBetweenDates(dateDebut, dateFin);
+    }
+
+    public List<IpEventEntity> getHistoIp(String siren) {
+        return ipDao.findBySiren(siren);
+    }
 }

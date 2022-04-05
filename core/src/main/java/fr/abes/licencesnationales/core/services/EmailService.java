@@ -61,7 +61,7 @@ public class EmailService {
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous venez de créer le compte établissement <b>");
         message.append(etab.getNomEtab());
-        message.append("</b>sur l'<a href='");
+        message.append("</b> sur l'<a href='");
         message.append(urlSite);
         message.append("' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("Un seul compte par établissement est autorisé. L’Abes va vérifier l’éligibilité de l’établissement.<br><br>");
@@ -126,6 +126,20 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    public void constructDevalidationCompteMailUser(String nomEtab, String emailUser) {
+        String subject = getEnv() + "[Appli LN] Modification du compte sur le site Licencesnationales.fr";
+        StringBuilder message = new StringBuilder(BONJOUR);
+        message.append("le compte de l’établissement");
+        message.append(nomEtab);
+        message.append(" créé sur l’application Licencesnationales");
+        message.append("<b> a été repassé en statut \"Nouveau\" dans l’application de gestion des accès aux licences nationales.</b><br><br>");
+        message.append("Pour toute question contacter l’Abes via le guichet d’assistance ABESstp. ");
+        message.append(signature());
+        String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
+        sendMail(jsonRequestConstruct);
+    }
+
+
     public void constructRelanceEtabMailUser(String nomEtab, String emailUser) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Relance : aucune IP déclarée sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
@@ -171,7 +185,7 @@ public class EmailService {
                 String[] commentaire = ip.split("[|]");
                 message.append("<tr><td style=\"border:1px solid\">" + commentaire[0]);
                 message.append("<br>");
-                if (commentaire.length >= 1) {
+                if (commentaire.length > 1) {
                     message.append("<u>Raison de la suppression</u> :<br>");
                     if (commentaire[1] == null || commentaire[1].equals("null")) {
                         message.append("Non précisée");

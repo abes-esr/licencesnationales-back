@@ -2,11 +2,9 @@ package fr.abes.licencesnationales.core.services.export;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementAdminDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.ExportService;
 import org.apache.commons.csv.CSVPrinter;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -35,7 +33,7 @@ public class ExportEtablissementAdmin extends ExportService<ExportEtablissementA
                 "Téléphone contact",
                 "Nom et prénom contact",
                 "Adresse mail contact",
-                "IP"
+                "IP validées"
         });
     }
 
