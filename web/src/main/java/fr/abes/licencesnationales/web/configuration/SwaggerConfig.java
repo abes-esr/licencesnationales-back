@@ -14,7 +14,7 @@ public class SwaggerConfig {
                 .info(new Info().title("API Licences Nationales")
                         .description("Le service web RESTful permet d'exposer un message public de bienvenue et un message privé aux utilisateurs authentifiés sur le service.</br>" +
                                 "Les échanges s'opèrent via des requêtes HTTP contenant des fichiers JSON dans le corps des requêtes (Body) et une clé 'Authorization' dans l'entête des requêtes pour les appels à des fr.abes.licencesnationales.core.services sécurisés.")
-                        .version("v0.0.1")
+                        .version(this.getClass().getPackage().getImplementationVersion())
                         .contact(new Contact().url("https://github.com/abes-esr/licencesnationales-back").name("Abes").email("scod@abes.fr")));
     }
 
