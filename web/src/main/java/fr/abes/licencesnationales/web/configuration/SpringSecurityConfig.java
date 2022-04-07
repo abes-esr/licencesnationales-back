@@ -1,8 +1,8 @@
 package fr.abes.licencesnationales.web.configuration;
 
+import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import fr.abes.licencesnationales.web.security.jwt.JwtAuthenticationEntryPoint;
 import fr.abes.licencesnationales.web.security.jwt.JwtAuthenticationFilter;
-import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -59,11 +59,11 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers("/v1/authentification/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/v1/etablissements").permitAll()
-                .antMatchers( "/v1/etablissements/getType").permitAll()
+                .antMatchers("/v1/etablissements/getType").permitAll()
                 .antMatchers("/v1/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/v1/applicationVersion").permitAll()
-                .antMatchers("/v2/api-docs", "/v3/api-docs", "/configuration/ui", "/swagger-resources/**", "/configuration/**","/swagger-ui.html**", "/swagger-ui/**","/webjars/**").permitAll()
+                .antMatchers("/v3/api-docs", "/v1/configuration/ui", "/v1/swagger-resources/**", "/v1/configuration/**", "/v1/swagger-ui.html**", "/v1/swagger-ui/**", "/v1/webjars/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
