@@ -61,10 +61,10 @@ public class Constant implements Serializable {
     public static final String ERROR_BDD = "Erreur de mise à jour de la base de données : ";
     public static final String ERROR_STATUT_IP = "Erreur statut Ip : ";
     public static final String ERROR_TYPEETAB_INCONNU = "Type d'établissement inconnu : ";
-    public static final String ERROR_ETAB_INCONNU = "Etablissement absent de la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
+    public static final String ERROR_ETAB_INCONNU = "Etablissement absent de la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>";
     public static final String ERROR_IP_INCONNUE = "IP inconnue : ";
     public static final String ERROR_EDITEUR_INCONNU = "Editeur inconnu : ";
-    public static final String ERROR_DOUBLON_MAIL = "Cette adresse est déjà présente dans la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
+    public static final String ERROR_DOUBLON_MAIL = "Cette adresse est déjà présente dans la base. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>";
     public static final String ERROR_SPRING_BATCH = "Ne peut pas initialiser spring batch : ";
     public static final String ERROR_RECUP_DERNIERE_DATE_MODIF = "Erreur lors de la recupération de la dernière date de modification : " ;
     public static final String ERROR_CSV_WRITING = "Erreur d'ecriture dans le fichier CSV" ;
@@ -136,7 +136,7 @@ public class Constant implements Serializable {
     public static final String IP_UNABLE_TO_DECODE = "Impossible de décoder l'IP";
     public static final String MDP_NOTNULL = "Le mot de passe ne doit pas être nulle ou vide";
     public static final String ETAB_NOTNULL = "L'établissement ne peut pas être nul";
-    public static final String SIREN_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
+    public static final String SIREN_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>";
     public static final String SIREN_NE_CORRESPOND_PAS = "Le siren demandé ne correspond pas au siren de l'utilisateur connecté";
     public static final String STATUT_INCONNU = "Statut inconnu";
     public static final String METHODE_AUTHENTIFICATION_PAS_SUPPORTEE = "La méthode d'authentification n'est pas supportée";
@@ -152,8 +152,8 @@ public class Constant implements Serializable {
     /**
      * STRING avec variable
      **/
-    public static final String ERROR_ETAB_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales";
-    public static final String ERROR_IP_DOUBLON = "L’adresse / la plage %s est déjà déclarée pour votre établissement. Pour toute question sur la gestion des IP, contacter l’Abes via le guichet d’assistance : https://stp.abes.fr/node/3?origine=LicencesNationales ";
+    public static final String ERROR_ETAB_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>";
+    public static final String ERROR_IP_DOUBLON = "L’adresse / la plage %s est déjà déclarée pour votre établissement. Pour toute question sur la gestion des IP, contacter l’Abes via le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a> ";
     public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
     public static final String ERROR_ETAB_EXISTE_PAS = "L'établissement %s n'existe pas";

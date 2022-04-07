@@ -52,7 +52,7 @@ public class EmailService {
 
     public void constructCreationCompteEmailAdmin(String emailUser, String nomEtab) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Nouveau compte Etablissement créé";
-        String jsonRequestConstruct = mailToJSON(emailUser, null, subject, "Le compte établissement suivant a été créé par : " + nomEtab);
+        String jsonRequestConstruct = mailToJSON(emailUser, null, subject, "Le compte établissement suivant a été créé par : " + nomEtab + "<br /><a href='" + urlSite + "' target='_blank'>Se rendre sur le tableau de bord.</a><br /><br />");
         sendMail(jsonRequestConstruct);
     }
 
