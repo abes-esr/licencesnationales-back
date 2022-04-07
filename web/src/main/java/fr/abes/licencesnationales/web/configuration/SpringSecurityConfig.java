@@ -63,7 +63,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/v1/reinitialisationMotDePasse/**").permitAll()
                 .antMatchers("/test").permitAll()
                 .antMatchers("/v1/applicationVersion").permitAll()
-                .antMatchers("/v3/api-docs", "/v1/configuration/ui", "/v1/swagger-resources/**", "/v1/configuration/**", "/v1/swagger-ui.html**", "/v1/swagger-ui/**", "/v1/webjars/**").permitAll()
+                .antMatchers("/v1/v3/api-docs", "/v1/v3/api-docs/**", "/v1/configuration/ui", "/v1/swagger-resources/**", "/v1/configuration/**", "/v1/swagger-ui.html**", "/v1/swagger-ui/**", "/v1/webjars/**").permitAll()
                 .anyRequest().authenticated();
 
         http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -72,7 +72,7 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/swagger-ui/**", "/v3/api-docs/**");
+        web.ignoring().antMatchers("/v1/swagger-ui/**", "/v1/v3/api-docs/**");
     }
 
 }
