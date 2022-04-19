@@ -152,8 +152,8 @@ public class Constant implements Serializable {
     /**
      * STRING avec variable
      **/
-    public static final String ERROR_ETAB_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a>";
-    public static final String ERROR_IP_DOUBLON = "L’adresse / la plage %s est déjà déclarée pour votre établissement. Pour toute question sur la gestion des IP, contacter l’Abes via le guichet d’assistance : <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>https://stp.abes.fr/node/3?origine=LicencesNationales</a> ";
+    public static final String ERROR_ETAB_DOUBLON = "Cet établissement dispose déjà d’un compte. Pour toute question sur la gestion des comptes, contacter le <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>guichet d’assistance</a>";
+    public static final String ERROR_IP_DOUBLON = "L’adresse / la plage %s est déjà déclarée. Pour toute question sur la gestion des IP, contacter l’Abes via le <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>guichet d’assistance</a> ";
     public static final String ERROR_MAIL_DOUBLON = "L'adresse mail %s renseignée est déjà utilisée. Veuillez renseigner une autre adresse mail.";
     public static final String ERROR_IP_EXISTE_PAS = "L'IP %s n'existe pas";
     public static final String ERROR_ETAB_EXISTE_PAS = "L'établissement %s n'existe pas";
