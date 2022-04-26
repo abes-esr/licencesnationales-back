@@ -4,8 +4,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.Column;
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
+import javax.validation.constraints.Size;
 
 @Entity
 @NoArgsConstructor
@@ -13,6 +15,9 @@ import javax.persistence.Entity;
 @Getter
 @Setter
 public class IpSupprimeeEventEntity extends IpEventEntity {
+
+    @Column(length = 4000)
+    @Size(max = 4000)
     private String commentaire;
 
     public IpSupprimeeEventEntity(Object source) {
