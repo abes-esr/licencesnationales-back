@@ -27,10 +27,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 @Component
 @Slf4j
@@ -174,59 +171,108 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" dans l’<a href='https://acces.licencesnationales.fr/' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("L’Abes a vérifié l’éligibilité des nouvelles IP déclarées comme suit :");
-        message.append("<table style=\"border-collapse:collapse;border:1px solid\">");
-        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>IP supprimé(es)</b></td><td style=\"border:1px solid; width:30%; vertical-align: top; text-align: left;\">");
-        if (listIps.get("suppression").isEmpty()) {
-            message.append("Aucune IP</td>");
-        } else {
-            message.append("<table style=\"border-collapse:collapse;width:100%\">");
-            listIps.get("suppression").stream().forEach(ip -> {
-                //on découpe le résultat sur | pour avoir l'IP en première position et le commentaire en seconde
+        message.append("<table style=\"border: solid 1px; border-radius: 5px; border-collapse: collapse; font: 1em 'Open Sans', sans-serif;\">\n");
+        message.append("<tr style=\"height: 3em; background-color: #F7F9FA\">" +
+                "            <th style=\"border: 1px solid; width: 20%\">Action de l'Abes</th>" +
+                "<th style=\"border: 1px solid; width: 20%\">IP concernée</th>" +
+                "<th style=\"border: 1px solid;\">Détails</th></tr>");
+
+        if (!listIps.get("suppression").isEmpty()) {
+            message.append("<tr style=\"border-bottom: 1px solid;\">\n" +
+                    "            <td style=\"border: 1px solid; font-weight: bold;\">IP supprimée(s)</td>" +
+                    "            <td style=\"border: 1px solid;\" colspan=\"2\">" +
+                    "<table style=\"width: 100%; border-collapse: collapse;\">");
+
+            List<String> listeSuppr = listIps.get("suppression");
+            Iterator<String> iterator = listeSuppr.iterator();
+            while (iterator.hasNext()) {
+                String ip = iterator.next();
                 String[] commentaire = ip.split("[|]");
-                message.append("<tr><td style=\"border:1px solid\">" + commentaire[0]);
-                message.append("<br>");
-                if (commentaire.length > 1) {
-                    message.append("<u>Raison de la suppression</u> :<br>");
-                    if (commentaire[1] == null || commentaire[1].equals("null")) {
-                        message.append("Non précisée");
+                if (iterator.hasNext()) {
+                    message.append("<tr style=\"border-bottom: 1px solid;\"><td style=\"border-right: solid 1px; width: 25%; vertical-align: top;\"><b>" + commentaire[0] + "</b>");
+                    message.append("</td><td style=\"font-size: 0.8em;\"><p style=\"text-decoration: underline;\">Raison de la suppresion :<br /></p>");
+                    if (commentaire.length > 1) {
+                        if (commentaire[1] == null || commentaire[1].equals("null")) {
+                            message.append("Non précisée");
+                        } else {
+                            message.append(commentaire[1]);
+                        }
                     } else {
-                        message.append(commentaire[1]);
+                        message.append("Non précisée");
                     }
+                    message.append("</td></tr>");
+                } else {
+                    message.append("<tr><td style=\"border-right: solid 1px; width: 25%; vertical-align: top;\"><b>" + commentaire[0] + "</b>");
+                    message.append("</td><td style=\"font-size: 0.8em;\"><p style=\"text-decoration: underline;\">Raison de la suppresion :<br /></p>");
+                    if (commentaire.length > 1) {
+                        if (commentaire[1] == null || commentaire[1].equals("null")) {
+                            message.append("Non précisée");
+                        } else {
+                            message.append(commentaire[1]);
+                        }
+                    } else {
+                        message.append("Non précisée");
+                    }
+                    message.append("</td></tr>");
                 }
-                message.append("<br></td></tr>");
-            });
+            }
             message.append("</table>");
             message.append(ENDOFLINE);
         }
-        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>IP en attente d'attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : <a href='mailto:ln-admin@abes.fr'>ln-admin@abes.fr</a></td><td style=\"border:1px solid; width:30%; vertical-align: top; text-align: left;\">");
-        if (listIps.get("rejet").isEmpty()) {
-            message.append("Aucune IP</td>");
-        } else {
-            message.append("<table style=\"border-collapse:collapse;width:100%\">");
-            listIps.get("rejet").stream().forEach(ip -> {
-                message.append("<tr><td style=\"border:1px solid\">");
-                message.append(ip);
-                message.append("<br>");
-                message.append("</td></tr>");
-            });
-            message.append("</table>");
-            message.append(ENDOFLINE);
+
+        if (!listIps.get("validation").isEmpty()) {
+            message.append("<tr style=\"border-bottom: 1px solid;\"><td style=\"border: 1px solid; font-weight: bold;\">IP validée(s)</td>");
+            message.append("<td style=\"border: 1px solid; vertical-align: top;\">");
+            message.append("<table style=\"width: 100%; border-collapse: collapse;\">");
+
+            List<String> listeValid = listIps.get("validation");
+            Iterator<String> iterator = listeValid.iterator();
+            while (iterator.hasNext()) {
+                String ip = iterator.next();
+                if (iterator.hasNext()) {
+                    message.append("<tr style=\"border-bottom: 1px solid;\"><td style=\"vertical-align: top;\"><b>");
+                    message.append(ip);
+                    message.append("</b></td></tr>");
+                } else {
+                    message.append("<tr><td style=\"vertical-align: top;\"><b>");
+                    message.append(ip);
+                    message.append("</b></td></tr>");
+                }
+            }
+            message.append("</table>" +
+                    "</td>" +
+                    "<td style=\"border: 1px solid; font-size: 0.8em;\">Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès. <br /></td>" +
+                    "</tr>");
         }
-        message.append("<tr><td style=\"border:1px solid;width:70%\"><b>Ip Validées</b><br><br><i>Les IP validées sont transmises une fois par  mois aux éditeurs et à l’Inist qui disposent d’un délai de trois semaines maximum après réception pour ouvrir les accès.</i></td><td style=\"border:1px solid; width:30%; vertical-align: top; text-align: left;\">");
-        if (listIps.get("validation").isEmpty()) {
-            message.append("Aucune IP</td>");
-        } else {
-            message.append("<table style=\"border-collapse:collapse;width:100%\">");
-            listIps.get("validation").stream().forEach(ip -> {
-                message.append("<tr><td style=\"border:1px solid\">");
-                message.append(ip);
-                message.append("<br>");
-                message.append("</td></tr>");
-            });
-            message.append("</table>");
-            message.append(ENDOFLINE);
+
+
+        if (!listIps.get("rejet").isEmpty()) {
+            message.append("<tr style=\"border-bottom: 1px solid;\">");
+            message.append("<td style=\"border: 1px solid; font-weight: bold;\">IP en attente d'attestation</td>");
+            message.append("<td style=\"border: 1px solid; vertical-align: top;\"> <table style=\"width: 100%; border-collapse: collapse;\">");
+
+            List<String> listeRejet = listIps.get("rejet");
+            Iterator<String> iterator = listeRejet.iterator();
+            while (iterator.hasNext()) {
+                String ip = iterator.next();
+                if (iterator.hasNext()) {
+                    message.append("<tr style=\"border-bottom: 1px solid;\"><td style=\"vertical-align: top;\"><b>");
+                    message.append(ip);
+                    message.append("</b></td></tr>");
+                } else {
+                    message.append("<tr><td style=\"vertical-align: top;\"><b>");
+                    message.append(ip);
+                    message.append("</b></td></tr>");
+                }
+            }
+            message.append("</table></td>");
+            message.append("<td style=\"border: 1px solid; font-size: 0.8em;\">Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br><b>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif</b> de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. <b>Télécharger un modèle d’attestation</b><br><br>Ce document doit être envoyé à l’adresse : <b><a href='mailto:ln-admin@abes.fr'>ln-admin@abes.fr</a></b></td>" +
+                    "        </tr>");
+
         }
-        message.append("</table><br>");
+
+        message.append("</tbody></table>");
+
         message.append(aideALaSaisieIp());
         message.append(signature());
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
