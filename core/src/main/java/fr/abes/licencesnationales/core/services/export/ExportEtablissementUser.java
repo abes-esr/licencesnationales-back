@@ -4,6 +4,7 @@ import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementUserDto;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
 import fr.abes.licencesnationales.core.services.ExportService;
+import fr.abes.licencesnationales.core.services.GenererIdAbes;
 import org.apache.commons.csv.CSVPrinter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,8 +23,8 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
 
     @Override
     protected void writeHeader(CSVPrinter printer) throws IOException {
-       printer.printRecord((Object[]) new String[] {
-               "ID Abes",
+       printer.printRecord((Object[]) new String[]{
+               "Identifiant Abes",
                "Siren",
                "Nom de l'établissement",
                "Type de l'établissement",
@@ -53,7 +54,7 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
     }
 
     private void writeEtabInfo(ExportEtablissementUserDto item, List<String> output) {
-        output.add(item.getIdAbes());
+        output.add(GenererIdAbes.genererIdAbes(item.getIdAbes()));
         output.add(item.getSiren());
         output.add(item.getNom());
         output.add(item.getTypeEtablissement());
