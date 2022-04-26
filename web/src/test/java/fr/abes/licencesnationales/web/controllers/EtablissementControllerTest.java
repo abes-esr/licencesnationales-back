@@ -706,7 +706,7 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
 
         String fileContent = "Identifiant Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP validées\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com\r\n";
+        fileContent += "ABES123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com\r\n";
         String json = "[]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
@@ -733,8 +733,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
 
         String fileContent = "Identifiant Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP validées\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.1\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.2\r\n";
+        fileContent += "ABES123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.1\r\n";
+        fileContent += "ABES123456789;123456789;nomEtab;validé;adresse 11111 ville BP cedex;1111111111;nom prenom;mail2@mail.com;192.162.0.2\r\n";
         String json = "[]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
@@ -749,11 +749,11 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     void testExportEtablissementAdmin() throws Exception {
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
         contact.setRole("admin");
-        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "fxIe2s71T4cIB6L8yCCIhgKL", contact);
 
         ContactEntity contact2 = new ContactEntity(2, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
         contact2.setRole("etab");
-        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "123456", contact2);
+        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "fxIe2s71T4cIB6L8yCCIhgKL", contact2);
 
         List listeEtabOut = new ArrayList();
         listeEtabOut.add(etab);
@@ -763,8 +763,8 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
 
         String fileContent = "Identifiant Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Ville;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP validées\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com\r\n";
-        fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
+        fileContent += "ABESFXIE2S71T;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com\r\n";
+        fileContent += "ABESFXIE2S71T;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
         String json = "[\"123456789\",\"111111111\"]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
@@ -779,13 +779,13 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
     void testExportEtablissementAdminWithIp() throws Exception {
         ContactEntity contact = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "11111", "ville", "cedex", "1111111111", "mail2@mail.com", "mdp");
         contact.setRole("admin");
-        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "123456789", contact);
+        EtablissementEntity etab = new EtablissementEntity(1, "nomEtab", "123456789", new TypeEtablissementEntity(3, "validé"), "fxIe2s71T4cIB6L8yCCIhgKL", contact);
         etab.ajouterIp(new IpV4("192.162.0.1", "commentaire", new StatutIpEntity(3, "test")));
         etab.ajouterIp(new IpV4("192.162.0.2", "commentaire", new StatutIpEntity(3, "test")));
 
         ContactEntity contact2 = new ContactEntity(2, "nom2", "prenom2", "adresse2", "BP2", "11111", "ville2", "cedex2", "1111111111", "mail@mail.com", "mdp2");
         contact2.setRole("etab");
-        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "123456", contact2);
+        EtablissementEntity etab2 = new EtablissementEntity(2, "nomEtab2", "111111111", new TypeEtablissementEntity(3, "validé"), "fxIe2s71T4cIB6L8yCCIhgKL", contact2);
 
         List listeEtabOut = new ArrayList();
         listeEtabOut.add(etab);
@@ -795,9 +795,9 @@ public class EtablissementControllerTest extends LicencesNationalesAPIApplicatio
         Mockito.when(dao.findAllBySirenIn(Mockito.any())).thenReturn(listeEtabOut);
 
         String fileContent = "Identifiant Abes;Siren;Nom de l'établissement;Type de l'établissement;Adresse de l'établissement;Ville;Téléphone contact;Nom et prénom contact;Adresse mail contact;IP validées\r\n";
-        fileContent += "123456789;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com;192.162.0.1;192.162.0.2\r\n";
-        fileContent += "123456;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
-        String json = "[\"123456789\",\"111111111\"]";
+        fileContent += "ABESFXIE2S71T;123456789;nomEtab;validé;adresse 11111 BP cedex;ville;1111111111;nom prenom;mail2@mail.com;192.162.0.1;192.162.0.2\r\n";
+        fileContent += "ABESFXIE2S71T;111111111;nomEtab2;validé;adresse2 11111 BP2 cedex2;ville2;1111111111;nom2 prenom2;mail@mail.com\r\n";
+        String json = "[\"fxIe2s71T4cIB6L8yCCIhgKL\",\"111111111\"]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/etablissements/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
 
         Assertions.assertEquals("text/csv;charset=UTF-8", result.getResponse().getContentType());
