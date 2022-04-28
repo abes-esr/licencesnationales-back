@@ -87,7 +87,7 @@ Les images docker de licencesnationales-back sont générées automatiquement à
 - ``abesesr/licencesnationales:main-web`` : l'image du dernier git push sur la branche ``main``
 - ``abesesr/licencesnationales:develop-web`` : l'image du dernier git push sur la branche ``develop``
 - ``abesesr/licencesnationales:X.X.X-web`` : l'image dont le n° de version est ``X.X.X``
-- ``abesesr/licencesnationales:latest-web`` : l'image de la dernière version publiée
+- ``abesesr/licencesnationales:latest-web`` : l'image pointant vers la dernière version X.X.X publiée
 
 Il est aussi possible de générer ces images localement en tapant par exemple les commandes suivantes :
 ```bash
