@@ -1,7 +1,7 @@
 package fr.abes.licencesnationales.web.dto.authentification;
 
 import fr.abes.licencesnationales.core.constant.Constant;
-import io.swagger.annotations.ApiModelProperty;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,11 +12,11 @@ import javax.validation.constraints.Pattern;
 public class ConnexionRequestDto {
 
 	@NotBlank(message = Constant.ERROR_ETAB_SIREN_OBLIGATOIRE)
-	@Pattern(regexp = "^\\d{9}$", message = Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)
-	@ApiModelProperty(value = "identifiant siren", name = "login", dataType = "String", example = "123456789")
+    @Pattern(regexp = "^\\d{9}$", message = Constant.SIREN_DOIT_CONTENIR_9_CHIFFRES)
+    @Schema(description = "identifiant siren", name = "login", type = "String", example = "123456789")
 	private String login; //siren
 
-	@NotBlank(message = Constant.ERROR_ETAB_MDP_OBLIGATOIRE)
-	@ApiModelProperty(value = "Mot de passe de l'utilisateur", name = "password", dataType = "String", example = "?Ll2020!")
+    @NotBlank(message = Constant.ERROR_ETAB_MDP_OBLIGATOIRE)
+    @Schema(description = "Mot de passe de l'utilisateur", name = "password", type = "String", example = "?Ll2020!")
 	private String password;
 }

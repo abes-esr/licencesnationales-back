@@ -1,7 +1,5 @@
 package fr.abes.licencesnationales;
 
-import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -15,8 +13,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
 import java.util.Collections;
-import java.util.ArrayList;
-import java.util.List;
 
 @SpringBootApplication
 public class LicencesNationalesAPIApplication extends SpringBootServletInitializer implements CommandLineRunner {

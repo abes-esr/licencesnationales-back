@@ -21,7 +21,7 @@ import fr.abes.licencesnationales.web.security.services.impl.UserDetailsServiceI
 import fr.abes.licencesnationales.web.service.ReCaptchaAction;
 import fr.abes.licencesnationales.web.service.ReCaptchaService;
 import io.jsonwebtoken.ExpiredJwtException;
-import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -75,8 +75,8 @@ public class AuthenticationController extends AbstractController{
         this.passwordService = passwordService;
     }
 
-    @ApiOperation(value = "permet de s'authentifier et de récupérer un token.",
-            notes = "le token doit être utilisé pour accéder aux ressources protegées.")
+    @Operation(summary = "permet de s'authentifier et de récupérer un token.",
+            description = "le token doit être utilisé pour accéder aux ressources protegées.")
     @PostMapping("/connexion")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody ConnexionRequestDto loginRequest) {
         Authentication authentication;
@@ -84,7 +84,7 @@ public class AuthenticationController extends AbstractController{
             UsernamePasswordAuthenticationToken credential = new UsernamePasswordAuthenticationToken(loginRequest.getLogin(), loginRequest.getPassword());
 
             authentication = authenticationManager.authenticate(credential);
-        }catch (AuthenticationException ex){
+        } catch (AuthenticationException ex) {
             throw new AuthenticationServiceException(Constant.WRONG_LOGIN_AND_OR_PASS);
         }
         if (authentication == null) {
@@ -108,8 +108,8 @@ public class AuthenticationController extends AbstractController{
 
     }
 
-    @ApiOperation(value = "permet de ",
-            notes = "le ")
+    @Operation(summary = "permet de ",
+            description = "le ")
     @PostMapping("/motDePasseOublie")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody MotDePasseOublieRequestDto dto, HttpServletRequest request) throws RestClientException, CaptchaException, JsonIncorrectException {
         String captcha = dto.getRecaptcha();
@@ -153,8 +153,8 @@ public class AuthenticationController extends AbstractController{
         return buildResponseEntity(response);
     }
 
-    @ApiOperation(value = "permet de ",
-            notes = "le ")
+    @Operation(summary = "permet de ",
+            description = "le ")
     @PostMapping(value = "/reinitialiserMotDePasse")
     public ResponseEntity<?> resetPasswordConfirm(@Valid @RequestBody ReinitialiserMotDePasseRequestDto request) throws CaptchaException, InvalidTokenException, JsonIncorrectException, MailDoublonException, SirenExistException {
         String captcha = request.getRecaptcha();
@@ -216,7 +216,7 @@ public class AuthenticationController extends AbstractController{
         return buildResponseEntity(response);
     }
 
-    @ApiOperation(value = "permet de mettre à jour le mot de passe une fois connecté")
+    @Operation(summary = "permet de mettre à jour le mot de passe une fois connecté")
     @PostMapping(value = "/modifierMotDePasse")
     public ResponseEntity<?> modifierMotDePasse(HttpServletRequest requestHtttp, @Valid @RequestBody ModifierMotDePasseRequestDto request) throws PasswordMismatchException, MailDoublonException, SirenExistException, JsonIncorrectException, InvalidTokenException {
 
