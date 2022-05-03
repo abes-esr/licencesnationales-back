@@ -199,7 +199,7 @@ public class EtablissementController extends AbstractController {
         etablissementDiviseEvent.setNomEtab(etablissement.getNom());
         etablissementDiviseEvent.setRoleContact(etablissement.getContact().getRole());
         etablissementDiviseEvent.setValide(etablissement.isValide());
-        //on initialise le statut et le type des nouveaux établissement et on génère l'Id Abes ainsi que le mot de passe
+        //on initialise le statut et le type des nouveaux établissement et on génère l'Identifiant Abes ainsi que le mot de passe
         for (EtablissementEntity e : etablissementDiviseEvent.getEtablissementDivises()) {
             //on génère un identifiant Abes
             e.setIdAbes(GenererIdAbes.generateId());
