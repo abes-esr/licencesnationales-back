@@ -357,6 +357,21 @@ public class EtablissementWebDtoConverter {
                     dto.ajouterNotification(notif);
                     return dto;
                 }
+
+                //cas ou toutes les IP déclarées sont validées
+                if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() == source.getIps().size()) {
+                    Map<String, String> notif = new HashMap<>();
+                    notif.put("message", "<strong>Toutes les IPs déclarées sont validées</strong>");
+                    notif.put("description", "Une fois validées par l'Abes, les IP sont transmises mensuellement aux éditeurs pour activation des accès.");
+                    dto.ajouterNotification(notif);
+                    return dto;
+                } else if (!source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).isEmpty()) {
+                    Map<String, String> notif = new HashMap<>();
+                    notif.put("message", "<strong>Certaines IPs déclarées sont validées</strong>");
+                    notif.put("description", "Une fois validées par l'Abes, les IP sont transmises mensuellement aux éditeurs pour activation des accès.");
+                    dto.ajouterNotification(notif);
+                }
+
                 //cas ou toutes les IP déclarées sont en état nouvelle IP
                 if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_NOUVELLE)).collect(Collectors.toList()).size() == source.getIps().size()) {
                     Map<String, String> notif = new HashMap<>();
