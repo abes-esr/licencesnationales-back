@@ -405,7 +405,7 @@ public class EtablissementWebDtoConverter {
                     key.append(i.getIp());
                     key.append(". Envoyer l'attestation à ln-admin@abes.fr.");
                     notif.put("message", key.toString());
-                    notif.put("description", "Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici");
+                    notif.put("description", "Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>");
                     dto.ajouterNotification(notif);
                 });
                 return dto;
