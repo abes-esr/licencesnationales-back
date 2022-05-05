@@ -553,8 +553,8 @@ public class EtablissementWebDtoConverterTest {
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
         Assertions.assertEquals(3, dto.getNotifications().size());
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(2).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation + nouvelles IP")
@@ -581,8 +581,8 @@ public class EtablissementWebDtoConverterTest {
 
         Assertions.assertEquals(4, dto.getNotifications().size());
         Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(3).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(2).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(3).get("description"));
 
     }
 
