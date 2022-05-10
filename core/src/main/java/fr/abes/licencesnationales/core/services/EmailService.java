@@ -105,7 +105,7 @@ public class EmailService {
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Après vérifications, le compte de l’établissement ");
         message.append(nomEtab);
-        message.append("a été validé par l'Admin");
+        message.append(" a été validé par l'Admin");
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
         sendMail(jsonRequestConstruct);
     }
