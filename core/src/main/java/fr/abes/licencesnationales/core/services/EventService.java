@@ -95,27 +95,37 @@ public class EventService {
 
     public Date getDateSuppressionEtab(EtablissementEntity etab) {
         List<EtablissementEventEntity> etablissement = etablissementDao.getDateSuppressionEtab(etab.getSiren());
+        if (etablissement.isEmpty())
+            return null;
         return etablissement.get(0).getDateCreationEvent();
     }
 
     public Date getDateValidationIp(IpEntity ip) {
         List<IpEventEntity> ipEventEntity = ipDao.getDateValidation(ip.getIp());
+        if (ipEventEntity.isEmpty())
+            return null;
         return ipEventEntity.get(0).getDateCreationEvent();
     }
 
 
     public Date getDateSuppressionIp(IpEntity ip) {
         List<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip.getIp());
+        if (ipEventEntity.isEmpty())
+            return null;
         return ipEventEntity.get(0).getDateCreationEvent();
     }
 
     public Date getDateFusionEtab(EtablissementEntity etab) {
         List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateFusion(etab.getSiren());
+        if (etablissementEventEntity.isEmpty())
+            return null;
         return etablissementEventEntity.get(0).getDateCreationEvent();
     }
 
     public Date getDateScissionEtab(EtablissementEntity etab) {
         List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateScission(etab.getSiren());
+        if (etablissementEventEntity.isEmpty())
+            return null;
         return etablissementEventEntity.get(0).getDateCreationEvent();
     }
 
