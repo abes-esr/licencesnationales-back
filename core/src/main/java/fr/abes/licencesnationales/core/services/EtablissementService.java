@@ -103,21 +103,23 @@ public class EtablissementService {
         List<EtablissementEntity> emptyEtab = etablissementDao.getEtablissementEntityByIps_Empty();
         List<EtablissementEntity> listeOut = new ArrayList<>();
         for (EtablissementEntity etab : emptyEtab) {
-            Date dateSuppressionDerniereIp = eventService.getLastDateSuppressionIpEtab(etab);
-            if (dateSuppressionDerniereIp != null) {
-                //si on a la date de dernière suppression d'une IP de l'etab, on regarde si elle est plus vieille d'un an
-                if (dateSuppressionDerniereIp.before(oneYearAgo.getTime())) {
-                    listeOut.add(etab);
-                }
-            } else {
-                //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
-                try {
-                    Date dateCreationEtab = eventService.getDateCreationEtab(etab);
-                    if (dateCreationEtab.before(oneYearAgo.getTime())) {
+            if (!etab.getContact().getRole().equals("admin")) {
+                Date dateSuppressionDerniereIp = eventService.getLastDateSuppressionIpEtab(etab);
+                if (dateSuppressionDerniereIp != null) {
+                    //si on a la date de dernière suppression d'une IP de l'etab, on regarde si elle est plus vieille d'un an
+                    if (dateSuppressionDerniereIp.before(oneYearAgo.getTime())) {
                         listeOut.add(etab);
                     }
-                } catch (UnknownEtablissementException ex) {
-                    log.warn("L'établissement " + etab.getSiren() + " ne dispose pas d'évènement de création");
+                } else {
+                    //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
+                    try {
+                        Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                        if (dateCreationEtab.before(oneYearAgo.getTime())) {
+                            listeOut.add(etab);
+                        }
+                    } catch (UnknownEtablissementException ex) {
+                        log.warn("L'établissement " + etab.getSiren() + " ne dispose pas d'évènement de création");
+                    }
                 }
             }
         }
