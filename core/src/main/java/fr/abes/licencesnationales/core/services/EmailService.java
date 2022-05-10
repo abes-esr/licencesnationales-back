@@ -47,6 +47,8 @@ public class EmailService {
     @Value("${site.url}")
     private String urlSite;
 
+    private final String urlWordpress = "https://www.licencesnationales.fr/";
+
     public void constructCreationCompteEmailAdmin(String emailUser, String nomEtab) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Nouveau compte Etablissement créé";
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, "Le compte établissement suivant a été créé par : " + nomEtab + "<br /><a href='" + urlSite + "' target='_blank'>Se rendre sur le tableau de bord.</a><br /><br />");
@@ -56,10 +58,10 @@ public class EmailService {
     public void constructCreationCompteEmailUser(EtablissementCreeEventEntity etab) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Compte Etablissement créé sur le site Licences Nationales";
         StringBuilder message = new StringBuilder(BONJOUR);
-        message.append("Vous venez de créer le compte établissement <b>");
+        message.append("Vous venez de créer le compte de l'établissement <b>");
         message.append(etab.getNomEtab());
         message.append("</b> sur l'<a href='");
-        message.append(urlSite);
+        message.append(urlWordpress);
         message.append("' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("Un seul compte par établissement est autorisé. L’Abes va vérifier l’éligibilité de l’établissement.<br><br>");
         message.append("<b>Nous vous invitons dès à présent à déclarer des adresses IP publiques</b> afin que votre établissement puisse bénéficier de l’accès aux ressources acquises sous licences nationales.<br><br>");
@@ -103,7 +105,7 @@ public class EmailService {
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Après vérifications, le compte de l’établissement ");
         message.append(nomEtab);
-        message.append("a été validé par l'Admin");
+        message.append(" a été validé par l'Admin");
         String jsonRequestConstruct = mailToJSON(emailUser, null, subject, message.toString());
         sendMail(jsonRequestConstruct);
     }
@@ -111,9 +113,9 @@ public class EmailService {
     public void constructValidationCompteMailUser(String nomEtab, String emailUser) {
         String subject = getEnv() + "[Appli LN] Validation du compte sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
-        message.append("Après vérifications, le compte de l’établissement");
+        message.append("Après vérifications, le compte de l’établissement ");
         message.append(nomEtab);
-        message.append(" créé sur l’application Licencesnationales");
+        message.append(" créé sur l’application Licencesnationales ");
         message.append("<b>a été validé par l'Abes.</b><br><br>");
         message.append("<b>Si cela n’est pas encore fait, nous vous invitons dès à présent à déclarer des adresses IP publiques </b>");
         message.append("afin que votre établissement puisse bénéficier de l’accès aux ressources acquises sous licences nationales.");
@@ -280,7 +282,15 @@ public class EmailService {
     }
 
     public void constructSuppresionIpMail(List<String> ipsSupprimees, List<String> ipsAttestation, String to, String cc) {
-        String subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et/ou en attente d’attestation sur le site Licencesnationales.fr";
+        String subject;
+        if (!ipsSupprimees.isEmpty() && !ipsAttestation.isEmpty())
+            subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées et en attente d’attestation sur le site Licencesnationales.fr";
+        else if (ipsAttestation.isEmpty() && !ipsSupprimees.isEmpty())
+            subject = getEnv() + "[Appli LN] Relance automatique : IP supprimées sur le site Licencesnationales.fr";
+        else
+            subject = getEnv() + "[Appli LN] Relance automatique : IP en attente d’attestation sur le site Licencesnationales.fr";
+
+
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("<table>");
         if (!ipsSupprimees.isEmpty()) {
@@ -465,9 +475,9 @@ public class EmailService {
         signature.append("<br>Bien cordialement,<br><br>");
         signature.append("L'équipe Licences nationales<br>");
         signature.append("<a href='");
-        signature.append(urlSite);
+        signature.append(urlWordpress);
         signature.append("' target='_blank'>");
-        signature.append(urlSite);
+        signature.append(urlWordpress);
         signature.append("</a>");
         return signature.toString();
     }
@@ -479,14 +489,14 @@ public class EmailService {
 
     private String aideALaSaisieIp() {
         StringBuilder message = new StringBuilder();
-        message.append("<ul><li><b>Pour vous aider dans la déclaration des IP,</b> vous pouvez consulter ");
+        message.append("<ul><li><b>Pour vous aider dans la déclaration des adresses IP,</b> vous pouvez consulter ");
         message.append("<a href='http://documentation.abes.fr/aidelicencesnationales/index.html' target='_blank'>Le Guide à destination des établissements bénéficiaires</a>");
         message.append(" rubrique ");
         message.append("<a href='http://documentation.abes.fr/aidelicencesnationales/index.html#DeclarerAdressesIP' target='_blank'>Déclarer les IP publiques.</a></li>");
         message.append("<li>Le site <a href='");
-        message.append(urlSite);
+        message.append(urlWordpress);
         message.append("' target='_blank'>");
-        message.append(urlSite);
+        message.append(urlWordpress);
         message.append("</a> centralise les informations sur les licences nationales et vous permettra notamment d’explorer <a href='https://www.licencesnationales.fr/les-corpus-acquis/' target='_blank'>les corpus acquis.</a></li>");
         message.append("<li>");
         message.append(lienAssistance());
