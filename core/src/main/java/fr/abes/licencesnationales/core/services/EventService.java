@@ -21,7 +21,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Slf4j
@@ -74,11 +73,11 @@ public class EventService {
      * @throws UnknownEtablissementException : établissement inconnu
      */
     public Date getDateCreationEtab(EtablissementEntity etab) throws UnknownEtablissementException{
-        Optional<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
+        List<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
         if (etablissement.isEmpty()){
             throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS,etab.getSiren()));
         }
-        return etablissement.get().getDateCreationEvent();
+        return etablissement.get(0).getDateCreationEvent();
     }
 
     /**
@@ -95,43 +94,53 @@ public class EventService {
     }
 
     public Date getDateSuppressionEtab(EtablissementEntity etab) {
-        Optional<EtablissementEventEntity> etablissement = etablissementDao.getDateSuppressionEtab(etab.getSiren());
-        return etablissement.orElse(null).getDateCreationEvent();
+        List<EtablissementEventEntity> etablissement = etablissementDao.getDateSuppressionEtab(etab.getSiren());
+        if (etablissement.isEmpty())
+            return null;
+        return etablissement.get(0).getDateCreationEvent();
     }
 
     public Date getDateValidationIp(IpEntity ip) {
-        Optional<IpEventEntity> ipEventEntity = ipDao.getDateValidation(ip.getIp());
-        return ipEventEntity.orElse(null).getDateCreationEvent();
+        List<IpEventEntity> ipEventEntity = ipDao.getDateValidation(ip.getIp());
+        if (ipEventEntity.isEmpty())
+            return null;
+        return ipEventEntity.get(0).getDateCreationEvent();
     }
 
 
     public Date getDateSuppressionIp(IpEntity ip) {
-        Optional<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip.getIp());
-        return ipEventEntity.orElse(null).getDateCreationEvent();
+        List<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip.getIp());
+        if (ipEventEntity.isEmpty())
+            return null;
+        return ipEventEntity.get(0).getDateCreationEvent();
     }
 
     public Date getDateFusionEtab(EtablissementEntity etab) {
-        Optional<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateFusion(etab.getSiren());
-        return etablissementEventEntity.orElse(null).getDateCreationEvent();
+        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateFusion(etab.getSiren());
+        if (etablissementEventEntity.isEmpty())
+            return null;
+        return etablissementEventEntity.get(0).getDateCreationEvent();
     }
 
     public Date getDateScissionEtab(EtablissementEntity etab) {
-        Optional<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateScission(etab.getSiren());
-        return etablissementEventEntity.orElse(null).getDateCreationEvent();
+        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateScission(etab.getSiren());
+        if (etablissementEventEntity.isEmpty())
+            return null;
+        return etablissementEventEntity.get(0).getDateCreationEvent();
     }
 
     public EtablissementFusionneEventEntity getEtabFusionEvent(String siren) {
-        Optional<EtablissementFusionneEventEntity> etab = etablissementDao.getEventFusion(siren);
-        if (!etab.isPresent())
+        List<EtablissementFusionneEventEntity> etab = etablissementDao.getEventFusion(siren);
+        if (etab.isEmpty())
             throw new UnknownEtablissementException("Etablissement inconnu");
-        return etab.get();
+        return etab.get(0);
     }
 
     public EtablissementDiviseEventEntity getEtabScissionEvent(String siren) {
-        Optional<EtablissementDiviseEventEntity> etab = etablissementDao.getEventScission(siren);
-        if (!etab.isPresent())
+        List<EtablissementDiviseEventEntity> etab = etablissementDao.getEventScission(siren);
+        if (etab.isEmpty())
             throw new UnknownEtablissementException("Etablissement inconnu");
-        return etab.get();
+        return etab.get(0);
     }
 
     public List<EtablissementEventEntity> getHistoAllEtab(Date dateDebut, Date dateFin) {

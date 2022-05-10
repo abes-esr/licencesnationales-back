@@ -59,10 +59,9 @@ jobs:
           # CURRENT_GIT_BRANCH vaut main ou master, c'est la où est créé la release
           CURRENT_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           git switch develop
-          git merge $CURRENT_GIT_BRANCH
+          git merge --no-commit $CURRENT_GIT_BRANCH
+          git commit -m "[skip ci]"
           git push
-
-
 
       - name: 'Create the github release'
         uses: softprops/action-gh-release@v1

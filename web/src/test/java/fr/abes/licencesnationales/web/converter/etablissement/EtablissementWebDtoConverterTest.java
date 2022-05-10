@@ -17,7 +17,10 @@ import fr.abes.licencesnationales.core.entities.statut.StatutEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
 import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.web.converter.ip.IpWebDtoConverter;
-import fr.abes.licencesnationales.web.dto.etablissement.*;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementAdminWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementSearchWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.EtablissementUserWebDto;
+import fr.abes.licencesnationales.web.dto.etablissement.NotificationsDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.ContactCreeWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeSansCaptchaWebDto;
 import fr.abes.licencesnationales.web.dto.etablissement.creation.EtablissementCreeWebDto;
@@ -506,9 +509,9 @@ public class EtablissementWebDtoConverterTest {
 
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
-        Assertions.assertEquals(2, dto.getNotifications().size());
-        Assertions.assertEquals("en attente d'examen par l'Abes : 1.1.1.1. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("description"));
-        Assertions.assertEquals("en attente d'examen par l'Abes : 1111:1111:1111:1111:1111:1111:1111:1111. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals(3, dto.getNotifications().size());
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1.1.1.1. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals("en attente d'examen par l'Abes : 1111:1111:1111:1111:1111:1111:1111:1111. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(2).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas IPs en attente attestation")
@@ -549,9 +552,9 @@ public class EtablissementWebDtoConverterTest {
 
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
-        Assertions.assertEquals(2, dto.getNotifications().size());
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(0).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals(3, dto.getNotifications().size());
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(2).get("description"));
     }
 
     @DisplayName("test conversion établissement -> notifications : cas quelques IPs en attente attestation + nouvelles IP")
@@ -576,10 +579,10 @@ public class EtablissementWebDtoConverterTest {
 
         NotificationsDto dto = utilsMapper.map(etab, NotificationsDto.class);
 
-        Assertions.assertEquals(3, dto.getNotifications().size());
-        Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(0).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(1).get("description"));
-        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer ici", dto.getNotifications().get(2).get("description"));
+        Assertions.assertEquals(4, dto.getNotifications().size());
+        Assertions.assertEquals("en attente d'examen par l'Abes : 2.2.2.2. L'accès correspondant n'est pas ouvert", dto.getNotifications().get(1).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(2).get("description"));
+        Assertions.assertEquals("Tant qu'une IP n'est pas validée l'accès correspondant n'est pas ouvert. Pour en savoir plus cliquer <a href=\"http://documentation.abes.fr/aidelicencesnationales/aidelicencesnationalesTestsUX/index.html#StatutsEtProcessusDeValidationDesIP\" target=\"_blank\">ici</a>", dto.getNotifications().get(3).get("description"));
 
     }
 
