@@ -29,7 +29,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {EventService.class})
@@ -85,7 +84,7 @@ public class EventServiceTest {
         DateFormat format = new SimpleDateFormat("dd/mm/yyyy");
         EtablissementEventEntity etab = new EtablissementCreeEventEntity(this);
         etab.setDateCreationEvent(format.parse("10/02/2020"));
-        Mockito.when(etablissementRepository.getDateCreationEtab("111111111")).thenReturn(Optional.of(etab));
+        Mockito.when(etablissementRepository.getDateCreationEtab("111111111")).thenReturn(List.of(etab));
 
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
@@ -95,8 +94,6 @@ public class EventServiceTest {
     @DisplayName("test récupération date de création d'un établissement : établissement inconnu")
     @Test
     void testGetDateCreationEtabUnknown() {
-        Mockito.when(etablissementRepository.getDateCreationEtab("111111111")).thenReturn(Optional.empty());
-
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
         Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact)));
