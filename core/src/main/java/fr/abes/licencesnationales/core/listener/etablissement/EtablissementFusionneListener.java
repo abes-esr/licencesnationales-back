@@ -43,20 +43,18 @@ public class EtablissementFusionneListener implements ApplicationListener<Etabli
 
         EtablissementEntity etab = new EtablissementEntity(event.getNomEtab(), event.getSiren(), referenceService.findTypeEtabByLibelle(event.getTypeEtablissement()), event.getIdAbes(), contactEntity);
 
+        if (service.existeMail(etab.getContact().getMail())) {
+            throw new MailDoublonException(String.format(Constant.ERROR_MAIL_DOUBLON, etab.getContact().getMail()));
+        }
+        if (service.existeSiren(etab.getSiren())) {
+            throw new SirenExistException(String.format(Constant.ERROR_ETAB_DOUBLON, etab.getSiren()));
+        }
+
         for (String siren : event.getSirenAnciensEtablissements()) {
             EtablissementEntity etablissementEntity = service.getFirstBySiren(siren);
             etab.ajouterIps(etablissementEntity.getIps());
-
+            service.save(etab);
             service.deleteBySiren(siren);
         }
-
-        if (service.existeMail(etab.getContact().getMail())) {
-            throw new MailDoublonException(String.format(Constant.ERROR_MAIL_DOUBLON,etab.getContact().getMail()));
-        }
-        if (service.existeSiren(etab.getSiren())) {
-            throw new SirenExistException(String.format(Constant.ERROR_ETAB_DOUBLON,etab.getSiren()));
-        }
-
-        service.save(etab);
     }
 }
