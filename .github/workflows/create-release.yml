@@ -62,6 +62,7 @@ jobs:
           git commit --amend -m "Version $NEW_TAG"
           git pull --no-edit && git push
           git switch develop
+          git add .
           git merge --no-commit $CURRENT_GIT_BRANCH
           git commit -m "[skip ci]"
           git push
