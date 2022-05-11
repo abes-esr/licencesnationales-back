@@ -59,7 +59,7 @@ jobs:
           # CURRENT_GIT_BRANCH vaut main ou master, c'est la où est créé la release
           CURRENT_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
           git commit --amend -m "Version $NEW_TAG"
-          git pull --ff-only && git push
+          git pull --no-edit && git push
           git switch develop
           git merge --no-commit $CURRENT_GIT_BRANCH
           git commit -m "[skip ci]"
