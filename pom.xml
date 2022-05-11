@@ -193,7 +193,7 @@
             <artifactId>maven-release-plugin</artifactId>
             <version>3.0.0-M5</version>
             <configuration>
-              <!-- <scmReleaseCommitComment>[maven-release-plugin] Version @{releaseLabel}</scmReleaseCommitComment> -->
+              <scmReleaseCommitComment>[maven-release-plugin] Version @{releaseLabel}</scmReleaseCommitComment>
               <scmCommentPrefix>[maven-release-plugin] [no ci]</scmCommentPrefix>
             </configuration>
           </plugin>
