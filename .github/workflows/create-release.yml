@@ -42,7 +42,7 @@ jobs:
       - name: 'Generate the new version (patch few files + git tag)'
         env:
           NEW_TAG: ${{ github.event.inputs.releaseVersion }}
-          GITHUB_TOKEN: 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
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_FOR_GITHUB_ACTION }}
         run: |
           # préparation de la release qui va :
           # - modifier le numéro de version dans les pom.xml du projet
