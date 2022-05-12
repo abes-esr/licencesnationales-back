@@ -55,6 +55,13 @@ jobs:
             -DreleaseVersion=$NEW_TAG \
             -Darguments=-DskipTests \
             -DtagNameFormat="@{project.version}"
+            
+          # add TAG $NEW_TAG
+          git push
+          git commit --amend -m "Version $NEW_TAG"
+          git tag $NEW_TAG
+          git push origin $NEW_TAG
+          
           # merge la préparation de la nouvelle version sur develop
           # (version X.X.X-SNAPSHOT)
           # CURRENT_GIT_BRANCH vaut main ou master, c'est la où est créé la release
