@@ -20,7 +20,7 @@
     <groupId>fr.abes.licencesnationales</groupId>
     <artifactId>licencesnationales-backoffice</artifactId>
     <packaging>pom</packaging>
-    <version>1.1.26-SNAPSHOT</version>
+    <version>1.1.27-SNAPSHOT</version>
     <name>Licences Nationales Back</name>
     <description>API pour les licences nationales</description>
 
