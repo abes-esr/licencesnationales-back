@@ -1,4 +1,4 @@
-name: "build-test-pubtodockerhub"
+name: "build-global-pubtodockerhub"
 
 # IMPORTANT : personnalisez cette variable pour que les images
 # de votre application soient pousées sur dockerhub
@@ -13,13 +13,14 @@ on:
     paths-ignore:
       - '**.md'
       - '.github/**'
+    tags-ignore:
+      - '*.*.*'
   workflow_dispatch:
 
 jobs:
-  build-test-pubtodockerhub:
+  build-global-pubtodockerhub:
     runs-on: ubuntu-latest
     steps:
-
 
       - name: "Build: checkout source code"
         uses: actions/checkout@v2          
