@@ -1,4 +1,4 @@
-name: "build-global-pubtodockerhub"
+name: "build-develop-pubtodockerhub"
 
 # IMPORTANT : personnalisez cette variable pour que les images
 # de votre application soient pousées sur dockerhub
@@ -18,7 +18,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-global-pubtodockerhub:
+  build-develop-pubtodockerhub:
     runs-on: ubuntu-latest
     steps:
 
