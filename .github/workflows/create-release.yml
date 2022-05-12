@@ -59,7 +59,6 @@ jobs:
           # add TAG $NEW_TAG
           git push
           git commit --amend -m "Version $NEW_TAG"
-          git tag $NEW_TAG
           git push origin $NEW_TAG
           
           # merge la préparation de la nouvelle version sur develop
