@@ -1,4 +1,4 @@
-name: "build-develop-pubtodockerhub"
+name: "build-test-pubtodockerhub"
 
 # IMPORTANT : personnalisez cette variable pour que les images
 # de votre application soient pousées sur dockerhub
@@ -13,12 +13,10 @@ on:
     paths-ignore:
       - '**.md'
       - '.github/**'
-    tags-ignore:
-      - '*.*.*'
   workflow_dispatch:
 
 jobs:
-  build-develop-pubtodockerhub:
+  build-test-pubtodockerhub:
     runs-on: ubuntu-latest
     steps:
 
