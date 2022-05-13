@@ -51,10 +51,7 @@ jobs:
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
           #git config pull.rebase false
-          mvn release:prepare \
-            --batch-mode \
-            -Darguments=-DskipTests \
-            -DtagNameFormat="@{project.version}"
+          mvn --batch-mode -Darguments=-DskipTests
             
           git add -- pom.xml core/pom.xml batch/pom.xml web/pom.xml
           git rev-parse --show-prefix
