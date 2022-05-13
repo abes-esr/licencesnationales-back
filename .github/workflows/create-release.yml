@@ -56,12 +56,11 @@ jobs:
             -DreleaseVersion=$NEW_TAG \
             -Darguments=-DskipTests \
             -DtagNameFormat="@{project.version}"
-          git push
             
           # add TAG $NEW_TAG
           git commit --amend -m "Version $NEW_TAG"
-          git push $NEW_TAG
-          gh release create $NEW_TAG --generate-notes
+          git push && git push $NEW_TAG
+          #gh release create $NEW_TAG --generate-notes
           
           # merge la préparation de la nouvelle version sur develop
           # (version X.X.X-SNAPSHOT)
