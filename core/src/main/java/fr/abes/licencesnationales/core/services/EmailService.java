@@ -79,7 +79,7 @@ public class EmailService {
         message.append(nomEtab);
         message.append(" sur le site Licencesnationales.fr. ");
         message.append("Pour créer un nouveau mot de passe, cliquez sur le lien ci-dessous :  <br>");
-        message.append(url);
+        message.append("<a href='").append(url).append("' target='_blank'>").append(url).append("</a>");
         message.append("<br><br>Le lien sera valable 24 heures.<br>");
         message.append(lienAssistance());
         message.append(signature());
