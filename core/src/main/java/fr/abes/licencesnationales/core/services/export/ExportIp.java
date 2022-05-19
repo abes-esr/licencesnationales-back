@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportIp extends ExportService<ExportIpDto, String> {
     @Autowired
@@ -40,8 +42,8 @@ public class ExportIp extends ExportService<ExportIpDto, String> {
         output.add(item.getType());
         output.add(item.getIp());
         output.add(item.getDateModificationStatut());
-        output.add(item.getStatut());
-        output.add(item.getCommentaire());
+        output.add(stripAccents(item.getStatut()));
+        output.add(stripAccents(item.getCommentaire()));
         printer.printRecord(output);
     }
 
