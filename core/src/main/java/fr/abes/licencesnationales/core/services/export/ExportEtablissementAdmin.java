@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportEtablissementAdmin extends ExportService<ExportEtablissementAdminDto, String> {
     private final UtilsMapper mapper;
@@ -27,14 +29,14 @@ public class ExportEtablissementAdmin extends ExportService<ExportEtablissementA
         printer.printRecord((Object[]) new String[]{
                 "Identifiant Abes",
                 "Siren",
-                "Nom de l'établissement",
-                "Type de l'établissement",
-                "Adresse de l'établissement",
+                "Nom de l'etablissement",
+                "Type de l'etablissement",
+                "Adresse de l'etablissement",
                 "Ville",
-                "Téléphone contact",
-                "Nom et prénom contact",
+                "Telephone contact",
+                "Nom et prenom contact",
                 "Adresse mail contact",
-                "IP validées"
+                "IP validees"
         });
     }
 
@@ -43,12 +45,12 @@ public class ExportEtablissementAdmin extends ExportService<ExportEtablissementA
         List<String> output = new ArrayList<>();
         output.add(GenererIdAbes.genererIdAbes(item.getIdAbes()));
         output.add(item.getSiren());
-        output.add(item.getNom());
-        output.add(item.getTypeEtablissement());
-        output.add(item.getAdresse());
-        output.add(item.getVille());
+        output.add(stripAccents(item.getNom()));
+        output.add(stripAccents(item.getTypeEtablissement()));
+        output.add(stripAccents(item.getAdresse()));
+        output.add(stripAccents(item.getVille()));
         output.add(item.getTelephone());
-        output.add(item.getNomPrenomContact());
+        output.add(stripAccents(item.getNomPrenomContact()));
         output.add(item.getMailContact());
         for (String ip : item.getIps()) {
             output.add(ip);
