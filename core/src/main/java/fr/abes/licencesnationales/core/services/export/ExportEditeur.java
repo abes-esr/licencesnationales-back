@@ -28,7 +28,7 @@ public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
     @Override
     protected void writeHeader(CSVPrinter printer) throws IOException {
         printer.printRecord((Object[]) new String[]{
-                "ID editeur",
+                "Identifiant editeur",
                 "Nom de l'editeur",
                 "Adresse de l'editeur",
                 "Nom(s) et Prenom(s) des contacts",

@@ -1,6 +1,5 @@
 package fr.abes.licencesnationales.web.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.LicencesNationalesAPIApplicationTests;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
@@ -9,9 +8,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpV4;
 import fr.abes.licencesnationales.core.entities.ip.IpV6;
-import fr.abes.licencesnationales.core.entities.ip.event.IpCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.statut.StatutIpEntity;
-import fr.abes.licencesnationales.core.exception.IpException;
 import fr.abes.licencesnationales.core.exception.UnknownIpException;
 import fr.abes.licencesnationales.core.repository.ip.IpEventRepository;
 import fr.abes.licencesnationales.core.repository.ip.IpRepository;
@@ -24,7 +21,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -427,7 +423,7 @@ public class IpControllerTest extends LicencesNationalesAPIApplicationTests {
         Mockito.when(dao.findAllBySiren(Mockito.any())).thenReturn(list);
 
         String fileContent = "Date de saisie;Type d'IP;Valeur;Date de modification du statut;Statut;Commentaires\r\n";
-        fileContent += format.format(dateDuJour.getTime())+";IP V4;192.128.0.1;;validé;test\r\n";
+        fileContent += format.format(dateDuJour.getTime()) + ";IP V4;192.128.0.1;;valide;test\r\n";
         String json = "[]";
 
 

@@ -351,7 +351,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
         Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
 
-        String fileContent = "ID editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        String fileContent = "Identifiant editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         fileContent += "identifiant2;nomEditeur2;adresse2;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
         String json = "[1,2]";
@@ -380,7 +380,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
         Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
 
-        String fileContent = "ID editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        String fileContent = "Identifiant editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         String json = "[1]";
         MvcResult result = mockMvc.perform(MockMvcRequestBuilders.post("/v1/editeurs/export").contentType(MediaType.APPLICATION_JSON).content(json)).andExpect(MockMvcResultMatchers.status().is(200)).andReturn();
@@ -410,7 +410,7 @@ public class EditeurControllerTest extends LicencesNationalesAPIApplicationTests
         Mockito.when(filtrerAccesServices.getRoleFromSecurityContextUser()).thenReturn("admin");
         Mockito.when(dao.getAllByIdIn(Mockito.any())).thenReturn(listEditeur);
 
-        String fileContent = "ID editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
+        String fileContent = "Identifiant editeur;Nom de l'editeur;Adresse de l'editeur;Nom(s) et Prenom(s) des contacts;Adresse(s) mail(s) des contacts;Type de contact\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomCom prenomCom;mailCom@mail.com;Commercial\r\n";
         fileContent += "identifiant;nomEditeur;adresse;nomTech prenomTech;mailTech@mail.com;Technique\r\n";
         String json = "[1]";
