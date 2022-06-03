@@ -53,7 +53,6 @@ jobs:
           mvn --batch-mode release:update-versions \
               -DautoVersionSubmodules=true \
               -DdevelopmentVersion=${NEW_TAG}-SNAPSHOT
-          
           git add -- pom.xml core/pom.xml batch/pom.xml web/pom.xml
           git commit -m '[Prepare version] [no ci]'
           git push
