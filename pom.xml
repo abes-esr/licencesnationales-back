@@ -204,6 +204,6 @@
     <scm>
       <connection>scm:git:https://github.com/abes-esr/licencesnationales-back.git</connection>
       <tag>HEAD</tag>
-  </scm>
+    </scm>
         
 </project>
