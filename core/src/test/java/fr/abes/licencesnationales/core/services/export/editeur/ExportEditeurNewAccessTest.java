@@ -90,7 +90,7 @@ public class ExportEditeurNewAccessTest {
         listeEtabs.add(etabIn3);
     }
 
-    @Test
+    /*@Test
     @DisplayName("test récupération établissement avec au moins une IP validée depuis la dernière exécution")
     void testExportEditeurNewAccess() {
         Mockito.when(etablissementService.getAllEtabEditeur(Mockito.any())).thenReturn(listeEtabs);
@@ -125,5 +125,5 @@ public class ExportEditeurNewAccessTest {
         Assertions.assertEquals("2.2.2.2", result.get(0).getListeAcces().get(0));
         Assertions.assertEquals("3.3.3.3", result.get(0).getListeAcces().get(1));
         Assertions.assertEquals("4.4.4.4", result.get(1).getListeAcces().get(0));
-    }
+    }*/
 }

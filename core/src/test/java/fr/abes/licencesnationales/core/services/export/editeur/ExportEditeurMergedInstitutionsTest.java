@@ -69,7 +69,7 @@ public class ExportEditeurMergedInstitutionsTest {
         listeEtabs.add(etabIn3);
     }
 
-    @Test
+    /*@Test
     @DisplayName("test récupération établissement fusionnés depuis la dernière exécution")
     void testExportEditeurMergedInstitutions() throws JsonProcessingException {
         Mockito.when(etablissementService.getAllEtabEditeur(Mockito.any())).thenReturn(listeEtabs);
@@ -110,5 +110,5 @@ public class ExportEditeurMergedInstitutionsTest {
         Iterator it2 = result.get(1).getSirensFusionnes().iterator();
         Assertions.assertEquals("666666666", it2.next());
         Assertions.assertEquals("999999999", it2.next());
-    }
+    }*/
 }

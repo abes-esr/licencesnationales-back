@@ -39,7 +39,7 @@ public class ExportEditeurListAllTest {
     @MockBean
     private EtablissementService etablissementService;
 
-    @DisplayName("test génération csv listAll")
+   /* @DisplayName("test génération csv listAll")
     @Test
     void testGenerateCsvListAll() throws IpException {
         StatutIpEntity statutValide = new StatutIpEntity(Constant.STATUT_IP_VALIDEE, "Validée");
@@ -82,5 +82,5 @@ public class ExportEditeurListAllTest {
         result.append("654321;testNom3;testType;adresse;BP;CP;cedex;ville;nom prenom;mail@mail.com;telephone;6.6.6.6\r\n");
 
         Assertions.assertEquals(result.toString(), csvString);
-    }
+    }*/
 }
