@@ -63,8 +63,7 @@ public class ExportEditeurDeletedAccess extends ExportEditeurService<ExportEtabl
      * @return
      */
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<Integer> ids) {
-        List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(ids);
+    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         etabs.stream().forEach(e -> {
             //on récupère les IP supprimées depuis la dernière exécution et validée avant

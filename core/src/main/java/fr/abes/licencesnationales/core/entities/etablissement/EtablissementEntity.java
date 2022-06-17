@@ -63,8 +63,7 @@ public class EtablissementEntity implements Serializable {
     @Setter
     private ContactEntity contact;
 
-    @OneToMany(mappedBy = "etablissement")
-    @Cascade(org.hibernate.annotations.CascadeType.ALL)
+    @OneToMany(mappedBy = "etablissement", cascade = CascadeType.ALL)
     @JsonIgnore
     @Getter
     @Setter

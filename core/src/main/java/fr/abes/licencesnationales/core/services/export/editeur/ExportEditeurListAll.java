@@ -2,6 +2,7 @@ package fr.abes.licencesnationales.core.services.export.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.ExportEditeurService;
 import org.apache.commons.csv.CSVPrinter;
@@ -46,7 +47,7 @@ public class ExportEditeurListAll extends ExportEditeurService<ExportEtablisseme
     }
 
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<Integer> ids) {
-        return mapper.mapList(etablissementService.getAllEtabEditeur(ids), ExportEtablissementEditeurDto.class);
+    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
+        return mapper.mapList(etabs, ExportEtablissementEditeurDto.class);
     }
 }

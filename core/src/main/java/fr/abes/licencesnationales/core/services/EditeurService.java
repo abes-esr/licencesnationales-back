@@ -64,22 +64,16 @@ public class EditeurService {
     }
 
     public List<EditeurEntity> search(List<String> criteres) {
-        List<EditeurEntity> resultats = new ArrayList<>();
-        searchByCriteria(editeurRepository.findAll(), resultats, criteres);
-        return resultats;
+        return searchByCriteria(editeurRepository.findAll(), criteres);
     }
 
     /**
      * Fonction récursive permettant d'alimenter une liste de résultats à partir d'une liste d'éditeur et de critères de recherche
      * @param editeurs liste des éditeurs sur lesquels effectuer la recherche
-     * @param resultats liste de résultat alimentée à chaque nouveau passage dans la fonction
      * @param criteres liste des critères dépilée à chaque nouveau passage
      */
-    private void searchByCriteria(List<EditeurEntity> editeurs, List<EditeurEntity> resultats, List<String> criteres) {
-        //condition de sortie de la fonction récursive
-        if (criteres.size() == 0) {
-            return;
-        }
+    private List<EditeurEntity> searchByCriteria(List<EditeurEntity> editeurs, List<String> criteres) {
+        List<EditeurEntity> resultats = new ArrayList<>();
         String critLower = criteres.get(0).toLowerCase(Locale.ROOT);
         resultats.addAll(editeurs.stream().filter(editeur -> {
             if (editeur.getNom().toLowerCase().contains(critLower) || editeur.getAdresse().toLowerCase().contains(critLower) || editeur.getIdentifiant().toLowerCase().contains(critLower))
@@ -98,7 +92,11 @@ public class EditeurService {
             return false;
         }).collect(Collectors.toList()));
         criteres.remove(0);
-        searchByCriteria(editeurs, resultats, criteres);
+        //condition de sortie de la fonction récursive
+        if (criteres.size() == 0) {
+            return resultats;
+        }
+        return searchByCriteria(editeurs, criteres);
     }
 
 

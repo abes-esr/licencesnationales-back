@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.services;
 
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -16,9 +17,9 @@ public abstract class ExportEditeurService<T> {
 
     protected abstract void writeLine(CSVPrinter printer, T item) throws IOException;
 
-    protected abstract List<T> getItems(List<Integer> ids);
+    protected abstract List<T> getItems(List<EtablissementEntity> ids);
 
-    public ByteArrayInputStream generateCsv(List<Integer> ids) {
+    public ByteArrayInputStream generateCsv(List<EtablissementEntity> ids) {
         try (final ByteArrayOutputStream stream = new ByteArrayOutputStream();
              final CSVPrinter printer = new CSVPrinter(new PrintWriter(stream), CSVFormat.EXCEL.withDelimiter(';').withRecordSeparator("\r\n"))) {
             List<T> query = this.getItems(ids);
