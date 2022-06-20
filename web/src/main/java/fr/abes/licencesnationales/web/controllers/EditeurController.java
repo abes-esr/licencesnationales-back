@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 
@@ -176,14 +177,14 @@ public class EditeurController extends AbstractController {
             Map<String, ByteArrayInputStream> mapFichiers = new HashMap<>();
             List<Integer> listeTypesEditeurs = editeurEntity.getTypeEtablissements().stream().map(t -> t.getId()).collect(Collectors.toList());
             List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(listeTypesEditeurs);
-            mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("splitInstitutions.csv", exportEditeurSplitInstitutions.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("newAccess.csv", exportEditeurNewAccess.generateCsv(new CopyOnWriteArrayList<>(etabs)));
-            mapFichiers.put("deletedAccess.csv", exportEditeurDeletedAccess.generateCsv(new CopyOnWriteArrayList<>(etabs)));
+            mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("splitInstitutions.csv", exportEditeurSplitInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("newAccess.csv", exportEditeurNewAccess.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("deletedAccess.csv", exportEditeurDeletedAccess.generateCsv(new ArrayList<>(etabs)));
             try {
                 //on envoie le mail aux contacts techniques (concaténation des adresse mails avec un ;) avec copie à l'admin LN
                 emailService.constructEnvoiFichierEditeurs(editeurEntity.getContactsTechniques().stream().map(c -> c.getMail()).collect(Collectors.joining(";")), mailAdmin, mapFichiers);

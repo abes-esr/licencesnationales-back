@@ -59,7 +59,7 @@ public class ExportEditeurDeletedAccess extends ExportEditeurService<ExportEtabl
 
     /**
      * Récupère les établissements dont au moins une IP a été validée avant la dernière exécution, et supprimée entre la dernière exécution et aujourd'hui
-     * @param ids
+     * @param etabs
      * @return
      */
     @Override
