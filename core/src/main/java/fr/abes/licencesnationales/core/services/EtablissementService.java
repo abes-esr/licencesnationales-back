@@ -12,12 +12,12 @@ import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.ContactRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.EtablissementRepository;
+import fr.abes.licencesnationales.core.repository.ip.IpRepository;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.Transactional;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -26,6 +26,9 @@ import java.util.stream.Collectors;
 public class EtablissementService {
     @Autowired
     private EtablissementRepository etablissementDao;
+
+    @Autowired
+    private IpRepository ipDao;
 
     @Autowired
     private EventService eventService;
@@ -138,9 +141,9 @@ public class EtablissementService {
     public List<EtablissementEntity> getAllEtabEditeur(List<Integer> ids) {
         List<TypeEtablissementEntity> typesEtab = referenceService.findTypeEtabByIds(ids);
         List<EtablissementEntity> listeEtab = etablissementDao.findAllByValideAndTypeEtablissementIn(true, typesEtab);
-        List<EtablissementEntity> listeEtabFiltres = listeEtab.stream().filter(e -> e.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() > 0).collect(Collectors.toList());
+        List<EtablissementEntity> listeEtabFiltres = listeEtab.stream().filter(e -> ipDao.findAllBySiren(e.getSiren()).stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() > 0).collect(Collectors.toList());
         //on supprime les IP non validés des établissements retournés
-        listeEtabFiltres.stream().forEach(e -> e.getIps().removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
+        listeEtabFiltres.stream().forEach(e -> ipDao.findAllBySiren(e.getSiren()).removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
         return listeEtabFiltres;
     }
 
