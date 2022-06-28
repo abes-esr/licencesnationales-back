@@ -38,7 +38,7 @@ public abstract class ExportEditeurService<T> {
 
     protected List<String> writeCommonLine(String idEtablissement, String nomEtablissement, String typeEtablissement, String adresse, String boitePostale, String codePostal, String cedex, String ville, String nomContact, String mailContact, String telephoneContact) {
         List<String> output = new ArrayList<>();
-        output.add(idEtablissement);
+        output.add(GenererIdAbes.genererIdAbes(idEtablissement));
         output.add(nomEtablissement);
         output.add(typeEtablissement);
         output.add(adresse);
