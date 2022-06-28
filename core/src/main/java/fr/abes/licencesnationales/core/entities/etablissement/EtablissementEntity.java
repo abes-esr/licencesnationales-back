@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static fr.abes.licencesnationales.core.constant.Constant.*;
+
 @Entity
 @Table(name = "Etablissement")
 public class EtablissementEntity implements Serializable {
@@ -166,21 +168,26 @@ public class EtablissementEntity implements Serializable {
     }
 
     public String getStatut() {
-        if (this.ips.size() == 0) {
+        if (this.ips.isEmpty()) {
             return Constant.STATUT_ETAB_SANSIP;
         } else {
             Stream<IpEntity> ipSorted = this.ips.stream().collect(Collectors.toSet()).stream().sorted();
+            String statut = "";
             for (IpEntity ip : ipSorted.collect(Collectors.toSet())) {
                 switch (ip.getStatut().getIdStatut()) {
-                    case Constant.STATUT_IP_NOUVELLE:
-                        return Constant.STATUT_ETAB_EXAMINERIP;
-                    case Constant.STATUT_IP_ATTESTATION:
-                        return Constant.STATUT_ETAB_ATTENTEATTESTATION;
+                    case STATUT_IP_NOUVELLE:
+                        statut = STATUT_ETAB_EXAMINERIP;
+                        break;
+                    case STATUT_IP_ATTESTATION:
+                        if (!statut.equals(STATUT_ETAB_EXAMINERIP))
+                            statut = STATUT_ETAB_ATTENTEATTESTATION;
+                        break;
                     default:
-                        return Constant.STATUT_ETAB_IPOK;
+                        if (!statut.equals(STATUT_ETAB_EXAMINERIP) && !statut.equals(STATUT_ETAB_ATTENTEATTESTATION))
+                            statut = STATUT_ETAB_IPOK;
                 }
             }
+            return statut;
         }
-        return "";
     }
 }
