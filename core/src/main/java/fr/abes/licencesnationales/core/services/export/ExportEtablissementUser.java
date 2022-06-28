@@ -13,6 +13,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportEtablissementUser extends ExportService<ExportEtablissementUserDto, String> {
     @Autowired
@@ -26,13 +28,13 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
        printer.printRecord((Object[]) new String[]{
                "Identifiant Abes",
                "Siren",
-               "Nom de l'établissement",
-               "Type de l'établissement",
-               "Adresse de l'établissement",
-               "Téléphone contact",
-               "Nom et prénom contact",
+               "Nom de l'etablissement",
+               "Type de l'etablissement",
+               "Adresse de l'etablissement",
+               "Telephone contact",
+               "Nom et prenom contact",
                "Adresse mail contact",
-               "IP validées"
+               "IP validees"
        });
     }
 
@@ -56,11 +58,11 @@ public class ExportEtablissementUser extends ExportService<ExportEtablissementUs
     private void writeEtabInfo(ExportEtablissementUserDto item, List<String> output) {
         output.add(GenererIdAbes.genererIdAbes(item.getIdAbes()));
         output.add(item.getSiren());
-        output.add(item.getNom());
-        output.add(item.getTypeEtablissement());
-        output.add(item.getAdresse());
+        output.add(stripAccents(item.getNom()));
+        output.add(stripAccents(item.getTypeEtablissement()));
+        output.add(stripAccents(item.getAdresse()));
         output.add(item.getTelephone());
-        output.add(item.getNomPrenomContact());
+        output.add(stripAccents(item.getNomPrenomContact()));
         output.add(item.getMailContact());
     }
 

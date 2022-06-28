@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
 
@@ -26,9 +28,9 @@ public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
     @Override
     protected void writeHeader(CSVPrinter printer) throws IOException {
         printer.printRecord((Object[]) new String[]{
-                "ID éditeur",
-                "Nom de l'éditeur",
-                "Adresse de l'éditeur",
+                "Identifiant editeur",
+                "Nom de l'editeur",
+                "Adresse de l'editeur",
                 "Nom(s) et Prenom(s) des contacts",
                 "Adresse(s) mail(s) des contacts",
                 "Type de contact",
@@ -45,7 +47,7 @@ public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
         else {
             for (ContactEditeurDto contact : item.getContact()) {
                 writeEditeurInfo(item, output);
-                output.add(contact.getNomPrenom());
+                output.add(stripAccents(contact.getNomPrenom()));
                 output.add(contact.getMail());
                 output.add(contact.getType());
                 printer.printRecord(output);
@@ -56,8 +58,8 @@ public class ExportEditeur extends ExportService<ExportEditeurDto, Integer> {
 
     private void writeEditeurInfo(ExportEditeurDto item, List<String> output) {
         output.add(item.getId());
-        output.add(item.getNom());
-        output.add(item.getAdresse());
+        output.add(stripAccents(item.getNom()));
+        output.add(stripAccents(item.getAdresse()));
     }
 
     @Override
