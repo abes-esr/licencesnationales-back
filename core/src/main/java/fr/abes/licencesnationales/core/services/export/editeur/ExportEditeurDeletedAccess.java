@@ -59,12 +59,11 @@ public class ExportEditeurDeletedAccess extends ExportEditeurService<ExportEtabl
 
     /**
      * Récupère les établissements dont au moins une IP a été validée avant la dernière exécution, et supprimée entre la dernière exécution et aujourd'hui
-     * @param ids
+     * @param etabs
      * @return
      */
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<Integer> ids) {
-        List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(ids);
+    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         etabs.stream().forEach(e -> {
             //on récupère les IP supprimées depuis la dernière exécution et validée avant

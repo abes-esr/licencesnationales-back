@@ -58,8 +58,7 @@ public class ExportEditeurDeletedInstitutions extends ExportEditeurService<Expor
     }
 
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<Integer> ids) {
-        List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(ids);
+    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         return mapper.mapList(etabs.stream().filter(e -> {
             Date dateSuppressionEtab = eventService.getDateSuppressionEtab(e);

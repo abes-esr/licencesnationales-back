@@ -176,28 +176,26 @@ public class IpService {
     }
 
     public List<IpEntity> search(List<String> criteres) {
-        List<IpEntity> resultats = new ArrayList<>();
-        searchByCriteria(ipRepository.findAll(), resultats, criteres);
-        return resultats;
+        return searchByCriteria(ipRepository.findAll(), criteres);
     }
 
     /**
      * Fonction récursive permettant d'alimenter une liste de résultats à partir d'une liste d'Ips et de critères de recherche
      * @param ips liste des IPs sur lesquels effectuer la recherche
-     * @param resultats liste de résultat alimentée à chaque nouveau passage dans la fonction
      * @param criteres liste des critères dépilée à chaque nouveau passage
      */
-    private void searchByCriteria(List<IpEntity> ips, List<IpEntity> resultats, List<String> criteres) {
-        //condition de sortie de la fonction récursive
-        if (criteres.size() == 0) {
-            return;
-        }
-        String critLower = criteres.get(0).toLowerCase();
+    private List<IpEntity> searchByCriteria(List<IpEntity> ips, List<String> criteres) {
+        List<IpEntity> resultats = new ArrayList<>();
+        String critere = criteres.get(0);
         resultats.addAll(ips.stream().filter(ip -> {
-           if (ip.getIp().contains(critLower)) return true;
+           if (ip.getIp().contains(critere)) return true;
            return false;
         }).collect(Collectors.toList()));
         criteres.remove(0);
-        searchByCriteria(ips, resultats, criteres);
+        //condition de sortie de la fonction récursive
+        if (criteres.size() == 0) {
+            return resultats;
+        }
+        return searchByCriteria(resultats, criteres);
     }
 }

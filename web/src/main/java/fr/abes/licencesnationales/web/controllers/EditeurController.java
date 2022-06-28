@@ -9,12 +9,10 @@ import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
-import fr.abes.licencesnationales.core.services.EditeurService;
-import fr.abes.licencesnationales.core.services.EmailService;
-import fr.abes.licencesnationales.core.services.EventService;
-import fr.abes.licencesnationales.core.services.ReferenceService;
+import fr.abes.licencesnationales.core.services.*;
 import fr.abes.licencesnationales.core.services.export.ExportEditeur;
 import fr.abes.licencesnationales.core.services.export.editeur.*;
 import fr.abes.licencesnationales.web.dto.editeur.EditeurCreeWebDto;
@@ -37,19 +35,24 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 
 @Slf4j
 @RestController
 @RequestMapping("/v1/editeurs")
-public class EditeurController extends AbstractController{
+public class EditeurController extends AbstractController {
 
     @Autowired
     private UtilsMapper mapper;
 
     @Autowired
     private EditeurService editeurService;
+
+    @Autowired
+    private EtablissementService etablissementService;
 
     @Autowired
     private ApplicationEventPublisher applicationEventPublisher;
@@ -104,7 +107,7 @@ public class EditeurController extends AbstractController{
         event.setSource(this);
         //initialisation de la liste des types d'établissements par récupération dans la BDD
         for (String t : editeurCreeWebDto.getTypesEtablissements()) {
-                event.addTypeEtab(referenceService.findTypeEtabByLibelle(t));
+            event.addTypeEtab(referenceService.findTypeEtabByLibelle(t));
         }
 
         // On publie l'événement et on le sauvegarde
@@ -115,7 +118,7 @@ public class EditeurController extends AbstractController{
 
     @PostMapping(value = "/{id}")
     @PreAuthorize("hasAuthority('admin')")
-    public ResponseEntity<Object> edit (@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
+    public ResponseEntity<Object> edit(@PathVariable Integer id, @Valid @RequestBody EditeurModifieWebDto editeurModifieWebDto) throws UnknownTypeEtablissementException, JsonProcessingException {
         editeurModifieWebDto.setId(id);
         EditeurModifieEventEntity event = mapper.map(editeurModifieWebDto, EditeurModifieEventEntity.class);
         event.setSource(this);
@@ -157,11 +160,11 @@ public class EditeurController extends AbstractController{
 
     @PostMapping(value = "/export")
     @PreAuthorize("hasAuthority('admin')")
-    public void exportEditeur(@RequestBody List<Integer> ids, HttpServletResponse response) throws IOException{
+    public void exportEditeur(@RequestBody List<Integer> ids, HttpServletResponse response) throws IOException {
         response.setContentType("text/csv;charset=UTF-8");
         response.setHeader("Content-disposition", "attachment;filename=\"export.csv\"");
         InputStream stream = exportEditeur.generateCsv(ids);
-        IOUtils.copy(stream , response.getOutputStream());
+        IOUtils.copy(stream, response.getOutputStream());
         response.flushBuffer();
     }
 
@@ -169,24 +172,26 @@ public class EditeurController extends AbstractController{
     @PreAuthorize("hasAuthority('admin')")
     public ResponseEntity<Object> envoiMensuel() throws SendMailException {
         List<String> erreurMails = new ArrayList<>();
-        editeurService.findAllEditeur().stream().forEach(editeurEntity -> {
+        List<EditeurEntity> listEditeur = editeurService.findAllEditeur();
+        for (EditeurEntity editeurEntity : listEditeur) {
             Map<String, ByteArrayInputStream> mapFichiers = new HashMap<>();
             List<Integer> listeTypesEditeurs = editeurEntity.getTypeEtablissements().stream().map(t -> t.getId()).collect(Collectors.toList());
-            mapFichiers.put("deletedAccess.csv", exportEditeurDeletedAccess.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("newAccess.csv", exportEditeurNewAccess.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(listeTypesEditeurs));
-            mapFichiers.put("splitInstitutions.csv", exportEditeurSplitInstitutions.generateCsv(listeTypesEditeurs));
+            List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(listeTypesEditeurs);
+            mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("splitInstitutions.csv", exportEditeurSplitInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("newAccess.csv", exportEditeurNewAccess.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("deletedAccess.csv", exportEditeurDeletedAccess.generateCsv(new ArrayList<>(etabs)));
             try {
                 //on envoie le mail aux contacts techniques (concaténation des adresse mails avec un ;) avec copie à l'admin LN
                 emailService.constructEnvoiFichierEditeurs(editeurEntity.getContactsTechniques().stream().map(c -> c.getMail()).collect(Collectors.joining(";")), mailAdmin, mapFichiers);
             } catch (IOException e) {
                 erreurMails.add(editeurEntity.getNom());
             }
-        });
+        }
         if (erreurMails.size() != 0) {
             throw new SendMailException("aux éditeurs : " + String.join(",", erreurMails));
         }
