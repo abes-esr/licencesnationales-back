@@ -49,7 +49,7 @@ public class ExportEditeurListAllTest {
         ContactEntity contact1 = new ContactEntity(1, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
         //Etablissement avec 2 Ip validée et une Ip Nouvelle
-        EtablissementEntity etabIn1 = new EtablissementEntity(2, "testNom2", "111111111", type1, "12345", contact1);
+        EtablissementEntity etabIn1 = new EtablissementEntity(2, "testNom2", "111111111", type1, "i635xg1P64Qg8hF66Cgr82lA", contact1);
 
         IpEntity ip1 = new IpV4("4.4.4.4", "test", statutValide);
         IpEntity ip2 = new IpV4("5.5.5.5", "test", statutValide);
@@ -57,7 +57,7 @@ public class ExportEditeurListAllTest {
         etabIn1.ajouterIp(ip2);
 
         //Etablissement avec une seule IP validée
-        EtablissementEntity etabIn2 = new EtablissementEntity(3, "testNom3", "222222222", type1, "654321", contact1);
+        EtablissementEntity etabIn2 = new EtablissementEntity(3, "testNom3", "222222222", type1, "i635xg1P64Qg8hF66Cgr82lA", contact1);
 
         IpEntity ip3 = new IpV4("6.6.6.6", "test", statutValide);
         etabIn2.ajouterIp(ip3);
@@ -78,8 +78,8 @@ public class ExportEditeurListAllTest {
         String csvString = new String(bytes, StandardCharsets.UTF_8);
 
         StringBuilder result = new StringBuilder("ID Etablissement;Nom Etablissement;Type d'Etablissement;Adresse;Boite Postale;Code Postal;Cedex;Ville;Contact Nom;Contact Email;Contact Tel;Liste Acces\r\n");
-        result.append("12345;testNom2;testType;adresse;BP;CP;cedex;ville;nom prenom;mail@mail.com;telephone;4.4.4.4;5.5.5.5\r\n");
-        result.append("654321;testNom3;testType;adresse;BP;CP;cedex;ville;nom prenom;mail@mail.com;telephone;6.6.6.6\r\n");
+        result.append("ABESI635XG1P6;testNom2;testType;adresse;BP;CP;cedex;ville;nom prenom;mail@mail.com;telephone;4.4.4.4;5.5.5.5\r\n");
+        result.append("ABESI635XG1P6;testNom3;testType;adresse;BP;CP;cedex;ville;nom prenom;mail@mail.com;telephone;6.6.6.6\r\n");
 
         Assertions.assertEquals(result.toString(), csvString);
     }
