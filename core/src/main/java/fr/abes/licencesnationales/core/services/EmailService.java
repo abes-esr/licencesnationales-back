@@ -61,7 +61,7 @@ public class EmailService {
         message.append("Vous venez de créer le compte de l'établissement <b>");
         message.append(etab.getNomEtab());
         message.append("</b> sur l'<a href='");
-        message.append(urlWordpress);
+        message.append(urlSite);
         message.append("' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("Un seul compte par établissement est autorisé. L’Abes va vérifier l’éligibilité de l’établissement.<br><br>");
         message.append("<b>Nous vous invitons dès à présent à déclarer des adresses IP publiques</b> afin que votre établissement puisse bénéficier de l’accès aux ressources acquises sous licences nationales.<br><br>");
@@ -475,9 +475,9 @@ public class EmailService {
         signature.append("<br>Bien cordialement,<br><br>");
         signature.append("L'équipe Licences nationales<br>");
         signature.append("<a href='");
-        signature.append(urlWordpress);
+        signature.append(urlSite);
         signature.append("' target='_blank'>");
-        signature.append(urlWordpress);
+        signature.append(urlSite);
         signature.append("</a>");
         return signature.toString();
     }
