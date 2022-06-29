@@ -353,7 +353,7 @@ public class EtablissementWebDtoConverter {
                 if (Constant.STATUT_ETAB_SANSIP.equals(source.getStatut())) {
                     Map<String, String> notif = new HashMap<>();
                     notif.put("message", "<strong>Aucune IP enregistrée. Déclarer au moins une IP pour accéder aux licences nationales.</strong>");
-                    notif.put("description", "Consulter l'aide à la déclaration des IP.");
+                    notif.put("description", "<a href='https://documentation.abes.fr/aidelicencesnationales/index.html#TutoDeDeclarationDesIP' target='_blank'>Consulter l'aide à la déclaration des IP.</a>");
                     dto.ajouterNotification(notif);
                     return dto;
                 }
@@ -362,7 +362,7 @@ public class EtablissementWebDtoConverter {
                 if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() == source.getIps().size()) {
                     Map<String, String> notif = new HashMap<>();
                     notif.put("message", "<strong>Aucune action requise. Toutes les IP déclarées sont validées.</strong>");
-                    notif.put("description", "En savoir plus sur le délai d'ouverture des accès");
+                    notif.put("description", "<a href='https://documentation.abes.fr/aidelicencesnationales/index.html#StatutsEtProcessusDeValidationDesIP:CgILNaqqg4eJrTC78srR8c' target='_blank'>En savoir plus sur le délai d'ouverture des accès</a>");
                     dto.ajouterNotification(notif);
                     return dto;
                 }
@@ -371,7 +371,7 @@ public class EtablissementWebDtoConverter {
                 if (source.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_NOUVELLE)).collect(Collectors.toList()).size() == source.getIps().size()) {
                     Map<String, String> notif = new HashMap<>();
                     notif.put("message", "<strong>Aucune action requise. La ou les IP déclarées sont en attente d'examen par l'Abes.</strong>");
-                    notif.put("description", "En savoir plus sur le cycle de validation des IP");
+                    notif.put("description", "<a href='https://documentation.abes.fr/aidelicencesnationales/index.html#StatutsEtProcessusDeValidationDesIP' target='_blank'>En savoir plus sur le cycle de validation des IP</a>");
                     dto.ajouterNotification(notif);
                     return dto;
                 }
@@ -382,8 +382,8 @@ public class EtablissementWebDtoConverter {
                     key.append(i.getIp());
                     key.append(" à ln-admin@abes.fr.");
                     notif.put("message", key.toString());
-                    notif.put("description", "Télécharger le modèle d'attestation <br />" +
-                            "Pourquoi une attestation est demandée ?");
+                    notif.put("description", "<a href='https://www.licencesnationales.fr/modele_attestation_ip_licences_nationales/' target='_blank'>Télécharger le modèle d'attestation</a> <br />" +
+                            "<a href='https://documentation.abes.fr/aidelicencesnationales/index.html#StatutsEtProcessusDeValidationDesIP:DdxqgVeI57cdWkxUf4O9Vc' target='_blank'>Pourquoi une attestation est demandée ?</a>");
                     dto.ajouterNotification(notif);
                 });
                 return dto;
