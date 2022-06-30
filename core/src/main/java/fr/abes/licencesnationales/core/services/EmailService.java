@@ -303,7 +303,7 @@ public class EmailService {
             message.append(ENDOFLINE);
         }
         if (!ipsAttestation.isEmpty()) {
-            message.append("<tr><td style='border: solid'><b>RAPPEL : IP en attente d’attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. Télécharger un modèle d’attestation<br><br>Ce document doit être envoyé à l’adresse : ln-admin@abes.fr<br><br>Pour en savoir plus sur la vérification des IP, vous pouvez consulter <a href='http://documentation.abes.fr/aidelicencesnationales/co/DeclarerAdressesIP.html#h6cleoZtHXSMiDIX5wCuf' target='_blank'>cette page</a>.</td><td style='border: solid'>");
+            message.append("<tr><td style='border: solid'><b>RAPPEL : IP en attente d’attestation</b><br><br>Lorsque nos vérifications ne permettent pas de rattacher une IP à votre établissement, l’IP ne peut pas être validée et  transmise aux éditeurs et à l'Inist pour ouverture des accès. <br><br><i>Les IP déclarées doivent impérativement être rattachées au seul établissement bénéficiaire des licences nationales et ne peuvent pas être localisées à l'étranger sauf pour les établissements bénéficiaires dont le siège se situe à l’étranger ou dans le cas d’un reverse proxy géré par un prestataire depuis l’étranger.</i><br><br>Nous vous invitons donc à nous fournir pour la ou les IP concernées un justificatif de la part de votre service informatique ou de votre fournisseur Internet / fournisseur de services d’accès distant, qui atteste que la ou les IP en attente appartiennent bien à votre institution. <a href='https://www.licencesnationales.fr/modele_attestation_ip_licences_nationales/' target='_blank'>Télécharger un modèle d’attestation</a><br><br>Ce document doit être envoyé à l’adresse : ln-admin@abes.fr<br><br>Pour en savoir plus sur la vérification des IP, vous pouvez consulter <a href='http://documentation.abes.fr/aidelicencesnationales/co/DeclarerAdressesIP.html#h6cleoZtHXSMiDIX5wCuf' target='_blank'>cette page</a>.</td><td style='border: solid'>");
             ipsAttestation.forEach(ip -> {
                 message.append("<b>");
                 message.append(ip);
@@ -496,7 +496,7 @@ public class EmailService {
         message.append("<li>Le site <a href='");
         message.append(urlWordpress);
         message.append("' target='_blank'>");
-        message.append(urlWordpress);
+        message.append("Licences Nationales");
         message.append("</a> centralise les informations sur les licences nationales et vous permettra notamment d’explorer <a href='https://www.licencesnationales.fr/les-corpus-acquis/' target='_blank'>les corpus acquis.</a></li>");
         message.append("<li>");
         message.append(lienAssistance());
