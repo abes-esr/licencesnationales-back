@@ -43,7 +43,7 @@ public class ContactEntity implements Serializable {
     private String telephone;
 
     @NotNull
-    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,\\s-]+)$", message = "L'adresse postale fournie n'est pas valide")
+    @Pattern(regexp = "^([0-9A-Za-z'àâéèêôùûçÀÂÉÈÔÙÛÇ,.\\/\\s-]+)$", message = "L'adresse postale fournie n'est pas valide")
     private String adresse;
 
     private String boitePostale;
