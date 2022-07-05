@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -26,7 +25,7 @@ public class EmailServiceTest {
     @BeforeEach
     void init() {
         jsonResult = new StringBuilder("{");
-        jsonResult.append("\"to\":[\"test@test.com\",\"test2@test.com\"],");
+        jsonResult.append("\"to\":[\"ln-admin@abes.fr\"],");
         jsonResult.append("\"cc\":[\"test2@test2.com\"],");
         jsonResult.append("\"cci\":[],");
         jsonResult.append("\"subject\":\"Test subject\",");
