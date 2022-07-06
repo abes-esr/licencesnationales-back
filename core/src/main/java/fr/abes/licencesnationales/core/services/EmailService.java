@@ -450,7 +450,7 @@ public class EmailService {
     }
 
     protected String mailToJSON(String to, String cc, String subject, String text) {
-        if (!getEnv().equals("PROD")) {
+        if (!getEnv().equals("")) {
             to = "ln-admin@abes.fr";
         }
         String json = "";
