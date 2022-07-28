@@ -4,12 +4,12 @@ package fr.abes.licencesnationales.web.controllers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
+import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.EditeurEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurCreeEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurSupprimeEventEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.exception.UnknownTypeEtablissementException;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.services.*;
@@ -35,8 +35,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 
 
@@ -176,7 +174,7 @@ public class EditeurController extends AbstractController {
         for (EditeurEntity editeurEntity : listEditeur) {
             Map<String, ByteArrayInputStream> mapFichiers = new HashMap<>();
             List<Integer> listeTypesEditeurs = editeurEntity.getTypeEtablissements().stream().map(t -> t.getId()).collect(Collectors.toList());
-            List<EtablissementEntity> etabs = etablissementService.getAllEtabEditeur(listeTypesEditeurs);
+            List<ExportEtablissementEditeurDto> etabs = mapper.mapList(etablissementService.getAllEtabEditeur(listeTypesEditeurs), ExportEtablissementEditeurDto.class);
             mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(new ArrayList<>(etabs)));
             mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new ArrayList<>(etabs)));
             mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(new ArrayList<>(etabs)));

@@ -1,10 +1,9 @@
 package fr.abes.licencesnationales.core.services.export.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurFusionDto;
+import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurScissionDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -59,10 +58,10 @@ public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportE
     }
 
     @Override
-    protected List<ExportEtablissementEditeurScissionDto> getItems(List<EtablissementEntity> etabs) {
+    protected List<ExportEtablissementEditeurScissionDto> getItems(List<ExportEtablissementEditeurDto> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         List<ExportEtablissementEditeurScissionDto> dtos = mapper.mapList(etabs.stream().filter(e -> {
-            Date dateModificationEtab = eventService.getDateScissionEtab(e);
+            Date dateModificationEtab = eventService.getDateScissionEtab(e.getSirenEtablissement());
             if (dateModificationEtab == null) {
                 return false;
             } else {

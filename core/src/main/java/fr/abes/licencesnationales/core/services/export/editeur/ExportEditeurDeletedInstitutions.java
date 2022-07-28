@@ -2,9 +2,7 @@ package fr.abes.licencesnationales.core.services.export.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurFusionDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,10 +55,10 @@ public class ExportEditeurDeletedInstitutions extends ExportEditeurService<Expor
     }
 
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
+    protected List<ExportEtablissementEditeurDto> getItems(List<ExportEtablissementEditeurDto> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         return mapper.mapList(etabs.stream().filter(e -> {
-            Date dateSuppressionEtab = eventService.getDateSuppressionEtab(e);
+            Date dateSuppressionEtab = eventService.getDateSuppressionEtab(e.getSirenEtablissement());
             if (dateSuppressionEtab == null) {
                 return false;
             } else {
