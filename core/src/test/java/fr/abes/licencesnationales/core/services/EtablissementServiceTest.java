@@ -209,7 +209,7 @@ class EtablissementServiceTest {
         IpEntity ip6 = new IpV4("6.6.6.6", "test", statutValide);
         etabIn3.ajouterIp(ip6);
 
-        List<EtablissementEntity> listeEtabs = new ArrayList<>();
+        Set<EtablissementEntity> listeEtabs = new HashSet<>();
         listeEtabs.add(etabIn1);
         listeEtabs.add(etabIn2);
         listeEtabs.add(etabIn3);
