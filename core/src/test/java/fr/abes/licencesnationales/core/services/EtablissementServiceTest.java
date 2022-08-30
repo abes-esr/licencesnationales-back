@@ -131,7 +131,7 @@ class EtablissementServiceTest {
         EtablissementEntity etabIn1 = new EtablissementEntity( 1, "testNom", "000000000", type, "12345", contact1);
 
         ContactEntity contact2 = new ContactEntity(2, "nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
-        EtablissementEntity etabIn2 = new EtablissementEntity( 2, "testNom2", "000000000", type, "12345", contact2);
+        EtablissementEntity etabIn2 = new EtablissementEntity(2, "testNom2", "000000001", type, "12345", contact2);
 
         List<EtablissementEntity> listIn = new ArrayList<>();
         listIn.add(etabIn1);
@@ -140,8 +140,8 @@ class EtablissementServiceTest {
         Mockito.when(etablissementDao.getEtablissementEntityByIps_Empty()).thenReturn(listIn);
         Mockito.when(eventService.getLastDateSuppressionIpEtab(Mockito.any())).thenReturn(null);
         Calendar dateCreationEtab = new GregorianCalendar(2019, 1, 1);
-        Mockito.when(eventService.getDateCreationEtab(etabIn1)).thenReturn(dateCreationEtab.getTime());
-        Mockito.when(eventService.getDateCreationEtab(etabIn2)).thenReturn(Calendar.getInstance().getTime());
+        Mockito.when(eventService.getDateCreationEtab(etabIn1.getSiren())).thenReturn(dateCreationEtab.getTime());
+        Mockito.when(eventService.getDateCreationEtab(etabIn2.getSiren())).thenReturn(Calendar.getInstance().getTime());
 
         List<EtablissementEntity> listeEtab = service.getEtabASupprimer();
         Assertions.assertEquals(1, listeEtab.size());
@@ -209,7 +209,7 @@ class EtablissementServiceTest {
         IpEntity ip6 = new IpV4("6.6.6.6", "test", statutValide);
         etabIn3.ajouterIp(ip6);
 
-        List<EtablissementEntity> listeEtabs = new ArrayList<>();
+        Set<EtablissementEntity> listeEtabs = new HashSet<>();
         listeEtabs.add(etabIn1);
         listeEtabs.add(etabIn2);
         listeEtabs.add(etabIn3);

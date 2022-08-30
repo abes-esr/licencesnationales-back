@@ -18,6 +18,7 @@ import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -161,6 +162,10 @@ public class EditeurEntity implements Serializable {
 
     public void setIdentifiant(String identifiantEditeur) {
         this.identifiant = identifiantEditeur;
+    }
+
+    public String getIdentifiant() {
+        return Objects.requireNonNullElse(this.identifiant, "");
     }
 
     public void setAdresse(String adresseEditeur) {

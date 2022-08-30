@@ -9,7 +9,6 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
@@ -68,62 +67,64 @@ public class EventService {
 
     /**
      * Récupère la date de création d'un établissement
+     *
      * @param etab
      * @return la date de création de l'établissement (dans la table des events)
      * @throws UnknownEtablissementException : établissement inconnu
      */
-    public Date getDateCreationEtab(EtablissementEntity etab) throws UnknownEtablissementException{
-        List<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(etab.getSiren());
-        if (etablissement.isEmpty()){
-            throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS,etab.getSiren()));
+    public Date getDateCreationEtab(String siren) throws UnknownEtablissementException {
+        List<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(siren);
+        if (etablissement.isEmpty()) {
+            throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS, siren));
         }
         return etablissement.get(0).getDateCreationEvent();
     }
 
     /**
      * Récupère la date de dernière modification d'un établissement
+     *
      * @param etab
      * @return
      */
-    public Date getLastDateModificationEtab(EtablissementEntity etab) {
-        List<EtablissementEventEntity> etablissementsModifies = etablissementDao.getLastModicationEtab(etab.getSiren());
+    public Date getLastDateModificationEtab(String siren) {
+        List<EtablissementEventEntity> etablissementsModifies = etablissementDao.getLastModicationEtab(siren);
         if (etablissementsModifies.size() > 0) {
             return etablissementsModifies.stream().sorted((e1, e2) -> e2.getDateCreationEvent().compareTo(e1.getDateCreationEvent())).findFirst().get().getDateCreationEvent();
         }
         return null;
     }
 
-    public Date getDateSuppressionEtab(EtablissementEntity etab) {
-        List<EtablissementEventEntity> etablissement = etablissementDao.getDateSuppressionEtab(etab.getSiren());
+    public Date getDateSuppressionEtab(String siren) {
+        List<EtablissementEventEntity> etablissement = etablissementDao.getDateSuppressionEtab(siren);
         if (etablissement.isEmpty())
             return null;
         return etablissement.get(0).getDateCreationEvent();
     }
 
-    public Date getDateValidationIp(IpEntity ip) {
-        List<IpEventEntity> ipEventEntity = ipDao.getDateValidation(ip.getIp());
+    public Date getDateValidationIp(String ip) {
+        List<IpEventEntity> ipEventEntity = ipDao.getDateValidation(ip);
         if (ipEventEntity.isEmpty())
             return null;
         return ipEventEntity.get(0).getDateCreationEvent();
     }
 
 
-    public Date getDateSuppressionIp(IpEntity ip) {
-        List<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip.getIp());
+    public Date getDateSuppressionIp(String ip) {
+        List<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip);
         if (ipEventEntity.isEmpty())
             return null;
         return ipEventEntity.get(0).getDateCreationEvent();
     }
 
-    public Date getDateFusionEtab(EtablissementEntity etab) {
-        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateFusion(etab.getSiren());
+    public Date getDateFusionEtab(String siren) {
+        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateFusion(siren);
         if (etablissementEventEntity.isEmpty())
             return null;
         return etablissementEventEntity.get(0).getDateCreationEvent();
     }
 
-    public Date getDateScissionEtab(EtablissementEntity etab) {
-        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateScission(etab.getSiren());
+    public Date getDateScissionEtab(String siren) {
+        List<EtablissementEventEntity> etablissementEventEntity = etablissementDao.getDateScission(siren);
         if (etablissementEventEntity.isEmpty())
             return null;
         return etablissementEventEntity.get(0).getDateCreationEvent();
