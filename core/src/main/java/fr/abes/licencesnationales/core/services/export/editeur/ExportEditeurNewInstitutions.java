@@ -2,11 +2,8 @@ package fr.abes.licencesnationales.core.services.export.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurFusionDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
-import fr.abes.licencesnationales.core.repository.etablissement.EtablissementEventRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
 import fr.abes.licencesnationales.core.services.ExportEditeurService;
@@ -15,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -59,8 +55,8 @@ public class ExportEditeurNewInstitutions extends ExportEditeurService<ExportEta
     }
 
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
+    protected List<ExportEtablissementEditeurDto> getItems(List<ExportEtablissementEditeurDto> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
-        return mapper.mapList(etabs.stream().filter(e -> eventService.getDateCreationEtab(e).after(dateDernierEnvoi)).collect(Collectors.toList()), ExportEtablissementEditeurDto.class);
+        return mapper.mapList(etabs.stream().filter(e -> eventService.getDateCreationEtab(e.getSirenEtablissement()).after(dateDernierEnvoi)).collect(Collectors.toList()), ExportEtablissementEditeurDto.class);
     }
 }

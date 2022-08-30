@@ -54,7 +54,7 @@ public class TraiterEtabSansIpTasklet implements Tasklet, StepExecutionListener 
             } else {
                 try {
                     //on récupère la date de création de l'établissement
-                    Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                    Date dateCreationEtab = eventService.getDateCreationEtab(etab.getSiren());
                     dateSuppressionEtab.setTime(dateCreationEtab);
                 } catch (UnknownEtablissementException ex) {
                     log.error(Constant.ERROR_ETAB_INCONNU + ex.getMessage());

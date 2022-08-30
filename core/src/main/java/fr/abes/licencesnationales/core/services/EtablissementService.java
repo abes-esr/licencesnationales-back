@@ -117,7 +117,7 @@ public class EtablissementService {
                 } else {
                     //on récupère la date de création de l'établissement et on regarde s'il est plus vieux d'un an
                     try {
-                        Date dateCreationEtab = eventService.getDateCreationEtab(etab);
+                        Date dateCreationEtab = eventService.getDateCreationEtab(etab.getSiren());
                         if (dateCreationEtab.before(oneYearAgo.getTime())) {
                             listeOut.add(etab);
                         }
@@ -140,10 +140,10 @@ public class EtablissementService {
      */
     public List<EtablissementEntity> getAllEtabEditeur(List<Integer> ids) {
         List<TypeEtablissementEntity> typesEtab = referenceService.findTypeEtabByIds(ids);
-        List<EtablissementEntity> listeEtab = etablissementDao.findAllByValideAndTypeEtablissementIn(true, typesEtab);
-        List<EtablissementEntity> listeEtabFiltres = listeEtab.stream().filter(e -> ipDao.findAllBySiren(e.getSiren()).stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() > 0).collect(Collectors.toList());
+        Set<EtablissementEntity> listeEtab = etablissementDao.findAllByValideAndTypeEtablissementIn(true, typesEtab);
+        List<EtablissementEntity> listeEtabFiltres = listeEtab.stream().filter(e -> e.getIps().stream().filter(i -> i.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)).collect(Collectors.toList()).size() > 0).collect(Collectors.toList());
         //on supprime les IP non validés des établissements retournés
-        listeEtabFiltres.stream().forEach(e -> ipDao.findAllBySiren(e.getSiren()).removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
+        listeEtabFiltres.stream().forEach(e -> e.getIps().removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
         return listeEtabFiltres;
     }
 

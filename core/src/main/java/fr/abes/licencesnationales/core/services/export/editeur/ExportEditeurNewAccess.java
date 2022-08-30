@@ -2,10 +2,7 @@ package fr.abes.licencesnationales.core.services.export.editeur;
 
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
-import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurFusionDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
-import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
-import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -15,7 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,19 +55,19 @@ public class ExportEditeurNewAccess extends ExportEditeurService<ExportEtablisse
     }
 
     @Override
-    protected List<ExportEtablissementEditeurDto> getItems(List<EtablissementEntity> etabs) {
+    protected List<ExportEtablissementEditeurDto> getItems(List<ExportEtablissementEditeurDto> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         etabs.stream().forEach(e -> {
-            //on récupère les IP validées depuis la dernière exécution
-            e.setIps(e.getIps().stream().filter(i -> {
+
+            e.setListeAcces(e.getListeAcces().stream().filter(i -> {
                 Date dateValidation = eventService.getDateValidationIp(i);
                 if (dateValidation == null || dateValidation.before(dateDernierEnvoi))
                     return false;
                 else
                     return true;
-            }).collect(Collectors.toSet()));
+            }).collect(Collectors.toList()));
         });
         //on ne retourne que les etablissement disposant d'au moins une ip validée depuis la dernière exécution
-        return mapper.mapList(etabs.stream().filter(e -> e.getIps().size() != 0).collect(Collectors.toList()), ExportEtablissementEditeurDto.class);
+        return etabs.stream().filter(e -> !e.getListeAcces().isEmpty()).collect(Collectors.toList());
     }
 }

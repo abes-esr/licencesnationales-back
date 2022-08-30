@@ -433,12 +433,16 @@ public class EmailService {
 
         /*Ajout des fichiers au mail d'envoi*/
         for(Map.Entry nomFichier : listeFichiers.entrySet()){
+            byte[] readBuffer = ((ByteArrayInputStream) nomFichier.getValue()).readAllBytes();
+            // On ne rajoute pas de piece jointe vide
+            if (readBuffer.length > 0) {
                 builder.addBinaryBody(
                         "attachment",
-                        ((ByteArrayInputStream)nomFichier.getValue()).readAllBytes(),
+                        readBuffer,
                         ContentType.APPLICATION_OCTET_STREAM,
-                        (String)nomFichier.getKey()
+                        (String) nomFichier.getKey()
                 );
+            }
         }
 
         org.apache.http.HttpEntity multipart = builder.build();

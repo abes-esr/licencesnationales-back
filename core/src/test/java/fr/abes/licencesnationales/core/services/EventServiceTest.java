@@ -88,7 +88,7 @@ public class EventServiceTest {
 
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
-        Assertions.assertEquals("10/02/2020", format.format(service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact))));
+        Assertions.assertEquals("10/02/2020", format.format(service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact).getSiren())));
     }
 
     @DisplayName("test récupération date de création d'un établissement : établissement inconnu")
@@ -96,7 +96,7 @@ public class EventServiceTest {
     void testGetDateCreationEtabUnknown() {
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
-        Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact)));
+        Exception ex = Assertions.assertThrows(UnknownEtablissementException.class, () -> service.getDateCreationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact).getSiren()));
         Assertions.assertEquals(String.format(Constant.ERROR_ETAB_EXISTE_PAS,"111111111"), ex.getMessage());
     }
 
@@ -118,7 +118,7 @@ public class EventServiceTest {
 
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
 
-        Date dateDerniereModif = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact));
+        Date dateDerniereModif = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact).getSiren());
         Assertions.assertEquals("15/03/2021", format.format(dateDerniereModif));
     }
 
@@ -127,7 +127,7 @@ public class EventServiceTest {
     void testGetLastDateModificationEtabNoModif(){
         Mockito.when(etablissementRepository.getLastModicationEtab("111111111")).thenReturn(new ArrayList<>());
         ContactEntity contact = new ContactEntity("nom", "prenom", "adresse", "BP", "CP", "ville", "cedex", "telephone", "mail@mail.com", "password");
-        Date dateLastModification = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact));
+        Date dateLastModification = service.getLastDateModificationEtab(new EtablissementEntity(1, "nomEtab", "111111111", new TypeEtablissementEntity(1, "Type"), "123456789", contact).getSiren());
 
         Assertions.assertEquals(null, dateLastModification);
     }
