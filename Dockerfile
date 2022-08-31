@@ -62,6 +62,8 @@ RUN apt update && DEBIAN_FRONTEND=noninteractive apt -y install locales
 RUN apt -y install whois netbase
 RUN sed -i '/fr_FR.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen
+RUN apt update && apt install tzdata -y
+ENV TZ="Europe/Paris"
 ENV LANG fr_FR.UTF-8
 ENV LANGUAGE fr_FR:fr
 ENV LC_ALL fr_FR.UTF-8
