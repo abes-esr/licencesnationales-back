@@ -10,6 +10,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class MailDto {
+    private String app;
     private String[] to;
     private String[] cc;
     private String[] cci;
