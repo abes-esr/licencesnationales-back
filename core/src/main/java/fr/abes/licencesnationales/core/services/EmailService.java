@@ -460,6 +460,7 @@ public class EmailService {
         String json = "";
         ObjectMapper mapper = new ObjectMapper();
         MailDto mail = new MailDto();
+        mail.setApp("ln");
         mail.setTo(to.split(";"));
         if (cc != null) {
             mail.setCc(cc.split(";"));

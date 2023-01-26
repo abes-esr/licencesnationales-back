@@ -25,6 +25,7 @@ public class EmailServiceTest {
     @BeforeEach
     void init() {
         jsonResult = new StringBuilder("{");
+        jsonResult.append("\"app\":\"ln\",");
         jsonResult.append("\"to\":[\"ln-admin@abes.fr\"],");
         jsonResult.append("\"cc\":[\"test2@test2.com\"],");
         jsonResult.append("\"cci\":[],");
