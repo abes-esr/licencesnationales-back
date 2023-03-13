@@ -17,6 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportEtablissementEditeurScissionDto> {
     @Autowired
@@ -49,7 +51,7 @@ public class ExportEditeurSplitInstitutions extends ExportEditeurService<ExportE
 
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurScissionDto item) throws IOException {
-        List<String> output = writeCommonLine(item.getIdEtablissement(), item.getNomEtablissement(), item.getTypeEtablissement(), item.getAdresse(), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), item.getVille(), item.getNomContact(), item.getMailContact(), item.getTelephoneContact());
+        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), stripAccents(item.getTypeEtablissement().toUpperCase()), stripAccents(item.getAdresse().toUpperCase()), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), stripAccents(item.getVille().toUpperCase()), stripAccents(item.getNomContact().toUpperCase()), item.getMailContact(), item.getTelephoneContact());
         output.add(item.getSirenScinde());
         for (String ip : item.getListeAcces()) {
             output.add(ip);
