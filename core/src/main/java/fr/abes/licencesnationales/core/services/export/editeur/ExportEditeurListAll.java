@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.stripAccents;
+
 @Service
 public class ExportEditeurListAll extends ExportEditeurService<ExportEtablissementEditeurDto> {
     @Autowired
@@ -38,7 +40,7 @@ public class ExportEditeurListAll extends ExportEditeurService<ExportEtablisseme
 
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurDto item) throws IOException {
-        List<String> output = writeCommonLine(item.getIdEtablissement(), item.getNomEtablissement(), item.getTypeEtablissement(), item.getAdresse(), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), item.getVille(), item.getNomContact(), item.getMailContact(), item.getTelephoneContact());
+        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), stripAccents(item.getTypeEtablissement().toUpperCase()), stripAccents(item.getAdresse().toUpperCase()), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), stripAccents(item.getVille().toUpperCase()), stripAccents(item.getNomContact().toUpperCase()), item.getMailContact(), item.getTelephoneContact());
         for (String ip : item.getListeAcces()) {
             output.add(ip);
         }
