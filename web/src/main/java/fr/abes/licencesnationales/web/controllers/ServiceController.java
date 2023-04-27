@@ -57,6 +57,8 @@ public class ServiceController {
         headers.set("Authorization", "Bearer " + sirenToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
+        System.out.println(sirenUrl + siren);
+
         ResponseEntity<String> response =  restTemplate.exchange(sirenUrl + siren, HttpMethod.GET, entity, String.class);
 
         return new ResponseEntity<>(
