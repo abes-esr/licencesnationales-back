@@ -40,7 +40,6 @@ import javax.validation.Valid;
 
 
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping(value = "/v1/authentification", produces = MediaType.APPLICATION_JSON_VALUE)
 public class AuthenticationController extends AbstractController{
