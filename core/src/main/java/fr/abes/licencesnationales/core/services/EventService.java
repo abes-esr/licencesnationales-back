@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.entities.EventEntity;
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.editeur.event.EditeurEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
@@ -152,6 +153,15 @@ public class EventService {
         return etablissementDao.findBySiren(siren);
     }
 
+    public List<EtablissementEventEntity> getEtabsSupprimes() {
+        return etablissementDao.findDeleted();
+    }
+
+    List<EtablissementEventEntity> findAllByTypeEtablissementIn(List<TypeEtablissementEntity> ids) {
+        return etablissementDao.findAllByTypeEtablissementIn(ids);
+    }
+
+
     public List<IpEventEntity> getHistoAllIp(Date dateDebut, Date dateFin) {
         return ipDao.findBetweenDates(dateDebut, dateFin);
     }
@@ -159,4 +169,9 @@ public class EventService {
     public List<IpEventEntity> getHistoIp(String siren) {
         return ipDao.findBySiren(siren);
     }
+
+    public List<IpEventEntity> getIpSupprimeesBySiren(String siren) {
+        return ipDao.getIpSupprimeBySiren(siren);
+    }
+
 }

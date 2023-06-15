@@ -34,22 +34,13 @@ public class ExportEditeurDeletedInstitutions extends ExportEditeurService<Expor
         printer.printRecord((Object[]) new String[] {
                 "ID Etablissement",
                 "Nom Etablissement",
-                "Type d'Etablissement",
-                "Adresse",
-                "Boite Postale",
-                "Code Postal",
-                "Cedex",
-                "Ville",
-                "Contact Nom",
-                "Contact Email",
-                "Contact Tel",
-                "Liste Acces"
+                "Type d'Etablissement"
         });
     }
 
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurDto item) throws IOException {
-        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), stripAccents(item.getTypeEtablissement().toUpperCase()), stripAccents(item.getAdresse().toUpperCase()), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), stripAccents(item.getVille().toUpperCase()), stripAccents(item.getNomContact().toUpperCase()), item.getMailContact(), item.getTelephoneContact());
+        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), stripAccents(item.getTypeEtablissement().toUpperCase()), "", "", "", "", "", "", "", "");
         for (String ip : item.getListeAcces()) {
             output.add(ip);
         }

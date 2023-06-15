@@ -1,5 +1,6 @@
 package fr.abes.licencesnationales.core.repository.etablissement;
 
+import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
@@ -41,5 +42,11 @@ public interface EtablissementEventRepository extends JpaRepository<Etablissemen
 
     @Query("select e from EtablissementEventEntity e where e.dateCreationEvent BETWEEN :dateDebut AND :dateFin")
     List<EtablissementEventEntity> findBetweenDates(Date dateDebut, Date dateFin);
+
+    @Query("select e from EtablissementEventEntity e where TYPE(e)=EtablissementSupprimeEventEntity")
+    List<EtablissementEventEntity> findDeleted();
+
+    List<EtablissementEventEntity> findAllByTypeEtablissementIn(List<TypeEtablissementEntity> ids);
+
 
 }

@@ -9,7 +9,7 @@ import fr.abes.licencesnationales.core.repository.StatutRepository;
 import fr.abes.licencesnationales.core.repository.etablissement.TypeEtablissementRepository;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,6 +33,15 @@ public class ReferenceService {
 
     public List<TypeEtablissementEntity> findTypeEtabByIds(List<Integer> ids) {
         return typeEtabRepository.findAllByIdIn(ids);
+    }
+
+    public List<String> findTypeEtabToStringByIds(List<Integer> ids) {
+        List<TypeEtablissementEntity> l = typeEtabRepository.findAllByIdIn(ids);
+        List<String> list = new ArrayList<>();
+        for (TypeEtablissementEntity t : l) {
+            list.add(t.getLibelle());
+        }
+        return list;
     }
 
     public TypeEtablissementEntity findTypeEtabByLibelle(String libelle) throws UnknownTypeEtablissementException {

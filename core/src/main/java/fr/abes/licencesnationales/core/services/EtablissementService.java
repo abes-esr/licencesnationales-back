@@ -2,9 +2,11 @@ package fr.abes.licencesnationales.core.services;
 
 import fr.abes.licencesnationales.core.constant.Constant;
 import fr.abes.licencesnationales.core.dto.NotificationAdminDto;
+import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
 import fr.abes.licencesnationales.core.entities.TypeEtablissementEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.IpEntity;
 import fr.abes.licencesnationales.core.exception.MailDoublonException;
 import fr.abes.licencesnationales.core.exception.SirenExistException;
@@ -145,6 +147,25 @@ public class EtablissementService {
         //on supprime les IP non validés des établissements retournés
         listeEtabFiltres.stream().forEach(e -> e.getIps().removeIf(ipEntity -> !ipEntity.getStatut().getIdStatut().equals(Constant.STATUT_IP_VALIDEE)));
         return listeEtabFiltres;
+    }
+
+    public List<ExportEtablissementEditeurDto> getDeletedEtabs(List<Integer> ids) {
+        List<String> typesEtab = referenceService.findTypeEtabToStringByIds(ids);
+
+        List<EtablissementEventEntity> listeEtabEvent = eventService.getEtabsSupprimes();
+        List<ExportEtablissementEditeurDto> listeEtab = new ArrayList<>();
+
+        for (EtablissementEventEntity e: listeEtabEvent) {
+            if(e.getTypeEtablissement() != null & typesEtab.contains(e.getTypeEtablissement())){
+                ExportEtablissementEditeurDto etab = new ExportEtablissementEditeurDto();
+                etab.setSirenEtablissement(e.getSiren());
+                etab.setNomEtablissement(e.getNomEtab());
+                etab.setIdEtablissement(e.getIdAbes());
+                etab.setTypeEtablissement(e.getTypeEtablissement());
+                listeEtab.add(etab);
+            }
+        }
+        return listeEtab;
     }
 
     public List<EtablissementEntity> getEtabsAvecUneIpSupprimeeDepuisDernierEnvoiEditeur(List<EtablissementEntity> listeEtab, Date date) {

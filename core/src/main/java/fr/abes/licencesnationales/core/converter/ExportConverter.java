@@ -209,6 +209,7 @@ public class ExportConverter {
         utilsMapper.addConverter(myConverter);
     }
 
+
     @Bean
     public void converterExportEtablissementFusionneEditeur() {
         Converter<EtablissementFusionneEventEntity, ExportEtablissementEditeurFusionDto> myConverter = new Converter<EtablissementFusionneEventEntity, ExportEtablissementEditeurFusionDto>() {

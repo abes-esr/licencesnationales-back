@@ -3,6 +3,7 @@ package fr.abes.licencesnationales.core.services.export.editeur;
 import fr.abes.licencesnationales.core.converter.UtilsMapper;
 import fr.abes.licencesnationales.core.dto.export.ExportEtablissementEditeurDto;
 import fr.abes.licencesnationales.core.entities.DateEnvoiEditeurEntity;
+import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.repository.DateEnvoiEditeurRepository;
 import fr.abes.licencesnationales.core.services.EtablissementService;
 import fr.abes.licencesnationales.core.services.EventService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,7 +51,7 @@ public class ExportEditeurDeletedAccess extends ExportEditeurService<ExportEtabl
 
     @Override
     protected void writeLine(CSVPrinter printer, ExportEtablissementEditeurDto item) throws IOException {
-        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), item.getTypeEtablissement(), stripAccents(item.getAdresse().toUpperCase()), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), stripAccents(item.getVille().toUpperCase()), stripAccents(item.getNomContact().toUpperCase()), item.getMailContact(), item.getTelephoneContact());
+        List<String> output = writeCommonLine(item.getIdEtablissement(), stripAccents(item.getNomEtablissement().toUpperCase()), stripAccents(item.getTypeEtablissement().toUpperCase()), stripAccents(item.getAdresse().toUpperCase()), item.getBoitePostale(), item.getCodePostal(), item.getCedex(), stripAccents(item.getVille().toUpperCase()), stripAccents(item.getNomContact().toUpperCase()), item.getMailContact(), item.getTelephoneContact());
         for (String ip : item.getListeAcces()) {
             output.add(ip);
         }
@@ -66,8 +68,14 @@ public class ExportEditeurDeletedAccess extends ExportEditeurService<ExportEtabl
     protected List<ExportEtablissementEditeurDto> getItems(List<ExportEtablissementEditeurDto> etabs) {
         Date dateDernierEnvoi = dateEnvoiEditeurRepository.findTopByOrderByDateEnvoiDesc().orElse(new DateEnvoiEditeurEntity()).getDateEnvoi();
         etabs.stream().forEach(e -> {
+
             //on récupère les IP supprimées depuis la dernière exécution et validée avant
-            e.setListeAcces(e.getListeAcces().stream().filter(i -> {
+            List<String> ipSupprimees = new ArrayList<>();
+            for (IpEventEntity ipE : eventService.getIpSupprimeesBySiren(e.getSirenEtablissement())) {
+                ipSupprimees.add(ipE.getIp());
+            }
+
+            e.setListeAcces(ipSupprimees.stream().filter(i -> {
                 Date dateValidation = eventService.getDateValidationIp(i);
                 if (dateValidation == null || dateValidation.after(dateDernierEnvoi)) {
                     return false;

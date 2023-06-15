@@ -175,8 +175,9 @@ public class EditeurController extends AbstractController {
             Map<String, ByteArrayInputStream> mapFichiers = new HashMap<>();
             List<Integer> listeTypesEditeurs = editeurEntity.getTypeEtablissements().stream().map(t -> t.getId()).collect(Collectors.toList());
             List<ExportEtablissementEditeurDto> etabs = mapper.mapList(etablissementService.getAllEtabEditeur(listeTypesEditeurs), ExportEtablissementEditeurDto.class);
+            List<ExportEtablissementEditeurDto> etabsSupprimes = etablissementService.getDeletedEtabs(listeTypesEditeurs);
             mapFichiers.put("listAll.csv", exportEditeurListAll.generateCsv(new ArrayList<>(etabs)));
-            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new ArrayList<>(etabs)));
+            mapFichiers.put("deletedInstitutions.csv", exportEditeurDeletedInstitutions.generateCsv(new ArrayList<>(etabsSupprimes)));
             mapFichiers.put("mergedInstitutions.csv", exportEditeurMergedInstitutions.generateCsv(new ArrayList<>(etabs)));
             mapFichiers.put("modifiedInstitutions.csv", exportEditeurModifiedInstitutions.generateCsv(new ArrayList<>(etabs)));
             mapFichiers.put("newInstitutions.csv", exportEditeurNewInstitutions.generateCsv(new ArrayList<>(etabs)));
