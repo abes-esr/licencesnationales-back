@@ -37,7 +37,7 @@ L'authentification et la sécurisation des points d'accès se fait via JWT, à l
 
 L'API est documentée à l'aide d'OpenAPI, et le code grâce à JavaDoc.
 
-Un fichier jenkinsfile est présent sur le dépôt, et nous permet d'utiliser pour le déploiement et l'intégration continue les pipelines jenkins.
+L'application est déployé à l'aide d'une github action, qui compile et crée une image de l'API, qui est ensuite publiée sur Docker Hub, puis déployée sur nos machines à l'aide des scripts docker-compose présentes sur le dépot https://github.com/abes-esr/licencesnationales-docker
 
 Les tests unitaire utilisent JUnit et Mockito.
 
