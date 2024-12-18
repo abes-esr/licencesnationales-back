@@ -62,7 +62,7 @@ public class ConstructionListeEtabTasklet implements Tasklet, StepExecutionListe
     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
         try {
             List<EtablissementEntity> etab = service.findAll();
-            this.etabSansIp = etab.stream().filter(e -> e.getIps().size() == 0).collect(Collectors.toList());
+            this.etabSansIp = etab.stream().filter(e -> e.getIps().size() == 0).filter(e -> !e.getContact().getRole().equals("admin")).collect(Collectors.toList());
             this.etabAvecAuMoinsUneIpAttestation = etab.stream().filter(e ->
                 e.getIps().stream().anyMatch(i -> i.getStatut().getIdStatut() == Constant.STATUT_IP_ATTESTATION)
             ).collect(Collectors.toList());
