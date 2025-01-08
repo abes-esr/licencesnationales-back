@@ -95,10 +95,16 @@ public class EtablissementService {
 
     public List<EtablissementEntity> findAll() {
         List<EtablissementEntity> list = etablissementDao.findAll();
-        list.forEach(etab -> {
-            etab.setIdAbes(GenererIdAbes.genererIdAbes(etab.getIdAbes()));
-        });
-        return list;
+        return list.stream().map(e ->
+            new EtablissementEntity(
+                    e.getId(),
+                    e.getNom(),
+                    e.getSiren(),
+                    e.getTypeEtablissement(),
+                    GenererIdAbes.genererIdAbes(e.getIdAbes()),
+                    e.getContact()
+            )
+        ).collect(Collectors.toList());
     }
 
     public EtablissementEntity getUserByMail(String mail) {
