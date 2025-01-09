@@ -95,15 +95,20 @@ public class EtablissementService {
 
     public List<EtablissementEntity> findAll() {
         List<EtablissementEntity> list = etablissementDao.findAll();
-        return list.stream().map(e ->
-            new EtablissementEntity(
+        return list.stream().map(e -> {
+            EtablissementEntity etablissement =  new EtablissementEntity(
                     e.getId(),
                     e.getNom(),
                     e.getSiren(),
                     e.getTypeEtablissement(),
                     GenererIdAbes.genererIdAbes(e.getIdAbes()),
                     e.getContact()
-            )
+            );
+                    etablissement.setDateCreation(e.getDateCreation());
+                    etablissement.setValide(e.isValide());
+                    etablissement.setIps(e.getIps());
+                    return etablissement;
+        }
         ).collect(Collectors.toList());
     }
 
