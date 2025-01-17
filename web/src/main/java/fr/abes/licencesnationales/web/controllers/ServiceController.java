@@ -54,7 +54,7 @@ public class ServiceController {
         });
 
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", "Bearer " + sirenToken);
+        headers.set("X-INSEE-Api-Key-Integration", sirenToken);
         HttpEntity<String> entity = new HttpEntity<>(headers);
 
         ResponseEntity<String> response =  restTemplate.exchange(sirenUrl + siren, HttpMethod.GET, entity, String.class);
