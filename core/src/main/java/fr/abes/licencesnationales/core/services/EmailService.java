@@ -491,7 +491,7 @@ public class EmailService {
     }
 
     private String lienAssistance() {
-        StringBuilder lienAssistance = new StringBuilder("Pour toute question contacter l’Abes via le <a href='https://stp.abes.fr/node/3?origine=LicencesNationales' target='_blank'>guichet d’assistance ABESstp.</a><br>");
+        StringBuilder lienAssistance = new StringBuilder("Pour toute question contacter l’Abes via le <a href='https://assistance.stp.abes.fr/servicedesk/customer/portals' target='_blank'>guichet d’assistance.</a><br>");
         return lienAssistance.toString();
     }
 
