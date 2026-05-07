@@ -1,4 +1,4 @@
-name: "build-test-pubtodockerhub"
+name: "buildx-test-pubtodockerhub"
 
 # IMPORTANT : personnalisez cette variable pour que les images
 # de votre application soient pousées sur dockerhub
