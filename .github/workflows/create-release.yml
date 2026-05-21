@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       versionType:
-        description: 'Quel type de mise à jour ?'
+        description: 'Quel type de version ?'
         required: true
         default: 'patch'
         type: choice
@@ -54,46 +54,53 @@ jobs:
 
           echo "releaseVersion=$releaseVersion" >> $GITHUB_OUTPUT
           echo "snapshotVersion=$snapshotVersion" >> $GITHUB_OUTPUT
-
+          
           echo "New tag: $releaseVersion"
           echo "New Snapshot tag: $snapshotVersion"
 
       - name: 'Verify release is created only on "main" or "master" git branch'
         run: |
           CURRENT_GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-          echo "Current branch: $CURRENT_GIT_BRANCH"
+          echo $CURRENT_GIT_BRANCH
           [[ "$CURRENT_GIT_BRANCH" == "main" || "$CURRENT_GIT_BRANCH" == "master" ]] && exit 0 || exit 1
 
-      - name: 'Verify version is correctly formatted (X.X.X)'
+      - name: 'Verify version is semver formatted (X.X.X)'
         env:
-          NEW_TAG:  ${{ steps.calculate-version.outputs.releaseVersion }}
+          NEW_TAG: ${{ steps.calculate-version.outputs.releaseVersion }}
         run: |
           echo $NEW_TAG | grep -E '^[0-9]+\.[0-9]+\.[0-9]+$'
 
       - name: 'Verify version is not already used as a git tag'
         env:
-          NEW_TAG:  ${{ steps.calculate-version.outputs.releaseVersion }}
+          NEW_TAG: ${{ steps.calculate-version.outputs.releaseVersion }}
         run: |
           [[ "$(git tag --list | grep $NEW_TAG)" == "" ]] && exit 0 || exit 1
 
-      - name: 'Verify snapshot version is formatted (X.X.X-SNAPSHOT)'
+      - name: 'Verify snapshot version is semver formatted (X.X.X)'
         env:
           NEW_SNAPSHOT_TAG: ${{ steps.calculate-version.outputs.snapshotVersion }}
         run: |
           echo $NEW_SNAPSHOT_TAG | grep -E '^[0-9]+\.[0-9]+\.[0-9]+-SNAPSHOT$'
 
-      - name: 'Generate the new version (update files + git tag)'
+      - name: 'Generate the new version (patch few files + git tag)'
         env:
           NEW_TAG: ${{ steps.calculate-version.outputs.releaseVersion }}
           NEW_SNAPSHOT_TAG: ${{ steps.calculate-version.outputs.snapshotVersion }}
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB_FOR_GITHUB_ACTION }}
         run: |
           git config --global user.email "github-action@noreply"
           git config --global user.name "Github Action"
-          npm config set tag-version-prefix ''
-          npm config set git-tag-version false
+          sudo apt-get install -y libxml2-utils
 
-          # set release version
-          npm version $NEW_TAG         
+          echo -e "setns x=http://maven.apache.org/POM/4.0.0\ncd /x:project/x:version\nset $NEW_TAG\nsave" \
+            | xmllint --shell ./pom.xml
+
+          for POM_FILE in $(ls */pom.xml)
+          do
+            echo -e "setns x=http://maven.apache.org/POM/4.0.0\ncd /x:project/x:parent/x:version\nset $NEW_TAG\nsave" \
+              | xmllint --shell $POM_FILE
+          done
+
           sed -i "s#Version: [0-9]\+\.[0-9]\+\.[0-9]\+\(-SNAPSHOT\)\?#Version: $NEW_TAG#g" README.md
 
           git add .
@@ -103,12 +110,19 @@ jobs:
           git commit --amend -m "Version $NEW_TAG [skip ci]"
           git push
 
-          # merge to develop
           git switch develop
           git merge main -m "Merge main to develop [skip ci]"
+          git push
 
-          # set snapshot version
-          npm version $NEW_SNAPSHOT_TAG
+          echo -e "setns x=http://maven.apache.org/POM/4.0.0\ncd /x:project/x:version\nset $NEW_SNAPSHOT_TAG\nsave" \
+            | xmllint --shell ./pom.xml
+
+          for POM_FILE in $(ls */pom.xml)
+          do
+            echo -e "setns x=http://maven.apache.org/POM/4.0.0\ncd /x:project/x:parent/x:version\nset $NEW_SNAPSHOT_TAG\nsave" \
+              | xmllint --shell $POM_FILE
+          done
+
           sed -i "s#Version: [0-9]\+\.[0-9]\+\.[0-9]\+\(-SNAPSHOT\)\?#Version: $NEW_SNAPSHOT_TAG#g" README.md
 
           git add .
