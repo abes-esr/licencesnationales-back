@@ -10,6 +10,7 @@ import fr.abes.licencesnationales.core.entities.etablissement.EtablissementEntit
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementDiviseEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementEventEntity;
 import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementFusionneEventEntity;
+import fr.abes.licencesnationales.core.entities.etablissement.event.EtablissementModifieEventEntity;
 import fr.abes.licencesnationales.core.entities.ip.event.IpEventEntity;
 import fr.abes.licencesnationales.core.exception.UnknownEtablissementException;
 import fr.abes.licencesnationales.core.repository.editeur.EditeurEventRepository;
@@ -19,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -149,8 +151,30 @@ public class EventService {
         return etablissementDao.findBetweenDates(dateDebut, dateFin);
     }
 
+    /**
+     * Récupère l'historique des événements d'un établissement de manière récursive.
+     * Si l'établissement a changé de SIREN au cours de son histoire, cette méthode
+     * remonte la chaîne des anciens SIREN via l'événement EtablissementModifieEventEntity
+     * et combine l'historique complet, trié par ordre chronologique.
+     *
+     * @param siren Le SIREN actuel de l'établissement
+     * @return La liste ordonnée de tous les événements de l'historique
+     */
     public List<EtablissementEventEntity> getHistoEtab(String siren) {
-        return etablissementDao.findBySiren(siren);
+        List<EtablissementEventEntity> events = new ArrayList<>(etablissementDao.findBySiren(siren));
+
+        for (EtablissementEventEntity event : events) {
+            if (event instanceof EtablissementModifieEventEntity) {
+                String ancienSiren = ((EtablissementModifieEventEntity) event).getAncienSiren();
+                if (ancienSiren != null && !ancienSiren.isEmpty()) {
+                    events.addAll(getHistoEtab(ancienSiren));
+                    break;
+                }
+            }
+        }
+
+        events.sort((e1, e2) -> e1.getDateCreationEvent().compareTo(e2.getDateCreationEvent()));
+        return events;
     }
 
     public List<EtablissementEventEntity> getEtabsSupprimes() {

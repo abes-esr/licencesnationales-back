@@ -24,11 +24,26 @@ public class EtablissementModifieListener implements ApplicationListener<Etablis
         this.referenceService = referenceService;
     }
 
+    /**
+     * Traite l'événement de modification d'un établissement.
+     * Si le SIREN a été modifié (ancienSiren renseigné), l'établissement est recherché
+     * par son ancien SIREN puis son nouveau SIREN lui est affecté.
+     *
+     * @param event L'événement contenant les modifications à appliquer
+     */
     @Override
     @Transactional
     @SneakyThrows
     public void onApplicationEvent(EtablissementModifieEventEntity event) {
-        EtablissementEntity etab = service.getFirstBySiren(event.getSiren());
+        EtablissementEntity etab;
+        if (event.getAncienSiren() != null) {
+            // Récupère l'établissement par son ancien SIREN et met à jour avec le nouveau
+            etab = service.getFirstBySiren(event.getAncienSiren());
+            etab.setSiren(event.getSiren());
+        } else {
+            // Récupère l'établissement par son SIREN actuel
+            etab = service.getFirstBySiren(event.getSiren());
+        }
         ContactEntity contact = etab.getContact();
 
         // Nom

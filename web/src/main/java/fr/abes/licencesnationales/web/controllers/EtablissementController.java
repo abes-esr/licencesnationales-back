@@ -130,7 +130,7 @@ public class EtablissementController extends AbstractController {
     }
 
     @PostMapping(value = "/{siren}")
-    public ResponseEntity<Object> edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException {
+    public ResponseEntity<Object> edit(@PathVariable String siren, @Valid @RequestBody EtablissementModifieWebDto etablissementModifieWebDto) throws SirenIntrouvableException, AccesInterditException, JsonProcessingException, MailDoublonException, InvalidTokenException, SirenExistException {
         boolean envoiMail = false;
         if (etablissementModifieWebDto instanceof EtablissementModifieUserWebDto) {
             if (filtrerAccesServices.getSirenFromSecurityContextUser().equals(siren)) {
@@ -143,7 +143,13 @@ public class EtablissementController extends AbstractController {
                 throw new AccesInterditException(Constant.OPERATION_QUE_PAR_ADMIN);
             }
         }
-        EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(etablissementModifieWebDto.getSiren());
+        String newSiren = etablissementModifieWebDto.getSiren();
+        if (newSiren != null && !newSiren.equals(siren)) {
+            if (etablissementService.existeSiren(newSiren)) {
+                throw new SirenExistException(Constant.SIREN_DOUBLON);
+            }
+        }
+        EtablissementEntity etabInBdd = etablissementService.getFirstBySiren(siren);
         String ancienMail = etabInBdd.getContact().getMail();
         if (!(ancienMail.equals(etablissementModifieWebDto.getContact().getMail()))) {
             if (etablissementService.existeMail(etablissementModifieWebDto.getContact().getMail())) {
@@ -154,6 +160,9 @@ public class EtablissementController extends AbstractController {
 
         EtablissementModifieEventEntity event = mapper.map(etablissementModifieWebDto, EtablissementModifieEventEntity.class);
         event.setSource(this);
+        if (newSiren != null && !newSiren.equals(siren)) {
+            event.setAncienSiren(siren);
+        }
         applicationEventPublisher.publishEvent(event);
         eventService.save(event);
         if (envoiMail) {
