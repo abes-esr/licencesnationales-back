@@ -74,8 +74,17 @@ public class EmailService {
         sendMail(jsonRequestConstruct);
     }
 
+    /**
+     * Envoie un email à l'utilisateur avec un lien de réinitialisation de mot de passe contenant un token JWT.
+     * Le lien pointe vers la route front /password/reset.
+     *
+     * @param token     Token JWT de réinitialisation
+     * @param emailUser Adresse email du destinataire
+     * @param nomEtab   Nom de l'établissement concerné
+     * @throws RestClientException En cas d'erreur lors de l'appel au webservice d'envoi de mail
+     */
     public void constructResetTokenEmailUser(String token, String emailUser, String nomEtab) throws RestClientException {
-        final String url = this.urlSite + "/reinitialisationPass?token=" + token;
+        final String url = this.urlSite + "/password/reset?token=" + token;
         String subject = getEnv() + "[Appli LN] Réinitialisation de votre mot de passe";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous souhaitez accéder au compte de ");
@@ -142,12 +151,19 @@ public class EmailService {
     }
 
 
+    /**
+     * Envoie un email de relance à l'utilisateur pour l'informer qu'aucune adresse IP n'est déclarée.
+     *
+     * @param nomEtab   Nom de l'établissement
+     * @param emailUser Adresse email de l'utilisateur
+     * @throws RestClientException En cas d'erreur lors de l'appel au webservice d'envoi de mail
+     */
     public void constructRelanceEtabMailUser(String nomEtab, String emailUser) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Relance : aucune IP déclarée sur le site Licencesnationales.fr";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Aucune IP n’est déclarée sur le compte établissement ");
         message.append(nomEtab);
-        message.append("<br><b>Au bout d’un an sans IP, le compte sera supprimé automatiquement de l’<a href='https://acces.licencesnationales.fr/' target='_blank'>application de gestion des accès licences nationales</a>.</b><br><br>");
+        message.append("<br><b>Au bout d’un an sans IP, le compte sera supprimé automatiquement de l’<a href='").append(urlSite).append("' target='_blank'>application de gestion des accès licences nationales</a>.</b><br><br>");
         message.append("<b>Nous vous invitons dès à présent à déclarer des adresses IP publiques</b> afin que votre établissement puisse bénéficier de l’accès aux ressources acquises sous licences nationales.");
         message.append("en l'absence de document certifiant l'appartenance de l'IP ");
         message.append(aideALaSaisieIp());
@@ -169,12 +185,20 @@ public class EmailService {
         }
     }
 
+    /**
+     * Envoie un bilan récapitulatif des actions de validation/suppression/rejet d'IP à l'utilisateur.
+     *
+     * @param emailUser Adresse email du contact établissement
+     * @param nomEtab   Nom de l'établissement
+     * @param listIps   Map contenant les listes d'IPs par statut (suppression, validation, rejet)
+     * @throws RestClientException En cas d'erreur lors de l'appel au webservice d'envoi de mail
+     */
     public void constructBilanRecapActionIpUser(String emailUser, String nomEtab, Map<String, List<String>> listIps) throws RestClientException {
         String subject = getEnv() + "[Appli LN] Vérification des nouvelles IP déclarées";
         StringBuilder message = new StringBuilder(BONJOUR);
         message.append("Vous avez déclaré une ou plusieurs IP sur le compte de l’établissement ");
         message.append(nomEtab);
-        message.append(" dans l’<a href='https://acces.licencesnationales.fr/' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
+        message.append(" dans l’<a href='").append(urlSite).append("' target='_blank'>application de gestion des accès aux licences nationales</a> administrée par l’Abes.<br><br>");
         message.append("L’Abes a vérifié l’éligibilité des nouvelles IP déclarées comme suit :");
         message.append("<table style=\"border: solid 1px; border-radius: 5px; border-collapse: collapse; font: 1em 'Open Sans', sans-serif;\">\n");
         message.append("<tr style=\"height: 3em; background-color: #F7F9FA\">" +
