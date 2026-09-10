@@ -44,7 +44,7 @@ public class EmailService {
     @Value("${mail.ws.url}")
     private String mailServerURL;
 
-    @Value("${mail.test.recipient:ln-admin@abes.fr}")
+    @Value("${mail.test.recipient:original}")
     private String mailTestRecipient;
 
     @Value("${site.url}")
@@ -482,9 +482,9 @@ public class EmailService {
 
     /**
      * Construit la chaîne JSON représentant le mail à envoyer via l'API d'envoi.
-     * En environnement hors production (DEV, TEST, LOCAL), le destinataire 'to' est redirigé
-     * vers l'adresse définie dans 'mail.test.recipient' (par défaut ln-admin@abes.fr),
-     * ou conservé tel quel si la propriété vaut 'original'.
+     * Si la propriété 'mail.test.recipient' est configurée et différente de 'original',
+     * le destinataire 'to' est redirigé vers cette adresse (utile en environnement hors production).
+     * En production (ou lorsque mail.test.recipient=original), les adresses réelles sont conservées.
      *
      * @param to      Adresse(s) email du ou des destinataires principaux (séparées par des points-virgules)
      * @param cc      Adresse(s) email du ou des destinataires en copie (séparées par des points-virgules)
@@ -493,10 +493,8 @@ public class EmailService {
      * @return Le contenu JSON sérialisé pour le webservice mail
      */
     protected String mailToJSON(String to, String cc, String subject, String text) {
-        if (!getEnv().equals("")) {
-            if (!"original".equalsIgnoreCase(mailTestRecipient)) {
-                to = mailTestRecipient;
-            }
+        if (mailTestRecipient != null && !"original".equalsIgnoreCase(mailTestRecipient)) {
+            to = mailTestRecipient;
         }
         String json = "";
         ObjectMapper mapper = new ObjectMapper();
