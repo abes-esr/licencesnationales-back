@@ -48,5 +48,13 @@ public interface EtablissementEventRepository extends JpaRepository<Etablissemen
 
     List<EtablissementEventEntity> findAllByTypeEtablissementIn(List<TypeEtablissementEntity> ids);
 
-
+    /**
+     * Récupère la liste des événements de modification ayant pour ancien SIREN la valeur indiquée.
+     * Permet d'identifier les nouveaux SIRENs adoptés par l'établissement.
+     *
+     * @param siren L'ancien SIREN de l'établissement
+     * @return La liste des événements de modification correspondants
+     */
+    @Query("select e from EtablissementModifieEventEntity e where e.ancienSiren = :siren")
+    List<EtablissementEventEntity> findByAncienSiren(@Param("siren") String siren);
 }

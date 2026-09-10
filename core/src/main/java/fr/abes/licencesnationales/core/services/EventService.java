@@ -22,7 +22,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -47,9 +50,9 @@ public class EventService {
             if (event instanceof EtablissementFusionneEventEntity) {
                 ((EtablissementFusionneEventEntity) event).setAnciensEtablissementsInBdd(mapper.writeValueAsString(((EtablissementFusionneEventEntity) event).getSirenAnciensEtablissements()));
             }
-            etablissementDao.save((EtablissementEventEntity)event);
-        } else  if (event instanceof EditeurEventEntity) {
-            editeurDao.save((EditeurEventEntity)event);
+            etablissementDao.save((EtablissementEventEntity) event);
+        } else if (event instanceof EditeurEventEntity) {
+            editeurDao.save((EditeurEventEntity) event);
         } else if (event instanceof IpEventEntity) {
             ipDao.save((IpEventEntity) event);
         }
@@ -69,18 +72,24 @@ public class EventService {
     }
 
     /**
-     * Récupère la date de création d'un établissement
+     * Récupère la date de création d'un établissement sous le SIREN spécifié.
+     * Cette méthode se base sur le premier événement chronologique de l'historique
+     * où ce numéro SIREN est mentionné.
      *
-     * @param etab
-     * @return la date de création de l'établissement (dans la table des events)
-     * @throws UnknownEtablissementException : établissement inconnu
+     * @param siren Le numéro SIREN de l'établissement
+     * @return La date du premier événement où ce SIREN apparaît
+     * @throws UnknownEtablissementException si aucun événement n'est trouvé pour cet établissement
      */
     public Date getDateCreationEtab(String siren) throws UnknownEtablissementException {
-        List<EtablissementEventEntity> etablissement = etablissementDao.getDateCreationEtab(siren);
+        List<EtablissementEventEntity> etablissement = getHistoEtab(siren);
         if (etablissement.isEmpty()) {
             throw new UnknownEtablissementException(String.format(Constant.ERROR_ETAB_EXISTE_PAS, siren));
         }
-        return etablissement.get(0).getDateCreationEvent();
+        return etablissement.stream()
+                .filter(e -> siren.equals(e.getSiren()))
+                .findFirst()
+                .map(EventEntity::getDateCreationEvent)
+                .orElse(etablissement.get(0).getDateCreationEvent());
     }
 
     /**
@@ -110,7 +119,6 @@ public class EventService {
             return null;
         return ipEventEntity.get(0).getDateCreationEvent();
     }
-
 
     public Date getDateSuppressionIp(String ip) {
         List<IpEventEntity> ipEventEntity = ipDao.getDateSuppression(ip);
@@ -147,34 +155,76 @@ public class EventService {
         return etab.get(0);
     }
 
+    /**
+     * Récupère l'historique de tous les événements pour les établissements ayant des événements
+     * sur la période donnée, depuis leur création.
+     *
+     * @param dateDebut Date de début
+     * @param dateFin   Date de fin
+     * @return Liste ordonnée de tous les événements
+     */
     public List<EtablissementEventEntity> getHistoAllEtab(Date dateDebut, Date dateFin) {
-        return etablissementDao.findBetweenDates(dateDebut, dateFin);
+        List<EtablissementEventEntity> events = etablissementDao.findBetweenDates(dateDebut, dateFin);
+        List<EtablissementEventEntity> allEvents = new ArrayList<>();
+
+        for (EtablissementEventEntity event : events) {
+            allEvents.addAll(getHistoEtab(event.getSiren()));
+        }
+
+        List<EtablissementEventEntity> uniqueEvents = allEvents.stream().distinct().collect(Collectors.toList());
+        uniqueEvents.sort((e1, e2) -> e1.getDateCreationEvent().compareTo(e2.getDateCreationEvent()));
+        return uniqueEvents;
     }
 
     /**
      * Récupère l'historique des événements d'un établissement de manière récursive.
-     * Si l'établissement a changé de SIREN au cours de son histoire, cette méthode
-     * remonte la chaîne des anciens SIREN via l'événement EtablissementModifieEventEntity
-     * et combine l'historique complet, trié par ordre chronologique.
+     * Remonte la chaîne des anciens SIRENs et descend vers les nouveaux SIRENs.
      *
      * @param siren Le SIREN actuel de l'établissement
      * @return La liste ordonnée de tous les événements de l'historique
      */
     public List<EtablissementEventEntity> getHistoEtab(String siren) {
+        return getHistoEtab(siren, new HashSet<>());
+    }
+
+    /**
+     * Méthode récursive pour récupérer l'historique d'un SIREN (anciens et nouveaux).
+     * 
+     * @param siren Le SIREN courant
+     * @param visited L'ensemble des SIRENs déjà visités pour éviter les boucles
+     * @return La liste des événements liés
+     */
+    private List<EtablissementEventEntity> getHistoEtab(String siren, Set<String> visited) {
+        if (siren == null || siren.isEmpty() || !visited.add(siren)) {
+            return new ArrayList<>();
+        }
+
         List<EtablissementEventEntity> events = new ArrayList<>(etablissementDao.findBySiren(siren));
 
-        for (EtablissementEventEntity event : events) {
+        // Récupération récursive des anciens événements
+        for (EtablissementEventEntity event : new ArrayList<>(events)) {
             if (event instanceof EtablissementModifieEventEntity) {
                 String ancienSiren = ((EtablissementModifieEventEntity) event).getAncienSiren();
                 if (ancienSiren != null && !ancienSiren.isEmpty()) {
-                    events.addAll(getHistoEtab(ancienSiren));
+                    events.addAll(getHistoEtab(ancienSiren, visited));
                     break;
                 }
             }
         }
 
-        events.sort((e1, e2) -> e1.getDateCreationEvent().compareTo(e2.getDateCreationEvent()));
-        return events;
+        // Récupération récursive des nouveaux événements
+        List<EtablissementEventEntity> nouveaux = etablissementDao.findByAncienSiren(siren);
+        for (EtablissementEventEntity event : nouveaux) {
+            String nouveauSiren = event.getSiren();
+            if (nouveauSiren != null && !nouveauSiren.isEmpty()) {
+                events.addAll(getHistoEtab(nouveauSiren, visited));
+                break;
+            }
+        }
+
+        List<EtablissementEventEntity> uniqueEvents = events.stream().distinct().collect(Collectors.toList());
+        uniqueEvents.sort((e1, e2) -> e1.getDateCreationEvent().compareTo(e2.getDateCreationEvent()));
+        return uniqueEvents;
     }
 
     public List<EtablissementEventEntity> getEtabsSupprimes() {
@@ -184,7 +234,6 @@ public class EventService {
     List<EtablissementEventEntity> findAllByTypeEtablissementIn(List<TypeEtablissementEntity> ids) {
         return etablissementDao.findAllByTypeEtablissementIn(ids);
     }
-
 
     public List<IpEventEntity> getHistoAllIp(Date dateDebut, Date dateFin) {
         return ipDao.findBetweenDates(dateDebut, dateFin);
