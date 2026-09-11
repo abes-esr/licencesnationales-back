@@ -199,10 +199,10 @@ public class EventService {
             return new ArrayList<>();
         }
 
-        List<EtablissementEventEntity> events = new ArrayList<>(etablissementDao.findBySiren(siren));
+        List<EtablissementEventEntity> events = etablissementDao.findBySiren(siren);
 
         // Récupération récursive des anciens événements
-        for (EtablissementEventEntity event : new ArrayList<>(events)) {
+        for (EtablissementEventEntity event : events) {
             if (event instanceof EtablissementModifieEventEntity) {
                 String ancienSiren = ((EtablissementModifieEventEntity) event).getAncienSiren();
                 if (ancienSiren != null && !ancienSiren.isEmpty()) {
